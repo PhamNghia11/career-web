@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server"
-import { promises as fs } from "fs"
-import path from "path"
+import jobsData from "@/data/jobs.json"
 
-// Read jobs from JSON file
-async function getJobsFromFile() {
-  const filePath = path.join(process.cwd(), "data", "jobs.json")
-  const fileContent = await fs.readFile(filePath, "utf-8")
-  const data = JSON.parse(fileContent)
+// Get jobs from imported data - works on Vercel
+function getJobs() {
+  const data = jobsData as any
   // Support both old array format and new object format
   return Array.isArray(data) ? data : data.jobs || []
 }
@@ -19,7 +16,7 @@ export async function GET(req: Request) {
     const field = searchParams.get("field")
     const search = searchParams.get("search")?.toLowerCase()
 
-    let jobs = await getJobsFromFile()
+    let jobs = getJobs()
 
     // Filter by type (internship, full-time, part-time)
     if (type && type !== "all") {

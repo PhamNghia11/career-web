@@ -1,14 +1,48 @@
 import { NextResponse } from "next/server"
-import { exec } from "child_process"
-import { promisify } from "util"
-import { readFileSync, existsSync } from "fs"
-import { join } from "path"
 
-const execAsync = promisify(exec)
-
-export async function POST() {
+export async function POST(request: Request) {
     try {
-        // Run the Python script to process JSON data
+        // Check if running on Vercel (serverless)
+        const isVercel = process.env.VERCEL === "1" || process.env.VERCEL_ENV
+
+        if (isVercel) {
+            // On Vercel, we can't run Python scripts
+            // Instead, read the pre-processed data from public folder
+            const url = new URL(request.url)
+            const baseUrl = `${url.protocol}//${url.host}`
+
+            const statsResponse = await fetch(`${baseUrl}/data/reviews-stats.json`)
+            const reviewsResponse = await fetch(`${baseUrl}/data/reviews.json`)
+
+            if (statsResponse.ok && reviewsResponse.ok) {
+                const stats = await statsResponse.json()
+                const reviews = await reviewsResponse.json()
+
+                return NextResponse.json({
+                    success: true,
+                    message: "Dữ liệu đã được tải từ file JSON đã xử lý trước đó.",
+                    stats: {
+                        ...stats,
+                        total_reviews: reviews.length,
+                    },
+                    isPreProcessed: true,
+                })
+            }
+
+            return NextResponse.json({
+                success: false,
+                error: "Không tìm thấy dữ liệu. Vui lòng chạy script Python trên máy local và push lên GitHub.",
+                isVercel: true,
+            }, { status: 400 })
+        }
+
+        // Local environment - can run Python script
+        const { exec } = await import("child_process")
+        const { promisify } = await import("util")
+        const { existsSync } = await import("fs")
+        const { join } = await import("path")
+
+        const execAsync = promisify(exec)
         const scriptPath = join(process.cwd(), "scripts", "process_reviews_json.py")
 
         if (!existsSync(scriptPath)) {
@@ -31,6 +65,7 @@ export async function POST() {
 
         // Read the generated stats file to return to frontend
         const statsPath = join(process.cwd(), "public", "data", "reviews-stats.json")
+        const { readFileSync } = await import("fs")
 
         if (existsSync(statsPath)) {
             const statsContent = readFileSync(statsPath, "utf-8")

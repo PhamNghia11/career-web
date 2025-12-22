@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server"
-import { readFileSync, existsSync } from "fs"
-import { join } from "path"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // Read stats from file exported by Python script
-    const statsPath = join(process.cwd(), "public", "data", "reviews-stats.json")
+    // Get base URL from request for fetching static files
+    const url = new URL(request.url)
+    const baseUrl = `${url.protocol}//${url.host}`
 
-    if (existsSync(statsPath)) {
-      const fileContent = readFileSync(statsPath, "utf-8")
-      const stats = JSON.parse(fileContent)
+    // Fetch stats from public URL - works both locally and on Vercel
+    const response = await fetch(`${baseUrl}/data/reviews-stats.json`)
+
+    if (response.ok) {
+      const stats = await response.json()
 
       return NextResponse.json({
         success: true,
@@ -40,4 +41,3 @@ export async function GET() {
     )
   }
 }
-
