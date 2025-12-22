@@ -420,32 +420,7 @@ export function ReviewsClient() {
       )
       : null
 
-  if (dataSource === "none") {
-    return (
-      <div className="space-y-6">
-        <ReviewsDataManager onDataProcessed={handleDataProcessed} />
 
-        <Card className="p-12 text-center bg-gradient-to-br from-muted/50 to-background border-2 border-dashed">
-          <div className="flex flex-col items-center gap-4 max-w-md mx-auto">
-            <div className="p-4 bg-primary/10 rounded-full">
-              <Upload className="h-12 w-12 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-bold text-xl text-foreground mb-2">Chưa có dữ liệu đánh giá</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Vui lòng nhấn nút <span className="font-semibold">"Xử lý dữ liệu (Python)"</span> ở trên để tải và hiển thị
-                dữ liệu đánh giá từ Google Maps.
-              </p>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-              <AlertCircle className="h-4 w-4" />
-              <span>Yêu cầu file reviews_full.json và Python Environment</span>
-            </div>
-          </div>
-        </Card>
-      </div>
-    )
-  }
 
   return (
     <div className="space-y-6">
@@ -640,7 +615,7 @@ export function ReviewsClient() {
               <div className="flex gap-4">
                 <Avatar className="h-14 w-14 shrink-0 text-lg font-semibold">
                   {review.avatarUrl && (
-                    <AvatarImage src={review.avatarUrl} alt={review.author} />
+                    <AvatarImage src={review.avatarUrl} alt={review.author} referrerPolicy="no-referrer" />
                   )}
                   <AvatarFallback
                     className={`bg-gradient-to-br ${review.avatarColor || "from-primary to-primary/70"} text-white`}
@@ -726,7 +701,7 @@ export function ReviewsClient() {
                               <div className="flex items-center justify-between mb-1">
                                 <div className="flex items-center gap-2">
                                   <Avatar className="h-6 w-6">
-                                    {comment.avatarUrl && <AvatarImage src={comment.avatarUrl} alt={comment.author} />}
+                                    {comment.avatarUrl && <AvatarImage src={comment.avatarUrl} alt={comment.author} referrerPolicy="no-referrer" />}
                                     <AvatarFallback className="text-[10px]">{comment.author?.charAt(0) || "U"}</AvatarFallback>
                                   </Avatar>
                                   <span className="font-medium text-sm text-foreground">{comment.author}</span>
