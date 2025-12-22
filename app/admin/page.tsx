@@ -1,4 +1,7 @@
 import { getCollection, COLLECTIONS } from "@/lib/mongodb"
+
+// Force dynamic rendering to avoid MongoDB connection during build
+export const dynamic = 'force-dynamic'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LayoutDashboard, Users, FileText, TrendingUp, Calendar, ArrowUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
