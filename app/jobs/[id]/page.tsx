@@ -17,13 +17,13 @@ interface JobPageProps {
 
 export function generateStaticParams() {
     return allJobs.map((job) => ({
-        id: job.id,
+        id: job._id,
     }))
 }
 
 export default async function JobPage(props: JobPageProps) {
     const params = await props.params;
-    const job = allJobs.find((j) => j.id === params.id)
+    const job = allJobs.find((j) => j._id === params.id)
 
     if (!job) {
         notFound()

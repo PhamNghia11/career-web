@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SocialChatWidget } from "@/components/chat/social-chat-widget"
@@ -19,7 +20,9 @@ export default function JobsPage() {
           </div>
         </div>
         <div className="container mx-auto px-4 py-8">
-          <JobsListClient />
+          <Suspense fallback={<div className="text-center py-20">Đang tải danh sách việc làm...</div>}>
+            <JobsListClient />
+          </Suspense>
         </div>
       </main>
       <Footer />
