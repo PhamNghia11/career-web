@@ -81,11 +81,9 @@ export function ReviewsClient() {
 
   // Only fetch reviews when category changes, data has been processed, or user/visitorId changes
   useEffect(() => {
-    if (dataProcessed) {
-      fetchReviews()
-      fetchStats()
-    }
-  }, [selectedCategory, dataProcessed, user?.id, visitorId])
+    fetchReviews()
+    fetchStats()
+  }, [selectedCategory, user?.id, visitorId])
 
   const fetchReviews = async () => {
     setLoading(true)
