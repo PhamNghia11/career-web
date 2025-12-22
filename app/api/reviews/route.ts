@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server"
-import { readFileSync, existsSync } from "fs"
-import { join } from "path"
 import { ObjectId } from "mongodb"
 
 function getAvatarColor(name: string): string {
@@ -32,39 +30,41 @@ interface ProcessedReview {
   verified: boolean
 }
 
-function loadReviewsFromJSON() {
+async function loadReviewsFromJSON(baseUrl: string) {
   try {
-    // Read from the JSON file exported by Python script
-    const dataPath = join(process.cwd(), "public", "data", "reviews.json")
-    if (existsSync(dataPath)) {
-      const fileContent = readFileSync(dataPath, "utf-8")
-      const reviews: ProcessedReview[] = JSON.parse(fileContent)
-
-      if (!reviews || reviews.length === 0) {
-        return null
-      }
-
-      return reviews.map((review) => {
-        return {
-          id: String(review.id),
-          author: review.name,
-          avatar: review.avatar,
-          avatarUrl: review.avatarUrl || "",
-          avatarColor: getAvatarColor(review.name),
-          major: "Sinh viên GDU",
-          year: "K2023",
-          rating: review.rating,
-          category: "Đánh giá Google Maps",
-          title: generateTitle(review.comment, review.rating),
-          content: review.comment,
-          likes: 0,
-          comments: 0,
-          date: "",
-          review_time: review.review_time || "",
-          helpful: review.verified,
-        }
-      })
+    // Fetch from public URL - works both locally and on Vercel
+    const response = await fetch(`${baseUrl}/data/reviews.json`)
+    if (!response.ok) {
+      console.error("[v0] Failed to fetch reviews.json:", response.status)
+      return null
     }
+
+    const reviews: ProcessedReview[] = await response.json()
+
+    if (!reviews || reviews.length === 0) {
+      return null
+    }
+
+    return reviews.map((review) => {
+      return {
+        id: String(review.id),
+        author: review.name,
+        avatar: review.avatar,
+        avatarUrl: review.avatarUrl || "",
+        avatarColor: getAvatarColor(review.name),
+        major: "Sinh viên GDU",
+        year: "K2023",
+        rating: review.rating,
+        category: "Đánh giá Google Maps",
+        title: generateTitle(review.comment, review.rating),
+        content: review.comment,
+        likes: 0,
+        comments: 0,
+        date: "",
+        review_time: review.review_time || "",
+        helpful: review.verified,
+      }
+    })
   } catch (error) {
     console.error("[v0] Error loading reviews from JSON:", error)
   }
@@ -128,8 +128,12 @@ export async function GET(request: Request) {
     const userId = searchParams.get("userId")
     const visitorId = searchParams.get("visitorId")
 
+    // Get base URL from request for fetching static files
+    const url = new URL(request.url)
+    const baseUrl = `${url.protocol}//${url.host}`
+
     // 1. Load JSON Reviews
-    const jsonReviews = loadReviewsFromJSON() || []
+    const jsonReviews = await loadReviewsFromJSON(baseUrl) || []
 
     // 2. Load User Reviews from MongoDB
     let userReviews: any[] = []
