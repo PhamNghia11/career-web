@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import { ObjectId } from "mongodb"
+// Import data directly so it's bundled by Next.js
+import reviewsData from "@/data/reviews.json"
 
 function getAvatarColor(name: string): string {
   const colors = [
@@ -30,45 +32,33 @@ interface ProcessedReview {
   verified: boolean
 }
 
-async function loadReviewsFromJSON(baseUrl: string) {
-  try {
-    // Fetch from public URL - works both locally and on Vercel
-    const response = await fetch(`${baseUrl}/data/reviews.json`)
-    if (!response.ok) {
-      console.error("[v0] Failed to fetch reviews.json:", response.status)
-      return null
-    }
+function getReviewsData() {
+  const reviews = reviewsData as ProcessedReview[]
 
-    const reviews: ProcessedReview[] = await response.json()
-
-    if (!reviews || reviews.length === 0) {
-      return null
-    }
-
-    return reviews.map((review) => {
-      return {
-        id: String(review.id),
-        author: review.name,
-        avatar: review.avatar,
-        avatarUrl: review.avatarUrl || "",
-        avatarColor: getAvatarColor(review.name),
-        major: "Sinh viên GDU",
-        year: "K2023",
-        rating: review.rating,
-        category: "Đánh giá Google Maps",
-        title: generateTitle(review.comment, review.rating),
-        content: review.comment,
-        likes: 0,
-        comments: 0,
-        date: "",
-        review_time: review.review_time || "",
-        helpful: review.verified,
-      }
-    })
-  } catch (error) {
-    console.error("[v0] Error loading reviews from JSON:", error)
+  if (!reviews || reviews.length === 0) {
+    return []
   }
-  return null
+
+  return reviews.map((review) => {
+    return {
+      id: String(review.id),
+      author: review.name,
+      avatar: review.avatar,
+      avatarUrl: review.avatarUrl || "",
+      avatarColor: getAvatarColor(review.name),
+      major: "Sinh viên GDU",
+      year: "K2023",
+      rating: review.rating,
+      category: "Đánh giá Google Maps",
+      title: generateTitle(review.comment, review.rating),
+      content: review.comment,
+      likes: 0,
+      comments: 0,
+      date: "",
+      review_time: review.review_time || "",
+      helpful: review.verified,
+    }
+  })
 }
 
 function generateTitle(comment: string, rating: number): string {
@@ -132,8 +122,8 @@ export async function GET(request: Request) {
     const url = new URL(request.url)
     const baseUrl = `${url.protocol}//${url.host}`
 
-    // 1. Load JSON Reviews
-    const jsonReviews = await loadReviewsFromJSON(baseUrl) || []
+    // 1. Load JSON Reviews (Sync)
+    const jsonReviews = getReviewsData()
 
     // 2. Load User Reviews from MongoDB
     let userReviews: any[] = []

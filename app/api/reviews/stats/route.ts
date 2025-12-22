@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server"
+// Import data directly so it's bundled by Next.js
+import statsData from "@/data/reviews-stats.json"
 
 export async function GET(request: Request) {
   try {
-    // Get base URL from request for fetching static files
-    const url = new URL(request.url)
-    const baseUrl = `${url.protocol}//${url.host}`
+    const stats = statsData
 
-    // Fetch stats from public URL - works both locally and on Vercel
-    const response = await fetch(`${baseUrl}/data/reviews-stats.json`)
-
-    if (response.ok) {
-      const stats = await response.json()
-
+    if (stats) {
       return NextResponse.json({
         success: true,
         stats,
