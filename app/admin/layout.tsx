@@ -3,7 +3,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, Users, FileText, Bell, Search, Menu, LogOut, Settings } from "lucide-react"
+import { LayoutDashboard, Users, FileText, Bell, Search, Menu, LogOut, ShieldAlert } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
@@ -15,8 +15,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useAuth } from "@/lib/auth-context"
 
 export default function AdminLayout({
     children,
@@ -25,16 +26,48 @@ export default function AdminLayout({
 }) {
     const pathname = usePathname()
     const router = useRouter()
+    const { user, isLoading, logout } = useAuth()
     const [isMobileOpen, setIsMobileOpen] = useState(false)
 
-    // Using basic Logout mock for now since AuthProvider might be client-side only context
-    // In a real app we'd import { useAuth } from "@/lib/auth-context"
-    // But to keep it simple and robust without breaking existing context usage:
+    // Check if user is admin
+    useEffect(() => {
+        if (!isLoading) {
+            if (!user) {
+                // Not logged in, redirect to login
+                router.push("/login?redirect=" + pathname)
+            } else if (user.role !== "admin") {
+                // Logged in but not admin, redirect to dashboard
+                router.push("/dashboard?error=unauthorized")
+            }
+        }
+    }, [user, isLoading, router, pathname])
+
     const handleLogout = () => {
-        // Clear local storage
-        localStorage.removeItem("gdu_user")
-        // Redirect to login or home
+        logout()
         router.push("/")
+    }
+
+    // Show loading while checking auth
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-900">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
+        )
+    }
+
+    // Show access denied for non-admin users
+    if (!user || user.role !== "admin") {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white">
+                <ShieldAlert className="h-16 w-16 text-red-500 mb-4" />
+                <h1 className="text-2xl font-bold mb-2">Truy cập bị từ chối</h1>
+                <p className="text-slate-400 mb-6">Bạn không có quyền truy cập trang quản trị</p>
+                <Button onClick={() => router.push("/dashboard")} variant="outline">
+                    Quay về Dashboard
+                </Button>
+            </div>
+        )
     }
 
     const navItems = [
@@ -49,6 +82,7 @@ export default function AdminLayout({
                 <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight">
                     <span className="text-blue-400">GDU</span>
                     <span>Career</span>
+                    <span className="ml-2 text-xs bg-red-500 px-2 py-0.5 rounded">Admin</span>
                 </Link>
             </div>
             <div className="flex-1 overflow-auto py-6 px-4">
@@ -77,6 +111,10 @@ export default function AdminLayout({
                 </nav>
             </div>
             <div className="p-4 border-t border-slate-800">
+                <div className="mb-3 px-3 py-2 bg-slate-800 rounded-lg">
+                    <p className="text-xs text-slate-400">Đăng nhập với</p>
+                    <p className="text-sm font-medium truncate">{user.email}</p>
+                </div>
                 <div
                     onClick={handleLogout}
                     className="flex items-center gap-3 px-3 py-2 text-slate-400 hover:text-white transition-colors cursor-pointer"
@@ -127,16 +165,31 @@ export default function AdminLayout({
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                                     <Avatar className="h-9 w-9 border-2 border-white shadow-sm">
-                                        <AvatarImage src="/placeholder-avatar.jpg" alt="Admin" />
-                                        <AvatarFallback className="bg-blue-600 text-white">AD</AvatarFallback>
+                                        <AvatarImage src={user.avatar} alt={user.name} />
+                                        <AvatarFallback className="bg-blue-600 text-white">
+                                            {user.name?.charAt(0).toUpperCase() || "A"}
+                                        </AvatarFallback>
                                     </Avatar>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Tài khoản</DropdownMenuLabel>
+                                <DropdownMenuLabel>
+                                    <div>
+                                        <p className="font-medium">{user.name}</p>
+                                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                                    </div>
+                                </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>Cài đặt</DropdownMenuItem>
-                                <DropdownMenuItem onClick={handleLogout}>Đăng xuất</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+                                    Dashboard
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
+                                    Cài đặt
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                                    Đăng xuất
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -149,3 +202,4 @@ export default function AdminLayout({
         </div>
     )
 }
+

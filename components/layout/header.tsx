@@ -172,10 +172,20 @@ export function Header() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <Link href="/settings" className="w-full">
+                      <Link href="/dashboard/settings" className="w-full">
                         Cài đặt
                       </Link>
                     </DropdownMenuItem>
+                    {user.role === "admin" && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                          <Link href="/admin" className="w-full text-red-600 font-medium">
+                            🔧 Quản trị Admin
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>Đăng xuất</DropdownMenuItem>
                   </DropdownMenuContent>

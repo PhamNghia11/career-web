@@ -135,6 +135,19 @@ export function DashboardSidebar() {
           </a>
         </div>
 
+        {/* Admin Panel Link - Only for admins */}
+        {user?.role === "admin" && (
+          <div className="px-3 pb-2">
+            <Link
+              href="/admin"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors font-medium"
+            >
+              <Settings className="h-5 w-5" />
+              <span>🔧 Quản trị Admin</span>
+            </Link>
+          </div>
+        )}
+
         {/* Logout */}
         <div className="px-3 py-4 border-t border-sidebar-border">
           <button
