@@ -1,5 +1,5 @@
 import { getCollection, COLLECTIONS } from "@/lib/mongodb"
-import { ApplicationsTable } from "@/components/admin/applications-table"
+import { ApplicationsTable } from "@/components/admin/ApplicationsTable"
 
 // Force dynamic rendering to avoid MongoDB connection during build
 export const dynamic = 'force-dynamic'
