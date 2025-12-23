@@ -2,12 +2,12 @@ import { notFound } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SocialChatWidget } from "@/components/chat/social-chat-widget"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { MapPin, DollarSign, Clock, Building, ChevronLeft, Calendar, CheckCircle2, Briefcase } from "lucide-react"
 import Link from "next/link"
 import { allJobs } from "@/lib/jobs-data"
+import { ApplyButton } from "@/components/jobs/apply-button"
 
 interface JobPageProps {
     params: Promise<{
@@ -162,9 +162,11 @@ export default async function JobPage(props: JobPageProps) {
                                     </div>
 
                                     <div className="pt-6 border-t border-gray-100">
-                                        <Button className="w-full bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white h-12 text-lg shadow-md transition-all hover:shadow-lg">
-                                            Ứng tuyển ngay
-                                        </Button>
+                                        <ApplyButton
+                                            jobId={job._id}
+                                            jobTitle={job.title}
+                                            company={job.company}
+                                        />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -177,3 +179,4 @@ export default async function JobPage(props: JobPageProps) {
         </div>
     )
 }
+
