@@ -34,7 +34,7 @@ const studentNav = [
 
 const employerNav = [
   { name: "Tổng quan", href: "/dashboard", icon: Home },
-  { name: "Đăng tin tuyển dụng", href: "/dashboard/post-job", icon: Briefcase },
+  { name: "Đăng tin tuyển dụng", href: "/dashboard/jobs/new", icon: Briefcase },
   { name: "Quản lý tin đăng", href: "/dashboard/my-jobs", icon: FileText },
   { name: "Ứng viên", href: "/dashboard/candidates", icon: Users },
   { name: "Công ty", href: "/dashboard/company", icon: Building },

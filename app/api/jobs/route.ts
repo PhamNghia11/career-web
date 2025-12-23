@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server"
-import jobsData from "@/data/jobs.json"
+import { getCollection, COLLECTIONS } from "@/lib/mongodb"
+import { ObjectId } from "mongodb"
 
-// Get jobs from imported data - works on Vercel
-function getJobs() {
-  const data = jobsData as any
-  // Support both old array format and new object format
-  return Array.isArray(data) ? data : data.jobs || []
-}
+export const dynamic = 'force-dynamic'
 
 export async function GET(req: Request) {
   try {
@@ -16,39 +12,49 @@ export async function GET(req: Request) {
     const field = searchParams.get("field")
     const search = searchParams.get("search")?.toLowerCase()
 
-    let jobs = getJobs()
+    // Default to active jobs if no status specified (for public view)
+    // Admin page will likely request status=all or specific status
 
-    // Filter by type (internship, full-time, part-time)
-    if (type && type !== "all") {
-      jobs = jobs.filter((j: any) => j.type === type)
-    }
+    const collection = await getCollection(COLLECTIONS.JOBS)
 
-    // Filter by status
+    let query: any = {}
+
     if (status && status !== "all") {
-      jobs = jobs.filter((j: any) => j.status === status)
+      query.status = status
+    } else if (!status) {
+      // Public view usually only wants active
+      query.status = "active"
     }
 
-    // Filter by field
+    if (type && type !== "all") {
+      query.type = type
+    }
+
     if (field && field !== "all") {
-      jobs = jobs.filter((j: any) => j.field === field)
+      query.field = field
     }
 
-    // Search by title, company, or description
     if (search) {
-      jobs = jobs.filter(
-        (j: any) =>
-          j.title.toLowerCase().includes(search) ||
-          j.company.toLowerCase().includes(search) ||
-          j.description.toLowerCase().includes(search) ||
-          j.skills.some((s: string) => s.toLowerCase().includes(search))
-      )
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { company: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ]
     }
+
+    const jobs = await collection.find(query).sort({ postedAt: -1 }).toArray()
+
+    // Map _id to string
+    const mappedJobs = jobs.map(job => ({
+      ...job,
+      _id: job._id.toString()
+    }))
 
     return NextResponse.json({
       success: true,
       data: {
-        jobs,
-        total: jobs.length,
+        jobs: mappedJobs,
+        total: mappedJobs.length,
       },
     })
   } catch (error) {
@@ -63,21 +69,54 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json()
+    const {
+      title, company, companyId, location, type, field,
+      salary, salaryMin, salaryMax, isNegotiable,
+      deadline, description, requirements, benefits,
+      relatedMajors, detailedBenefits, creatorId, role
+    } = body
+
+    // Validate permission (Only Employer or Admin)
+    // Ideally use session check here, but relying on payload for now as per context
+    // if (role === 'student') return NextResponse.json({ error: "Students cannot post jobs" }, { status: 403 })
+
+    const collection = await getCollection(COLLECTIONS.JOBS)
 
     const newJob = {
-      id: String(Date.now()),
-      ...body,
-      createdAt: new Date().toISOString(),
-      status: "active",
+      title,
+      company,
+      companyId: companyId || "unknown", // Should link to company profile
+      logo: body.logo || "/placeholder.svg?height=100&width=100", // Default logo
+      location,
+      type,
+      field,
+      salary: isNegotiable ? "Thỏa thuận" : salary,
+      salaryMin,
+      salaryMax,
+      isNegotiable,
+      deadline,
+      description,
+      requirements: Array.isArray(requirements) ? requirements : [],
+      benefits: Array.isArray(benefits) ? benefits : [],
+      detailedBenefits: Array.isArray(detailedBenefits) ? detailedBenefits : [],
+      relatedMajors: Array.isArray(relatedMajors) ? relatedMajors : [],
+
+      postedAt: new Date().toISOString(),
+      status: role === 'admin' ? 'active' : 'pending', // Admin posts are active immediately
       applicants: 0,
+      creatorId,
+      views: 0
     }
+
+    const result = await collection.insertOne(newJob)
 
     return NextResponse.json({
       success: true,
-      message: "Job posted successfully",
-      data: newJob,
+      message: role === 'admin' ? "Đăng tuyển thành công!" : "Đã gửi duyệt tin tuyển dụng!",
+      data: { ...newJob, _id: result.insertedId.toString() },
     })
   } catch (error) {
+    console.error("Post job error:", error)
     return NextResponse.json(
       { success: false, error: "Failed to post job" },
       { status: 500 }

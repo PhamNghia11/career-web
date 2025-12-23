@@ -1,108 +1,247 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useAuth } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
-import { Loader2, Briefcase, MapPin, DollarSign, Calendar } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { useAuth } from "@/lib/auth-context"
+import { useToast } from "@/hooks/use-toast"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Check, X, Loader2 } from "lucide-react"
 
-// Simple Jobs Page for Admin
-export default function JobsPage() {
-    const { user, isLoading } = useAuth()
+// Types matching API response
+type Job = {
+    _id: string
+    title: string
+    company: string
+    status: "active" | "closed" | "pending" | "rejected" | "request_changes"
+    postedAt: string
+    type: string
+    salary: string
+    creatorId?: string
+}
+
+export default function AdminJobsPage() {
+    const { user, isLoading: authLoading } = useAuth()
+    const [jobs, setJobs] = useState<Job[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+    const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
+    const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
+    const [feedback, setFeedback] = useState("")
+    const { toast } = useToast()
     const router = useRouter()
-    const [jobs, setJobs] = useState<any[]>([])
-    const [loadingData, setLoadingData] = useState(true)
 
     useEffect(() => {
-        if (!isLoading) {
-            if (!user || user.role !== "admin") {
-                router.push("/dashboard")
+        if (!authLoading) {
+            if (user?.role !== 'admin') {
+                router.push('/dashboard')
                 return
             }
             fetchJobs()
         }
-    }, [user, isLoading, router])
+    }, [user, authLoading, router])
 
     const fetchJobs = async () => {
         try {
-            const res = await fetch("/api/jobs")
-            const response = await res.json()
-            if (response.success) {
-                // Should return { success: true, data: { jobs: [], total: ... } }
-                const jobsList = response.data.jobs || []
-                setJobs(jobsList)
+            // Fetch all jobs including pending/rejected
+            const response = await fetch('/api/jobs?status=all')
+            const data = await response.json()
+            if (data.success) {
+                setJobs(data.data.jobs)
             }
         } catch (error) {
             console.error("Failed to fetch jobs", error)
+            toast({
+                title: "Lỗi tải dữ liệu",
+                description: "Không thể lấy danh sách tin tuyển dụng",
+                variant: "destructive"
+            })
         } finally {
-            setLoadingData(false)
+            setIsLoading(false)
         }
     }
 
-    if (isLoading || loadingData) {
+    const handleStatusUpdate = async (id: string, newStatus: string, adminFeedback: string = "") => {
+        try {
+            const response = await fetch(`/api/jobs/${id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus, feedback: adminFeedback })
+            })
+
+            const data = await response.json()
+
+            if (data.success) {
+                toast({
+                    title: "Cập nhật thành công",
+                    description: `Trạng thái tin tuyển dụng đã được cập nhật thành: ${newStatus}`,
+                })
+                // Refresh list locally
+                setJobs(prev => prev.map(job =>
+                    job._id === id ? { ...job, status: newStatus as any } : job
+                ))
+            } else {
+                throw new Error(data.error)
+            }
+        } catch (error) {
+            toast({
+                title: "Lỗi cập nhật",
+                description: "Không thể cập nhật trạng thái.",
+                variant: "destructive"
+            })
+        }
+    }
+
+    const confirmReject = () => {
+        if (selectedJobId) {
+            handleStatusUpdate(selectedJobId, "rejected", feedback)
+            setRejectDialogOpen(false)
+            setFeedback("")
+            setSelectedJobId(null)
+        }
+    }
+
+    const openRejectDialog = (id: string) => {
+        setSelectedJobId(id)
+        setRejectDialogOpen(true)
+    }
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'active': return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Đã duyệt</Badge>
+            case 'pending': return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">Chờ duyệt</Badge>
+            case 'rejected': return <Badge variant="destructive">Từ chối</Badge>
+            case 'request_changes': return <Badge variant="outline" className="text-orange-600 border-orange-600">Cần sửa</Badge>
+            case 'closed': return <Badge variant="secondary">Đã đóng</Badge>
+            default: return <Badge variant="outline">{status}</Badge>
+        }
+    }
+
+    if (authLoading || isLoading) {
         return <div className="flex justify-center p-10"><Loader2 className="animate-spin" /></div>
     }
 
-    if (!user || user.role !== "admin") return null
-
     return (
-        <div className="space-y-6 max-w-6xl">
-            <div>
-                <h2 className="text-3xl font-bold tracking-tight">Quản lý việc làm</h2>
-                <p className="text-muted-foreground">Danh sách tất cả việc làm trên hệ thống ({jobs.length})</p>
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Quản lý tin tuyển dụng</h1>
+                    <p className="text-muted-foreground">Dyệt và quản lý các bài đăng tuyển dụng từ doanh nghiệp.</p>
+                </div>
             </div>
 
-            <div className="grid gap-4">
-                {jobs.map((job) => (
-                    <Card key={job.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                        <CardContent className="p-0">
-                            <div className="flex flex-col md:flex-row gap-4 p-6">
-                                <div className="h-16 w-16 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
-                                    {job.logo ? (
-                                        <img src={job.logo} alt={job.company} className="h-12 w-12 object-contain" />
-                                    ) : (
-                                        <Briefcase className="h-8 w-8 text-gray-400" />
-                                    )}
-                                </div>
-                                <div className="flex-1 min-w-0 space-y-2">
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div>
-                                            <h3 className="font-semibold text-lg hover:text-primary cursor-pointer truncate">
-                                                {job.title}
-                                            </h3>
-                                            <p className="text-muted-foreground font-medium">{job.company}</p>
-                                        </div>
-                                        <Badge variant={job.status === "active" ? "default" : "secondary"}>
-                                            {job.status === "active" ? "Đang tuyển" : "Đã đóng"}
-                                        </Badge>
-                                    </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Danh sách bài đăng</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Ngày đăng</TableHead>
+                                <TableHead>Vị trí</TableHead>
+                                <TableHead>Công ty</TableHead>
+                                <TableHead>Mức lương</TableHead>
+                                <TableHead>Trạng thái</TableHead>
+                                <TableHead className="text-right">Hành động</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {jobs.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} className="text-center py-8">Chưa có tin tuyển dụng nào.</TableCell>
+                                </TableRow>
+                            ) : (
+                                jobs.map((job) => (
+                                    <TableRow key={job._id}>
+                                        <TableCell>{new Date(job.postedAt).toLocaleDateString("vi-VN")}</TableCell>
+                                        <TableCell className="font-medium">{job.title}</TableCell>
+                                        <TableCell>{job.company}</TableCell>
+                                        <TableCell>{job.salary}</TableCell>
+                                        <TableCell>{getStatusBadge(job.status)}</TableCell>
+                                        <TableCell className="text-right">
+                                            <div className="flex justify-end gap-2">
+                                                {job.status === 'pending' && (
+                                                    <>
+                                                        <Button
+                                                            size="sm"
+                                                            className="bg-green-600 hover:bg-green-700 h-8"
+                                                            onClick={() => handleStatusUpdate(job._id, "active")}
+                                                            title="Duyệt bài"
+                                                        >
+                                                            <Check className="h-4 w-4 mr-1" /> Duyệt
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="destructive"
+                                                            className="h-8"
+                                                            onClick={() => openRejectDialog(job._id)}
+                                                            title="Từ chối"
+                                                        >
+                                                            <X className="h-4 w-4 mr-1" /> Từ chối
+                                                        </Button>
+                                                    </>
+                                                )}
 
-                                    <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-                                        <div className="flex items-center gap-1.5">
-                                            <MapPin className="h-4 w-4" />
-                                            <span>{job.location}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <DollarSign className="h-4 w-4" />
-                                            <span>{job.salary}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <Calendar className="h-4 w-4" />
-                                            <span>{new Date(job.createdAt).toLocaleDateString('vi-VN')}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex md:flex-col gap-2 justify-center">
-                                    <Button variant="outline" size="sm">Chỉnh sửa</Button>
-                                    <Button variant="destructive" size="sm">Xóa</Button>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+                                                {job.status === 'active' && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="h-8 text-red-600 border-red-200 hover:bg-red-50"
+                                                        onClick={() => openRejectDialog(job._id)}
+                                                    >
+                                                        Gỡ bài
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+
+            <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Từ chối / Gỡ bài tuyển dụng</DialogTitle>
+                        <DialogDescription>
+                            Vui lòng nhập lý do từ chối để nhà tuyển dụng biết và chỉnh sửa (nếu cần).
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <Textarea
+                            placeholder="Nhập lý do tại đây..."
+                            value={feedback}
+                            onChange={(e) => setFeedback(e.target.value)}
+                            rows={4}
+                        />
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>Hủy</Button>
+                        <Button variant="destructive" onClick={confirmReject}>Xác nhận từ chối</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

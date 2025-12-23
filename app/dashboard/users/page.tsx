@@ -13,6 +13,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/lib/auth-context"
+import { useToast } from "@/hooks/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 // Mock users removed
 
@@ -30,39 +41,123 @@ const roleLabels = {
 
 export default function UsersManagementPage() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const [searchQuery, setSearchQuery] = useState("")
   const [roleFilter, setRoleFilter] = useState<string>("all")
   const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('/api/users')
-        const data = await response.json()
-        console.log("Users API response:", data)
-        if (data.success) {
-          const usersWithDebug = data.users;
-          (usersWithDebug as any).debug = data.debug;
-          setUsers(usersWithDebug)
-        } else {
-          console.error("Users API failed:", data.error)
-        }
-      } catch (error) {
-        console.error("Failed to fetch users", error)
-      } finally {
-        setLoading(false)
-      }
-    }
+  // Dialog states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<string | null>(null)
 
-    if (user?.role === 'admin') {
-      fetchUsers()
-    } else {
-      setLoading(false)
-    }
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [editingUser, setEditingUser] = useState<any>(null)
+
+  const [roleDialogOpen, setRoleDialogOpen] = useState(false)
+  const [selectedRole, setSelectedRole] = useState("")
+
+  useEffect(() => {
+    fetchUsers()
   }, [user])
 
+  const fetchUsers = async () => {
+    try {
+      if (user?.role !== 'admin') {
+        setLoading(false)
+        return
+      }
+      setLoading(true)
+      const response = await fetch('/api/users')
+      const data = await response.json()
+      if (data.success) {
+        setUsers(data.users)
+      }
+    } catch (error) {
+      console.error("Failed to fetch users", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return
+
+    try {
+      const response = await fetch(`/api/users/${userToDelete}`, {
+        method: 'DELETE'
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        toast({ title: "Xóa thành công", description: "Người dùng đã được xóa khỏi hệ thống." })
+        setUsers(prev => prev.filter(u => u._id !== userToDelete))
+      } else {
+        throw new Error(data.error)
+      }
+    } catch (error) {
+      toast({ title: "Lỗi", description: "Không thể xóa người dùng.", variant: "destructive" })
+    } finally {
+      setDeleteDialogOpen(false)
+      setUserToDelete(null)
+    }
+  }
+
+  const handleUpdateUser = async () => {
+    if (!editingUser) return
+
+    try {
+      const payload = {
+        name: editingUser.name, // Only update name and role for now as example
+        role: editingUser.role
+      }
+
+      const response = await fetch(`/api/users/${editingUser._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        toast({ title: "Cập nhật thành công", description: "Thông tin người dùng đã được cập nhật." })
+        setUsers(prev => prev.map(u => u._id === editingUser._id ? { ...u, ...payload } : u))
+      } else {
+        throw new Error(data.error)
+      }
+    } catch (error) {
+      toast({ title: "Lỗi", description: "Không thể cập nhật thông tin.", variant: "destructive" })
+    } finally {
+      setEditDialogOpen(false)
+      setEditingUser(null)
+    }
+  }
+
+  const handleRoleChange = async () => {
+    if (!editingUser || !selectedRole) return
+
+    try {
+      const response = await fetch(`/api/users/${editingUser._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: selectedRole })
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        toast({ title: "Thành công", description: `Đã đổi vai trò thành ${roleLabels[selectedRole as keyof typeof roleLabels]}.` })
+        setUsers(prev => prev.map(u => u._id === editingUser._id ? { ...u, role: selectedRole } : u))
+      }
+    } catch (e) {
+      toast({ title: "Lỗi", description: "Không thể đổi vai trò.", variant: "destructive" })
+    } finally {
+      setRoleDialogOpen(false)
+      setEditingUser(null)
+    }
+  }
+
   if (user?.role !== "admin") {
+    // ... existing unauthorized view
     return (
       <div className="flex items-center justify-center h-[50vh]">
         <Card className="max-w-md">
@@ -182,20 +277,29 @@ export default function UsersManagementPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Eye className="h-4 w-4 mr-2" />
-                              Xem chi tiết
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              setEditingUser(u)
+                              setEditDialogOpen(true)
+                            }}>
                               <Edit className="h-4 w-4 mr-2" />
                               Chỉnh sửa
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              setEditingUser(u)
+                              setSelectedRole(u.role)
+                              setRoleDialogOpen(true)
+                            }}>
                               <Shield className="h-4 w-4 mr-2" />
                               Đổi vai trò
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive">
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => {
+                                setUserToDelete(u._id)
+                                setDeleteDialogOpen(true)
+                              }}
+                            >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Xóa
                             </DropdownMenuItem>
@@ -209,6 +313,72 @@ export default function UsersManagementPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa người dùng</DialogTitle>
+            <DialogDescription>
+              Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa người dùng này không?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Hủy</Button>
+            <Button variant="destructive" onClick={handleDeleteUser}>Xóa người dùng</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa thông tin</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label>Họ và tên</label>
+              <Input
+                value={editingUser?.name || ""}
+                onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleUpdateUser}>Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Role Change Dialog */}
+      <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Thay đổi vai trò người dùng</DialogTitle>
+            <DialogDescription>
+              Chọn vai trò mới cho người dùng <strong>{editingUser?.name}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Select value={selectedRole} onValueChange={setSelectedRole}>
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn vai trò" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="student">Sinh viên</SelectItem>
+                <SelectItem value="employer">Nhà tuyển dụng</SelectItem>
+                <SelectItem value="admin">Quản trị viên</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRoleDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleRoleChange}>Cập nhật vai trò</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

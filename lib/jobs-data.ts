@@ -5,19 +5,26 @@ export type Job = {
     title: string
     company: string
     companyId: string
-    logo: string
+    logo?: string
     location: string
     type: "internship" | "full-time" | "part-time"
     field: string
     salary: string
+    salaryMin?: number
+    salaryMax?: number
+    isNegotiable?: boolean
     deadline: string
     postedAt: string
     description: string
-    skills: string[]
     requirements: string[]
     benefits: string[]
-    status: "active" | "closed"
+    detailedBenefits?: string[]
+    relatedMajors?: string[]
+    status: "active" | "closed" | "pending" | "rejected" | "request_changes"
+    adminFeedback?: string
     applicants: number
+    creatorId?: string // Link to employer user
+    views?: number
 }
 
 // Support both array format and object format with .jobs property
