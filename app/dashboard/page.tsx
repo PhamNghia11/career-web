@@ -3,6 +3,7 @@
 import { useAuth } from "@/lib/auth-context"
 import { AdminDashboardContent } from "@/components/dashboard/admin-content"
 import { StudentDashboardContent } from "@/components/dashboard/student-content"
+import { EmployerDashboardContent } from "@/components/dashboard/employer-content"
 import { Loader2 } from "lucide-react"
 
 export default function DashboardPage() {
@@ -29,6 +30,8 @@ export default function DashboardPage() {
 
       {user?.role === "admin" ? (
         <AdminDashboardContent />
+      ) : user?.role === "employer" ? (
+        <EmployerDashboardContent />
       ) : (
         <StudentDashboardContent />
       )}

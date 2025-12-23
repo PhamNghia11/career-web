@@ -11,6 +11,7 @@ export async function GET(req: Request) {
     const status = searchParams.get("status")
     const field = searchParams.get("field")
     const search = searchParams.get("search")?.toLowerCase()
+    const creatorId = searchParams.get("creatorId")
 
     // Default to active jobs if no status specified (for public view)
     // Admin page will likely request status=all or specific status
@@ -19,11 +20,24 @@ export async function GET(req: Request) {
 
     let query: any = {}
 
-    if (status && status !== "all") {
-      query.status = status
-    } else if (!status) {
-      // Public view usually only wants active
-      query.status = "active"
+    // Refined logic:
+    // If creatorId is provided, we fetch jobs for that specific user (Employer/Admin viewing their own jobs)
+    // In this case, we default to ALL statuses unless specific one is requested.
+
+    if (creatorId) {
+      query.creatorId = creatorId
+      if (status && status !== "all") {
+        query.status = status
+      }
+      // If no status is provided when filtering by creator, we return ALL jobs (active, pending, rejected)
+    } else {
+      // Public view or Admin All Jobs view
+      if (status && status !== "all") {
+        query.status = status
+      } else if (!status) {
+        // Public view usually only wants active
+        query.status = "active"
+      }
     }
 
     if (type && type !== "all") {
