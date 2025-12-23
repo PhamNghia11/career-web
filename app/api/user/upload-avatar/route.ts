@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server"
-import { writeFile, mkdir } from "fs/promises"
-import { join } from "path"
 import { getCollection, COLLECTIONS } from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 
@@ -24,30 +22,18 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Invalid file type. Only JPG, PNG, WEBP, GIF allowed." }, { status: 400 })
         }
 
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            return NextResponse.json({ error: "File too large. Max 5MB allowed." }, { status: 400 })
+        // Validate file size (max 2MB for Base64 storage)
+        if (file.size > 2 * 1024 * 1024) {
+            return NextResponse.json({ error: "File too large. Max 2MB allowed." }, { status: 400 })
         }
 
+        // Convert file to Base64 data URL
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
+        const base64 = buffer.toString("base64")
+        const avatarUrl = `data:${file.type};base64,${base64}`
 
-        // Ensure directory exists
-        const uploadDir = join(process.cwd(), "public", "uploads", "avatars")
-        await mkdir(uploadDir, { recursive: true })
-
-        // Create unique filename
-        const ext = file.name.split(".").pop()
-        const filename = `${userId}-${Date.now()}.${ext}`
-        const filepath = join(uploadDir, filename)
-
-        // Write file to disk
-        await writeFile(filepath, buffer)
-
-        // Generate public URL
-        const avatarUrl = `/uploads/avatars/${filename}`
-
-        // Update user in MongoDB
+        // Update user in MongoDB with Base64 avatar
         const collection = await getCollection(COLLECTIONS.USERS)
         await collection.updateOne(
             { _id: new ObjectId(userId) },
