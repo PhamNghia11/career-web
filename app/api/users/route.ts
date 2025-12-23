@@ -24,23 +24,23 @@ export async function GET(request: Request) {
             .project({ password: 0 }) // Exclude password
             .toArray()
 
-        debug: {
-            collection: COLLECTIONS.USERS,
+        return NextResponse.json({
+            success: true,
+            debug: {
+                collection: COLLECTIONS.USERS,
                 query: query,
-                    count: users.length,
-                        dbName: collection.dbName
-        },
-        users: users.map(user => ({
-            ...user,
-            _id: user._id.toString(),
-            // Ensure other date fields are strings if needed, but JSON.stringify handles Dates usually.
-            // We'll map them explicitly just in case for consistency
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt
-        })),
+                count: users.length,
+                dbName: collection.dbName
+            },
+            users: users.map(user => ({
+                ...user,
+                _id: user._id.toString(),
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            })),
         })
-} catch (error) {
-    console.error("Error fetching users:", error)
-    return NextResponse.json({ success: false, error: "Failed to fetch users" }, { status: 500 })
-}
+    } catch (error) {
+        console.error("Error fetching users:", error)
+        return NextResponse.json({ success: false, error: "Failed to fetch users" }, { status: 500 })
+    }
 }
