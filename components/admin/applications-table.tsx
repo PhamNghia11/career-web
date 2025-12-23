@@ -2,19 +2,27 @@
 
 import { useState } from "react"
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+import {
+        Table,
+        TableBody,
+        TableCell,
+        TableHead,
+        TableHeader,
+        TableRow,
+    } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search, Download, FileText, Trash2, Eye } from "lucide-react"
+import { Search, Download, FileText, Trash2, Eye, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 interface Application {
     _id: string
@@ -26,6 +34,7 @@ interface Application {
     cvPath: string
     cvOriginalName: string
     createdAt: string
+    status?: string // Added status
 }
 
 interface ApplicationsTableProps {
@@ -36,6 +45,7 @@ export function ApplicationsTable({ initialApplications }: ApplicationsTableProp
     const { toast } = useToast()
     const [applications, setApplications] = useState<Application[]>(initialApplications)
     const [searchQuery, setSearchQuery] = useState("")
+    const [updatingId, setUpdatingId] = useState<string | null>(null)
 
     const filteredApplications = applications.filter((app) =>
         app.fullname.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -57,6 +67,48 @@ export function ApplicationsTable({ initialApplications }: ApplicationsTableProp
             title: "Đã xóa đơn ứng tuyển",
             description: "Hồ sơ đã được xóa (Giả lập).",
         })
+    }
+
+    const handleStatusChange = async (id: string, newStatus: string) => {
+        setUpdatingId(id)
+        try {
+            const response = await fetch(`/api/applications/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            })
+
+            if (response.ok) {
+                setApplications(prev => prev.map(app =>
+                    app._id === id ? { ...app, status: newStatus } : app
+                ))
+                toast({
+                    title: "Đã cập nhật trạng thái",
+                    description: "Trạng thái hồ sơ đã được cập nhật thành công.",
+                })
+            } else {
+                throw new Error("Failed to update")
+            }
+        } catch (error) {
+            toast({
+                title: "Lỗi cập nhật",
+                description: "Không thể cập nhật trạng thái. Vui lòng thử lại.",
+                variant: "destructive"
+            })
+        } finally {
+            setUpdatingId(null)
+        }
+    }
+
+    const getStatusBadge = (status?: string) => {
+        switch (status) {
+            case 'new': return <Badge variant="secondary">Mới</Badge>
+            case 'reviewed': return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">Đang xem</Badge>
+            case 'interviewed': return <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">Phỏng vấn</Badge>
+            case 'hired': return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Tuyển dụng</Badge>
+            case 'rejected': return <Badge variant="destructive">Từ chối</Badge>
+            default: return <Badge variant="outline">Mới</Badge>
+        }
     }
 
     return (
@@ -82,9 +134,10 @@ export function ApplicationsTable({ initialApplications }: ApplicationsTableProp
                     <Table>
                         <TableHeader className="bg-gray-50/50">
                             <TableRow>
-                                <TableHead className="w-[150px] font-semibold">Ngày ứng tuyển</TableHead>
+                                <TableHead className="w-[120px] font-semibold">Ngày ứng tuyển</TableHead>
                                 <TableHead className="font-semibold">Ứng viên</TableHead>
                                 <TableHead className="font-semibold">Vị trí / Công ty</TableHead>
+                                <TableHead className="font-semibold">Trạng thái</TableHead>
                                 <TableHead className="font-semibold">Liên hệ</TableHead>
                                 <TableHead className="font-semibold">CV</TableHead>
                                 <TableHead className="text-right font-semibold">Thao tác</TableHead>
@@ -93,29 +146,44 @@ export function ApplicationsTable({ initialApplications }: ApplicationsTableProp
                         <TableBody>
                             {filteredApplications.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-12 text-gray-500">
+                                    <TableCell colSpan={7} className="text-center py-12 text-gray-500">
                                         {searchQuery ? "Không tìm thấy kết quả nào" : "Không có dữ liệu"}
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 filteredApplications.map((app) => (
                                     <TableRow key={app._id} className="hover:bg-gray-50/50 transition-colors">
-                                        <TableCell className="w-[150px] text-gray-600">
+                                        <TableCell className="text-gray-600 text-sm">
                                             {new Date(app.createdAt).toLocaleDateString("vi-VN", {
                                                 day: '2-digit', month: '2-digit', year: 'numeric'
                                             })}
                                         </TableCell>
                                         <TableCell>
                                             <div className="font-medium text-gray-900">{app.fullname}</div>
-                                            <Badge variant="secondary" className="mt-1 text-xs font-normal">
-                                                Mới
-                                            </Badge>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-col">
-                                                <span className="font-medium text-blue-600">{app.jobTitle}</span>
+                                                <span className="font-medium text-blue-600 truncate max-w-[150px]" title={app.jobTitle}>{app.jobTitle}</span>
                                                 <span className="text-gray-500 text-xs mt-0.5">{app.companyName}</span>
                                             </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Select
+                                                defaultValue={app.status || 'new'}
+                                                onValueChange={(val) => handleStatusChange(app._id, val)}
+                                                disabled={updatingId === app._id}
+                                            >
+                                                <SelectTrigger className="w-[130px] h-8 text-xs">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="new">Mới</SelectItem>
+                                                    <SelectItem value="reviewed">Đang xem</SelectItem>
+                                                    <SelectItem value="interviewed">Phỏng vấn</SelectItem>
+                                                    <SelectItem value="hired">Tuyển dụng</SelectItem>
+                                                    <SelectItem value="rejected">Từ chối</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex flex-col gap-1">
@@ -129,7 +197,7 @@ export function ApplicationsTable({ initialApplications }: ApplicationsTableProp
                                                 onClick={() => handleDownload(app.cvOriginalName)}
                                             >
                                                 <FileText size={14} className="text-gray-500" />
-                                                <span className="truncate max-w-[150px]">{app.cvOriginalName}</span>
+                                                <span className="truncate max-w-[100px]" title={app.cvOriginalName}>{app.cvOriginalName}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">

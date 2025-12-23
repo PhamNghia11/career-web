@@ -50,7 +50,7 @@ export function NotificationBell() {
 
         try {
             setLoading(true)
-            const response = await fetch(`/api/notifications?userId=${user.id}`)
+            const response = await fetch(`/api/notifications?userId=${user.id}&role=${user.role || ''}`)
             const data = await response.json()
 
             if (data.success) {

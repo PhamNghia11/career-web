@@ -300,6 +300,22 @@ export async function POST(request: Request) {
     const collection = await getCollection(COLLECTIONS.USER_REVIEWS)
     const result = await collection.insertOne(newReview)
 
+    // Create Notification for Admins
+    try {
+      const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+      await notificationsCollection.insertOne({
+        targetRole: 'admin',
+        type: 'system', // or 'visitor' or 'review' if added to types
+        title: 'Đánh giá mới',
+        message: `${newReview.author} vừa gửi một đánh giá: "${newReview.title}"`,
+        read: false,
+        createdAt: new Date(),
+        link: '/dashboard/reviews'
+      })
+    } catch (notifError) {
+      console.error("Failed to create notification:", notifError)
+    }
+
     const responseReview = {
       ...newReview,
       id: result.insertedId.toString(),

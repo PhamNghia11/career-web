@@ -4,7 +4,8 @@ import { ObjectId } from "mongodb"
 
 export interface Notification {
   _id?: ObjectId
-  userId: string
+  userId?: string // Made optional because admin notifications might not have a specific userId
+  targetRole?: "admin" | "user" // Add targetRole
   type: "job" | "message" | "interview" | "system" | "visitor"
   title: string
   message: string
@@ -18,19 +19,40 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get("userId")
+    const role = searchParams.get("role") // Get user role from params
 
     if (!userId) {
       return NextResponse.json({ success: false, error: "userId is required" }, { status: 400 })
     }
 
     const collection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+
+    // Build query based on role
+    let query: any = { userId }
+
+    if (role === 'admin') {
+      query = {
+        $or: [
+          { userId },
+          { targetRole: 'admin' }
+        ]
+      }
+    }
+
     const notifications = await collection
-      .find({ userId })
+      .find(query)
       .sort({ createdAt: -1 })
       .limit(50)
       .toArray()
 
     // Count unread notifications
+    // For admin, we might need a separate way to track "read" status for shared notifications,
+    // but for now, let's keep it simple: if it's in the list and read=false, it's unread.
+    // (Note: In a shared notification system, "read" status is tricky. 
+    // Usually, you'd verify if *this* user has read it. 
+    // For this simple implementation, we'll assume shared notifications are "read" if the flag is true in DB, 
+    // which means if ANY admin reads it, it's read for all. OR we rely on client side state. 
+    // Let's stick to the simple DB flag for now as requested.)
     const unreadCount = notifications.filter((n) => !n.read).length
 
     return NextResponse.json({
@@ -48,15 +70,17 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { userId, type, title, message, link } = body
+    const { userId, targetRole, type, title, message, link } = body
 
-    if (!userId || !type || !title || !message) {
+    // Validate: Needs either userId OR targetRole
+    if ((!userId && !targetRole) || !type || !title || !message) {
       return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 })
     }
 
     const collection = await getCollection(COLLECTIONS.NOTIFICATIONS)
     const notification: Omit<Notification, "_id"> = {
       userId,
+      targetRole,
       type,
       title,
       message,

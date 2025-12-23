@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
     const applicationsCollection = await getCollection(COLLECTIONS.APPLICATIONS)
 
-    await applicationsCollection.insertOne({
+    const result = await applicationsCollection.insertOne({
       jobTitle,
       companyName,
       fullname,
@@ -53,6 +53,23 @@ export async function POST(request: Request) {
       createdAt: new Date(),
       status: "new", // new, reviewed, interviewed, rejected, hired
     })
+
+    // Create Notification for Admins
+    try {
+      const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+      await notificationsCollection.insertOne({
+        targetRole: 'admin',
+        type: 'job',
+        title: 'Hồ sơ ứng tuyển mới',
+        message: `${fullname} vừa ứng tuyển vị trí ${jobTitle}`,
+        read: false,
+        createdAt: new Date(),
+        link: '/dashboard/applications' // Or specific link if available
+      })
+    } catch (notifError) {
+      console.error("Failed to create notification:", notifError)
+      // Don't fail the request if notification fails
+    }
 
     return NextResponse.json(
       {
