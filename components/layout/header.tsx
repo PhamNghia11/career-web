@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Menu, X, Search, Bell, User, ChevronDown } from "lucide-react"
+import { Menu, X, Search, User, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/lib/auth-context"
+import { NotificationBell } from "@/components/notifications/notification-bell"
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -91,59 +92,7 @@ export function Header() {
 
             {user ? (
               <>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-primary hover:bg-primary/10 relative"
-                    >
-                      <Bell className="h-6 w-6" />
-                      <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                        3
-                      </span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-80">
-                    <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100">
-                      <span className="font-semibold text-sm">Thông báo</span>
-                      <span className="text-xs text-primary cursor-pointer hover:underline">Đánh dấu đã đọc</span>
-                    </div>
-                    <div className="max-h-[300px] overflow-y-auto">
-                      <DropdownMenuItem className="cursor-pointer p-4 items-start gap-3">
-                        <div className="w-2 h-2 mt-2 rounded-full bg-blue-500 flex-shrink-0" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium leading-none mb-1">Hồ sơ được xem</p>
-                          <p className="text-xs text-muted-foreground">Nhà tuyển dụng FPT Software đã xem hồ sơ của bạn.</p>
-                          <p className="text-[10px] text-gray-400 mt-1">2 giờ trước</p>
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="cursor-pointer p-4 items-start gap-3">
-                        <div className="w-2 h-2 mt-2 rounded-full bg-blue-500 flex-shrink-0" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium leading-none mb-1">Việc làm phù hợp mới</p>
-                          <p className="text-xs text-muted-foreground">Có 5 việc làm mới phù hợp với kỹ năng ReactJS của bạn.</p>
-                          <p className="text-[10px] text-gray-400 mt-1">5 giờ trước</p>
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="cursor-pointer p-4 items-start gap-3">
-                        <div className="w-2 h-2 mt-2 rounded-full bg-gray-300 flex-shrink-0" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium leading-none mb-1">Cập nhật hồ sơ</p>
-                          <p className="text-xs text-muted-foreground">Đừng quên cập nhật CV mới nhất để thu hút nhà tuyển dụng.</p>
-                          <p className="text-[10px] text-gray-400 mt-1">1 ngày trước</p>
-                        </div>
-                      </DropdownMenuItem>
-                    </div>
-                    <div className="p-2 border-t border-gray-100 text-center">
-                      <Link href="/notifications" className="text-xs text-primary hover:underline font-medium">
-                        Xem tất cả
-                      </Link>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <NotificationBell />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="text-primary hover:bg-primary/10 gap-2 pr-2 pl-2">
@@ -166,26 +115,6 @@ export function Header() {
                         Dashboard
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Link href="/dashboard/profile" className="w-full">
-                        Hồ sơ cá nhân
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Link href="/dashboard/settings" className="w-full">
-                        Cài đặt
-                      </Link>
-                    </DropdownMenuItem>
-                    {user.role === "admin" && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                          <Link href="/admin" className="w-full text-red-600 font-medium">
-                            🔧 Quản trị Admin
-                          </Link>
-                        </DropdownMenuItem>
-                      </>
-                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>Đăng xuất</DropdownMenuItem>
                   </DropdownMenuContent>

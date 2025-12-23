@@ -54,4 +54,6 @@ export const COLLECTIONS = {
   USER_REVIEWS: "user_reviews",
   SAVED_JOBS: "saved_jobs",
   CONTACTS: "contacts",
+  NOTIFICATIONS: "notifications",
+  VISITORS: "visitors",
 } as const

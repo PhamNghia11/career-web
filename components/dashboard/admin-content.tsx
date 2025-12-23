@@ -6,6 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
+interface ReviewStats {
+    total_reviews: number
+    average_rating: number
+    rating_distribution: Record<string, number>
+    verified_count: number
+    place_name: string
+    google_maps_rating: number
+    total_reviews_on_maps: number
+    reviews_crawled: number
+    crawl_date: string
+}
+
 export function AdminDashboardContent() {
     const [stats, setStats] = useState({
         users: 0,
@@ -13,6 +25,7 @@ export function AdminDashboardContent() {
         applications: 0,
         contacts: 0
     })
+    const [reviewStats, setReviewStats] = useState<ReviewStats | null>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -30,6 +43,11 @@ export function AdminDashboardContent() {
 
                 const jobRes = await fetch("/api/jobs")
                 const jobData = await jobRes.json()
+
+                // Fetch real Google review stats
+                const reviewsRes = await fetch("/data/reviews-stats.json")
+                const reviewsData = await reviewsRes.json()
+                setReviewStats(reviewsData)
 
                 setStats({
                     users: 15420, // Mock for now
@@ -96,15 +114,17 @@ export function AdminDashboardContent() {
 
                 <Card className="shadow-sm hover:shadow-md transition-shadow">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">Đánh giá</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Đánh giá Google</CardTitle>
                         <div className="h-8 w-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center">
                             <Star size={18} />
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">4.8/5</div>
+                        <div className="text-2xl font-bold">
+                            {reviewStats ? `${reviewStats.average_rating}/5` : "---"}
+                        </div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            Trung bình đánh giá
+                            {reviewStats ? `${reviewStats.total_reviews} đánh giá (${reviewStats.total_reviews_on_maps} trên Maps)` : "Đang tải..."}
                         </p>
                     </CardContent>
                 </Card>

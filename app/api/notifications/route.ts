@@ -1,73 +1,105 @@
 import { NextResponse } from "next/server"
+import { getCollection, COLLECTIONS } from "@/lib/mongodb"
+import { ObjectId } from "mongodb"
 
-const mockNotifications = [
-  {
-    id: "1",
-    type: "job" as const,
-    title: "Đơn ứng tuyển được xem xét",
-    message: "FPT Software đang xem xét đơn ứng tuyển của bạn cho vị trí Frontend Developer Intern",
-    timestamp: new Date(Date.now() - 7200000).toISOString(),
-    read: false,
-  },
-  {
-    id: "2",
-    type: "message" as const,
-    title: "Tin nhắn mới từ nhà tuyển dụng",
-    message: "Vingroup đã gửi tin nhắn về lịch phỏng vấn",
-    timestamp: new Date(Date.now() - 18000000).toISOString(),
-    read: false,
-  },
-  {
-    id: "3",
-    type: "interview" as const,
-    title: "Lịch phỏng vấn mới",
-    message: "Bạn có lịch phỏng vấn với Techcombank vào ngày 20/12/2025 lúc 14:00",
-    timestamp: new Date(Date.now() - 43200000).toISOString(),
-    read: false,
-  },
-  {
-    id: "4",
-    type: "system" as const,
-    title: "Cập nhật hồ sơ",
-    message: "Hồ sơ của bạn đã được cập nhật thành công",
-    timestamp: new Date(Date.now() - 86400000).toISOString(),
-    read: true,
-  },
-  {
-    id: "5",
-    type: "job" as const,
-    title: "Việc làm mới phù hợp",
-    message: "5 việc làm mới phù hợp với hồ sơ của bạn",
-    timestamp: new Date(Date.now() - 172800000).toISOString(),
-    read: true,
-  },
-]
+export interface Notification {
+  _id?: ObjectId
+  userId: string
+  type: "job" | "message" | "interview" | "system" | "visitor"
+  title: string
+  message: string
+  read: boolean
+  createdAt: Date
+  link?: string
+}
 
-export async function GET() {
+// GET - Lấy notifications của user
+export async function GET(request: Request) {
   try {
-    await new Promise((resolve) => setTimeout(resolve, 300))
+    const { searchParams } = new URL(request.url)
+    const userId = searchParams.get("userId")
+
+    if (!userId) {
+      return NextResponse.json({ success: false, error: "userId is required" }, { status: 400 })
+    }
+
+    const collection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+    const notifications = await collection
+      .find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .toArray()
+
+    // Count unread notifications
+    const unreadCount = notifications.filter((n) => !n.read).length
 
     return NextResponse.json({
       success: true,
-      data: mockNotifications,
+      data: notifications,
+      unreadCount,
     })
   } catch (error) {
+    console.error("Error fetching notifications:", error)
     return NextResponse.json({ success: false, error: "Failed to fetch notifications" }, { status: 500 })
   }
 }
 
+// POST - Tạo notification mới
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const { userId, type, title, message, link } = body
+
+    if (!userId || !type || !title || !message) {
+      return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 })
+    }
+
+    const collection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+    const notification: Omit<Notification, "_id"> = {
+      userId,
+      type,
+      title,
+      message,
+      read: false,
+      createdAt: new Date(),
+      link,
+    }
+
+    const result = await collection.insertOne(notification)
+
+    return NextResponse.json({
+      success: true,
+      data: { ...notification, _id: result.insertedId },
+    })
+  } catch (error) {
+    console.error("Error creating notification:", error)
+    return NextResponse.json({ success: false, error: "Failed to create notification" }, { status: 500 })
+  }
+}
+
+// PATCH - Đánh dấu đã đọc
 export async function PATCH(request: Request) {
   try {
-    const { notificationId, action } = await request.json()
+    const { notificationId, action, userId } = await request.json()
 
-    if (action === "mark_read") {
+    const collection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+
+    if (action === "mark_read" && notificationId) {
+      await collection.updateOne(
+        { _id: new ObjectId(notificationId) },
+        { $set: { read: true } }
+      )
       return NextResponse.json({
         success: true,
         message: "Notification marked as read",
       })
     }
 
-    if (action === "mark_all_read") {
+    if (action === "mark_all_read" && userId) {
+      await collection.updateMany(
+        { userId, read: false },
+        { $set: { read: true } }
+      )
       return NextResponse.json({
         success: true,
         message: "All notifications marked as read",
@@ -76,10 +108,12 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({ success: false, error: "Invalid action" }, { status: 400 })
   } catch (error) {
+    console.error("Error updating notification:", error)
     return NextResponse.json({ success: false, error: "Failed to update notification" }, { status: 500 })
   }
 }
 
+// DELETE - Xóa notification
 export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
@@ -89,11 +123,15 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, error: "Notification ID is required" }, { status: 400 })
     }
 
+    const collection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+    await collection.deleteOne({ _id: new ObjectId(notificationId) })
+
     return NextResponse.json({
       success: true,
       message: "Notification deleted successfully",
     })
   } catch (error) {
+    console.error("Error deleting notification:", error)
     return NextResponse.json({ success: false, error: "Failed to delete notification" }, { status: 500 })
   }
 }
