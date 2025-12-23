@@ -60,24 +60,22 @@ export default function MyJobsPage() {
         if (!jobToDelete) return
 
         try {
-            // Note: Ideally implements DELETE /api/jobs/[id], but standard route might handle it?
-            // I will assume standard DELETE endpoint exists or needs to be used.
-            // Wait, I only created GET/POST in main route. I need to make sure I have DELETE.
-            // I actually haven't implemented DELETE /api/jobs/[id] yet in this session.
-            // I implemented DELETE /api/users/[id].
-            // Let's implement DELETE for jobs too or just simulate it for now?
-            // NO, User asked to "do it" (implememt). I should probably implement the API for DELETE job.
-            // For now, let's just log and show toast as "Coming soon" or try to call it and fail gracefully if not there.
-            // Actually, I should probably check if I need to implement DELETE job API.
-            // Let's assume for this step I will build the UI and then if API is missing I'll add it.
-            // Wait, the user prompt was "deploy features", I'm in "dashboard revamp". 
-            // I'll stick to UI first, but basic "Remove" is expected.
+            const response = await fetch(`/api/jobs/${jobToDelete}`, {
+                method: 'DELETE'
+            })
+            const data = await response.json()
 
-            toast({ title: "Thông báo", description: "Chức năng xóa đang được cập nhật." })
-            // Placeholder for delete logic
-            setDeleteDialogOpen(false)
+            if (data.success) {
+                toast({ title: "Xóa thành công", description: "Tin tuyển dụng đã được xóa." })
+                setJobs(prev => prev.filter(job => job._id !== jobToDelete))
+            } else {
+                throw new Error(data.error)
+            }
         } catch (e) {
             toast({ title: "Lỗi", description: "Không thể xóa tin.", variant: "destructive" })
+        } finally {
+            setDeleteDialogOpen(false)
+            setJobToDelete(null)
         }
     }
 
@@ -185,9 +183,11 @@ export default function MyJobsPage() {
                                                         <DropdownMenuItem>
                                                             <FileText className="mr-2 h-4 w-4" /> Xem ứng viên
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem>
-                                                            <Edit className="mr-2 h-4 w-4" /> Chỉnh sửa
-                                                        </DropdownMenuItem>
+                                                        <Link href={`/dashboard/jobs/${job._id}/edit`}>
+                                                            <DropdownMenuItem>
+                                                                <Edit className="mr-2 h-4 w-4" /> Chỉnh sửa
+                                                            </DropdownMenuItem>
+                                                        </Link>
                                                         <DropdownMenuItem
                                                             className="text-destructive font-medium"
                                                             onClick={() => {
