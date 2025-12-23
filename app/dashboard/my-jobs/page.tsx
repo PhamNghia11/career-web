@@ -1,4 +1,5 @@
 "use client"
+// Deployment trigger: fixed linking issues
 
 import { useState, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
