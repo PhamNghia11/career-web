@@ -63,6 +63,10 @@ export default function LoginPage() {
                 <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-md">{error}</div>
               )}
 
+              {/* Dummy inputs to prevent Chrome autofill */}
+              <input type="text" style={{ display: "none" }} />
+              <input type="password" style={{ display: "none" }} />
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -92,6 +96,7 @@ export default function LoginPage() {
                     placeholder="Nhập mật khẩu"
                     className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                     required
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
