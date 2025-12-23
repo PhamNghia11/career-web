@@ -49,6 +49,35 @@ export async function POST(request: Request) {
       id: result.insertedId.toString()
     }
 
+    // Send notification email to Admin
+    if (process.env.ADMIN_EMAIL) {
+      // We don't await this to avoid blocking the response time
+      // or ensure error handling doesn't fail the registration
+      import("@/lib/email").then(({ sendEmail }) => {
+        sendEmail({
+          to: process.env.ADMIN_EMAIL!,
+          subject: `✨ Người dùng mới đăng ký: ${name}`,
+          html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <h2 style="color: #0F52BA;">Người dùng mới đăng ký tài khoản</h2>
+                        <p>Thông tin chi tiết:</p>
+                        <ul>
+                            <li><strong>Họ tên:</strong> ${name}</li>
+                            <li><strong>Email:</strong> ${email}</li>
+                            <li><strong>Vai trò:</strong> ${role || "student"}</li>
+                            <li><strong>Thời gian:</strong> ${new Date().toLocaleString("vi-VN")}</li>
+                        </ul>
+                        <p>Vui lòng đăng nhập vào trang quản trị để xem chi tiết.</p>
+                        <a href="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/users" 
+                           style="background-color: #0F52BA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                           Quản lý người dùng
+                        </a>
+                    </div>
+                `
+        }).catch(err => console.error("Failed to send admin notification:", err))
+      })
+    }
+
     return NextResponse.json({
       success: true,
       user: userResponse,
