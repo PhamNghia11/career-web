@@ -134,7 +134,7 @@ export function Footer() {
         </div>
 
         <div className="text-center text-sm text-primary-foreground/60 pt-4">
-          <p>&copy; 2025 Gia Dinh University. All rights reserved. <Link href="/admin" className="opacity-0 hover:opacity-100 transition-opacity ml-2">Admin</Link></p>
+          <p>&copy; 2025 Gia Dinh University. All rights reserved.</p>
         </div>
       </div>
     </footer>

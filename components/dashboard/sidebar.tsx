@@ -44,9 +44,10 @@ const adminNav = [
   { name: "Tổng quan", href: "/dashboard", icon: Home },
   { name: "Quản lý người dùng", href: "/dashboard/users", icon: Users },
   { name: "Quản lý việc làm", href: "/dashboard/jobs", icon: Briefcase },
+  { name: "Đơn ứng tuyển", href: "/dashboard/applications", icon: FileText },
   { name: "Đánh giá Google", href: "/dashboard/reviews", icon: Star },
   { name: "Thống kê", href: "/dashboard/analytics", icon: BarChart3 },
-  { name: "Tin nhắn", href: "/dashboard/messages", icon: MessageSquare },
+  { name: "Liên hệ", href: "/dashboard/messages", icon: MessageSquare },
   { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },
 ]
 
