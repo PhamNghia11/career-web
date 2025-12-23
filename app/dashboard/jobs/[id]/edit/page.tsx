@@ -1,0 +1,494 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/lib/auth-context"
+import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Loader2, Briefcase, MapPin, DollarSign, Building, ArrowLeft } from "lucide-react"
+
+// Constants (Duplicated from new/page.tsx for simplicity)
+const JOB_TYPES = [
+    { value: "full-time", label: "Toàn thời gian" },
+    { value: "part-time", label: "Bán thời gian" },
+    { value: "internship", label: "Thực tập" },
+]
+
+const MAJORS = [
+    "Công nghệ thông tin", "Kinh tế - Quản trị", "Marketing", "Kế toán - Tài chính",
+    "Ngôn ngữ Anh", "Thiết kế đồ họa", "Du lịch - Khách sạn", "Logistics", "Đông phương học",
+    "Luật", "Điện - Điện tử"
+]
+
+const COMMON_BENEFITS = [
+    "Bảo hiểm y tế/XH", "Thưởng tháng 13", "Du lịch hàng năm", "Laptop làm việc",
+    "Đào tạo chuyên môn", "Phụ cấp ăn trưa", "Phụ cấp gửi xe", "Review lương định kỳ"
+]
+
+const formSchema = z.object({
+    title: z.string().min(5, "Tiêu đề phải có ít nhất 5 ký tự"),
+    company: z.string().min(2, "Tên công ty phải có ít nhất 2 ký tự"),
+    location: z.string().min(5, "Địa điểm phải có ít nhất 5 ký tự"),
+    type: z.enum(["full-time", "part-time", "internship"]),
+    field: z.string().min(2, "Vui lòng chọn hoặc nhập ngành nghề"),
+    salaryMin: z.coerce.number().optional(),
+    salaryMax: z.coerce.number().optional(),
+    isNegotiable: z.boolean().default(false),
+    relatedMajors: z.array(z.string()).min(1, "Chọn ít nhất 1 chuyên ngành liên quan"),
+    benefits: z.array(z.string()).optional(),
+    description: z.string().min(20, "Mô tả công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
+    requirements: z.string().min(20, "Yêu cầu công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
+    detailedBenefits: z.string().optional(),
+})
+
+export default function EditJobPage({ params }: { params: { id: string } }) {
+    const { user } = useAuth()
+    const router = useRouter()
+    const { toast } = useToast()
+    const [isLoading, setIsLoading] = useState(false)
+    const [isFetching, setIsFetching] = useState(true)
+
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            title: "",
+            company: "",
+            location: "",
+            type: "full-time",
+            field: "",
+            salaryMin: 0,
+            salaryMax: 0,
+            isNegotiable: false,
+            relatedMajors: [],
+            benefits: [],
+            description: "",
+            requirements: "",
+            detailedBenefits: "",
+        },
+    })
+
+    const isNegotiable = form.watch("isNegotiable")
+
+    useEffect(() => {
+        const fetchJob = async () => {
+            try {
+                const res = await fetch(`/api/jobs/${params.id}`)
+                const data = await res.json()
+
+                if (data.success && data.data) {
+                    const job = data.data
+
+                    form.reset({
+                        title: job.title,
+                        company: job.company,
+                        location: job.location,
+                        type: job.type || "full-time",
+                        field: job.field,
+                        salaryMin: job.salaryMin || 0,
+                        salaryMax: job.salaryMax || 0,
+                        isNegotiable: job.isNegotiable || false,
+                        relatedMajors: job.relatedMajors || [],
+                        benefits: job.benefits || [],
+                        description: job.description,
+                        requirements: Array.isArray(job.requirements) ? job.requirements.join('\n') : job.requirements || "",
+                        detailedBenefits: Array.isArray(job.detailedBenefits) ? job.detailedBenefits.join('\n') : job.detailedBenefits || "",
+                    })
+                } else {
+                    toast({ title: "Lỗi", description: "Không tìm thấy tin tuyển dụng", variant: "destructive" })
+                    router.push("/dashboard/my-jobs")
+                }
+            } catch (error) {
+                console.error(error)
+                toast({ title: "Lỗi", description: "Không thể tải thông tin công việc", variant: "destructive" })
+            } finally {
+                setIsFetching(false)
+            }
+        }
+
+        fetchJob()
+    }, [params.id, form, router, toast])
+
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        setIsLoading(true)
+        try {
+            // Format data logic same as POST
+            let salaryString = "Thỏa thuận"
+            if (!values.isNegotiable) {
+                if (values.salaryMin && values.salaryMax) {
+                    salaryString = `${(values.salaryMin / 1000000).toLocaleString()} - ${(values.salaryMax / 1000000).toLocaleString()} triệu`
+                } else if (values.salaryMin) {
+                    salaryString = `Từ ${(values.salaryMin / 1000000).toLocaleString()} triệu`
+                } else if (values.salaryMax) {
+                    salaryString = `Đến ${(values.salaryMax / 1000000).toLocaleString()} triệu`
+                }
+            }
+
+            const requirementsList = values.requirements.split('\n').filter(line => line.trim() !== "")
+            const detailedBenefitsList = values.detailedBenefits ? values.detailedBenefits.split('\n').filter(line => line.trim() !== "") : []
+
+            const payload = {
+                ...values,
+                salary: salaryString,
+                requirements: requirementsList,
+                detailedBenefits: detailedBenefitsList,
+            }
+
+            const response = await fetch(`/api/jobs/${params.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) throw new Error(data.error || "Có lỗi xảy ra")
+
+            toast({
+                title: "Cập nhật thành công!",
+                description: "Thông tin tin tuyển dụng đã được lưu.",
+                variant: "default",
+            })
+
+            router.push("/dashboard/my-jobs")
+        } catch (error) {
+            console.error(error)
+            toast({
+                title: "Lỗi cập nhật",
+                description: "Vui lòng thử lại sau.",
+                variant: "destructive",
+            })
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    if (isFetching) {
+        return <div className="flex h-[50vh] items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+    }
+
+    return (
+        <div className="container mx-auto py-6 max-w-4xl">
+            <div className="mb-6 flex items-center gap-4">
+                <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                    <ArrowLeft className="w-5 h-5" />
+                </Button>
+                <div>
+                    <h1 className="text-3xl font-bold">Chỉnh sửa tin tuyển dụng</h1>
+                    <p className="text-gray-500">Cập nhật thông tin cho vị trí: {form.getValues("title")}</p>
+                </div>
+            </div>
+
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    {/* General Info */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-blue-600" /> Thông tin chung</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-6">
+                            <FormField
+                                control={form.control}
+                                name="title"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Tiêu đề công việc <span className="text-red-500">*</span></FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="VD: Thực tập sinh Frontend ReactJS" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            {/* ... (Same fields as Post Job) ... can extract component if needed but copying is faster for now */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="company"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Tên công ty <span className="text-red-500">*</span></FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Tên doanh nghiệp của bạn" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="location"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Địa điểm làm việc <span className="text-red-500">*</span></FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <MapPin className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                                                    <Input className="pl-9" placeholder="VD: Quận 3, TP.HCM" {...field} />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="type"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Hình thức làm việc</FormLabel>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Chọn hình thức" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {JOB_TYPES.map(type => (
+                                                        <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="field"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Lĩnh vực / Ngành nghề <span className="text-red-500">*</span></FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="VD: IT Phần mềm" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <div className="space-y-3">
+                                <FormLabel>Ngành học liên quan</FormLabel>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                    {MAJORS.map((major) => (
+                                        <FormField
+                                            key={major}
+                                            control={form.control}
+                                            name="relatedMajors"
+                                            render={({ field }) => {
+                                                const current = field.value || []
+                                                return (
+                                                    <FormItem
+                                                        key={major}
+                                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                                    >
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={current.includes(major)}
+                                                                onCheckedChange={(checked) => {
+                                                                    return checked
+                                                                        ? field.onChange([...current, major])
+                                                                        : field.onChange(
+                                                                            current.filter(
+                                                                                (value) => value !== major
+                                                                            )
+                                                                        )
+                                                                }}
+                                                            />
+                                                        </FormControl>
+                                                        <FormLabel className="font-normal text-sm cursor-pointer">
+                                                            {major}
+                                                        </FormLabel>
+                                                    </FormItem>
+                                                )
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                                <FormMessage>{form.formState.errors.relatedMajors?.message}</FormMessage>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Salary & Benefits */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><DollarSign className="w-5 h-5 text-green-600" /> Lương & Phúc lợi</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-6">
+                            <div className="flex flex-col gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="isNegotiable"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </FormControl>
+                                            <div className="space-y-1 leading-none">
+                                                <FormLabel>
+                                                    Mức lương Thoả thuận
+                                                </FormLabel>
+                                            </div>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {!isNegotiable && (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="salaryMin"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Tối thiểu (VNĐ)</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" placeholder="0" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="salaryMax"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Tối đa (VNĐ)</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" placeholder="0" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="space-y-3">
+                                <FormLabel>Phúc lợi</FormLabel>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                    {COMMON_BENEFITS.map((benefit) => (
+                                        <FormField
+                                            key={benefit}
+                                            control={form.control}
+                                            name="benefits"
+                                            render={({ field }) => {
+                                                const current = field.value || []
+                                                return (
+                                                    <FormItem
+                                                        key={benefit}
+                                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                                    >
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={current.includes(benefit)}
+                                                                onCheckedChange={(checked) => {
+                                                                    return checked
+                                                                        ? field.onChange([...current, benefit])
+                                                                        : field.onChange(
+                                                                            current.filter(
+                                                                                (value) => value !== benefit
+                                                                            )
+                                                                        )
+                                                                }}
+                                                            />
+                                                        </FormControl>
+                                                        <FormLabel className="font-normal text-sm cursor-pointer">
+                                                            {benefit}
+                                                        </FormLabel>
+                                                    </FormItem>
+                                                )
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Detailed Description */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Building className="w-5 h-5 text-orange-600" /> Mô tả chi tiết</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-6">
+                            <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Mô tả công việc <span className="text-red-500">*</span></FormLabel>
+                                        <FormControl>
+                                            <Textarea className="h-32" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="requirements"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Yêu cầu công việc <span className="text-red-500">*</span></FormLabel>
+                                        <FormControl>
+                                            <Textarea className="h-32" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="detailedBenefits"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Phúc lợi chi tiết</FormLabel>
+                                        <FormControl>
+                                            <Textarea className="h-24" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </CardContent>
+                    </Card>
+
+                    <div className="flex justify-end gap-4">
+                        <Button type="button" variant="outline" onClick={() => router.back()}>Hủy bỏ</Button>
+                        <Button type="submit" disabled={isLoading} className="bg-blue-600 hover:bg-blue-700">
+                            {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang lưu...</> : "Lưu thay đổi"}
+                        </Button>
+                    </div>
+                </form>
+            </Form>
+        </div>
+    )
+}
