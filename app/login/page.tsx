@@ -116,22 +116,6 @@ export default function LoginPage() {
                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
             </form>
-
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-white px-2 text-gray-500">Demo accounts</span>
-                </div>
-              </div>
-              <div className="mt-4 text-xs text-gray-600 space-y-1">
-                <p>Admin: admin@gdu.edu.vn / admin123</p>
-                <p>Student: student@gdu.edu.vn / student123</p>
-                <p>Employer: employer@company.com / employer123</p>
-              </div>
-            </div>
           </CardContent>
           <CardFooter className="justify-center">
             <p className="text-sm text-gray-600">
