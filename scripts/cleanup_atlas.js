@@ -19,27 +19,31 @@ function getEnvValue(key) {
 }
 
 const uri = getEnvValue('MONGODB_URI');
-console.log("Connecting to URI length:", uri ? uri.length : "null");
+
+const mockEmails = [
+    "nguyenvana@gdu.edu.vn",
+    "tranthib@gdu.edu.vn",
+    "hr@fpt.com.vn",
+    "levanc@gdu.edu.vn"
+    // "admin@gdu.edu.vn" // Skipping admin to be safe
+];
 
 async function run() {
-    if (!uri) {
-        console.error("No MongoDB URI found in .env.local");
-        return;
-    }
+    if (!uri) { return; }
     const client = new MongoClient(uri);
     try {
         await client.connect();
         const db = client.db("gdu_career");
 
-        const mockCount = await db.collection("users").countDocuments({ name: "Nguyen Van A" });
-        console.log(`Mock Users (Nguyen Van A) in DB: ${mockCount}`);
+        const result = await db.collection("users").deleteMany({
+            email: { $in: mockEmails }
+        });
 
-        const totalCount = await db.collection("users").countDocuments({});
-        console.log(`Total Users in DB: ${totalCount}`);
+        console.log(`Deleted ${result.deletedCount} mock users from Atlas.`);
 
-        const users = await db.collection("users").find({}, { projection: { name: 1, email: 1 } }).limit(5).toArray();
-        console.log("First 5 users in DB:");
-        users.forEach(u => console.log(`- ${u.name} (${u.email})`));
+        const allUsers = await db.collection("users").find({}, { projection: { name: 1, email: 1, role: 1 } }).toArray();
+        console.log("Current Users in Atlas (with roles):");
+        allUsers.forEach(u => console.log(`- ${u.name} (${u.email}) - Role: "${u.role}"`));
 
     } catch (e) {
         console.error("Error:", e);
