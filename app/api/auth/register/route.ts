@@ -50,12 +50,12 @@ export async function POST(request: Request) {
     }
 
     // Send notification email to Admin
+    // Send notification email to Admin
     if (process.env.ADMIN_EMAIL) {
-      // We don't await this to avoid blocking the response time
-      // or ensure error handling doesn't fail the registration
-      import("@/lib/email").then(({ sendEmail }) => {
-        sendEmail({
-          to: process.env.ADMIN_EMAIL!,
+      try {
+        const { sendEmail } = await import("@/lib/email")
+        await sendEmail({
+          to: process.env.ADMIN_EMAIL,
           subject: `✨ Người dùng mới đăng ký: ${name}`,
           html: `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -74,8 +74,11 @@ export async function POST(request: Request) {
                         </a>
                     </div>
                 `
-        }).catch(err => console.error("Failed to send admin notification:", err))
-      })
+        })
+      } catch (emailError) {
+        console.error("Failed to send admin notification:", emailError)
+        // Don't fail the registration if email fails
+      }
     }
 
     return NextResponse.json({
