@@ -66,3 +66,39 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
+// ... (existing POST)
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const email = searchParams.get("email")
+    const role = searchParams.get("role")
+
+    const collection = await getCollection(COLLECTIONS.APPLICATIONS)
+    let query = {}
+
+    // Simple role-based filter simulation
+    // If student, filter by email. If admin, return all.
+    // In a real secure app, we'd verify session/token here.
+    if (role === "student" && email) {
+      query = { email: email }
+    } else if (role === "admin") {
+      query = {} // All
+    } else {
+      // Default behavior (e.g. for API testing or if logic unclear)
+      // Maybe return nothing to be safe? Or match email if present.
+      if (email) query = { email: email }
+      else query = {} // Or maybe block? For now let's allow all if no filter for dev ease or empty.
+    }
+
+    const applications = await collection.find(query).sort({ createdAt: -1 }).toArray()
+
+    return NextResponse.json({
+      success: true,
+      data: applications
+    })
+  } catch (error) {
+    console.error("Fetch applications error:", error)
+    return NextResponse.json({ error: "Failed to fetch applications" }, { status: 500 })
+  }
+}

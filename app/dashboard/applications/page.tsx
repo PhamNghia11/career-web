@@ -36,10 +36,17 @@ const statusLabels = {
   accepted: "Chấp nhận",
 }
 
+import { useAuth } from "@/lib/auth-context"
+
+// ... imports
+
 export default function ApplicationsPage() {
+  const { user } = useAuth()
   const [applications, setApplications] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
+
+  // ... rest
 
   useEffect(() => {
     fetchApplications()
@@ -48,7 +55,8 @@ export default function ApplicationsPage() {
   const fetchApplications = async () => {
     setLoading(true)
     try {
-      const response = await fetch("/api/applications")
+      const userQuery = user ? `?role=${user.role}&email=${user.email}` : ""
+      const response = await fetch(`/api/applications${userQuery}`)
       const result = await response.json()
 
       if (result.success) {
