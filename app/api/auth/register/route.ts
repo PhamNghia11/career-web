@@ -65,7 +65,7 @@ export async function POST(request: Request) {
                             <li><strong>Họ tên:</strong> ${name}</li>
                             <li><strong>Email:</strong> ${email}</li>
                             <li><strong>Vai trò:</strong> ${role || "student"}</li>
-                            <li><strong>Thời gian:</strong> ${new Date().toLocaleString("vi-VN")}</li>
+                            <li><strong>Thời gian:</strong> ${new Intl.DateTimeFormat("vi-VN", { dateStyle: "full", timeStyle: "long", timeZone: "Asia/Ho_Chi_Minh" }).format(new Date())}</li>
                         </ul>
                         <p>Vui lòng đăng nhập vào trang quản trị để xem chi tiết.</p>
                         <a href="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/users" 

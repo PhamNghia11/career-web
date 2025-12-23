@@ -27,7 +27,7 @@ export async function GET() {
             <h2 style="color: #28a745;">Test Email Thành Công! 🎉</h2>
             <p>Nếu bạn nhận được email này, tính năng gửi mail đang hoạt động bình thường.</p>
             <hr>
-            <p style="color: #666; font-size: 12px;">Thời gian: ${new Date().toLocaleString("vi-VN")}</p>
+            <p style="color: #666; font-size: 12px;">Thời gian: ${new Intl.DateTimeFormat("vi-VN", { dateStyle: "full", timeStyle: "long", timeZone: "Asia/Ho_Chi_Minh" }).format(new Date())}</p>
         </div>
       `,
         })
