@@ -110,7 +110,7 @@ export default function PostJobPage() {
                 requirements: requirementsList,
                 detailedBenefits: detailedBenefitsList,
                 role: user?.role,
-                creatorId: user?.id || "unknown"
+                creatorId: user?._id || "unknown"
             }
 
             const response = await fetch("/api/jobs", {
