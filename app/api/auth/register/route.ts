@@ -65,7 +65,16 @@ export async function POST(request: Request) {
                             <li><strong>Họ tên:</strong> ${name}</li>
                             <li><strong>Email:</strong> ${email}</li>
                             <li><strong>Vai trò:</strong> ${role || "student"}</li>
-                            <li><strong>Thời gian:</strong> ${new Intl.DateTimeFormat("vi-VN", { dateStyle: "full", timeStyle: "long", timeZone: "Asia/Ho_Chi_Minh" }).format(new Date())}</li>
+                            <li><strong>Thời gian:</strong> ${(() => {
+              const now = new Date()
+              const vnTime = new Date(now.getTime() + (7 * 60 * 60 * 1000))
+              const hours = vnTime.getUTCHours().toString().padStart(2, '0')
+              const minutes = vnTime.getUTCMinutes().toString().padStart(2, '0')
+              const day = vnTime.getUTCDate().toString().padStart(2, '0')
+              const month = (vnTime.getUTCMonth() + 1).toString().padStart(2, '0')
+              const year = vnTime.getUTCFullYear()
+              return `${hours}:${minutes} ngày ${day}/${month}/${year}`
+            })()}</li>
                         </ul>
                         <p>Vui lòng đăng nhập vào trang quản trị để xem chi tiết.</p>
                         <a href="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/users" 

@@ -27,7 +27,16 @@ export async function GET() {
             <h2 style="color: #28a745;">Test Email Thành Công! 🎉</h2>
             <p>Nếu bạn nhận được email này, tính năng gửi mail đang hoạt động bình thường.</p>
             <hr>
-            <p style="color: #666; font-size: 12px;">Thời gian: ${new Intl.DateTimeFormat("vi-VN", { dateStyle: "full", timeStyle: "long", timeZone: "Asia/Ho_Chi_Minh" }).format(new Date())}</p>
+            <p style="color: #666; font-size: 12px;">Thời gian: ${(() => {
+                    const now = new Date()
+                    const vnTime = new Date(now.getTime() + (7 * 60 * 60 * 1000))
+                    const hours = vnTime.getUTCHours().toString().padStart(2, '0')
+                    const minutes = vnTime.getUTCMinutes().toString().padStart(2, '0')
+                    const day = vnTime.getUTCDate().toString().padStart(2, '0')
+                    const month = (vnTime.getUTCMonth() + 1).toString().padStart(2, '0')
+                    const year = vnTime.getUTCFullYear()
+                    return `${hours}:${minutes} ngày ${day}/${month}/${year}`
+                })()}</p>
         </div>
       `,
         })
