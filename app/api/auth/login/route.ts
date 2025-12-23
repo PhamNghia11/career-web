@@ -26,10 +26,11 @@ export async function POST(request: Request) {
     // Remove password from response
     const { password: _, _id, ...userWithoutPassword } = user
 
-    // Return user with string ID
+    // Return user with both id and _id for compatibility
     const userResponse = {
       ...userWithoutPassword,
-      id: _id.toString()
+      id: _id.toString(),
+      _id: _id.toString()
     }
 
     return NextResponse.json({
