@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request) {
+    // Debug endpoint for SMS
     const { searchParams } = new URL(request.url)
     const phone = searchParams.get("phone")
     const msg = "Ma xac minh GDU Career cua ban la: 123456"
