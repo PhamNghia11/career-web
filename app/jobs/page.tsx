@@ -3,8 +3,28 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import { JobsListClient } from "@/components/jobs/jobs-list-client"
+import { getCollection, COLLECTIONS } from "@/lib/mongodb"
+import { Job } from "@/lib/jobs-data"
 
-export default function JobsPage() {
+async function getActiveJobsFromDB(): Promise<Job[]> {
+  try {
+    const collection = await getCollection(COLLECTIONS.JOBS)
+    const jobs = await collection.find({ status: "active" }).sort({ postedAt: -1 }).toArray()
+
+    return jobs.map(job => ({
+      ...job,
+      _id: job._id.toString(),
+      skills: job.skills || []
+    })) as Job[]
+  } catch (error) {
+    console.error("Error fetching jobs from MongoDB:", error)
+    return []
+  }
+}
+
+export default async function JobsPage() {
+  const dbJobs = await getActiveJobsFromDB()
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/50 via-background to-muted/30">
       <Header />
@@ -21,7 +41,7 @@ export default function JobsPage() {
         </div>
         <div className="container mx-auto px-4 py-8">
           <Suspense fallback={<div className="text-center py-20">Đang tải danh sách việc làm...</div>}>
-            <JobsListClient />
+            <JobsListClient dbJobs={dbJobs} />
           </Suspense>
         </div>
       </main>

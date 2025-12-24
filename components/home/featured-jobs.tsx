@@ -1,13 +1,13 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { MapPin, Clock, DollarSign, Building, ArrowRight } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { useState } from "react"
 import { ApplyJobDialog } from "@/components/jobs/apply-job-dialog"
-import { getFeaturedJobs } from "@/lib/jobs-data"
+import { getFeaturedJobs, Job } from "@/lib/jobs-data"
 
 const typeColors = {
   "full-time": "bg-green-500/20 text-green-700 border border-green-500/30",
@@ -26,8 +26,42 @@ const typeLabels = {
 export function FeaturedJobs() {
   const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string } | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
+  const [featuredJobs, setFeaturedJobs] = useState<Job[]>(getFeaturedJobs(4))
+  const [loading, setLoading] = useState(true)
 
-  const featuredJobs = getFeaturedJobs(4)
+  // Fetch jobs from MongoDB and merge with static JSON
+  useEffect(() => {
+    const fetchDbJobs = async () => {
+      try {
+        const response = await fetch("/api/jobs?status=active")
+        const data = await response.json()
+
+        if (data.success && data.data?.jobs) {
+          const dbJobs: Job[] = data.data.jobs
+          const staticJobs = getFeaturedJobs(10)
+
+          // Merge: DB jobs first (priority), then static jobs that aren't duplicates
+          const dbJobIds = new Set(dbJobs.map(job => job._id))
+          const uniqueStaticJobs = staticJobs.filter(job => !dbJobIds.has(job._id))
+          const allJobs = [...dbJobs, ...uniqueStaticJobs]
+
+          // Sort by postedAt and take first 4
+          const sorted = allJobs
+            .sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
+            .slice(0, 4)
+
+          setFeaturedJobs(sorted)
+        }
+      } catch (error) {
+        console.error("Error fetching featured jobs:", error)
+        // Keep using static data on error
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDbJobs()
+  }, [])
 
   const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string) => {
     setSelectedJob({ title: jobTitle, company: company, jobId: jobId, creatorId: creatorId })

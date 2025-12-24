@@ -7,7 +7,7 @@ export type Job = {
     companyId: string
     logo?: string
     location: string
-    type: "internship" | "full-time" | "part-time"
+    type: "internship" | "full-time" | "part-time" | "freelance"
     field: string
     salary: string
     salaryMin?: number
@@ -20,6 +20,7 @@ export type Job = {
     benefits: string[]
     detailedBenefits?: string[]
     relatedMajors?: string[]
+    skills?: string[]
     status: "active" | "closed" | "pending" | "rejected" | "request_changes"
     adminFeedback?: string
     applicants: number

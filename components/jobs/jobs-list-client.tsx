@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/lib/auth-context"
 
-import { allJobs } from "@/lib/jobs-data"
+import { allJobs, Job } from "@/lib/jobs-data"
 import { ApplyJobDialog } from "./apply-job-dialog"
 
 const typeLabels = {
@@ -29,7 +29,11 @@ const typeColors = {
   freelance: "bg-blue-50 text-blue-600 font-medium border-transparent px-3 py-1",
 }
 
-export function JobsListClient() {
+interface JobsListClientProps {
+  dbJobs?: Job[]
+}
+
+export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
@@ -66,19 +70,27 @@ export function JobsListClient() {
     }
   }
 
+  // Merge jobs from MongoDB (dbJobs) with static JSON (allJobs)
+  // MongoDB jobs take priority (appear first), then JSON jobs that aren't duplicates
+  const mergedJobs = useMemo(() => {
+    const dbJobIds = new Set(dbJobs.map(job => job._id))
+    const uniqueJsonJobs = allJobs.filter(job => !dbJobIds.has(job._id))
+    return [...dbJobs, ...uniqueJsonJobs]
+  }, [dbJobs])
+
   // Get unique companies with job counts and logos
   const companies = useMemo(() => {
     const companyMap = new Map<string, { name: string; logo: string; count: number }>()
-    allJobs.forEach(job => {
+    mergedJobs.forEach(job => {
       if (companyMap.has(job.company)) {
         const existing = companyMap.get(job.company)!
         existing.count++
       } else {
-        companyMap.set(job.company, { name: job.company, logo: job.logo, count: 1 })
+        companyMap.set(job.company, { name: job.company, logo: job.logo || "", count: 1 })
       }
     })
     return Array.from(companyMap.values()).sort((a, b) => b.count - a.count)
-  }, [])
+  }, [mergedJobs])
 
   const checkSalaryMatch = (jobSalary: string, filterSalary: string) => {
     // Parse job salary (e.g., "5-8 triệu", "10-15 triệu")
@@ -109,7 +121,7 @@ export function JobsListClient() {
     return Math.max(...numbers)
   }
 
-  const filteredJobs = allJobs.filter((job) => {
+  const filteredJobs = mergedJobs.filter((job) => {
     const matchesSearch =
       job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -177,7 +189,7 @@ export function JobsListClient() {
         setSavedJobs([...savedJobs, jobId])
       }
 
-      const job = allJobs.find(j => j._id === jobId)
+      const job = mergedJobs.find(j => j._id === jobId)
 
       const response = await fetch("/api/saved-jobs", {
         method: "POST",
