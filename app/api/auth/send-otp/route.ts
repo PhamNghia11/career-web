@@ -99,8 +99,17 @@ export async function POST(request: Request) {
             }
 
             console.log("[send-otp] Sent email OTP to:", email)
+            console.log("[send-otp] Sent email OTP to:", email)
         } else if (type === "phone") {
-            // SMS OTP - Will be implemented in Phase 2
+            // SMS OTP integration
+            if (!user.phone) {
+                return NextResponse.json(
+                    { success: false, error: "Tài khoản chưa có số điện thoại" },
+                    { status: 400 }
+                )
+            }
+
+            // Update user with OTP
             await collection.updateOne(
                 { email },
                 {
@@ -111,21 +120,24 @@ export async function POST(request: Request) {
                 }
             )
 
-            // TODO: Send SMS via Twilio/eSMS
-            console.log("[send-otp] Phone OTP (not sent yet):", otp)
-        }
+            // Send via SMS
+            const { sendSMS } = await import("@/lib/sms")
+            const message = `Ma xac minh GDU Career cua ban la: ${otp}. Ma se het han sau 5 phut.`
+            await sendSMS(user.phone, message)
 
-        return NextResponse.json({
-            success: true,
-            message: type === "email"
-                ? "Mã OTP đã được gửi đến email của bạn"
-                : "Mã OTP đã được gửi đến số điện thoại của bạn",
-        })
-    } catch (error) {
-        console.error("Send OTP error:", error)
-        return NextResponse.json(
-            { success: false, error: "Có lỗi xảy ra. Vui lòng thử lại." },
-            { status: 500 }
-        )
+            console.log("[send-otp] Phone OTP processed for:", user.phone)
+
+            return NextResponse.json({
+                success: true,
+                message: type === "email"
+                    ? "Mã OTP đã được gửi đến email của bạn"
+                    : "Mã OTP đã được gửi đến số điện thoại của bạn",
+            })
+        } catch (error) {
+            console.error("Send OTP error:", error)
+            return NextResponse.json(
+                { success: false, error: "Có lỗi xảy ra. Vui lòng thử lại." },
+                { status: 500 }
+            )
+        }
     }
-}
