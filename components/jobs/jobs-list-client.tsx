@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Search, MapPin, DollarSign, Clock, Building, Filter, Bookmark, Briefcase, ChevronRight, Building2 } from "lucide-react"
+import { Search, MapPin, DollarSign, Clock, Building, Filter, Bookmark, Briefcase, ChevronRight, Building2, ChevronDown, GraduationCap, Calendar, X } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -29,6 +29,59 @@ const typeColors = {
   freelance: "bg-blue-50 text-blue-600 font-medium border-transparent px-3 py-1",
 }
 
+// Industry/Ngành nghề options
+const industryOptions = [
+  { id: "it", label: "Công nghệ thông tin" },
+  { id: "finance", label: "Tài chính - Ngân hàng" },
+  { id: "marketing", label: "Marketing - Truyền thông" },
+  { id: "sales", label: "Kinh doanh - Bán hàng" },
+  { id: "hr", label: "Nhân sự" },
+  { id: "accounting", label: "Kế toán - Kiểm toán" },
+  { id: "design", label: "Thiết kế - Đồ họa" },
+  { id: "education", label: "Giáo dục - Đào tạo" },
+  { id: "healthcare", label: "Y tế - Chăm sóc sức khỏe" },
+  { id: "logistics", label: "Logistics - Vận tải" },
+]
+
+// Experience/Kinh nghiệm options
+const experienceOptions = [
+  { id: "no-exp", label: "Chưa có kinh nghiệm" },
+  { id: "under-1", label: "Dưới 1 năm" },
+  { id: "1-2", label: "1 - 2 năm" },
+  { id: "2-5", label: "2 - 5 năm" },
+  { id: "5-10", label: "5 - 10 năm" },
+  { id: "above-10", label: "Trên 10 năm" },
+]
+
+// Education/Học vấn options
+const educationOptions = [
+  { id: "high-school", label: "Trung học phổ thông" },
+  { id: "college", label: "Cao đẳng" },
+  { id: "bachelor", label: "Đại học" },
+  { id: "master", label: "Thạc sĩ" },
+  { id: "phd", label: "Tiến sĩ" },
+]
+
+// Posted date/Đăng trong options
+const postedDateOptions = [
+  { id: "today", label: "Hôm nay" },
+  { id: "3-days", label: "3 ngày qua" },
+  { id: "7-days", label: "7 ngày qua" },
+  { id: "14-days", label: "14 ngày qua" },
+  { id: "30-days", label: "30 ngày qua" },
+]
+
+// Advanced salary ranges for horizontal filter
+const advancedSalaryRanges = [
+  { id: "under-5", label: "Dưới 5 triệu" },
+  { id: "5-10", label: "5 - 10 triệu" },
+  { id: "10-15", label: "10 - 15 triệu" },
+  { id: "15-20", label: "15 - 20 triệu" },
+  { id: "20-30", label: "20 - 30 triệu" },
+  { id: "above-30", label: "Trên 30 triệu" },
+  { id: "negotiate", label: "Thỏa thuận" },
+]
+
 interface JobsListClientProps {
   dbJobs?: Job[]
 }
@@ -47,6 +100,25 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const [savedJobs, setSavedJobs] = useState<string[]>([])
   const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string } | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
+
+  // Advanced filter states
+  const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null)
+  const [selectedExperience, setSelectedExperience] = useState<string | null>(null)
+  const [selectedEducation, setSelectedEducation] = useState<string | null>(null)
+  const [selectedPostedDate, setSelectedPostedDate] = useState<string | null>(null)
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setActiveDropdown(null)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   // Load saved jobs from database when user is logged in
   useEffect(() => {
@@ -242,9 +314,89 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     setSelectedType(null)
     setSelectedCompany(null)
     setSelectedSalary(null)
+    setSelectedIndustry(null)
+    setSelectedExperience(null)
+    setSelectedEducation(null)
+    setSelectedPostedDate(null)
+  }
+
+  const clearAdvancedFilters = () => {
+    setSelectedIndustry(null)
+    setSelectedExperience(null)
+    setSelectedEducation(null)
+    setSelectedPostedDate(null)
   }
 
   const hasActiveFilters = searchQuery || selectedType || selectedCompany || selectedSalary
+  const hasAdvancedFilters = selectedIndustry || selectedExperience || selectedEducation || selectedPostedDate
+  const advancedFilterCount = [selectedIndustry, selectedExperience, selectedEducation, selectedPostedDate].filter(Boolean).length
+
+  // FilterDropdown component
+  const FilterDropdown = ({
+    label,
+    options,
+    value,
+    onChange,
+    icon: Icon,
+    dropdownId
+  }: {
+    label: string
+    options: { id: string; label: string }[]
+    value: string | null
+    onChange: (value: string | null) => void
+    icon?: React.ComponentType<{ className?: string }>
+    dropdownId: string
+  }) => {
+    const isOpen = activeDropdown === dropdownId
+    const selectedOption = options.find(opt => opt.id === value)
+
+    return (
+      <div className="relative">
+        <button
+          onClick={() => setActiveDropdown(isOpen ? null : dropdownId)}
+          className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg border transition-all ${value
+            ? "bg-primary/10 border-primary text-primary font-medium"
+            : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+            }`}
+        >
+          {Icon && <Icon className="h-4 w-4" />}
+          <span>{selectedOption ? selectedOption.label : label}</span>
+          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+            {value && (
+              <button
+                onClick={() => {
+                  onChange(null)
+                  setActiveDropdown(null)
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50 flex items-center gap-2"
+              >
+                <X className="h-4 w-4" />
+                Xóa lọc
+              </button>
+            )}
+            {options.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => {
+                  onChange(option.id)
+                  setActiveDropdown(null)
+                }}
+                className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 ${value === option.id ? "bg-primary/10 text-primary font-medium" : "text-gray-700"
+                  }`}
+              >
+                <Checkbox checked={value === option.id} className="pointer-events-none" />
+                {option.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   const salaryRanges = [
     { id: "under-5", label: "Dưới 5 triệu" },
@@ -254,268 +406,338 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   ]
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-      {/* Sidebar Filters */}
-      <div className="lg:col-span-1 space-y-6">
-        <Card className="sticky top-24 border-none shadow-sm bg-white max-h-[calc(100vh-8rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <CardContent className="p-6 space-y-6">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <Filter className="h-5 w-5" />
-                  Bộ lọc tìm kiếm
-                </h3>
-                {hasActiveFilters && (
-                  <button
-                    onClick={clearFilters}
-                    className="text-xs text-primary hover:underline font-medium"
-                  >
-                    Xóa bộ lọc
-                  </button>
-                )}
-              </div>
+    <div className="space-y-6">
+      {/* Advanced Filter Bar */}
+      <div ref={dropdownRef} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <FilterDropdown
+            label="Ngành nghề"
+            options={industryOptions}
+            value={selectedIndustry}
+            onChange={setSelectedIndustry}
+            icon={Briefcase}
+            dropdownId="industry"
+          />
+          <FilterDropdown
+            label="Kinh nghiệm"
+            options={experienceOptions}
+            value={selectedExperience}
+            onChange={setSelectedExperience}
+            icon={Clock}
+            dropdownId="experience"
+          />
+          <FilterDropdown
+            label="Mức lương"
+            options={advancedSalaryRanges}
+            value={selectedSalary}
+            onChange={setSelectedSalary}
+            icon={DollarSign}
+            dropdownId="salary"
+          />
+          <FilterDropdown
+            label="Học vấn"
+            options={educationOptions}
+            value={selectedEducation}
+            onChange={setSelectedEducation}
+            icon={GraduationCap}
+            dropdownId="education"
+          />
+          <FilterDropdown
+            label="Loại công việc"
+            options={Object.entries(typeLabels).map(([id, label]) => ({ id, label }))}
+            value={selectedType}
+            onChange={setSelectedType}
+            icon={Building}
+            dropdownId="type"
+          />
+          <FilterDropdown
+            label="Đăng trong"
+            options={postedDateOptions}
+            value={selectedPostedDate}
+            onChange={setSelectedPostedDate}
+            icon={Calendar}
+            dropdownId="posted"
+          />
 
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">Từ khóa</Label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Chức danh, kỹ năng..."
-                      className="w-full pl-9 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 border-input"
-                    />
-                  </div>
+          {(hasAdvancedFilters || selectedSalary || selectedType) && (
+            <button
+              onClick={() => {
+                clearAdvancedFilters()
+                setSelectedSalary(null)
+                setSelectedType(null)
+              }}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <X className="h-4 w-4" />
+              Xóa lọc ({advancedFilterCount + (selectedSalary ? 1 : 0) + (selectedType ? 1 : 0)})
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Sidebar Filters */}
+        <div className="lg:col-span-1 space-y-6">
+          <Card className="sticky top-24 border-none shadow-sm bg-white max-h-[calc(100vh-8rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <CardContent className="p-6 space-y-6">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Filter className="h-5 w-5" />
+                    Bộ lọc tìm kiếm
+                  </h3>
+                  {hasActiveFilters && (
+                    <button
+                      onClick={clearFilters}
+                      className="text-xs text-primary hover:underline font-medium"
+                    >
+                      Xóa bộ lọc
+                    </button>
+                  )}
                 </div>
 
-                <Separator />
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Từ khóa</Label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Chức danh, kỹ năng..."
+                        className="w-full pl-9 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 border-input"
+                      />
+                    </div>
+                  </div>
 
-                {/* Company Filter */}
-                <div>
-                  <Label className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <Building2 className="h-4 w-4" />
-                    Công ty
-                  </Label>
-                  <div className="space-y-1 max-h-[220px] overflow-y-auto pr-1">
-                    {companies.map((company) => (
-                      <div
-                        key={company.name}
-                        className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedCompany === company.name
-                          ? "bg-primary/10 border border-primary/20"
-                          : "hover:bg-gray-50 border border-transparent"
-                          }`}
-                        onClick={() => handleCompanyChange(company.name)}
-                      >
-                        <div className="w-8 h-8 rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                          {company.logo ? (
-                            <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
-                          ) : (
-                            <Building className="h-4 w-4 text-gray-400" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <span className={`text-sm truncate block ${selectedCompany === company.name ? "font-semibold text-primary" : "font-medium"}`}>
-                            {company.name}
+                  <Separator />
+
+                  {/* Company Filter */}
+                  <div>
+                    <Label className="text-sm font-medium mb-3 flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      Công ty
+                    </Label>
+                    <div className="space-y-1 max-h-[220px] overflow-y-auto pr-1">
+                      {companies.map((company) => (
+                        <div
+                          key={company.name}
+                          className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedCompany === company.name
+                            ? "bg-primary/10 border border-primary/20"
+                            : "hover:bg-gray-50 border border-transparent"
+                            }`}
+                          onClick={() => handleCompanyChange(company.name)}
+                        >
+                          <div className="w-8 h-8 rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                            {company.logo ? (
+                              <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
+                            ) : (
+                              <Building className="h-4 w-4 text-gray-400" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <span className={`text-sm truncate block ${selectedCompany === company.name ? "font-semibold text-primary" : "font-medium"}`}>
+                              {company.name}
+                            </span>
+                          </div>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${selectedCompany === company.name
+                            ? "bg-primary text-white"
+                            : "text-muted-foreground bg-gray-100"
+                            }`}>
+                            {company.count}
                           </span>
                         </div>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${selectedCompany === company.name
-                          ? "bg-primary text-white"
-                          : "text-muted-foreground bg-gray-100"
-                          }`}>
-                          {company.count}
-                        </span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                <Separator />
+                  <Separator />
 
-                {/* Work Type Filter */}
-                <div>
-                  <Label className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <Briefcase className="h-4 w-4" />
-                    Hình thức làm việc
-                  </Label>
-                  <div className="space-y-1">
-                    {Object.entries(typeLabels).map(([value, label]) => (
-                      <div
-                        key={value}
-                        className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedType === value
-                          ? "bg-primary/10 border border-primary/20"
-                          : "hover:bg-gray-50 border border-transparent"
-                          }`}
-                        onClick={() => handleTypeChange(value)}
-                      >
-                        <span className={`text-sm block flex-1 ${selectedType === value ? "font-semibold text-primary" : "font-medium"}`}>
-                          {label}
-                        </span>
-                        {selectedType === value && <div className="w-2 h-2 rounded-full bg-primary" />}
-                      </div>
-                    ))}
+                  {/* Work Type Filter */}
+                  <div>
+                    <Label className="text-sm font-medium mb-3 flex items-center gap-2">
+                      <Briefcase className="h-4 w-4" />
+                      Hình thức làm việc
+                    </Label>
+                    <div className="space-y-1">
+                      {Object.entries(typeLabels).map(([value, label]) => (
+                        <div
+                          key={value}
+                          className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedType === value
+                            ? "bg-primary/10 border border-primary/20"
+                            : "hover:bg-gray-50 border border-transparent"
+                            }`}
+                          onClick={() => handleTypeChange(value)}
+                        >
+                          <span className={`text-sm block flex-1 ${selectedType === value ? "font-semibold text-primary" : "font-medium"}`}>
+                            {label}
+                          </span>
+                          {selectedType === value && <div className="w-2 h-2 rounded-full bg-primary" />}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                <Separator />
+                  <Separator />
 
-                {/* Salary Filter */}
-                <div>
-                  <Label className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    Mức lương
-                  </Label>
-                  <div className="space-y-1">
-                    {salaryRanges.map((range) => (
-                      <div
-                        key={range.id}
-                        className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedSalary === range.id
-                          ? "bg-primary/10 border border-primary/20"
-                          : "hover:bg-gray-50 border border-transparent"
-                          }`}
-                        onClick={() => handleSalaryChange(range.id)}
-                      >
-                        <span className={`text-sm block flex-1 ${selectedSalary === range.id ? "font-semibold text-primary" : "font-medium"}`}>
-                          {range.label}
-                        </span>
-                        {selectedSalary === range.id && <div className="w-2 h-2 rounded-full bg-primary" />}
-                      </div>
-                    ))}
+                  {/* Salary Filter */}
+                  <div>
+                    <Label className="text-sm font-medium mb-3 flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      Mức lương
+                    </Label>
+                    <div className="space-y-1">
+                      {salaryRanges.map((range) => (
+                        <div
+                          key={range.id}
+                          className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedSalary === range.id
+                            ? "bg-primary/10 border border-primary/20"
+                            : "hover:bg-gray-50 border border-transparent"
+                            }`}
+                          onClick={() => handleSalaryChange(range.id)}
+                        >
+                          <span className={`text-sm block flex-1 ${selectedSalary === range.id ? "font-semibold text-primary" : "font-medium"}`}>
+                            {range.label}
+                          </span>
+                          {selectedSalary === range.id && <div className="w-2 h-2 rounded-full bg-primary" />}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Content */}
-      <div className="lg:col-span-3 space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">
-            Việc làm nổi bật <span className="text-muted-foreground font-normal text-base ml-2">({sortedJobs.length})</span>
-          </h2>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Sắp xếp theo:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="border-none bg-transparent font-medium text-foreground focus:ring-0 cursor-pointer"
-            >
-              <option value="newest">Mới nhất</option>
-              <option value="salary">Lương cao nhất</option>
-              <option value="deadline">Hạn nộp hồ sơ</option>
-            </select>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="space-y-4">
-          {sortedJobs.map((job) => (
-            <Card key={job._id} className="group hover:border-primary/50 transition-all duration-300 bg-white border-gray-100 shadow-sm hover:shadow-md cursor-pointer" onClick={() => router.push(`/jobs/${job._id}`)}>
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-6">
-                  {/* Logo */}
-                  <div className="w-16 h-16 rounded-lg border border-gray-100 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-                    {job.logo ? (
-                      <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
-                    ) : (
-                      <Building className="h-8 w-8 text-gray-400" />
-                    )}
-                  </div>
+        {/* Main Content */}
+        <div className="lg:col-span-3 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-900">
+              Việc làm nổi bật <span className="text-muted-foreground font-normal text-base ml-2">({sortedJobs.length})</span>
+            </h2>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Sắp xếp theo:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="border-none bg-transparent font-medium text-foreground focus:ring-0 cursor-pointer"
+              >
+                <option value="newest">Mới nhất</option>
+                <option value="salary">Lương cao nhất</option>
+                <option value="deadline">Hạn nộp hồ sơ</option>
+              </select>
+            </div>
+          </div>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-2">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#1e3a5f] transition-colors mb-1">
-                          {job.title}
-                        </h3>
-                        <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-                          <Building className="h-4 w-4" />
-                          {job.company}
+          <div className="space-y-4">
+            {sortedJobs.map((job) => (
+              <Card key={job._id} className="group hover:border-primary/50 transition-all duration-300 bg-white border-gray-100 shadow-sm hover:shadow-md cursor-pointer" onClick={() => router.push(`/jobs/${job._id}`)}>
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    {/* Logo */}
+                    <div className="w-16 h-16 rounded-lg border border-gray-100 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                      {job.logo ? (
+                        <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
+                      ) : (
+                        <Building className="h-8 w-8 text-gray-400" />
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-2">
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#1e3a5f] transition-colors mb-1">
+                            {job.title}
+                          </h3>
+                          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+                            <Building className="h-4 w-4" />
+                            {job.company}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Badge variant="secondary" className={typeColors[job.type as keyof typeof typeColors]}>
+                            {typeLabels[job.type as keyof typeof typeLabels]}
+                          </Badge>
+                          <span className="text-sm text-gray-500 font-medium">{job.postedAt}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Badge variant="secondary" className={typeColors[job.type as keyof typeof typeColors]}>
-                          {typeLabels[job.type as keyof typeof typeLabels]}
-                        </Badge>
-                        <span className="text-sm text-gray-500 font-medium">{job.postedAt}</span>
-                      </div>
-                    </div>
 
-                    <div className="flex flex-wrap gap-y-2 gap-x-6 text-sm text-gray-500 mb-4">
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="h-4 w-4" />
-                        {job.location}
+                      <div className="flex flex-wrap gap-y-2 gap-x-6 text-sm text-gray-500 mb-4">
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="h-4 w-4" />
+                          {job.location}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <DollarSign className="h-4 w-4" />
+                          <span className="text-green-600 font-medium">{job.salary}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="h-4 w-4" />
+                          Hạn: {job.deadline}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <DollarSign className="h-4 w-4" />
-                        <span className="text-green-600 font-medium">{job.salary}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-4 w-4" />
-                        Hạn: {job.deadline}
-                      </div>
-                    </div>
 
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {job.skills?.map((skill) => (
-                        <span key={skill} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {job.skills?.map((skill) => (
+                          <span key={skill} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-gray-500 hover:text-primary hover:bg-transparent -ml-2 font-medium"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleSave(job._id, job.title)
-                        }}
-                      >
-                        <Bookmark className={`h-5 w-5 mr-2 ${savedJobs.includes(job._id) ? "fill-primary text-primary" : ""}`} />
-                        {savedJobs.includes(job._id) ? "Đã lưu" : "Lưu tin"}
-                      </Button>
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleApply(job._id, job.title, job.company, job.creatorId)
-                        }}
-                        className="bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white shadow-sm px-6"
-                      >
-                        Ứng tuyển ngay
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-gray-500 hover:text-primary hover:bg-transparent -ml-2 font-medium"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleSave(job._id, job.title)
+                          }}
+                        >
+                          <Bookmark className={`h-5 w-5 mr-2 ${savedJobs.includes(job._id) ? "fill-primary text-primary" : ""}`} />
+                          {savedJobs.includes(job._id) ? "Đã lưu" : "Lưu tin"}
+                        </Button>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleApply(job._id, job.title, job.company, job.creatorId)
+                          }}
+                          className="bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white shadow-sm px-6"
+                        >
+                          Ứng tuyển ngay
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {sortedJobs.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="h-8 w-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-1">Không tìm thấy kết quả</h3>
-            <p className="text-gray-500">Vui lòng thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        )}
+
+          {sortedJobs.length === 0 && (
+            <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">Không tìm thấy kết quả</h3>
+              <p className="text-gray-500">Vui lòng thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+            </div>
+          )}
+        </div>
+        <ApplyJobDialog
+          isOpen={isApplyDialogOpen}
+          onClose={() => setIsApplyDialogOpen(false)}
+          jobTitle={selectedJob?.title || ""}
+          companyName={selectedJob?.company || ""}
+          jobId={selectedJob?.jobId}
+          employerId={selectedJob?.creatorId}
+        />
       </div>
-      <ApplyJobDialog
-        isOpen={isApplyDialogOpen}
-        onClose={() => setIsApplyDialogOpen(false)}
-        jobTitle={selectedJob?.title || ""}
-        companyName={selectedJob?.company || ""}
-        jobId={selectedJob?.jobId}
-        employerId={selectedJob?.creatorId}
-      />
     </div>
   )
 }
