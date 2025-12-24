@@ -39,6 +39,7 @@ export function JobsListClient() {
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null)
   const [selectedSalary, setSelectedSalary] = useState<string | null>(null)
+  const [sortBy, setSortBy] = useState<string>("newest")
   const [savedJobs, setSavedJobs] = useState<string[]>([])
   const [selectedJob, setSelectedJob] = useState<{ title: string; company: string } | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
@@ -101,6 +102,13 @@ export function JobsListClient() {
     }
   }
 
+  // Helper function to parse maximum salary from string like "5-8 triệu" or "20-35 triệu"
+  const parseMaxSalary = (salary: string): number => {
+    const numbers = salary.match(/\d+/g)?.map(Number)
+    if (!numbers || numbers.length === 0) return 0
+    return Math.max(...numbers)
+  }
+
   const filteredJobs = allJobs.filter((job) => {
     const matchesSearch =
       job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -113,6 +121,25 @@ export function JobsListClient() {
 
     return matchesSearch && matchesType && matchesCompany && matchesSalary
   })
+
+  // Apply sorting based on selected sort option
+  const sortedJobs = useMemo(() => {
+    const jobs = [...filteredJobs]
+
+    switch (sortBy) {
+      case "newest":
+        // Sort by postedAt date, newest first
+        return jobs.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
+      case "salary":
+        // Sort by max salary, highest first
+        return jobs.sort((a, b) => parseMaxSalary(b.salary) - parseMaxSalary(a.salary))
+      case "deadline":
+        // Sort by deadline, soonest first
+        return jobs.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
+      default:
+        return jobs
+    }
+  }, [filteredJobs, sortBy])
 
   const handleTypeChange = (type: string) => {
     setSelectedType(prev => prev === type ? null : type)
@@ -355,20 +382,24 @@ export function JobsListClient() {
       <div className="lg:col-span-3 space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">
-            Việc làm nổi bật <span className="text-muted-foreground font-normal text-base ml-2">({filteredJobs.length})</span>
+            Việc làm nổi bật <span className="text-muted-foreground font-normal text-base ml-2">({sortedJobs.length})</span>
           </h2>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>Sắp xếp theo:</span>
-            <select className="border-none bg-transparent font-medium text-foreground focus:ring-0 cursor-pointer">
-              <option>Mới nhất</option>
-              <option>Lương cao nhất</option>
-              <option>Hạn nộp hồ sơ</option>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="border-none bg-transparent font-medium text-foreground focus:ring-0 cursor-pointer"
+            >
+              <option value="newest">Mới nhất</option>
+              <option value="salary">Lương cao nhất</option>
+              <option value="deadline">Hạn nộp hồ sơ</option>
             </select>
           </div>
         </div>
 
         <div className="space-y-4">
-          {filteredJobs.map((job) => (
+          {sortedJobs.map((job) => (
             <Card key={job._id} className="group hover:border-primary/50 transition-all duration-300 bg-white border-gray-100 shadow-sm hover:shadow-md cursor-pointer" onClick={() => router.push(`/jobs/${job._id}`)}>
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-6">
@@ -455,7 +486,7 @@ export function JobsListClient() {
           ))}
         </div>
 
-        {filteredJobs.length === 0 && (
+        {sortedJobs.length === 0 && (
           <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300">
             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Search className="h-8 w-8 text-gray-400" />
