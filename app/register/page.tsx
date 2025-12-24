@@ -160,21 +160,18 @@ export default function RegisterPage() {
                 <form onSubmit={handleEmailRegister} className="space-y-5">
                   <div className="space-y-2">
                     <Label htmlFor="role" className="text-gray-700 font-medium">Bạn là</Label>
-                    <div className="relative">
-                      <select
-                        id="role"
-                        name="role"
-                        value={formData.role}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white appearance-none transition-all"
-                      >
-                        <option value="student">Sinh viên</option>
-                        <option value="employer">Nhà tuyển dụng</option>
-                      </select>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                      </div>
-                    </div>
+                    <Select
+                      value={formData.role}
+                      onValueChange={(value) => setFormData({ ...formData, role: value as "student" | "employer" })}
+                    >
+                      <SelectTrigger className="w-full px-4 py-2.5 h-[46px] border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all text-gray-900">
+                        <SelectValue placeholder="Chọn vai trò" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="student">Sinh viên</SelectItem>
+                        <SelectItem value="employer">Nhà tuyển dụng</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">
@@ -304,21 +301,18 @@ export default function RegisterPage() {
                 <form onSubmit={handlePhoneRegister} className="space-y-5">
                   <div className="space-y-2">
                     <Label htmlFor="role_p" className="text-gray-700 font-medium">Bạn là</Label>
-                    <div className="relative">
-                      <select
-                        id="role_p"
-                        name="role"
-                        value={formData.role}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white appearance-none transition-all"
-                      >
-                        <option value="student">Sinh viên</option>
-                        <option value="employer">Nhà tuyển dụng</option>
-                      </select>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                      </div>
-                    </div>
+                    <Select
+                      value={formData.role}
+                      onValueChange={(value) => setFormData({ ...formData, role: value as "student" | "employer" })}
+                    >
+                      <SelectTrigger className="w-full px-4 py-2.5 h-[46px] border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all text-gray-900">
+                        <SelectValue placeholder="Chọn vai trò" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="student">Sinh viên</SelectItem>
+                        <SelectItem value="employer">Nhà tuyển dụng</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">
