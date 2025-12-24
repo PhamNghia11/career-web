@@ -236,9 +236,9 @@ export default function RegisterPage() {
                             name="major"
                             value={formData.major}
                             onChange={handleChange}
-                            className="w-full pl-11 pr-10 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white appearance-none transition-all placeholder:text-gray-400"
+                            className="w-full pl-11 pr-10 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white appearance-none truncate text-gray-700"
                           >
-                            <option value="">Chọn ngành học</option>
+                            <option value="" className="text-gray-400">Chọn ngành</option>
                             <option value="Công nghệ thông tin">Công nghệ thông tin</option>
                             <option value="Quản trị kinh doanh">Quản trị kinh doanh</option>
                             <option value="Marketing">Marketing</option>
