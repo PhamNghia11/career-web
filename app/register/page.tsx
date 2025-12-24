@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useAuth } from "@/lib/auth-context"
 
 export default function RegisterPage() {
@@ -231,24 +232,22 @@ export default function RegisterPage() {
                         <Label htmlFor="major" className="text-gray-700 font-medium">Ngành học</Label>
                         <div className="relative group">
                           <BookOpen className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
-                          <select
-                            id="major"
-                            name="major"
+                          <Select
                             value={formData.major}
-                            onChange={handleChange}
-                            className="w-full pl-11 pr-10 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white appearance-none truncate text-gray-700"
+                            onValueChange={(value) => setFormData({ ...formData, major: value })}
                           >
-                            <option value="" className="text-gray-400">Chọn ngành</option>
-                            <option value="Công nghệ thông tin">Công nghệ thông tin</option>
-                            <option value="Quản trị kinh doanh">Quản trị kinh doanh</option>
-                            <option value="Marketing">Marketing</option>
-                            <option value="Tài chính ngân hàng">Tài chính ngân hàng</option>
-                            <option value="Kế toán">Kế toán</option>
-                            <option value="Ngôn ngữ Anh">Ngôn ngữ Anh</option>
-                          </select>
-                          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
-                            <ChevronDown className="h-4 w-4" />
-                          </div>
+                            <SelectTrigger className="w-full pl-11 pr-4 py-2.5 h-[46px] border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all text-gray-900 data-[placeholder]:text-gray-400">
+                              <SelectValue placeholder="Chọn ngành học" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Công nghệ thông tin">Công nghệ thông tin</SelectItem>
+                              <SelectItem value="Quản trị kinh doanh">Quản trị kinh doanh</SelectItem>
+                              <SelectItem value="Marketing">Marketing</SelectItem>
+                              <SelectItem value="Tài chính ngân hàng">Tài chính ngân hàng</SelectItem>
+                              <SelectItem value="Kế toán">Kế toán</SelectItem>
+                              <SelectItem value="Ngôn ngữ Anh">Ngôn ngữ Anh</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                     </div>
