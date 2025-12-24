@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Mail, Lock, User, Phone, GraduationCap } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, User, Phone, GraduationCap, BookOpen, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -229,29 +229,33 @@ export default function RegisterPage() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="major" className="text-gray-700 font-medium">Ngành học</Label>
-                        <div className="relative">
+                        <div className="relative group">
+                          <BookOpen className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                           <select
                             id="major"
                             name="major"
                             value={formData.major}
                             onChange={handleChange}
-                            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white appearance-none text-sm transition-all"
+                            className="w-full pl-11 pr-10 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white appearance-none transition-all placeholder:text-gray-400"
                           >
-                            <option value="">Chọn ngành</option>
-                            <option value="Công nghệ thông tin">CNTT</option>
-                            <option value="Quản trị kinh doanh">QTKD</option>
+                            <option value="">Chọn ngành học</option>
+                            <option value="Công nghệ thông tin">Công nghệ thông tin</option>
+                            <option value="Quản trị kinh doanh">Quản trị kinh doanh</option>
                             <option value="Marketing">Marketing</option>
-                            <option value="Tài chính ngân hàng">TCNH</option>
+                            <option value="Tài chính ngân hàng">Tài chính ngân hàng</option>
                             <option value="Kế toán">Kế toán</option>
-                            <option value="Ngôn ngữ Anh">NNA</option>
+                            <option value="Ngôn ngữ Anh">Ngôn ngữ Anh</option>
                           </select>
+                          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
+                            <ChevronDown className="h-4 w-4" />
+                          </div>
                         </div>
                       </div>
                     </div>
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="password" classNae="text-gray-700 font-medium">Mật khẩu</Label>
+                    <Label htmlFor="password" className="text-gray-700 font-medium">Mật khẩu</Label>
                     <div className="relative group">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                       <input
@@ -275,7 +279,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" classNae="text-gray-700 font-medium">Xác nhận mật khẩu</Label>
+                    <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">Xác nhận mật khẩu</Label>
                     <div className="relative group">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                       <input
@@ -371,29 +375,33 @@ export default function RegisterPage() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="major_p" className="text-gray-700 font-medium">Ngành học</Label>
-                        <div className="relative">
+                        <div className="relative group">
+                          <BookOpen className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                           <select
                             id="major_p"
                             name="major"
                             value={formData.major}
                             onChange={handleChange}
-                            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white appearance-none text-sm transition-all"
+                            className="w-full pl-11 pr-10 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white appearance-none transition-all placeholder:text-gray-400"
                           >
-                            <option value="">Chọn ngành</option>
-                            <option value="Công nghệ thông tin">CNTT</option>
-                            <option value="Quản trị kinh doanh">QTKD</option>
+                            <option value="">Chọn ngành học</option>
+                            <option value="Công nghệ thông tin">Công nghệ thông tin</option>
+                            <option value="Quản trị kinh doanh">Quản trị kinh doanh</option>
                             <option value="Marketing">Marketing</option>
-                            <option value="Tài chính ngân hàng">TCNH</option>
+                            <option value="Tài chính ngân hàng">Tài chính ngân hàng</option>
                             <option value="Kế toán">Kế toán</option>
-                            <option value="Ngôn ngữ Anh">NNA</option>
+                            <option value="Ngôn ngữ Anh">Ngôn ngữ Anh</option>
                           </select>
+                          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within:text-red-500 transition-colors">
+                            <ChevronDown className="h-4 w-4" />
+                          </div>
                         </div>
                       </div>
                     </div>
                   )}
 
                   <div className="space-y-2">
-                    <Label htmlFor="password_p" classNae="text-gray-700 font-medium">Mật khẩu</Label>
+                    <Label htmlFor="password_p" className="text-gray-700 font-medium">Mật khẩu</Label>
                     <div className="relative group">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                       <input
@@ -417,7 +425,7 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword_p" classNae="text-gray-700 font-medium">Xác nhận mật khẩu</Label>
+                    <Label htmlFor="confirmPassword_p" className="text-gray-700 font-medium">Xác nhận mật khẩu</Label>
                     <div className="relative group">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                       <input

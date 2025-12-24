@@ -205,7 +205,7 @@ export default function LoginPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="password" classNae="text-gray-700 font-medium">Mật khẩu</Label>
+                    <Label htmlFor="password" className="text-gray-700 font-medium">Mật khẩu</Label>
                     <div className="relative group">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                       <input
