@@ -32,12 +32,18 @@ export async function GET(request: Request) {
         const res2 = await fetch(urlType2)
         const data2 = await res2.json()
 
+        // Test 3: Type 8 with EMPTY Brandname (let eSMS decide)
+        const urlType8NoBrand = `https://rest.esms.vn/MainService.svc/json/SendMultipleMessage_V4_get?Phone=${phone}&Content=${encodeURIComponent(msg)}&ApiKey=${apiKey}&SecretKey=${secretKey}&IsUnicode=0&SmsType=8`
+        const res8NoBrand = await fetch(urlType8NoBrand)
+        const data8NoBrand = await res8NoBrand.json()
+
         return NextResponse.json({
             description: "Debugging eSMS sending",
             config,
             results: {
-                type8_response: data8,
-                type2_response: data2
+                type8_response_verify: data8,
+                type2_response_verify: data2,
+                type8_response_no_brand: data8NoBrand
             },
             recommendation: "Check CodeResult. 100 = Success. 99/others = Error."
         })

@@ -7,7 +7,7 @@ export async function sendSMS(phone: string, message: string) {
     try {
         const apiKey = process.env.ESMS_API_KEY
         const secretKey = process.env.ESMS_SECRET_KEY
-        const brandName = process.env.ESMS_BRAND_NAME || "Verify"
+        const brandName = (process.env.ESMS_BRAND_NAME || "Verify").trim()
 
         // If no API key, log to console (Mock mode)
         if (!apiKey || !secretKey) {
@@ -30,7 +30,7 @@ export async function sendSMS(phone: string, message: string) {
         // 2: CSKH (Requires registered Brandname)
         // 8: Fixed Notify (often used for OTP/Notify with shared brandname)
         const smsType = "8"
-        const url = `http://rest.esms.vn/MainService.svc/json/SendMultipleMessage_V4_get?Phone=${encodeURIComponent(formattedPhone)}&Content=${encodeURIComponent(message)}&ApiKey=${apiKey}&SecretKey=${secretKey}&IsUnicode=0&Brandname=${brandName}&SmsType=${smsType}`
+        const url = `https://rest.esms.vn/MainService.svc/json/SendMultipleMessage_V4_get?Phone=${encodeURIComponent(formattedPhone)}&Content=${encodeURIComponent(message)}&ApiKey=${apiKey}&SecretKey=${secretKey}&IsUnicode=0&Brandname=${brandName}&SmsType=${smsType}`
 
         const response = await fetch(url)
         const data = await response.json()
