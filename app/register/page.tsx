@@ -101,7 +101,7 @@ export default function RegisterPage() {
       const data = await response.json()
 
       if (data.success) {
-        router.push(`/verify-phone?email=${encodeURIComponent(data.email || "")}&phone=${encodeURIComponent(data.phone || "")}`)
+        router.push(`/verify-phone?email=${encodeURIComponent(data.email || "")}&phone=${encodeURIComponent(data.phone || "")}&otpSent=true`)
       } else {
         setError(data.error || "Số điện thoại đã được sử dụng")
       }
