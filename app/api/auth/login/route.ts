@@ -23,6 +23,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email hoặc mật khẩu không đúng" }, { status: 401 })
     }
 
+    // Check if email is verified
+    // Allow old users who don't have emailVerified field (treat as verified)
+    if (user.emailVerified === false) {
+      return NextResponse.json({
+        error: "Tài khoản chưa được xác minh",
+        needsVerification: true,
+        email: user.email
+      }, { status: 403 })
+    }
+
     // Remove password from response
     const { password: _, _id, ...userWithoutPassword } = user
 
@@ -30,7 +40,9 @@ export async function POST(request: Request) {
     const userResponse = {
       ...userWithoutPassword,
       id: _id.toString(),
-      _id: _id.toString()
+      _id: _id.toString(),
+      emailVerified: user.emailVerified ?? true, // Old users without field are verified
+      phoneVerified: user.phoneVerified ?? false,
     }
 
     return NextResponse.json({

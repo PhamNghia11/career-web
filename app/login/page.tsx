@@ -26,11 +26,25 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      const success = await login(email, password)
-      if (success) {
-        router.push("/dashboard")
+      // Call login API directly to handle verification status
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (data.success && data.user) {
+        // Save user to localStorage and redirect
+        localStorage.setItem("gdu_user", JSON.stringify(data.user))
+        // Force auth context to refresh
+        window.location.href = "/dashboard"
+      } else if (data.needsVerification) {
+        // User needs to verify email first
+        router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
       } else {
-        setError("Email hoặc mật khẩu không đúng")
+        setError(data.error || "Email hoặc mật khẩu không đúng")
       }
     } catch (error) {
       console.error("[v0] Login error:", error)

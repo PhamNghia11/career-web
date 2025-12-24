@@ -59,11 +59,24 @@ export default function RegisterPage() {
 
     setIsLoading(true)
     try {
-      const success = await register(formData)
-      if (success) {
+      // Call register API directly instead of using auth context
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (data.success && data.needsVerification) {
+        // Redirect to email verification page
+        router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
+      } else if (data.success && data.user) {
+        // Old flow: direct login (for backward compatibility)
+        localStorage.setItem("gdu_user", JSON.stringify(data.user))
         router.push("/dashboard")
       } else {
-        setError("Email đã được sử dụng. Vui lòng thử email khác.")
+        setError(data.error || "Email đã được sử dụng. Vui lòng thử email khác.")
       }
     } catch (err) {
       console.error("[v0] Register error:", err)
