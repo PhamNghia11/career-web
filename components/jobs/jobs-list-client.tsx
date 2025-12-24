@@ -71,6 +71,18 @@ const postedDateOptions = [
   { id: "30-days", label: "30 ngày qua" },
 ]
 
+// Location/Địa điểm options
+const locationOptions = [
+  { id: "hcm", label: "TP. Hồ Chí Minh" },
+  { id: "hanoi", label: "Hà Nội" },
+  { id: "danang", label: "Đà Nẵng" },
+  { id: "binh-duong", label: "Bình Dương" },
+  { id: "dong-nai", label: "Đồng Nai" },
+  { id: "can-tho", label: "Cần Thơ" },
+  { id: "hai-phong", label: "Hải Phòng" },
+  { id: "other", label: "Tỉnh/Thành khác" },
+]
+
 // Advanced salary ranges for horizontal filter
 const advancedSalaryRanges = [
   { id: "under-5", label: "Dưới 5 triệu" },
@@ -106,6 +118,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const [selectedExperience, setSelectedExperience] = useState<string | null>(null)
   const [selectedEducation, setSelectedEducation] = useState<string | null>(null)
   const [selectedPostedDate, setSelectedPostedDate] = useState<string | null>(null)
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -318,6 +331,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     setSelectedExperience(null)
     setSelectedEducation(null)
     setSelectedPostedDate(null)
+    setSelectedLocation(null)
   }
 
   const clearAdvancedFilters = () => {
@@ -325,11 +339,12 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     setSelectedExperience(null)
     setSelectedEducation(null)
     setSelectedPostedDate(null)
+    setSelectedLocation(null)
   }
 
   const hasActiveFilters = searchQuery || selectedType || selectedCompany || selectedSalary
-  const hasAdvancedFilters = selectedIndustry || selectedExperience || selectedEducation || selectedPostedDate
-  const advancedFilterCount = [selectedIndustry, selectedExperience, selectedEducation, selectedPostedDate].filter(Boolean).length
+  const hasAdvancedFilters = selectedIndustry || selectedExperience || selectedEducation || selectedPostedDate || selectedLocation
+  const advancedFilterCount = [selectedIndustry, selectedExperience, selectedEducation, selectedPostedDate, selectedLocation].filter(Boolean).length
 
   // FilterDropdown component
   const FilterDropdown = ({
@@ -457,6 +472,14 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
             onChange={setSelectedPostedDate}
             icon={Calendar}
             dropdownId="posted"
+          />
+          <FilterDropdown
+            label="Địa điểm"
+            options={locationOptions}
+            value={selectedLocation}
+            onChange={setSelectedLocation}
+            icon={MapPin}
+            dropdownId="location"
           />
 
           {(hasAdvancedFilters || selectedSalary || selectedType) && (
