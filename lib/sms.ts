@@ -20,7 +20,7 @@ export async function sendSMS(phone: string, message: string) {
 
         // Format phone number: ensure 0 at start, no +84 (eSMS usually takes 09xxx)
         // Adjust logic if needed based on eSMS requirements
-        let formattedPhone = phone
+        let formattedPhone = phone.trim()
         if (formattedPhone.startsWith("+84")) {
             formattedPhone = "0" + formattedPhone.slice(3)
         }
