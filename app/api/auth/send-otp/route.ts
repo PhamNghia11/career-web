@@ -127,17 +127,19 @@ export async function POST(request: Request) {
 
             console.log("[send-otp] Phone OTP processed for:", user.phone)
 
-            return NextResponse.json({
-                success: true,
-                message: type === "email"
-                    ? "Mã OTP đã được gửi đến email của bạn"
-                    : "Mã OTP đã được gửi đến số điện thoại của bạn",
-            })
-        } catch (error) {
-            console.error("Send OTP error:", error)
-            return NextResponse.json(
-                { success: false, error: "Có lỗi xảy ra. Vui lòng thử lại." },
-                { status: 500 }
-            )
         }
+
+        return NextResponse.json({
+            success: true,
+            message: type === "email"
+                ? "Mã OTP đã được gửi đến email của bạn"
+                : "Mã OTP đã được gửi đến số điện thoại của bạn",
+        })
+    } catch (error) {
+        console.error("Send OTP error:", error)
+        return NextResponse.json(
+            { success: false, error: "Có lỗi xảy ra. Vui lòng thử lại." },
+            { status: 500 }
+        )
     }
+}
