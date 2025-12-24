@@ -10,17 +10,24 @@ function hashOTP(otp: string): string {
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { email, otp, type = "email" } = body
+        const { email, phone, otp, type = "email" } = body
 
-        if (!email || !otp) {
+        if ((!email && !phone) || !otp) {
             return NextResponse.json(
-                { success: false, error: "Email và mã OTP là bắt buộc" },
+                { success: false, error: "Thông tin xác minh và mã OTP là bắt buộc" },
                 { status: 400 }
             )
         }
 
         const collection = await getCollection(COLLECTIONS.USERS)
-        const user = await collection.findOne({ email })
+
+        // Find user
+        let user;
+        if (email) {
+            user = await collection.findOne({ email })
+        } else if (phone) {
+            user = await collection.findOne({ phone })
+        }
 
         if (!user) {
             return NextResponse.json(

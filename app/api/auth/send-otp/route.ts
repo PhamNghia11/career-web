@@ -18,19 +18,26 @@ export async function POST(request: Request) {
         const body = await request.json()
         const { email, type = "email" } = body
 
-        if (!email) {
+        if (!email && !body.phone) {
             return NextResponse.json(
-                { success: false, error: "Email là bắt buộc" },
+                { success: false, error: "Email hoặc số điện thoại là bắt buộc" },
                 { status: 400 }
             )
         }
 
         const collection = await getCollection(COLLECTIONS.USERS)
-        const user = await collection.findOne({ email })
+
+        // Find user by email or phone
+        let user;
+        if (email) {
+            user = await collection.findOne({ email })
+        } else if (body.phone) {
+            user = await collection.findOne({ phone: body.phone })
+        }
 
         if (!user) {
             return NextResponse.json(
-                { success: false, error: "Không tìm thấy tài khoản với email này" },
+                { success: false, error: "Không tìm thấy tài khoản" },
                 { status: 404 }
             )
         }

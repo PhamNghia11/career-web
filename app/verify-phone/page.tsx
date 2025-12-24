@@ -14,6 +14,7 @@ function VerifyPhoneContent() {
     const { toast } = useToast()
 
     const email = searchParams.get("email") || ""
+    const phone = searchParams.get("phone") || ""
 
     const [otp, setOtp] = useState(["", "", "", "", "", ""])
     const [isLoading, setIsLoading] = useState(false)
@@ -26,11 +27,10 @@ function VerifyPhoneContent() {
 
     // Helper to fetch user phone
     useEffect(() => {
-        if (email && countdown === 0) {
+        if ((email || phone) && countdown === 0) {
             // Trigger initial OTP send if needed? 
-            // Actually we should assume OTP was sent after email verify
-            // But maybe safer to let user click "Send" or auto-send on load if valid
-            // For now, let's auto-send if it's the first time landing here
+            // Actually we should assume OTP was sent after email verify or register
+            // Check if we just came from register (we probably did)
             handleResend()
         }
     }, []) // Run once
@@ -96,7 +96,7 @@ function VerifyPhoneContent() {
             const response = await fetch("/api/auth/verify-otp", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, otp: otpCode, type: "phone" }),
+                body: JSON.stringify({ email, phone, otp: otpCode, type: "phone" }),
             })
 
             const data = await response.json()
@@ -138,7 +138,7 @@ function VerifyPhoneContent() {
             const response = await fetch("/api/auth/send-otp", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, type: "phone" }),
+                body: JSON.stringify({ email, phone, type: "phone" }),
             })
 
             const data = await response.json()
@@ -167,10 +167,10 @@ function VerifyPhoneContent() {
         }
     }
 
-    if (!email) {
+    if (!email && !phone) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-                <p>Thiếu thông tin email.</p>
+                <p>Thiếu thông tin xác minh (Email hoặc SĐT).</p>
             </div>
         )
     }
