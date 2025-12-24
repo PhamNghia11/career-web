@@ -26,7 +26,11 @@ export async function sendSMS(phone: string, message: string) {
         }
 
         // Call eSMS API
-        const url = `http://rest.esms.vn/MainService.svc/json/SendMultipleMessage_V4_get?Phone=${encodeURIComponent(formattedPhone)}&Content=${encodeURIComponent(message)}&ApiKey=${apiKey}&SecretKey=${secretKey}&IsUnicode=0&Brandname=${brandName}&SmsType=2`
+        // SmsType:
+        // 2: CSKH (Requires registered Brandname)
+        // 8: Fixed Notify (often used for OTP/Notify with shared brandname)
+        const smsType = "8"
+        const url = `http://rest.esms.vn/MainService.svc/json/SendMultipleMessage_V4_get?Phone=${encodeURIComponent(formattedPhone)}&Content=${encodeURIComponent(message)}&ApiKey=${apiKey}&SecretKey=${secretKey}&IsUnicode=0&Brandname=${brandName}&SmsType=${smsType}`
 
         const response = await fetch(url)
         const data = await response.json()
