@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MessageCircle, X, Phone } from "lucide-react"
+import { MessageCircle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -67,20 +67,6 @@ export function SocialChatWidget() {
                   <div className="text-xs text-muted-foreground">Chat qua Messenger</div>
                 </div>
               </button>
-
-              {/* Phone Button */}
-              <a
-                href="tel:1800599920"
-                className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-green-50 hover:border-green-300 transition-colors"
-              >
-                <div className="bg-green-500 text-white p-2 rounded-full">
-                  <Phone className="h-5 w-5" />
-                </div>
-                <div className="text-left">
-                  <div className="font-medium">Gọi điện</div>
-                  <div className="text-xs text-muted-foreground">1800 599 920</div>
-                </div>
-              </a>
             </div>
           </CardContent>
         </Card>

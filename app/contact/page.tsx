@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import { ContactForm } from "@/components/contact/contact-form"
-import { MapPin, Phone, Mail, Clock } from "lucide-react"
+import { MapPin, Mail, Clock, MessageCircle } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
 export default function ContactPage() {
@@ -35,17 +35,40 @@ export default function ContactPage() {
                 </div>
               </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-secondary/10 to-secondary/5 border-secondary/20">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-secondary/10 rounded-lg shrink-0">
-                    <Phone className="h-6 w-6 text-secondary" />
+              <Card className="p-6 bg-gradient-to-br from-blue-500/10 to-purple-500/5 border-blue-500/20">
+                <a
+                  href="https://www.facebook.com/messages/t/TruongDaihocGiaDinh"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-4 hover:opacity-80 transition-opacity"
+                >
+                  <div className="p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg shrink-0">
+                    <MessageCircle className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-2 text-foreground">Điện thoại</h3>
-                    <p className="text-muted-foreground">Hotline: 1800 599 920</p>
-                    <p className="text-muted-foreground">Phòng CTSV: (028) 3829 2929</p>
+                    <h3 className="font-semibold mb-2 text-foreground">Messenger</h3>
+                    <p className="text-muted-foreground">Chat trực tiếp qua Facebook</p>
+                    <p className="text-primary font-medium">Nhắn tin ngay →</p>
                   </div>
-                </div>
+                </a>
+              </Card>
+
+              <Card className="p-6 bg-gradient-to-br from-[#0068FF]/10 to-[#0068FF]/5 border-[#0068FF]/20">
+                <a
+                  href="https://zalo.me/0961121018"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-4 hover:opacity-80 transition-opacity"
+                >
+                  <div className="p-3 bg-[#0068FF]/20 rounded-lg shrink-0 flex items-center justify-center">
+                    <span className="font-bold text-[#0068FF]">Zalo</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2 text-foreground">Zalo</h3>
+                    <p className="text-muted-foreground">Chat nhanh qua Zalo</p>
+                    <p className="text-primary font-medium">Nhắn tin ngay →</p>
+                  </div>
+                </a>
               </Card>
 
               <Card className="p-6 bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">

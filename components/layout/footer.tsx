@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Facebook, Phone, Mail, MapPin } from "lucide-react"
+import { Facebook, Mail, MapPin, MessageCircle } from "lucide-react"
 
 export function Footer() {
   return (
@@ -57,12 +57,6 @@ export function Footer() {
                 <span>371 Nguyen Kiem, Go Vap, TP.HCM</span>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-secondary" />
-                <a href="tel:1800599920" className="hover:text-secondary transition-colors">
-                  1800 599 920
-                </a>
-              </li>
-              <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-secondary" />
                 <a href="mailto:tuyendung@gdu.edu.vn" className="hover:text-secondary transition-colors">
                   tuyendung@gdu.edu.vn
@@ -103,32 +97,48 @@ export function Footer() {
         <div className="border-t border-primary-foreground/20 mt-8 pt-6">
           <div className="bg-secondary/20 rounded-lg p-6 mb-4">
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
-              <div className="flex items-center gap-3">
-                <div className="bg-secondary p-3 rounded-full">
-                  <Phone className="h-6 w-6 text-secondary-foreground" />
+              <a
+                href="https://www.facebook.com/messages/t/TruongDaihocGiaDinh"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              >
+                <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-3 rounded-full">
+                  <MessageCircle className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm text-primary-foreground/80 mb-1">Hotline tư vấn</p>
-                  <a href="tel:1800599920" className="text-2xl font-bold hover:text-secondary transition-colors">
-                    1800 599 920
-                  </a>
+                  <p className="text-sm text-primary-foreground/80 mb-1">Messenger</p>
+                  <span className="text-xl font-bold">Chat ngay</span>
                 </div>
-              </div>
+              </a>
               <div className="hidden md:block h-12 w-px bg-primary-foreground/20"></div>
-              <div className="flex items-center gap-3">
+              <a
+                href="https://zalo.me/0961121018"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              >
+                <div className="bg-[#0068FF] p-3 rounded-full">
+                  <span className="font-bold text-white text-sm">Zalo</span>
+                </div>
+                <div>
+                  <p className="text-sm text-primary-foreground/80 mb-1">Zalo</p>
+                  <span className="text-xl font-bold">Nhắn tin Zalo</span>
+                </div>
+              </a>
+              <div className="hidden md:block h-12 w-px bg-primary-foreground/20"></div>
+              <a
+                href="mailto:tuyendung@gdu.edu.vn"
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              >
                 <div className="bg-secondary p-3 rounded-full">
                   <Mail className="h-6 w-6 text-secondary-foreground" />
                 </div>
                 <div>
                   <p className="text-sm text-primary-foreground/80 mb-1">Email liên hệ</p>
-                  <a
-                    href="mailto:tuyendung@gdu.edu.vn"
-                    className="text-xl font-bold hover:text-secondary transition-colors"
-                  >
-                    tuyendung@gdu.edu.vn
-                  </a>
+                  <span className="text-xl font-bold">tuyendung@gdu.edu.vn</span>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
         </div>
