@@ -36,9 +36,9 @@ const employerNav = [
   { name: "Tổng quan", href: "/dashboard", icon: Home },
   { name: "Đăng tin tuyển dụng", href: "/dashboard/jobs/new", icon: Briefcase },
   { name: "Quản lý tin đăng", href: "/dashboard/my-jobs", icon: FileText },
-  { name: "Đơn ứng tuyển", href: "/dashboard/applications", icon: FileText },
-  { name: "Ứng viên", href: "/dashboard/candidates", icon: Users },
+  { name: "Hồ sơ ứng tuyển", href: "/dashboard/applications", icon: Users },
   { name: "Công ty", href: "/dashboard/company", icon: Building },
+  { name: "Thông báo", href: "/dashboard/notifications", icon: Bell },
   { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },
 ]
 
