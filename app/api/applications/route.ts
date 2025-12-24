@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/lib/mongodb"
 import { sendEmail } from "@/lib/email"
+import { ObjectId } from "mongodb"
 
 export async function POST(request: Request) {
   try {
@@ -10,13 +11,35 @@ export async function POST(request: Request) {
     const jobTitle = formData.get("jobTitle") as string
     const companyName = formData.get("companyName") as string
     const jobId = formData.get("jobId") as string
-    const employerId = formData.get("employerId") as string
+    let employerId = formData.get("employerId") as string
     const fullname = formData.get("fullname") as string
     const email = formData.get("email") as string
     const phone = formData.get("phone") as string
     const message = formData.get("message") as string
 
-    console.log("[Applications API] POST - jobId:", jobId, "employerId:", employerId)
+    console.log("[Applications API] POST - jobId:", jobId, "employerId from form:", employerId)
+
+    // If employerId not provided, try to lookup from job in MongoDB
+    if (!employerId && jobId) {
+      try {
+        const jobsCollection = await getCollection(COLLECTIONS.JOBS)
+        // Try to find job by ObjectId first (MongoDB jobs)
+        let job = null
+        try {
+          job = await jobsCollection.findOne({ _id: new ObjectId(jobId) })
+        } catch {
+          // If jobId is not a valid ObjectId, try string match (for static JSON jobs)
+          job = await jobsCollection.findOne({ _id: jobId as any })
+        }
+
+        if (job?.creatorId) {
+          employerId = job.creatorId
+          console.log("[Applications API] Found employerId from job:", employerId)
+        }
+      } catch (lookupError) {
+        console.error("[Applications API] Error looking up job:", lookupError)
+      }
+    }
 
     // Extract file
     const file = formData.get("cv") as File
@@ -49,7 +72,7 @@ export async function POST(request: Request) {
       jobId,
       jobTitle,
       companyName,
-      employerId,
+      employerId: employerId || null, // Store the resolved employerId
       fullname,
       email,
       phone,
@@ -76,9 +99,10 @@ export async function POST(request: Request) {
         message: `${fullname} vừa ứng tuyển vị trí ${jobTitle} tại ${companyName}`,
         read: false,
         createdAt: new Date(),
-        link: `/dashboard/applications/${applicationId}`,
+        link: `/dashboard/applications`,
         applicationId: applicationId
       })
+      console.log("[Applications API] Created admin notification")
     } catch (notifError) {
       console.error("Failed to create admin notification:", notifError)
     }
@@ -93,12 +117,15 @@ export async function POST(request: Request) {
           message: `${fullname} vừa ứng tuyển vị trí ${jobTitle}`,
           read: false,
           createdAt: new Date(),
-          link: `/dashboard/applications/${applicationId}`,
+          link: `/dashboard/applications`,
           applicationId: applicationId
         })
+        console.log("[Applications API] Created employer notification for:", employerId)
       } catch (notifError) {
         console.error("Failed to create employer notification:", notifError)
       }
+    } else {
+      console.log("[Applications API] No employerId found, skipping employer notification")
     }
 
     // 3. Send Email Notifications
