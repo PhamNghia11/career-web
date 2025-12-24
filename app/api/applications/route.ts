@@ -16,6 +16,8 @@ export async function POST(request: Request) {
     const phone = formData.get("phone") as string
     const message = formData.get("message") as string
 
+    console.log("[Applications API] POST - jobId:", jobId, "employerId:", employerId)
+
     // Extract file
     const file = formData.get("cv") as File
 

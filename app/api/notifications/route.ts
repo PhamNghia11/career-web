@@ -21,6 +21,8 @@ export async function GET(request: Request) {
     const userId = searchParams.get("userId")
     const role = searchParams.get("role") // Get user role from params
 
+    console.log("[Notifications API] GET - userId:", userId, "role:", role)
+
     if (!userId) {
       return NextResponse.json({ success: false, error: "userId is required" }, { status: 400 })
     }
@@ -31,19 +33,28 @@ export async function GET(request: Request) {
     let query: any = { userId }
 
     if (role === 'admin') {
+      // Admin sees: their own notifications + all admin-targeted notifications
       query = {
         $or: [
           { userId },
           { targetRole: 'admin' }
         ]
       }
+    } else if (role === 'employer') {
+      // Employer sees: their own notifications (where userId matches their ID)
+      query = { userId }
     }
+    // For students and other roles, default query { userId } is used
+
+    console.log("[Notifications API] Query:", JSON.stringify(query))
 
     const notifications = await collection
       .find(query)
       .sort({ createdAt: -1 })
       .limit(50)
       .toArray()
+
+    console.log("[Notifications API] Found", notifications.length, "notifications")
 
     // Count unread notifications
     // For admin, we might need a separate way to track "read" status for shared notifications,
