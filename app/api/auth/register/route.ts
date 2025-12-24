@@ -85,11 +85,52 @@ export async function POST(request: Request) {
     }
 
     // Check if phone already exists (only if phone is provided)
+    // Check if phone already exists (only if phone is provided)
     if (phone) {
       const existingUserPhone = await collection.findOne({ phone })
       if (existingUserPhone) {
-        // If user exists but might be unverified phone? 
-        // For now, let's just error strict uniqueness.
+        // If user exists but phone is NOT verified, allow claiming this account/resending OTP
+        if (!existingUserPhone.phoneVerified) {
+          // Generate new OTP for phone
+          const otp = generateOTP()
+          const hashedOTP = hashOTP(otp)
+          const expiresAt = new Date(Date.now() + 5 * 60 * 1000)
+
+          await collection.updateOne(
+            { phone },
+            {
+              $set: {
+                phoneOtp: hashedOTP,
+                phoneOtpExpires: expiresAt,
+                // Update other fields if they decided to change name/password in the new attempt?
+                // For security, maybe we should ONLY update OTP. 
+                // But if they messed up their name, they might want to fix it.
+                // Let's update basics.
+                name: name,
+                password: await bcrypt.hash(password, 10),
+                updatedAt: new Date()
+              }
+            }
+          )
+
+          // We need to send the SMS here OR rely on the frontend to call send-otp?
+          // To be consistent with the "new user" flow, we'll return needsPhoneVerification: true
+          // AND we should probably trigger the SMS send here to be helpful. 
+
+          // Send via SMS immediately
+          const { sendSMS } = await import("@/lib/sms")
+          const message = `Ma xac minh GDU Career cua ban la: ${otp}. Ma se het han sau 5 phut.`
+          await sendSMS(phone, message)
+
+          return NextResponse.json({
+            success: true,
+            needsVerification: true,
+            needsPhoneVerification: true,
+            phone: phone,
+            message: "Số điện thoại đã đăng ký nhưng chưa xác minh. Mã OTP mới đã được gửi.",
+          })
+        }
+
         return NextResponse.json({ error: "Số điện thoại đã được sử dụng" }, { status: 409 })
       }
     }
@@ -135,12 +176,20 @@ export async function POST(request: Request) {
       // Actually, simpler to just re-do logic slightly.
     }
 
+
     // REFACTORING TO FIX OTP VARIABLE SCOPE
     let emailOtpPlain = "";
     if (email) {
       emailOtpPlain = generateOTP();
       newUser.emailOtp = hashOTP(emailOtpPlain);
       newUser.emailOtpExpires = new Date(Date.now() + 5 * 60 * 1000);
+    }
+
+    let phoneOtpPlain = "";
+    if (phone && !email) {
+      phoneOtpPlain = generateOTP();
+      newUser.phoneOtp = hashOTP(phoneOtpPlain);
+      newUser.phoneOtpExpires = new Date(Date.now() + 5 * 60 * 1000);
     }
 
     // Send Email OTP
@@ -185,10 +234,15 @@ export async function POST(request: Request) {
     // The previous design relies on frontend calling 'send-otp' or receiving a response that prompts it.
     // If we just created the user, they need verification.
 
-    if (phone && !email) {
-      // We can trigger SMS send here if we want, or let frontend do it.
-      // Let's stick to frontend triggering it to keep backend generic?
-      // But wait, frontend needs to know if it should redirect.
+    if (phone && !email && phoneOtpPlain) {
+      try {
+        const { sendSMS } = await import("@/lib/sms")
+        const message = `Ma xac minh GDU Career cua ban la: ${phoneOtpPlain}. Ma se het han sau 5 phut.`
+        await sendSMS(phone, message)
+        console.log("[register] Sent OTP SMS to:", phone)
+      } catch (smsError) {
+        console.error("Failed to send OTP SMS:", smsError)
+      }
     }
 
     // Send notification to Admin (only if email is available for now, or use a default?)

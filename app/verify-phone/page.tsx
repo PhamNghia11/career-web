@@ -16,6 +16,8 @@ function VerifyPhoneContent() {
     const email = searchParams.get("email") || ""
     const phone = searchParams.get("phone") || ""
 
+    const otpSent = searchParams.get("otpSent") === "true"
+
     const [otp, setOtp] = useState(["", "", "", "", "", ""])
     const [isLoading, setIsLoading] = useState(false)
     const [isResending, setIsResending] = useState(false)
@@ -27,13 +29,16 @@ function VerifyPhoneContent() {
 
     // Helper to fetch user phone
     useEffect(() => {
-        if ((email || phone) && countdown === 0) {
-            // Trigger initial OTP send if needed? 
-            // Actually we should assume OTP was sent after email verify or register
-            // Check if we just came from register (we probably did)
-            handleResend()
+        if ((email || phone)) {
+            if (otpSent && countdown === 0) {
+                // Optimization: If we just came from register with OTP sent, don't resend immediately.
+                // Just start countdown.
+                setCountdown(60);
+            } else if (countdown === 0) {
+                handleResend()
+            }
         }
-    }, []) // Run once
+    }, []) // Run onceHTML
 
     // Countdown for resend button
     useEffect(() => {
