@@ -41,7 +41,7 @@ export function JobsListClient() {
   const [selectedSalary, setSelectedSalary] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<string>("newest")
   const [savedJobs, setSavedJobs] = useState<string[]>([])
-  const [selectedJob, setSelectedJob] = useState<{ title: string; company: string } | null>(null)
+  const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string } | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
 
   // Load saved jobs from database when user is logged in
@@ -153,8 +153,8 @@ export function JobsListClient() {
     setSelectedCompany(prev => prev === company ? null : company)
   }
 
-  const handleApply = (jobId: string, jobTitle: string, company: string) => {
-    setSelectedJob({ title: jobTitle, company: company })
+  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string) => {
+    setSelectedJob({ title: jobTitle, company: company, jobId: jobId, creatorId: creatorId })
     setIsApplyDialogOpen(true)
   }
 
@@ -471,7 +471,7 @@ export function JobsListClient() {
                       <Button
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleApply(job._id, job.title, job.company)
+                          handleApply(job._id, job.title, job.company, job.creatorId)
                         }}
                         className="bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white shadow-sm px-6"
                       >
@@ -501,6 +501,8 @@ export function JobsListClient() {
         onClose={() => setIsApplyDialogOpen(false)}
         jobTitle={selectedJob?.title || ""}
         companyName={selectedJob?.company || ""}
+        jobId={selectedJob?.jobId}
+        employerId={selectedJob?.creatorId}
       />
     </div>
   )

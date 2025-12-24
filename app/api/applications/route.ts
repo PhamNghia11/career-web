@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/lib/mongodb"
+import { sendEmail } from "@/lib/email"
 
 export async function POST(request: Request) {
   try {
@@ -8,6 +9,8 @@ export async function POST(request: Request) {
     // Extract text fields
     const jobTitle = formData.get("jobTitle") as string
     const companyName = formData.get("companyName") as string
+    const jobId = formData.get("jobId") as string
+    const employerId = formData.get("employerId") as string
     const fullname = formData.get("fullname") as string
     const email = formData.get("email") as string
     const phone = formData.get("phone") as string
@@ -21,60 +24,150 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Thiếu thông tin bắt buộc" }, { status: 400 })
     }
 
-    // Validate file (double check server side)
+    // Validate file type
     const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
     if (!validTypes.includes(file.type)) {
       return NextResponse.json({ error: "Loại file không hợp lệ" }, { status: 400 })
     }
 
+    // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json({ error: "File quá lớn (>5MB)" }, { status: 400 })
     }
 
-    // In a real app, you would upload the file to S3/Cloudinary/Blob Storage here.
-    // For this demo/prototype, we will store metadata and assume local storage or similar if needed,
-    // but typically we don't store files in MongoDB directly (GridFS is an option but complex).
-    // For now, we'll confirm receipt and store metadata.
-
-    // Mock file path for now
-    const cvPath = `/uploads/${Date.now()}-${file.name}`
+    // Convert CV to Base64 for storage in MongoDB
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    const cvBase64 = buffer.toString("base64")
+    const cvDataUrl = `data:${file.type};base64,${cvBase64}`
 
     const applicationsCollection = await getCollection(COLLECTIONS.APPLICATIONS)
 
-    const result = await applicationsCollection.insertOne({
+    const applicationData = {
+      jobId,
       jobTitle,
       companyName,
+      employerId,
       fullname,
       email,
       phone,
       message,
-      cvPath, // This would be the URL from S3
+      cvBase64: cvDataUrl,
       cvOriginalName: file.name,
+      cvMimeType: file.type,
       createdAt: new Date(),
       status: "new", // new, reviewed, interviewed, rejected, hired
-    })
+    }
 
-    // Create Notification for Admins
+    const result = await applicationsCollection.insertOne(applicationData)
+    const applicationId = result.insertedId.toString()
+
+    // Create Notifications
+    const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+
+    // 1. Notification for Admin
     try {
-      const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
       await notificationsCollection.insertOne({
         targetRole: 'admin',
         type: 'job',
         title: 'Hồ sơ ứng tuyển mới',
-        message: `${fullname} vừa ứng tuyển vị trí ${jobTitle}`,
+        message: `${fullname} vừa ứng tuyển vị trí ${jobTitle} tại ${companyName}`,
         read: false,
         createdAt: new Date(),
-        link: '/dashboard/applications' // Or specific link if available
+        link: `/dashboard/applications/${applicationId}`,
+        applicationId: applicationId
       })
     } catch (notifError) {
-      console.error("Failed to create notification:", notifError)
-      // Don't fail the request if notification fails
+      console.error("Failed to create admin notification:", notifError)
+    }
+
+    // 2. Notification for Employer (if employerId exists)
+    if (employerId) {
+      try {
+        await notificationsCollection.insertOne({
+          userId: employerId,
+          type: 'job',
+          title: 'Ứng viên mới ứng tuyển',
+          message: `${fullname} vừa ứng tuyển vị trí ${jobTitle}`,
+          read: false,
+          createdAt: new Date(),
+          link: `/dashboard/applications/${applicationId}`,
+          applicationId: applicationId
+        })
+      } catch (notifError) {
+        console.error("Failed to create employer notification:", notifError)
+      }
+    }
+
+    // 3. Send Email Notifications
+    const emailSubject = `[GDU Career] Hồ sơ ứng tuyển mới: ${jobTitle}`
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #1e3a5f; color: white; padding: 20px; text-align: center;">
+          <h1 style="margin: 0;">GDU Career Portal</h1>
+        </div>
+        <div style="padding: 30px; background: #f9f9f9;">
+          <h2 style="color: #1e3a5f;">Có ứng viên mới!</h2>
+          <p><strong>Vị trí:</strong> ${jobTitle}</p>
+          <p><strong>Công ty:</strong> ${companyName}</p>
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+          <h3 style="color: #333;">Thông tin ứng viên:</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: 8px 0;"><strong>Họ tên:</strong> ${fullname}</li>
+            <li style="padding: 8px 0;"><strong>Email:</strong> ${email}</li>
+            <li style="padding: 8px 0;"><strong>Số điện thoại:</strong> ${phone}</li>
+            <li style="padding: 8px 0;"><strong>CV:</strong> ${file.name}</li>
+            ${message ? `<li style="padding: 8px 0;"><strong>Lời nhắn:</strong> ${message}</li>` : ''}
+          </ul>
+          <p style="margin-top: 20px;">
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://career-web-three.vercel.app'}/dashboard/applications/${applicationId}" 
+               style="background: #1e3a5f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+              Xem hồ sơ chi tiết
+            </a>
+          </p>
+        </div>
+        <div style="padding: 15px; text-align: center; color: #666; font-size: 12px;">
+          <p>Email này được gửi tự động từ GDU Career Portal</p>
+        </div>
+      </div>
+    `
+
+    // Send email to admin
+    try {
+      if (process.env.ADMIN_EMAIL) {
+        await sendEmail({
+          to: process.env.ADMIN_EMAIL,
+          subject: emailSubject,
+          html: emailHtml
+        })
+      }
+    } catch (emailError) {
+      console.error("Failed to send admin email:", emailError)
+    }
+
+    // Send email to employer (if we have their email)
+    if (employerId) {
+      try {
+        const usersCollection = await getCollection(COLLECTIONS.USERS)
+        const { ObjectId } = await import("mongodb")
+        const employer = await usersCollection.findOne({ _id: new ObjectId(employerId) })
+        if (employer?.email) {
+          await sendEmail({
+            to: employer.email,
+            subject: emailSubject,
+            html: emailHtml
+          })
+        }
+      } catch (emailError) {
+        console.error("Failed to send employer email:", emailError)
+      }
     }
 
     return NextResponse.json(
       {
         success: true,
         message: "Ứng tuyển thành công",
+        applicationId: applicationId
       },
       { status: 200 },
     )
@@ -83,32 +176,34 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
-// ... (existing POST)
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const email = searchParams.get("email")
     const role = searchParams.get("role")
+    const employerId = searchParams.get("employerId")
 
     const collection = await getCollection(COLLECTIONS.APPLICATIONS)
-    let query = {}
+    let query: Record<string, any> = {}
 
-    // Simple role-based filter simulation
-    // If student, filter by email. If admin, return all.
-    // In a real secure app, we'd verify session/token here.
     if (role === "student" && email) {
       query = { email: email }
     } else if (role === "admin") {
       query = {} // All
+    } else if (role === "employer" && employerId) {
+      query = { employerId: employerId }
     } else {
-      // Default behavior (e.g. for API testing or if logic unclear)
-      // Maybe return nothing to be safe? Or match email if present.
       if (email) query = { email: email }
-      else query = {} // Or maybe block? For now let's allow all if no filter for dev ease or empty.
+      else query = {}
     }
 
-    const applications = await collection.find(query).sort({ createdAt: -1 }).toArray()
+    // Don't return cvBase64 in list to save bandwidth
+    const applications = await collection
+      .find(query)
+      .project({ cvBase64: 0 })
+      .sort({ createdAt: -1 })
+      .toArray()
 
     return NextResponse.json({
       success: true,

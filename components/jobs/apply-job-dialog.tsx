@@ -14,9 +14,11 @@ interface ApplyJobDialogProps {
     onClose: () => void
     jobTitle: string
     companyName: string
+    jobId?: string
+    employerId?: string
 }
 
-export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName }: ApplyJobDialogProps) {
+export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, employerId }: ApplyJobDialogProps) {
     const { toast } = useToast()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
@@ -86,6 +88,8 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName }: Apply
             const formData = new FormData()
             formData.append("jobTitle", jobTitle)
             formData.append("companyName", companyName)
+            if (jobId) formData.append("jobId", jobId)
+            if (employerId) formData.append("employerId", employerId)
 
             // Get form values using the element definition from usage
             // Since the inputs are uncontrolled in the JSX (except for some reason previously they weren't fully controlled state but just ID ref),

@@ -24,13 +24,13 @@ const typeLabels = {
 }
 
 export function FeaturedJobs() {
-  const [selectedJob, setSelectedJob] = useState<{ title: string; company: string } | null>(null)
+  const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string } | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
 
   const featuredJobs = getFeaturedJobs(4)
 
-  const handleApply = (jobTitle: string, company: string) => {
-    setSelectedJob({ title: jobTitle, company: company })
+  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string) => {
+    setSelectedJob({ title: jobTitle, company: company, jobId: jobId, creatorId: creatorId })
     setIsApplyDialogOpen(true)
   }
 
@@ -90,7 +90,7 @@ export function FeaturedJobs() {
               <CardFooter className="p-6 pt-0">
                 <Button
                   className="w-full bg-primary hover:bg-primary/90"
-                  onClick={() => handleApply(job.title, job.company)}
+                  onClick={() => handleApply(job._id, job.title, job.company, job.creatorId)}
                 >
                   Ứng tuyển ngay
                 </Button>
@@ -113,6 +113,8 @@ export function FeaturedJobs() {
         onClose={() => setIsApplyDialogOpen(false)}
         jobTitle={selectedJob?.title || ""}
         companyName={selectedJob?.company || ""}
+        jobId={selectedJob?.jobId}
+        employerId={selectedJob?.creatorId}
       />
     </section>
   )

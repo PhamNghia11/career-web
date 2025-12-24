@@ -1,200 +1,271 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { FileText, Calendar, Eye, Trash2 } from "lucide-react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { useSearchParams } from "next/navigation"
+import { Header } from "@/components/layout/header"
+import { Footer } from "@/components/layout/footer"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/hooks/use-toast"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Empty, EmptyTitle, EmptyDescription, EmptyAction } from "@/components/ui/empty"
-import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useAuth } from "@/lib/auth-context"
+import { FileText, Mail, Phone, Calendar, User, CheckCircle, XCircle, Clock, Eye } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useToast } from "@/hooks/use-toast"
 
 interface Application {
-  id: string
+  _id: string
+  jobId: string
   jobTitle: string
-  company: string
-  companyLogo: string
-  appliedDate: string
-  status: "pending" | "reviewing" | "interview" | "rejected" | "accepted"
+  companyName: string
+  fullname: string
+  email: string
+  phone: string
+  message: string
+  cvOriginalName: string
+  status: "new" | "reviewed" | "interviewed" | "rejected" | "hired"
+  createdAt: string
+  employerId?: string
 }
-
-const statusColors = {
-  pending: "bg-gray-500/20 text-gray-700 border border-gray-500/30",
-  reviewing: "bg-blue-500/20 text-blue-700 border border-blue-500/30",
-  interview: "bg-yellow-500/20 text-yellow-700 border border-yellow-500/30",
-  rejected: "bg-red-500/20 text-red-700 border border-red-500/30",
-  accepted: "bg-green-500/20 text-green-700 border border-green-500/30",
-}
-
-const statusLabels = {
-  pending: "Đang chờ",
-  reviewing: "Đang xem xét",
-  interview: "Phỏng vấn",
-  rejected: "Từ chối",
-  accepted: "Chấp nhận",
-}
-
-import { useAuth } from "@/lib/auth-context"
-
-// ... imports
 
 export default function ApplicationsPage() {
-  const { user } = useAuth()
-  const [applications, setApplications] = useState<Application[]>([])
-  const [loading, setLoading] = useState(true)
+  const { user, isLoading } = useAuth()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
 
-  // ... rest
+  const [applications, setApplications] = useState<Application[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedApp, setSelectedApp] = useState<Application | null>(null)
+  const [cvLoading, setCvLoading] = useState(false)
+  const [cvUrl, setCvUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchApplications()
-  }, [])
+    if (!isLoading && user) {
+      fetchApplications()
+    }
+  }, [isLoading, user])
 
   const fetchApplications = async () => {
-    setLoading(true)
     try {
-      const userQuery = user ? `?role=${user.role}&email=${user.email}` : ""
-      const response = await fetch(`/api/applications${userQuery}`)
-      const result = await response.json()
+      const role = user?.role || "student"
+      const queryParams = new URLSearchParams()
+      queryParams.set("role", role)
 
-      if (result.success) {
-        const formattedData = result.data.map((app: any) => ({
-          ...app,
-          appliedDate: new Date(app.appliedDate).toLocaleDateString("vi-VN"),
-        }))
-        setApplications(formattedData)
-      } else {
-        throw new Error(result.error)
+      if (role === "student") {
+        queryParams.set("email", user?.email || "")
+      } else if (role === "employer") {
+        queryParams.set("employerId", user?.id || "")
+      }
+
+      const res = await fetch(`/api/applications?${queryParams.toString()}`)
+      const data = await res.json()
+
+      if (data.success) {
+        setApplications(data.data)
       }
     } catch (error) {
-      console.error("[v0] Failed to fetch applications:", error)
-      toast({
-        title: "Lỗi",
-        description: "Không thể tải danh sách đơn ứng tuyển",
-        variant: "destructive",
-      })
+      console.error("Error fetching applications:", error)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleWithdraw = async (applicationId: string) => {
-    try {
-      const response = await fetch(`/api/applications?id=${applicationId}`, { method: "DELETE" })
-      const result = await response.json()
+  const handleViewCV = async (app: Application) => {
+    setSelectedApp(app)
+    setCvUrl(null)
+    setCvLoading(true)
 
-      if (result.success) {
-        setApplications(applications.filter((app) => app.id !== applicationId))
+    try {
+      const res = await fetch(`/api/applications/${app._id}`)
+      const data = await res.json()
+
+      if (data.success && data.data.cvBase64) {
+        setCvUrl(data.data.cvBase64)
+      } else {
         toast({
-          title: "Đã rút đơn",
-          description: "Đã rút đơn ứng tuyển thành công",
+          title: "Lỗi",
+          description: "Không thể tải CV",
+          variant: "destructive"
         })
       }
     } catch (error) {
+      console.error("Error fetching CV:", error)
       toast({
         title: "Lỗi",
-        description: "Không thể rút đơn ứng tuyển",
-        variant: "destructive",
+        description: "Có lỗi xảy ra khi tải CV",
+        variant: "destructive"
       })
+    } finally {
+      setCvLoading(false)
     }
   }
 
-  if (loading) {
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "new":
+        return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Mới</Badge>
+      case "reviewed":
+        return <Badge className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">Đã xem</Badge>
+      case "interviewed":
+        return <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100">Phỏng vấn</Badge>
+      case "hired":
+        return <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Đã tuyển</Badge>
+      case "rejected":
+        return <Badge className="bg-red-100 text-red-700 hover:bg-red-100">Từ chối</Badge>
+      default:
+        return <Badge variant="outline">Không xác định</Badge>
+    }
+  }
+
+  if (isLoading || loading) {
     return (
-      <div className="space-y-6 max-w-6xl">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Đơn ứng tuyển</h1>
-          <p className="text-muted-foreground mt-1">Theo dõi trạng thái các đơn ứng tuyển của bạn</p>
-        </div>
-        <Card>
-          <div className="p-6 space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-20 w-full" />
-            ))}
-          </div>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6 max-w-6xl">
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Đơn ứng tuyển</h1>
-        <p className="text-muted-foreground mt-1">
-          Bạn có <span className="font-semibold text-foreground">{applications.length}</span> đơn ứng tuyển
-        </p>
-      </div>
-
-      {applications.length === 0 ? (
-        <Card className="p-12">
-          <Empty>
-            <FileText className="h-12 w-12" />
-            <EmptyTitle>Chưa có đơn ứng tuyển nào</EmptyTitle>
-            <EmptyDescription>Hãy bắt đầu tìm kiếm và ứng tuyển vào các vị trí phù hợp với bạn</EmptyDescription>
-            <EmptyAction>
-              <Link href="/jobs">
-                <Button>Tìm việc làm</Button>
-              </Link>
-            </EmptyAction>
-          </Empty>
-        </Card>
-      ) : (
-        <Card>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Vị trí</TableHead>
-                  <TableHead>Công ty</TableHead>
-                  <TableHead>Ngày nộp</TableHead>
-                  <TableHead>Trạng thái</TableHead>
-                  <TableHead className="text-right">Hành động</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {applications.map((app) => (
-                  <TableRow key={app.id}>
-                    <TableCell className="font-medium">{app.jobTitle}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <img
-                          src={app.companyLogo || "/placeholder.svg"}
-                          alt={app.company}
-                          className="w-8 h-8 rounded object-cover"
-                        />
-                        <span>{app.company}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        {app.appliedDate}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={statusColors[app.status]}>{statusLabels[app.status]}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4 mr-1" />
-                          Chi tiết
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleWithdraw(app.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Quản lý ứng tuyển</h1>
+            <p className="text-muted-foreground mt-2">
+              {user?.role === "student"
+                ? "Theo dõi trạng thái các vị trí bạn đã ứng tuyển"
+                : "Quản lý hồ sơ ứng viên cho các vị trí tuyển dụng"}
+            </p>
           </div>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Danh sách hồ sơ ({applications.length})</CardTitle>
+            <CardDescription>
+              {user?.role === "student"
+                ? "Danh sách các công việc bạn đã nộp hồ sơ"
+                : "Danh sách ứng viên mới nhất"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {applications.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FileText className="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">Chưa có dữ liệu</h3>
+                <p className="text-gray-500">
+                  {user?.role === "student"
+                    ? "Bạn chưa ứng tuyển vị trí nào"
+                    : "Chưa có ứng viên nào nộp hồ sơ"}
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Vị trí / Công ty</TableHead>
+                      <TableHead>Ứng viên</TableHead>
+                      <TableHead>Liên hệ</TableHead>
+                      <TableHead>Ngày nộp</TableHead>
+                      <TableHead>CV</TableHead>
+                      <TableHead>Trạng thái</TableHead>
+                      <TableHead className="text-right">Hành động</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {applications.map((app) => (
+                      <TableRow key={app._id}>
+                        <TableCell>
+                          <div className="font-medium text-blue-900">{app.jobTitle}</div>
+                          <div className="text-sm text-gray-500">{app.companyName}</div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-gray-400" />
+                            <span className="font-medium">{app.fullname}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1 text-sm">
+                            <div className="flex items-center gap-2">
+                              <Mail className="h-3 w-3 text-gray-400" />
+                              {app.email}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Phone className="h-3 w-3 text-gray-400" />
+                              {app.phone}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(app.createdAt).toLocaleDateString("vi-VN")}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                            onClick={() => handleViewCV(app)}
+                          >
+                            <FileText className="h-4 w-4 mr-1" />
+                            Xem CV
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          {getStatusBadge(app.status)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon">
+                            <Eye className="h-4 w-4 text-gray-500" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
         </Card>
-      )}
+      </main>
+      <Footer />
+
+      <Dialog open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
+        <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>CV: {selectedApp?.fullname} - {selectedApp?.jobTitle}</span>
+              <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)}>
+                Tải lại
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 bg-gray-100 rounded-md overflow-hidden relative">
+            {cvLoading ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : cvUrl ? (
+              <iframe
+                src={cvUrl}
+                className="w-full h-full"
+                title="CV Preview"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+                Không thể hiển thị CV
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
