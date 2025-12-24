@@ -143,46 +143,61 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-red-50 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <div className="bg-red-600 text-white font-bold px-3 py-2 rounded">
+          <Link href="/" className="inline-flex items-center gap-2 group">
+            <div className="bg-red-600 text-white font-bold px-3 py-2 rounded-lg group-hover:bg-red-700 transition-colors shadow-sm">
               <span className="text-xl">GDU</span>
             </div>
-            <span className="font-bold text-xl text-gray-900">Career</span>
+            <span className="font-bold text-2xl text-gray-900 tracking-tight">Career</span>
           </Link>
         </div>
 
-        <Card className="shadow-lg border-0">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">Đăng nhập</CardTitle>
-            <CardDescription>Chọn phương thức đăng nhập</CardDescription>
+        <Card className="shadow-xl border-0 ring-1 ring-gray-200/50 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-2xl font-bold tracking-tight text-gray-900">Chào mừng trở lại</CardTitle>
+            <CardDescription className="text-base">Đăng nhập để tiếp tục</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="email" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="email">Email</TabsTrigger>
-                <TabsTrigger value="phone">Số điện thoại</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-8 p-1 bg-gray-100/80 rounded-xl">
+                <TabsTrigger
+                  value="email"
+                  className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-red-600 data-[state=active]:shadow-sm transition-all duration-200 py-2.5 font-medium"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Email
+                </TabsTrigger>
+                <TabsTrigger
+                  value="phone"
+                  className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-red-600 data-[state=active]:shadow-sm transition-all duration-200 py-2.5 font-medium"
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Số điện thoại
+                </TabsTrigger>
               </TabsList>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-md mb-4">{error}</div>
+                <div className="bg-red-50 border border-red-100 text-red-600 text-sm p-4 rounded-xl mb-6 flex items-center gap-2 animate-in fade-in zoom-in-95">
+                  <div className="w-1 h-1 rounded-full bg-red-600 shrink-0" />
+                  {error}
+                </div>
               )}
 
-              <TabsContent value="email">
-                <form onSubmit={handleEmailLogin} className="space-y-4">
+              <TabsContent value="email" className="mt-0 animate-in fade-in slide-in-from-left-4 duration-300">
+                <form onSubmit={handleEmailLogin} className="space-y-5">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
+                    <div className="relative group">
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                       <input
                         id="email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="email@gdu.edu.vn"
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
                         required
                         autoComplete="email"
                       />
@@ -190,23 +205,23 @@ export default function LoginPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="password">Mật khẩu</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Label htmlFor="password" classNae="text-gray-700 font-medium">Mật khẩu</Label>
+                    <div className="relative group">
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                       <input
                         id="password"
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Nhập mật khẩu"
-                        className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full pl-11 pr-10 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
                         required
                         autoComplete="current-password"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -214,34 +229,34 @@ export default function LoginPage() {
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" className="rounded border-gray-300" />
-                      <span>Ghi nhớ đăng nhập</span>
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <input type="checkbox" className="rounded border-gray-300 text-red-600 focus:ring-red-600 group-hover:border-red-400 transition-colors" />
+                      <span className="text-gray-600 group-hover:text-gray-800 transition-colors">Ghi nhớ đăng nhập</span>
                     </label>
-                    <Link href="/forgot-password" className="text-blue-600 hover:underline">
+                    <Link href="/forgot-password" className="text-red-600 hover:text-red-700 hover:underline font-medium transition-colors">
                       Quên mật khẩu?
                     </Link>
                   </div>
 
-                  <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={isLoading}>
-                    {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+                  <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-red-600/20 transition-all hover:shadow-red-600/30 active:scale-[0.98]" disabled={isLoading}>
+                    {isLoading ? "Đang xử lý..." : "Đăng nhập với Email"}
                   </Button>
                 </form>
               </TabsContent>
 
-              <TabsContent value="phone">
-                <form onSubmit={handlePhoneLogin} className="space-y-4">
+              <TabsContent value="phone" className="mt-0 animate-in fade-in slide-in-from-right-4 duration-300">
+                <form onSubmit={handlePhoneLogin} className="space-y-5">
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Số điện thoại</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Label htmlFor="phone" className="text-gray-700 font-medium">Số điện thoại</Label>
+                    <div className="relative group">
+                      <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                       <input
                         id="phone"
                         type="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="0901234567"
-                        className="w-full pl-10 pr-24 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full pl-11 pr-24 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
                         required
                         disabled={isOtpSent}
                         autoComplete="tel"
@@ -251,13 +266,13 @@ export default function LoginPage() {
                           type="button"
                           onClick={handleSendOtp}
                           disabled={isLoading || !phone || (isOtpSent && otpCountdown > 0)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 disabled:opacity-50"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-xs bg-red-50 text-red-600 font-medium px-3 py-1.5 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors"
                         >
                           {isOtpSent ? "Gửi lại" : "Gửi mã"}
                         </button>
                       )}
                       {isOtpSent && otpCountdown > 0 && (
-                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500 px-2 py-1">
+                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
                           {otpCountdown}s
                         </span>
                       )}
@@ -266,34 +281,34 @@ export default function LoginPage() {
 
                   {isOtpSent && (
                     <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                      <Label htmlFor="otp">Mã xác minh (OTP)</Label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Label htmlFor="otp" className="text-gray-700 font-medium">Mã xác minh (OTP)</Label>
+                      <div className="relative group">
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                         <input
                           id="otp"
                           type="text"
                           value={otp}
                           onChange={(e) => setOtp(e.target.value)}
-                          placeholder="Nhập 6 số OTP"
+                          placeholder="Nhập 6 số được gửi tới SĐT"
                           maxLength={6}
-                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                          className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400 tracking-widest font-medium"
                           required
                         />
                       </div>
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={isLoading || !isOtpSent}>
-                    {isLoading ? "Đang xử lý..." : "Đăng nhập bằng SĐT"}
+                  <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-red-600/20 transition-all hover:shadow-red-600/30 active:scale-[0.98]" disabled={isLoading || !isOtpSent}>
+                    {isLoading ? "Đang xử lý..." : "Đăng nhập"}
                   </Button>
                 </form>
               </TabsContent>
             </Tabs>
           </CardContent>
-          <CardFooter className="justify-center">
+          <CardFooter className="justify-center border-t border-gray-100 p-6 bg-gray-50/50">
             <p className="text-sm text-gray-600">
               Chưa có tài khoản?{" "}
-              <Link href="/register" className="text-blue-600 hover:underline font-medium">
+              <Link href="/register" className="text-red-600 hover:text-red-700 hover:underline font-semibold transition-colors">
                 Đăng ký ngay
               </Link>
             </p>
