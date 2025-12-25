@@ -206,6 +206,126 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     return Math.max(...numbers)
   }
 
+  // Helper function to check if job matches industry filter
+  const checkIndustryMatch = (job: Job, industry: string | null): boolean => {
+    if (!industry) return true
+    const industryKeywords: Record<string, string[]> = {
+      "it": ["công nghệ", "it", "lập trình", "developer", "software", "phần mềm", "web", "mobile", "data", "ai", "machine learning"],
+      "finance": ["tài chính", "ngân hàng", "finance", "banking", "kế toán", "accounting"],
+      "marketing": ["marketing", "truyền thông", "digital", "seo", "content", "social media", "quảng cáo"],
+      "sales": ["kinh doanh", "bán hàng", "sales", "business", "thương mại"],
+      "hr": ["nhân sự", "hr", "human resource", "tuyển dụng", "recruitment"],
+      "accounting": ["kế toán", "kiểm toán", "accounting", "audit", "thuế", "tax"],
+      "design": ["thiết kế", "design", "đồ họa", "graphic", "ui", "ux", "creative"],
+      "education": ["giáo dục", "đào tạo", "education", "training", "giảng viên", "teacher"],
+      "healthcare": ["y tế", "sức khỏe", "healthcare", "medical", "bác sĩ", "điều dưỡng"],
+      "logistics": ["logistics", "vận tải", "kho vận", "supply chain", "warehouse"],
+    }
+    const keywords = industryKeywords[industry] || []
+    const jobText = `${job.title} ${job.description} ${job.company}`.toLowerCase()
+    return keywords.some(keyword => jobText.includes(keyword))
+  }
+
+  // Helper function to check if job matches experience filter
+  const checkExperienceMatch = (job: Job, experience: string | null): boolean => {
+    if (!experience) return true
+    const jobText = `${job.title} ${job.description}`.toLowerCase()
+
+    switch (experience) {
+      case "no-exp":
+        return jobText.includes("không yêu cầu kinh nghiệm") ||
+          jobText.includes("chưa có kinh nghiệm") ||
+          jobText.includes("freshers") ||
+          jobText.includes("sinh viên") ||
+          job.type === "internship"
+      case "under-1":
+        return jobText.includes("dưới 1 năm") || jobText.includes("< 1 năm")
+      case "1-2":
+        return jobText.includes("1 năm") || jobText.includes("2 năm") || jobText.includes("1-2 năm")
+      case "2-5":
+        return jobText.includes("2-5 năm") || jobText.includes("3 năm") || jobText.includes("4 năm") || jobText.includes("5 năm")
+      case "5-10":
+        return jobText.includes("5-10 năm") || jobText.includes("6 năm") || jobText.includes("7 năm") || jobText.includes("8 năm")
+      case "above-10":
+        return jobText.includes("trên 10 năm") || jobText.includes("> 10 năm")
+      default:
+        return true
+    }
+  }
+
+  // Helper function to check if job matches education filter
+  const checkEducationMatch = (job: Job, education: string | null): boolean => {
+    if (!education) return true
+    const jobText = `${job.title} ${job.description}`.toLowerCase()
+
+    switch (education) {
+      case "high-school":
+        return jobText.includes("trung học") || jobText.includes("phổ thông") || jobText.includes("12/12")
+      case "college":
+        return jobText.includes("cao đẳng") || jobText.includes("trung cấp")
+      case "bachelor":
+        return jobText.includes("đại học") || jobText.includes("cử nhân") || jobText.includes("bachelor")
+      case "master":
+        return jobText.includes("thạc sĩ") || jobText.includes("master")
+      case "phd":
+        return jobText.includes("tiến sĩ") || jobText.includes("phd") || jobText.includes("doctor")
+      default:
+        return true
+    }
+  }
+
+  // Helper function to check if job matches posted date filter
+  const checkPostedDateMatch = (job: Job, postedDate: string | null): boolean => {
+    if (!postedDate) return true
+
+    const now = new Date()
+    const jobDate = new Date(job.postedAt)
+    const diffDays = Math.floor((now.getTime() - jobDate.getTime()) / (1000 * 60 * 60 * 24))
+
+    switch (postedDate) {
+      case "today":
+        return diffDays === 0
+      case "3-days":
+        return diffDays <= 3
+      case "7-days":
+        return diffDays <= 7
+      case "14-days":
+        return diffDays <= 14
+      case "30-days":
+        return diffDays <= 30
+      default:
+        return true
+    }
+  }
+
+  // Helper function to check if job matches location filter
+  const checkLocationMatch = (job: Job, location: string | null): boolean => {
+    if (!location) return true
+    const jobLocation = job.location.toLowerCase()
+
+    switch (location) {
+      case "hcm":
+        return jobLocation.includes("hồ chí minh") || jobLocation.includes("hcm") || jobLocation.includes("tp.hcm") || jobLocation.includes("sài gòn")
+      case "hanoi":
+        return jobLocation.includes("hà nội") || jobLocation.includes("hanoi")
+      case "danang":
+        return jobLocation.includes("đà nẵng") || jobLocation.includes("da nang")
+      case "binh-duong":
+        return jobLocation.includes("bình dương")
+      case "dong-nai":
+        return jobLocation.includes("đồng nai")
+      case "can-tho":
+        return jobLocation.includes("cần thơ")
+      case "hai-phong":
+        return jobLocation.includes("hải phòng")
+      case "other":
+        return !["hồ chí minh", "hcm", "tp.hcm", "sài gòn", "hà nội", "hanoi", "đà nẵng", "da nang", "bình dương", "đồng nai", "cần thơ", "hải phòng"]
+          .some(city => jobLocation.includes(city))
+      default:
+        return true
+    }
+  }
+
   const filteredJobs = mergedJobs.filter((job) => {
     const matchesSearch =
       job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -216,7 +336,15 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     const matchesCompany = !selectedCompany || job.company === selectedCompany
     const matchesSalary = !selectedSalary || checkSalaryMatch(job.salary, selectedSalary)
 
-    return matchesSearch && matchesType && matchesCompany && matchesSalary
+    // Apply advanced filters
+    const matchesIndustry = checkIndustryMatch(job, selectedIndustry)
+    const matchesExperience = checkExperienceMatch(job, selectedExperience)
+    const matchesEducation = checkEducationMatch(job, selectedEducation)
+    const matchesPostedDate = checkPostedDateMatch(job, selectedPostedDate)
+    const matchesLocation = checkLocationMatch(job, selectedLocation)
+
+    return matchesSearch && matchesType && matchesCompany && matchesSalary &&
+      matchesIndustry && matchesExperience && matchesEducation && matchesPostedDate && matchesLocation
   })
 
   // Apply sorting based on selected sort option
