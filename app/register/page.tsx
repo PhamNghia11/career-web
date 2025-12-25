@@ -41,6 +41,7 @@ export default function RegisterPage() {
     // Validation
     if (!formData.name.trim()) return setError("Vui lòng nhập họ và tên")
     if (!formData.email.trim()) return setError("Vui lòng nhập email")
+    if (!formData.email.endsWith("@gmail.com")) return setError("Vui lòng sử dụng địa chỉ Gmail (@gmail.com)")
     if (formData.password !== formData.confirmPassword) return setError("Mật khẩu xác nhận không khớp")
     if (formData.password.length < 6) return setError("Mật khẩu phải có ít nhất 6 ký tự")
 

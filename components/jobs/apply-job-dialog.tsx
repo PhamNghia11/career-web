@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/lib/auth-context"
 import { Upload, CheckCircle2 } from "lucide-react"
 
 interface ApplyJobDialogProps {
@@ -20,6 +21,7 @@ interface ApplyJobDialogProps {
 
 export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, employerId }: ApplyJobDialogProps) {
     const { toast } = useToast()
+    const { user } = useAuth()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [phoneError, setPhoneError] = useState("")
     const [isSuccess, setIsSuccess] = useState(false)
@@ -86,18 +88,23 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
         setIsSubmitting(true)
 
         try {
+            // Get form values
+            const form = e.target as HTMLFormElement
+            const email = (form.elements.namedItem("email") as HTMLInputElement).value
+
+            if (!email.endsWith("@gmail.com")) {
+                setError("Email phải là địa chỉ Gmail (@gmail.com)")
+                return
+            }
+
             const formData = new FormData()
             formData.append("jobTitle", jobTitle)
             formData.append("companyName", companyName)
             if (jobId) formData.append("jobId", jobId)
             if (employerId) formData.append("employerId", employerId)
 
-            // Get form values using the element definition from usage
-            // Since the inputs are uncontrolled in the JSX (except for some reason previously they weren't fully controlled state but just ID ref),
-            // and the form in JSX has IDs: fullname, email, phone, message.
-            const form = e.target as HTMLFormElement
             formData.append("fullname", (form.elements.namedItem("fullname") as HTMLInputElement).value)
-            formData.append("email", (form.elements.namedItem("email") as HTMLInputElement).value)
+            formData.append("email", email)
             formData.append("phone", (form.elements.namedItem("phone") as HTMLInputElement).value)
             formData.append("message", (form.elements.namedItem("message") as HTMLTextAreaElement).value)
             formData.append("cv", selectedFile)
@@ -188,7 +195,21 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="email">Email</Label>
-                                    <Input id="email" type="email" placeholder="example@gmail.com" required />
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="example@gmail.com"
+                                        defaultValue={user?.email || ""}
+                                        required
+                                        onChange={(e) => {
+                                            const val = e.target.value
+                                            if (val && !val.endsWith("@gmail.com")) {
+                                                setError("Email phải có định dạng @gmail.com")
+                                            } else {
+                                                setError(null)
+                                            }
+                                        }}
+                                    />
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="phone">Số điện thoại</Label>
