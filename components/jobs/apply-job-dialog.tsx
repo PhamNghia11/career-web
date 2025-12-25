@@ -191,7 +191,16 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="phone">Số điện thoại</Label>
-                                    <Input id="phone" type="tel" placeholder="0901234567" required />
+                                    <Input
+                                        id="phone"
+                                        type="tel"
+                                        placeholder="0901234567"
+                                        required
+                                        onChange={(e) => {
+                                            const val = e.target.value.replace(/\D/g, '')
+                                            e.target.value = val.startsWith('0') || val.length === 0 ? val : ''
+                                        }}
+                                    />
                                 </div>
                             </div>
                             <div className="grid gap-2">

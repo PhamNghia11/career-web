@@ -254,7 +254,10 @@ export default function LoginPage() {
                         id="phone"
                         type="tel"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '')
+                          setPhone(val.startsWith('0') || val.length === 0 ? val : '')
+                        }}
                         placeholder="0901234567"
                         className="w-full pl-11 pr-24 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
                         required

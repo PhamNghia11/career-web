@@ -195,7 +195,10 @@ export default function ProfilePage() {
                   name="phone"
                   type="tel"
                   value={formData.phone}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '')
+                    setFormData({ ...formData, phone: val.startsWith('0') || val.length === 0 ? val : '' })
+                  }}
                   disabled={!isEditing}
                   className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed"
                 />

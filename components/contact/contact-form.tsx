@@ -93,7 +93,10 @@ export function ContactForm() {
           <input
             type="tel"
             value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, '')
+              setFormData({ ...formData, phone: val.startsWith('0') || val.length === 0 ? val : '' })
+            }}
             className="w-full px-4 py-3 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"
             placeholder="0912 345 678"
           />
