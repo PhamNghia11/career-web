@@ -12,9 +12,15 @@ export async function POST(request: Request) {
     const companyName = formData.get("companyName") as string
     const jobId = formData.get("jobId") as string
     let employerId = formData.get("employerId") as string
+    // Student Info
     const fullname = formData.get("fullname") as string
     const email = formData.get("email") as string
     const phone = formData.get("phone") as string
+    const mssv = formData.get("mssv") as string
+    const major = formData.get("major") as string
+    const faculty = formData.get("faculty") as string
+    const cohort = formData.get("cohort") as string
+
     const message = formData.get("message") as string
 
     console.log("[Applications API] POST - jobId:", jobId, "employerId from form:", employerId)
@@ -45,7 +51,7 @@ export async function POST(request: Request) {
     const file = formData.get("cv") as File
 
     // Validate required fields
-    if (!fullname || !email || !phone || !file) {
+    if (!fullname || !email || !phone || !file || !mssv || !major) {
       return NextResponse.json({ error: "Thiếu thông tin bắt buộc" }, { status: 400 })
     }
 
@@ -76,6 +82,10 @@ export async function POST(request: Request) {
       fullname,
       email,
       phone,
+      mssv,
+      major,
+      faculty,
+      cohort,
       message,
       cvBase64: cvDataUrl,
       cvOriginalName: file.name,
@@ -160,6 +170,8 @@ export async function POST(request: Request) {
             <li style="padding: 8px 0;"><strong>Họ tên:</strong> ${fullname}</li>
             <li style="padding: 8px 0;"><strong>Email:</strong> ${email}</li>
             <li style="padding: 8px 0;"><strong>Số điện thoại:</strong> ${phone}</li>
+            <li style="padding: 8px 0;"><strong>MSSV:</strong> ${mssv}</li>
+            <li style="padding: 8px 0;"><strong>Ngành:</strong> ${major}</li>
             <li style="padding: 8px 0;"><strong>CV:</strong> ${file.name}</li>
             ${message ? `<li style="padding: 8px 0;"><strong>Lời nhắn:</strong> ${message}</li>` : ''}
           </ul>
