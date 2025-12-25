@@ -36,7 +36,9 @@
                 "Môi trường làm việc chuyên nghiệp"
             ],
             "status": "active",
-            "applicants": 45
+            "applicants": 45,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_2",
@@ -68,7 +70,9 @@
                 "Môi trường Agile/Scrum"
             ],
             "status": "active",
-            "applicants": 32
+            "applicants": 32,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_3",
@@ -99,7 +103,9 @@
                 "Remote working flexible"
             ],
             "status": "active",
-            "applicants": 18
+            "applicants": 18,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_4",
@@ -109,7 +115,7 @@
             "logo": "/logos/cohota.png",
             "location": "TP. Thủ Đức, TP.HCM",
             "type": "full-time",
-            "field": "management",
+            "field": "marketing",
             "salary": "12-18 triệu",
             "deadline": "2025-12-25",
             "postedAt": "2025-12-14",
@@ -130,7 +136,9 @@
                 "Cơ hội thăng tiến nhanh"
             ],
             "status": "active",
-            "applicants": 24
+            "applicants": 24,
+            "education": "bachelor",
+            "experience": "1-2"
         },
         {
             "_id": "job_5",
@@ -140,7 +148,7 @@
             "logo": "/logos/ips.png",
             "location": "Bình Chánh, TP.HCM",
             "type": "full-time",
-            "field": "business",
+            "field": "sales",
             "salary": "15-25 triệu",
             "deadline": "2025-12-28",
             "postedAt": "2025-12-16",
@@ -161,7 +169,9 @@
                 "Thăng tiến rõ ràng"
             ],
             "status": "active",
-            "applicants": 12
+            "applicants": 12,
+            "education": "bachelor",
+            "experience": "2-5"
         },
         {
             "_id": "job_6",
@@ -193,7 +203,9 @@
                 "Đào tạo chứng chỉ quốc tế"
             ],
             "status": "active",
-            "applicants": 56
+            "applicants": 56,
+            "education": "bachelor",
+            "experience": "2-5"
         },
         {
             "_id": "job_7",
@@ -203,7 +215,7 @@
             "logo": "/logos/teknix.png",
             "location": "Quận Bình Thạnh, TP.HCM",
             "type": "full-time",
-            "field": "media",
+            "field": "design",
             "salary": "15-25 triệu",
             "deadline": "2025-12-28",
             "postedAt": "2025-12-15",
@@ -224,7 +236,9 @@
                 "Thưởng dự án hấp dẫn"
             ],
             "status": "active",
-            "applicants": 22
+            "applicants": 22,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_8",
@@ -255,7 +269,9 @@
                 "Thăng tiến trong ngành"
             ],
             "status": "active",
-            "applicants": 28
+            "applicants": 28,
+            "education": "bachelor",
+            "experience": "1-2"
         },
         {
             "_id": "job_9",
@@ -265,7 +281,7 @@
             "logo": "/logos/cohota.png",
             "location": "TP. Thủ Đức, TP.HCM",
             "type": "part-time",
-            "field": "media",
+            "field": "marketing",
             "salary": "8-12 triệu",
             "deadline": "2025-12-30",
             "postedAt": "2025-12-18",
@@ -286,7 +302,9 @@
                 "Cơ hội làm full-time"
             ],
             "status": "active",
-            "applicants": 15
+            "applicants": 15,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_10",
@@ -296,7 +314,7 @@
             "logo": "/logos/itp.png",
             "location": "TP. Thủ Đức, TP.HCM",
             "type": "full-time",
-            "field": "business",
+            "field": "marketing",
             "salary": "12-18 triệu",
             "deadline": "2025-12-30",
             "postedAt": "2025-12-17",
@@ -317,7 +335,9 @@
                 "Được tham gia sự kiện quốc tế"
             ],
             "status": "active",
-            "applicants": 8
+            "applicants": 8,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_11",
@@ -348,7 +368,9 @@
                 "Remote working"
             ],
             "status": "active",
-            "applicants": 19
+            "applicants": 19,
+            "education": "bachelor",
+            "experience": "1-2"
         },
         {
             "_id": "job_12",
@@ -379,7 +401,9 @@
                 "Cơ hội fulltime"
             ],
             "status": "active",
-            "applicants": 35
+            "applicants": 35,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_13",
@@ -389,7 +413,7 @@
             "logo": "/logos/ips.png",
             "location": "Quận 7, TP.HCM",
             "type": "full-time",
-            "field": "business",
+            "field": "sales",
             "salary": "10-30 triệu",
             "deadline": "2025-12-31",
             "postedAt": "2025-12-18",
@@ -411,7 +435,9 @@
                 "Môi trường chuyên nghiệp"
             ],
             "status": "active",
-            "applicants": 42
+            "applicants": 42,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_14",
@@ -444,7 +470,9 @@
                 "Chứng chỉ AWS miễn phí"
             ],
             "status": "active",
-            "applicants": 14
+            "applicants": 14,
+            "education": "bachelor",
+            "experience": "2-5"
         },
         {
             "_id": "job_15",
@@ -454,7 +482,7 @@
             "logo": "/logos/cohota.png",
             "location": "TP. Thủ Đức, TP.HCM",
             "type": "full-time",
-            "field": "management",
+            "field": "hr",
             "salary": "12-16 triệu",
             "deadline": "2025-12-28",
             "postedAt": "2025-12-15",
@@ -475,7 +503,9 @@
                 "Phát triển kỹ năng HR"
             ],
             "status": "active",
-            "applicants": 20
+            "applicants": 20,
+            "education": "bachelor",
+            "experience": "1-2"
         },
         {
             "_id": "job_16",
@@ -505,7 +535,9 @@
                 "Bảo hiểm đầy đủ"
             ],
             "status": "active",
-            "applicants": 8
+            "applicants": 8,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_17",
@@ -515,7 +547,7 @@
             "logo": "/logos/teknix.png",
             "location": "Quận Bình Thạnh, TP.HCM",
             "type": "full-time",
-            "field": "management",
+            "field": "it",
             "salary": "25-40 triệu",
             "deadline": "2025-12-31",
             "postedAt": "2025-12-18",
@@ -537,7 +569,9 @@
                 "Môi trường startup"
             ],
             "status": "active",
-            "applicants": 11
+            "applicants": 11,
+            "education": "bachelor",
+            "experience": "2-5"
         },
         {
             "_id": "job_18",
@@ -569,7 +603,9 @@
                 "Bảo hiểm đầy đủ"
             ],
             "status": "active",
-            "applicants": 25
+            "applicants": 25,
+            "education": "bachelor",
+            "experience": "1-2"
         },
         {
             "_id": "job_19",
@@ -600,7 +636,9 @@
                 "Môi trường quốc tế"
             ],
             "status": "active",
-            "applicants": 30
+            "applicants": 30,
+            "education": "bachelor",
+            "experience": "1-2"
         },
         {
             "_id": "job_20",
@@ -610,7 +648,7 @@
             "logo": "/logos/itp.png",
             "location": "TP. Thủ Đức, TP.HCM",
             "type": "part-time",
-            "field": "media",
+            "field": "marketing",
             "salary": "6-10 triệu",
             "deadline": "2025-12-30",
             "postedAt": "2025-12-16",
@@ -631,7 +669,9 @@
                 "Phát triển kỹ năng"
             ],
             "status": "active",
-            "applicants": 18
+            "applicants": 18,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_21",
@@ -662,7 +702,9 @@
                 "Thăng tiến nhanh trong ngành"
             ],
             "status": "active",
-            "applicants": 22
+            "applicants": 22,
+            "education": "bachelor",
+            "experience": "2-5"
         },
         {
             "_id": "job_22",
@@ -694,7 +736,9 @@
                 "Cơ hội làm chính thức"
             ],
             "status": "active",
-            "applicants": 38
+            "applicants": 38,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_23",
@@ -704,7 +748,7 @@
             "logo": "/logos/cohota.png",
             "location": "TP. Thủ Đức, TP.HCM",
             "type": "full-time",
-            "field": "media",
+            "field": "design",
             "salary": "12-18 triệu",
             "deadline": "2025-12-28",
             "postedAt": "2025-12-15",
@@ -726,7 +770,9 @@
                 "Flexible hours"
             ],
             "status": "active",
-            "applicants": 16
+            "applicants": 16,
+            "education": "bachelor",
+            "experience": "no-exp"
         },
         {
             "_id": "job_24",
@@ -757,7 +803,9 @@
                 "Làm việc với dự án lớn"
             ],
             "status": "active",
-            "applicants": 9
+            "applicants": 9,
+            "education": "bachelor",
+            "experience": "2-5"
         },
         {
             "_id": "job_25",
@@ -767,7 +815,7 @@
             "logo": "/logos/itp.png",
             "location": "TP. Thủ Đức, TP.HCM",
             "type": "full-time",
-            "field": "management",
+            "field": "hr",
             "salary": "15-22 triệu",
             "deadline": "2025-12-28",
             "postedAt": "2025-12-14",
@@ -789,7 +837,9 @@
                 "Phát triển kỹ năng quản lý"
             ],
             "status": "active",
-            "applicants": 14
+            "applicants": 14,
+            "education": "bachelor",
+            "experience": "no-exp"
         }
     ]
 }

@@ -41,7 +41,6 @@ const industryOptions = [
   { id: "education", label: "Giáo dục - Đào tạo" },
   { id: "healthcare", label: "Y tế - Chăm sóc sức khỏe" },
   { id: "logistics", label: "Logistics - Vận tải" },
-  { id: "other", label: "Ngành nghề khác" },
 ]
 
 // Experience/Kinh nghiệm options
@@ -56,7 +55,6 @@ const experienceOptions = [
 
 // Education/Học vấn options
 const educationOptions = [
-  { id: "other", label: "Khác / Không yêu cầu" },
   { id: "high-school", label: "Trung học phổ thông" },
   { id: "college", label: "Cao đẳng" },
   { id: "bachelor", label: "Đại học" },
@@ -223,20 +221,22 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
       "healthcare": ["y tế", "sức khỏe", "healthcare", "medical", "bác sĩ", "điều dưỡng"],
       "logistics": ["logistics", "vận tải", "kho vận", "supply chain", "warehouse"],
     }
-    const jobText = `${job.title} ${job.description} ${job.company}`.toLowerCase()
-
-    if (industry === "other") {
-      const allKeywords = Object.values(industryKeywords).flat()
-      return !allKeywords.some(keyword => jobText.includes(keyword))
-    }
-
     const keywords = industryKeywords[industry] || []
+
+    // Check exact field match first if available
+    if (job.field === industry) return true
+
+    const jobText = `${job.title} ${job.description} ${job.company}`.toLowerCase()
     return keywords.some(keyword => jobText.includes(keyword))
   }
 
   // Helper function to check if job matches experience filter
   const checkExperienceMatch = (job: Job, experience: string | null): boolean => {
     if (!experience) return true
+
+    // Check structured experience field first
+    if (job.experience === experience) return true
+
     const jobText = `${job.title} ${job.description}`.toLowerCase()
 
     switch (experience) {
@@ -264,15 +264,13 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   // Helper function to check if job matches education filter
   const checkEducationMatch = (job: Job, education: string | null): boolean => {
     if (!education) return true
+
+    // Check structured education field first
+    if (job.education === education) return true
+
     const jobText = `${job.title} ${job.description}`.toLowerCase()
 
     switch (education) {
-      case "other":
-        return jobText.includes("không yêu cầu") ||
-          jobText.includes("không cần bằng cấp") ||
-          jobText.includes("lao động phổ thông") ||
-          jobText.includes("chứng chỉ") ||
-          (!jobText.includes("đại học") && !jobText.includes("cao đẳng") && !jobText.includes("thạc sĩ") && !jobText.includes("tiến sĩ") && !jobText.includes("bachelor") && !jobText.includes("master"))
       case "high-school":
         return jobText.includes("trung học") || jobText.includes("phổ thông") || jobText.includes("12/12")
       case "college":

@@ -10,6 +10,8 @@ export type Job = {
     type: "internship" | "full-time" | "part-time" | "freelance"
     field: string
     salary: string
+    education?: string
+    experience?: string
     salaryMin?: number
     salaryMax?: number
     isNegotiable?: boolean
