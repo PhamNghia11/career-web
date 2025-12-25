@@ -94,8 +94,15 @@ export function ContactForm() {
             type="tel"
             value={formData.phone}
             onChange={(e) => {
-              const val = e.target.value.replace(/\D/g, '')
-              setFormData({ ...formData, phone: val.startsWith('0') || val.length === 0 ? val : '' })
+              const val = e.target.value
+              if (/\D/.test(val)) {
+                toast({ title: "Lỗi định dạng", description: "Số điện thoại chỉ được chứa các chữ số.", variant: "destructive" })
+              }
+              const numericVal = val.replace(/\D/g, '')
+              if (numericVal.length > 0 && !numericVal.startsWith('0')) {
+                toast({ title: "Lỗi định dạng", description: "Số điện thoại phải bắt đầu bằng số 0.", variant: "destructive" })
+              }
+              setFormData({ ...formData, phone: numericVal.startsWith('0') || numericVal.length === 0 ? numericVal : '' })
             }}
             className="w-full px-4 py-3 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"
             placeholder="0912 345 678"

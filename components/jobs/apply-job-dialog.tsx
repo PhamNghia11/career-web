@@ -197,8 +197,33 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                                         placeholder="0901234567"
                                         required
                                         onChange={(e) => {
-                                            const val = e.target.value.replace(/\D/g, '')
-                                            e.target.value = val.startsWith('0') || val.length === 0 ? val : ''
+                                            const val = e.target.value
+
+                                            // Check if user tries to enter non-digits
+                                            if (/\D/.test(val)) {
+                                                toast({
+                                                    title: "Lỗi định dạng",
+                                                    description: "Số điện thoại chỉ được chứa các chữ số.",
+                                                    variant: "destructive",
+                                                    duration: 3000
+                                                })
+                                            }
+
+                                            const numericVal = val.replace(/\D/g, '')
+
+                                            // Check leading zero logic
+                                            if (numericVal.length > 0 && !numericVal.startsWith('0')) {
+                                                toast({
+                                                    title: "Lỗi định dạng",
+                                                    description: "Số điện thoại phải bắt đầu bằng số 0.",
+                                                    variant: "destructive",
+                                                    duration: 3000
+                                                })
+                                                e.target.value = ''
+                                                return
+                                            }
+
+                                            e.target.value = numericVal
                                         }}
                                     />
                                 </div>
