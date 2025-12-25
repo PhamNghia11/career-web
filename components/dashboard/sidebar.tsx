@@ -119,14 +119,14 @@ export function DashboardSidebar() {
         {user?.role !== "admin" && (
           <div className="px-3 pb-2 space-y-1">
             <a
-              href="https://www.facebook.com/GDUStudentCenter/?locale=vi_VN"
+              href="https://www.facebook.com/TruongDaihocGiaDinh"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full hover:bg-sidebar-accent text-sidebar-foreground/80 hover:text-[#1877F2] transition-colors"
-              title="Fanpage Trung tâm Trải nghiệm & Việc làm"
+              title="Fanpage Đại học Gia Định"
             >
               <Facebook className="h-5 w-5" />
-              <span>Facebook Việc làm</span>
+              <span>Facebook Trường</span>
             </a>
             <a
               href="https://zalo.me/0961121018"
