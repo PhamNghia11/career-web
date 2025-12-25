@@ -21,6 +21,7 @@ interface ApplyJobDialogProps {
 export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, employerId }: ApplyJobDialogProps) {
     const { toast } = useToast()
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [phoneError, setPhoneError] = useState("")
     const [isSuccess, setIsSuccess] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [dragActive, setDragActive] = useState(false)
@@ -201,24 +202,16 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
 
                                             // Check if user tries to enter non-digits
                                             if (/\D/.test(val)) {
-                                                toast({
-                                                    title: "Lỗi định dạng",
-                                                    description: "Số điện thoại chỉ được chứa các chữ số.",
-                                                    variant: "destructive",
-                                                    duration: 3000
-                                                })
+                                                setPhoneError("Số điện thoại chỉ được chứa các chữ số")
+                                            } else {
+                                                setPhoneError("")
                                             }
 
                                             const numericVal = val.replace(/\D/g, '')
 
                                             // Check leading zero logic
                                             if (numericVal.length > 0 && !numericVal.startsWith('0')) {
-                                                toast({
-                                                    title: "Lỗi định dạng",
-                                                    description: "Số điện thoại phải bắt đầu bằng số 0.",
-                                                    variant: "destructive",
-                                                    duration: 3000
-                                                })
+                                                setPhoneError("Số điện thoại phải bắt đầu bằng số 0")
                                                 e.target.value = ''
                                                 return
                                             }
@@ -226,6 +219,9 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                                             e.target.value = numericVal
                                         }}
                                     />
+                                    {phoneError && (
+                                        <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+                                    )}
                                 </div>
                             </div>
                             <div className="grid gap-2">

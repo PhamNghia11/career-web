@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [phoneError, setPhoneError] = useState("")
 
   // Phone Login State
   const [phone, setPhone] = useState("")
@@ -256,21 +257,20 @@ export default function LoginPage() {
                         value={phone}
                         onChange={(e) => {
                           const val = e.target.value
-                          if (/\D/.test(val)) setError("Số điện thoại chỉ được chứa các chữ số")
+                          if (/\D/.test(val)) setPhoneError("Chỉ được nhập số")
                           else {
                             const numericVal = val.replace(/\D/g, '')
-                            if (numericVal.length > 0 && !numericVal.startsWith('0')) setError("Số điện thoại phải bắt đầu bằng số 0")
-                            else setError("")
+                            if (numericVal.length > 0 && !numericVal.startsWith('0')) setPhoneError("Phải bắt đầu 0")
+                            else setPhoneError("")
 
                             setPhone(numericVal.startsWith('0') || numericVal.length === 0 ? numericVal : '')
                           }
                         }}
                         placeholder="0901234567"
-                        className="w-full pl-11 pr-24 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
-                        required
-                        disabled={isOtpSent}
                         autoComplete="tel"
+                        className={phoneError ? "w-full pl-11 pr-24 py-2.5 border border-red-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-red-50 transition-all placeholder:text-gray-400" : "w-full pl-11 pr-24 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"}
                       />
+                      {phoneError && <p className="text-red-500 text-xs mt-1 absolute -bottom-5 left-0">{phoneError}</p>}
                       {(!isOtpSent || otpCountdown <= 0) && (
                         <button
                           type="button"

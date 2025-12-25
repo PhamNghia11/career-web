@@ -26,6 +26,7 @@ export default function RegisterPage() {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState("")
+  const [phoneError, setPhoneError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 

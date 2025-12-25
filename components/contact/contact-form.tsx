@@ -11,6 +11,7 @@ import { Loader2 } from "lucide-react"
 export function ContactForm() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const [phoneError, setPhoneError] = useState("")
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -96,17 +97,20 @@ export function ContactForm() {
             onChange={(e) => {
               const val = e.target.value
               if (/\D/.test(val)) {
-                toast({ title: "Lỗi định dạng", description: "Số điện thoại chỉ được chứa các chữ số.", variant: "destructive" })
+                setPhoneError("Số điện thoại chỉ được chứa các chữ số")
+              } else {
+                setPhoneError("")
               }
               const numericVal = val.replace(/\D/g, '')
               if (numericVal.length > 0 && !numericVal.startsWith('0')) {
-                toast({ title: "Lỗi định dạng", description: "Số điện thoại phải bắt đầu bằng số 0.", variant: "destructive" })
+                setPhoneError("Số điện thoại phải bắt đầu bằng số 0")
               }
               setFormData({ ...formData, phone: numericVal.startsWith('0') || numericVal.length === 0 ? numericVal : '' })
             }}
-            className="w-full px-4 py-3 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+            className={phoneError ? "w-full px-4 py-3 border border-red-500 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-50" : "w-full px-4 py-3 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background"}
             placeholder="0912 345 678"
           />
+          {phoneError && <p className="text-red-500 text-sm mt-1">{phoneError}</p>}
         </div>
         <div>
           <label className="block text-sm font-medium mb-2 text-foreground">

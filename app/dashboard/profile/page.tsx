@@ -16,6 +16,7 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
+  const [phoneError, setPhoneError] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -198,17 +199,20 @@ export default function ProfilePage() {
                   onChange={(e) => {
                     const val = e.target.value
                     if (/\D/.test(val)) {
-                      toast({ title: "Lỗi định dạng", description: "Số điện thoại chỉ được chứa các chữ số.", variant: "destructive" })
+                      setPhoneError("Số điện thoại chỉ được chứa các chữ số")
+                    } else {
+                      setPhoneError("")
                     }
                     const numericVal = val.replace(/\D/g, '')
                     if (numericVal.length > 0 && !numericVal.startsWith('0')) {
-                      toast({ title: "Lỗi định dạng", description: "Số điện thoại phải bắt đầu bằng số 0.", variant: "destructive" })
+                      setPhoneError("Số điện thoại phải bắt đầu bằng số 0")
                     }
                     setFormData({ ...formData, phone: numericVal.startsWith('0') || numericVal.length === 0 ? numericVal : '' })
                   }}
                   disabled={!isEditing}
-                  className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed"
+                  className={phoneError ? "w-full pl-10 pr-4 py-2 border border-red-500 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-muted disabled:cursor-not-allowed" : "w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed"}
                 />
+                {phoneError && <p className="text-red-500 text-xs mt-1 absolute -bottom-5 left-0">{phoneError}</p>}
               </div>
             </div>
 
