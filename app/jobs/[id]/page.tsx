@@ -23,7 +23,27 @@ export function generateStaticParams() {
 
 export default async function JobPage(props: JobPageProps) {
     const params = await props.params;
-    const job = allJobs.find((j) => j._id === params.id)
+    let job = allJobs.find((j) => j._id === params.id)
+
+    if (!job) {
+        try {
+            const { getCollection, COLLECTIONS } = await import("@/lib/mongodb")
+            const { ObjectId } = await import("mongodb")
+            const collection = await getCollection(COLLECTIONS.JOBS)
+
+            try {
+                // Try to find by ObjectId
+                const dbJob = await collection.findOne({ _id: new ObjectId(params.id) })
+                if (dbJob) {
+                    job = { ...dbJob, _id: dbJob._id.toString() } as any
+                }
+            } catch (e) {
+                // If ID is not valid ObjectId, just ignore
+            }
+        } catch (error) {
+            console.error("Error fetching job from DB:", error)
+        }
+    }
 
     if (!job) {
         notFound()
