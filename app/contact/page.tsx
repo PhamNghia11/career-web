@@ -10,10 +10,19 @@ export default function ContactPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/30 to-background">
       <Header />
       <main className="flex-1">
-        <div className="bg-gradient-to-r from-primary via-primary to-primary/80 text-primary-foreground py-16">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl lg:text-4xl font-bold mb-3">Liên hệ với chúng tôi</h1>
-            <p className="text-lg text-primary-foreground/90 max-w-2xl mx-auto">
+        <div className="relative py-20 overflow-hidden">
+          {/* Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: "url('/hero-bg.png')" }}
+          />
+          {/* Dark Overlay */}
+          <div className="absolute inset-0 bg-primary/85" />
+
+          {/* Content */}
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <h1 className="text-3xl lg:text-4xl font-bold mb-3 text-white">Liên hệ với chúng tôi</h1>
+            <p className="text-lg text-white/90 max-w-2xl mx-auto">
               Chúng tôi luôn sẵn sàng hỗ trợ bạn. Hãy liên hệ với chúng tôi qua các kênh bên dưới.
             </p>
           </div>
