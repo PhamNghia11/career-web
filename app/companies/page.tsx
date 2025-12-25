@@ -8,7 +8,7 @@ export default function CompaniesPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/30 to-background">
       <Header />
       <main className="flex-1">
-        <div className="relative py-16 overflow-hidden">
+        <div className="relative py-20 overflow-hidden">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
