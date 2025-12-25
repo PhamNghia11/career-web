@@ -85,8 +85,8 @@ export function FeaturedJobs() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredJobs.map((job) => (
-            <Card key={job._id} className="hover:shadow-xl transition-all bg-card/80 backdrop-blur-sm border-border/50">
-              <CardContent className="p-6">
+            <Card key={job._id} className="hover:shadow-xl transition-all bg-card/80 backdrop-blur-sm border-border/50 h-full flex flex-col">
+              <CardContent className="p-6 flex-1">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-14 h-14 rounded-lg bg-white border flex items-center justify-center p-2 flex-shrink-0">
                     <img
@@ -101,7 +101,9 @@ export function FeaturedJobs() {
                     </Badge>
                   </div>
                 </div>
-                <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-foreground">{job.title}</h3>
+                <Link href={`/jobs/${job._id}`} className="group-hover:text-primary transition-colors block">
+                  <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-foreground group-hover:text-primary transition-colors">{job.title}</h3>
+                </Link>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <Building className="h-4 w-4 text-primary" />
