@@ -29,7 +29,6 @@ export function Header() {
     { name: "Trang chủ", href: "/" },
     { name: "Việc làm", href: "/jobs" },
     { name: "Doanh nghiệp", href: "/companies" },
-    { name: "Đánh giá GDU", href: "/reviews" },
     { name: "Liên hệ", href: "/contact" },
   ]
 
