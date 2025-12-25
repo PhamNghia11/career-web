@@ -12,6 +12,7 @@
             "company": "FPT Software",
             "companyId": "2",
             "logo": "/logos/fpt.png",
+            "website": "https://fpt-software.com",
             "location": "Quận 7, TP.HCM",
             "type": "internship",
             "field": "it",
@@ -46,6 +47,7 @@
             "company": "Techcombank",
             "companyId": "1",
             "logo": "/logos/techcombank.png",
+            "website": "https://www.techcombank.com.vn",
             "location": "Hà Nội",
             "type": "full-time",
             "field": "finance",
@@ -80,6 +82,7 @@
             "company": "TekNix Corporation",
             "companyId": "5",
             "logo": "/logos/teknix.png",
+            "website": "https://teknix.com",
             "location": "Quận Bình Thạnh, TP.HCM",
             "type": "full-time",
             "field": "it",
@@ -98,47 +101,49 @@
                 "Có kinh nghiệm với framework ML/DL"
             ],
             "benefits": [
-                "Lương cạnh tranh, thưởng dự án",
-                "Được tham gia conference quốc tế",
-                "Remote working flexible"
+                "Mức lương cạnh tranh",
+                "Làm việc với công nghệ mới nhất",
+                "Cơ hội thăng tiến"
             ],
             "status": "active",
-            "applicants": 18,
-            "education": "bachelor",
-            "experience": "no-exp"
+            "applicants": 12,
+            "education": "master",
+            "experience": "1-3"
         },
         {
             "_id": "job_4",
-            "title": "Marketing Executive",
-            "company": "Cohota",
-            "companyId": "6",
-            "logo": "/logos/cohota.png",
-            "location": "TP. Thủ Đức, TP.HCM",
+            "title": "Backend Developer",
+            "company": "FPT Software",
+            "companyId": "2",
+            "logo": "/logos/fpt.png",
+            "website": "https://career.fpt-software.com",
+            "location": "Hà Nội",
             "type": "full-time",
-            "field": "marketing",
-            "salary": "12-18 triệu",
-            "deadline": "2025-12-25",
-            "postedAt": "2025-12-14",
-            "description": "Lên kế hoạch và triển khai các chiến dịch Digital Marketing cho nền tảng EdTech.",
+            "field": "it",
+            "salary": "18-30 triệu",
+            "deadline": "2025-12-31",
+            "postedAt": "2025-12-21",
+            "description": "Thiết kế và phát triển các hệ thống Backend sử dụng Java/Spring Boot hoặc .NET Core. Tối ưu hóa hiệu năng hệ thống.",
             "skills": [
-                "Marketing",
-                "Content Creation",
-                "Social Media",
-                "SEO"
+                "Java",
+                "Spring Boot",
+                ".NET",
+                "SQL"
             ],
             "requirements": [
-                "Tốt nghiệp ĐH chuyên ngành Marketing, QTKD",
-                "Có ít nhất 1 năm kinh nghiệm Digital Marketing"
+                "Có ít nhất 1 năm kinh nghiệm Backend",
+                "Thành thạo Java hoặc C#",
+                "Hiểu biết về Database"
             ],
             "benefits": [
-                "Lương thưởng cạnh tranh",
-                "Môi trường startup năng động",
-                "Cơ hội thăng tiến nhanh"
+                "Gói thu nhập hấp dẫn",
+                "Bảo hiểm FPT Care",
+                "Cơ hội Onsite nước ngoài"
             ],
             "status": "active",
-            "applicants": 24,
+            "applicants": 28,
             "education": "bachelor",
-            "experience": "1-2"
+            "experience": "1-3"
         },
         {
             "_id": "job_5",

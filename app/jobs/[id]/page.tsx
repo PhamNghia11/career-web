@@ -252,7 +252,14 @@ export default async function JobPage(props: JobPageProps) {
                                         </div>
                                         <div>
                                             <p className="text-sm font-semibold text-gray-900">Website công ty</p>
-                                            <a href="#" className="text-sm text-blue-600 hover:underline truncate block max-w-[200px]">Đang cập nhật</a>
+                                            <a
+                                                href={job.website || "#"}
+                                                target={job.website ? "_blank" : "_self"}
+                                                rel="noopener noreferrer"
+                                                className={`text-sm ${job.website ? "text-blue-600 hover:underline" : "text-gray-500 cursor-default"} truncate block max-w-[200px]`}
+                                            >
+                                                {job.website || "Đang cập nhật"}
+                                            </a>
                                         </div>
                                     </div>
                                 </CardContent>

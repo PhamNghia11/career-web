@@ -28,6 +28,7 @@ export type Job = {
     applicants: number
     creatorId?: string // Link to employer user
     views?: number
+    website?: string
 }
 
 // Support both array format and object format with .jobs property
