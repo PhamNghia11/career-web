@@ -125,7 +125,22 @@ export async function POST(request: Request) {
         console.error("Failed to create employer notification:", notifError)
       }
     } else {
-      console.log("[Applications API] No employerId found, skipping employer notification")
+      // If no employerId (Static Job), notify ALL employers
+      try {
+        await notificationsCollection.insertOne({
+          targetRole: 'employer',
+          type: 'job',
+          title: 'Ứng viên mới (Sample Job)',
+          message: `${fullname} vừa ứng tuyển vị trí ${jobTitle} (Demo)`,
+          read: false,
+          createdAt: new Date(),
+          link: `/dashboard/applications`,
+          applicationId: applicationId
+        })
+        console.log("[Applications API] Created broadcast employer notification")
+      } catch (notifError) {
+        console.error("Failed to create broadcast employer notification:", notifError)
+      }
     }
 
     // 3. Send Email Notifications

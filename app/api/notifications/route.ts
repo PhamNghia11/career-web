@@ -41,8 +41,13 @@ export async function GET(request: Request) {
         ]
       }
     } else if (role === 'employer') {
-      // Employer sees: their own notifications (where userId matches their ID)
-      query = { userId }
+      // Employer sees: their own notifications OR notifications targeted at 'employer' role (e.g. for static jobs)
+      query = {
+        $or: [
+          { userId },
+          { targetRole: 'employer' }
+        ]
+      }
     }
     // For students and other roles, default query { userId } is used
 
