@@ -497,44 +497,53 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
       <div className="relative">
         <button
           onClick={() => setActiveDropdown(isOpen ? null : dropdownId)}
-          className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg border transition-all ${value
-            ? "bg-primary/10 border-primary text-primary font-medium"
-            : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+          className={`flex items-center gap-2 px-3 py-2.5 text-sm rounded-full border transition-all shadow-sm ${value
+            ? "bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30 text-primary font-medium"
+            : "bg-white border-gray-200 text-gray-600 hover:border-primary/30 hover:bg-gray-50/80 hover:shadow-md"
             }`}
         >
-          {Icon && <Icon className="h-4 w-4" />}
-          <span>{selectedOption ? selectedOption.label : label}</span>
-          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+          {Icon && <Icon className={`h-4 w-4 ${value ? "text-primary" : "text-gray-400"}`} />}
+          <span className="whitespace-nowrap">{selectedOption ? selectedOption.label : label}</span>
+          <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} ${value ? "text-primary" : "text-gray-400"}`} />
         </button>
 
         {isOpen && (
-          <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+          <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
+            <div className="px-3 py-2 border-b border-gray-100">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{label}</span>
+            </div>
+            <div className="max-h-64 overflow-y-auto py-1">
+              {options.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => {
+                    onChange(option.id)
+                    setActiveDropdown(null)
+                  }}
+                  className={`w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors ${value === option.id ? "bg-primary/5 text-primary font-medium" : "text-gray-700"
+                    }`}
+                >
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${value === option.id ? "border-primary bg-primary" : "border-gray-300"}`}>
+                    {value === option.id && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                  </div>
+                  {option.label}
+                </button>
+              ))}
+            </div>
             {value && (
-              <button
-                onClick={() => {
-                  onChange(null)
-                  setActiveDropdown(null)
-                }}
-                className="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50 flex items-center gap-2"
-              >
-                <X className="h-4 w-4" />
-                Xóa lọc
-              </button>
+              <div className="border-t border-gray-100 pt-1.5 mt-1">
+                <button
+                  onClick={() => {
+                    onChange(null)
+                    setActiveDropdown(null)
+                  }}
+                  className="w-full px-3 py-2 text-left text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  Bỏ chọn
+                </button>
+              </div>
             )}
-            {options.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => {
-                  onChange(option.id)
-                  setActiveDropdown(null)
-                }}
-                className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 ${value === option.id ? "bg-primary/10 text-primary font-medium" : "text-gray-700"
-                  }`}
-              >
-                <Checkbox checked={value === option.id} className="pointer-events-none" />
-                {option.label}
-              </button>
-            ))}
           </div>
         )}
       </div>
@@ -617,10 +626,11 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                 setSelectedSalary(null)
                 setSelectedType(null)
               }}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all border border-transparent hover:border-gray-200"
             >
-              <X className="h-4 w-4" />
-              Xóa lọc ({advancedFilterCount + (selectedSalary ? 1 : 0) + (selectedType ? 1 : 0)})
+              <X className="h-3.5 w-3.5" />
+              <span>Đặt lại</span>
+              <span className="ml-1 px-1.5 py-0.5 text-xs bg-gray-200 text-gray-600 rounded-full">{advancedFilterCount + (selectedSalary ? 1 : 0) + (selectedType ? 1 : 0)}</span>
             </button>
           )}
         </div>
