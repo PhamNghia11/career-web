@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { AuthProvider } from "@/lib/auth-context"
 import { VisitorTracker } from "@/components/visitor-tracker"
+import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin", "vietnamese"] })
@@ -42,6 +43,7 @@ export default function RootLayout({
         <AuthProvider>
           <VisitorTracker />
           {children}
+          <Toaster />
         </AuthProvider>
         <Analytics />
       </body>
