@@ -130,6 +130,34 @@ export default function ReviewsDashboardPage() {
     )
   }
 
+  const handleExportCSV = () => {
+    if (reviews.length === 0) return
+
+    // Add BOM for Excel correct display of UTF-8
+    const BOM = "\uFEFF"
+    const headers = ["ID", "Tên", "Đánh giá (Sao)", "Nội dung", "Thời gian", "Xác thực"]
+    const csvContent = BOM + [
+      headers.join(","),
+      ...reviews.map(r => [
+        r.id,
+        `"${r.name.replace(/"/g, '""')}"`,
+        r.rating,
+        `"${(r.comment || "").replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+        `"${r.review_time}"`,
+        r.verified ? "Có" : "Không"
+      ].join(","))
+    ].join("\n")
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.setAttribute("href", url)
+    link.setAttribute("download", `gdu_reviews_${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -143,7 +171,7 @@ export default function ReviewsDashboardPage() {
             <RefreshCw className="h-4 w-4 mr-2" />
             Cập nhật
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExportCSV}>
             <Download className="h-4 w-4 mr-2" />
             Xuất CSV
           </Button>
