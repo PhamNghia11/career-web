@@ -125,6 +125,25 @@ export async function POST(req: Request) {
 
     const result = await collection.insertOne(newJob)
 
+    // Nếu job cần duyệt (status === 'pending'), tạo thông báo cho Admin
+    if (newJob.status === 'pending') {
+      try {
+        const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+        await notifCollection.insertOne({
+          targetRole: 'admin', // Thông báo chung cho tất cả admin
+          type: 'job',
+          title: 'Tin tuyển dụng mới cần duyệt',
+          message: `${company} vừa đăng tin tuyển dụng: ${title}`,
+          read: false,
+          createdAt: new Date(),
+          link: '/dashboard', // Dẫn admin về trang duyệt tin
+        })
+      } catch (notifError) {
+        console.error("Failed to create admin notification:", notifError)
+        // Không block flow chính nếu lỗi tạo notif
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: role === 'admin' ? "Đăng tuyển thành công!" : "Đã gửi duyệt tin tuyển dụng!",

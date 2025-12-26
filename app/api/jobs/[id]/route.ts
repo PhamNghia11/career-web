@@ -59,10 +59,44 @@ export async function PATCH(
             updatedAt: new Date().toISOString()
         }
 
+        // Lấy thông tin job cũ để biết creatorId và status cũ
+        const currentJob = await collection.findOne({ _id: new ObjectId(id) })
+
         const result = await collection.updateOne(
             { _id: new ObjectId(id) },
             { $set: updateData }
         )
+
+        // Notification Logic: Thông báo cho Employer khi status thay đổi
+        if (currentJob && updateData.status && updateData.status !== currentJob.status) {
+            try {
+                const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+                let message = ""
+                let title = ""
+
+                if (updateData.status === 'active') {
+                    title = "Tin tuyển dụng được duyệt"
+                    message = `Tin "${currentJob.title}" của bạn đã được duyệt và đăng công khai.`
+                } else if (updateData.status === 'rejected') {
+                    title = "Tin tuyển dụng bị từ chối"
+                    message = `Tin "${currentJob.title}" của bạn đã bị từ chối.`
+                }
+
+                if (title && currentJob.creatorId) {
+                    await notifCollection.insertOne({
+                        userId: currentJob.creatorId,
+                        type: 'system',
+                        title: title,
+                        message: message,
+                        read: false,
+                        createdAt: new Date(),
+                        link: `/dashboard/my-jobs`,
+                    })
+                }
+            } catch (err) {
+                console.error("Failed to crate status notification:", err)
+            }
+        }
 
         if (result.matchedCount === 0) {
             return NextResponse.json({ error: "Job not found" }, { status: 404 })
