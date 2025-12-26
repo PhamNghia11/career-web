@@ -22,6 +22,8 @@ async function getActiveJobsFromDB(): Promise<Job[]> {
   }
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function JobsPage() {
   const dbJobs = await getActiveJobsFromDB()
 
