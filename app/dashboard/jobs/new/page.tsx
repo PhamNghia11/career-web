@@ -31,18 +31,17 @@ const JOB_TYPES = [
     { value: "internship", label: "Thực tập" },
 ]
 
-// Danh sách ngành học đơn giản - flat list để UI gọn
-const MAJORS = [
-    "Công nghệ thông tin", "Kỹ thuật Phần mềm", "Trí tuệ Nhân tạo", "Mạng máy tính",
-    "Kinh doanh Quốc tế", "Kinh doanh Thương mại", "Thương mại Điện tử",
-    "Quản trị Kinh doanh", "Marketing", "Quản trị Khách sạn", "Quản trị Du lịch & Lữ hành", "Logistics",
-    "Truyền thông Đa phương tiện", "Công nghệ Truyền thông", "Quan hệ Công chúng",
-    "Tài chính - Ngân hàng", "Công nghệ Tài chính", "Kế toán",
-    "Luật", "Luật Kinh tế",
-    "Ngôn ngữ Anh", "Đông Phương học", "Tâm lý học", "Ngôn ngữ Trung Quốc",
-    "Điều dưỡng", "Kỹ thuật Phục hồi Chức năng",
-    "Thiết kế đồ họa",
-]
+// Cấu trúc phân cấp: Lĩnh vực → Chuyên ngành
+const FIELDS_AND_MAJORS: Record<string, string[]> = {
+    "Công nghệ Thông tin": ["Công nghệ thông tin", "Kỹ thuật Phần mềm", "Trí tuệ Nhân tạo", "Mạng máy tính"],
+    "Kinh doanh & Quản lý": ["Kinh doanh Quốc tế", "Kinh doanh Thương mại", "Thương mại Điện tử", "Quản trị Kinh doanh", "Marketing", "Quản trị Khách sạn", "Logistics"],
+    "Truyền thông": ["Truyền thông Đa phương tiện", "Công nghệ Truyền thông", "Quan hệ Công chúng"],
+    "Tài chính - Ngân hàng": ["Tài chính - Ngân hàng", "Công nghệ Tài chính", "Kế toán"],
+    "Luật": ["Luật", "Luật Kinh tế"],
+    "Ngôn ngữ & Xã hội": ["Ngôn ngữ Anh", "Đông Phương học", "Tâm lý học", "Ngôn ngữ Trung Quốc"],
+    "Sức khỏe": ["Điều dưỡng", "Kỹ thuật Phục hồi Chức năng"],
+    "Thiết kế": ["Thiết kế đồ họa"],
+}
 
 const COMMON_BENEFITS = [
     "Bảo hiểm y tế/XH", "Thưởng tháng 13", "Du lịch hàng năm", "Laptop làm việc",
@@ -359,8 +358,8 @@ export default function PostJobPage() {
                                 />
                             </div>
 
-                            <div className="space-y-3">
-                                <FormLabel>Ngành học liên quan (Chọn các ngành phù hợp)</FormLabel>
+                            <div className="space-y-4">
+                                <FormLabel className="text-base font-semibold">Ngành học liên quan</FormLabel>
                                 <FormField
                                     control={form.control}
                                     name="relatedMajors"
@@ -368,28 +367,35 @@ export default function PostJobPage() {
                                         const selectedMajors = field.value || []
 
                                         return (
-                                            <div className="flex flex-wrap gap-2">
-                                                {MAJORS.map((major) => {
-                                                    const isSelected = selectedMajors.includes(major)
-                                                    return (
-                                                        <div
-                                                            key={major}
-                                                            className={`px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-all border select-none ${isSelected
-                                                                ? "bg-blue-600 text-white border-blue-600 shadow-sm hover:bg-blue-700"
-                                                                : "bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:bg-gray-50"
-                                                                }`}
-                                                            onClick={() => {
-                                                                if (isSelected) {
-                                                                    field.onChange(selectedMajors.filter((m) => m !== major))
-                                                                } else {
-                                                                    field.onChange([...selectedMajors, major])
-                                                                }
-                                                            }}
-                                                        >
-                                                            {major}
+                                            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 border rounded-md p-3">
+                                                {Object.entries(FIELDS_AND_MAJORS).map(([fieldName, majors]) => (
+                                                    <div key={fieldName}>
+                                                        <h4 className="text-sm font-semibold text-gray-700 mb-2 sticky top-0 bg-white py-1 z-10">{fieldName}</h4>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {majors.map((major) => {
+                                                                const isSelected = selectedMajors.includes(major)
+                                                                return (
+                                                                    <div
+                                                                        key={major}
+                                                                        className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all border select-none ${isSelected
+                                                                                ? "bg-blue-600 text-white border-blue-600 shadow-sm hover:bg-blue-700"
+                                                                                : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                                                                            }`}
+                                                                        onClick={() => {
+                                                                            if (isSelected) {
+                                                                                field.onChange(selectedMajors.filter((m) => m !== major))
+                                                                            } else {
+                                                                                field.onChange([...selectedMajors, major])
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {major}
+                                                                    </div>
+                                                                )
+                                                            })}
                                                         </div>
-                                                    )
-                                                })}
+                                                    </div>
+                                                ))}
                                             </div>
                                         )
                                     }}
