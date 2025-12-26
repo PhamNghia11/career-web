@@ -76,10 +76,16 @@ export async function PATCH(
 
                 if (updateData.status === 'active') {
                     title = "Tin tuyển dụng được duyệt"
-                    message = `Tin "${currentJob.title}" của bạn đã được duyệt và đăng công khai.`
+                    message = `Tin tuyển dụng "${currentJob.title}" của bạn đã được phê duyệt và hiển thị công khai.`
                 } else if (updateData.status === 'rejected') {
-                    title = "Tin tuyển dụng bị từ chối"
-                    message = `Tin "${currentJob.title}" của bạn đã bị từ chối.`
+                    title = "Tin tuyển dụng cần chỉnh sửa"
+                    // Include rejection reason if provided
+                    const reason = updateData.rejectionReason || body.rejectionReason
+                    if (reason) {
+                        message = `Tin tuyển dụng "${currentJob.title}" cần chỉnh sửa thêm. Lý do: ${reason}`
+                    } else {
+                        message = `Tin tuyển dụng "${currentJob.title}" của bạn cần được chỉnh sửa trước khi đăng. Vui lòng kiểm tra và cập nhật lại.`
+                    }
                 }
 
                 if (title && currentJob.creatorId) {
@@ -92,9 +98,10 @@ export async function PATCH(
                         createdAt: new Date(),
                         link: `/dashboard/my-jobs`,
                     })
+                    console.log(`[Jobs API] Created ${updateData.status} notification for employer:`, currentJob.creatorId)
                 }
             } catch (err) {
-                console.error("Failed to crate status notification:", err)
+                console.error("Failed to create status notification:", err)
             }
         }
 

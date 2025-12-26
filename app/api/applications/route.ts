@@ -22,8 +22,9 @@ export async function POST(request: Request) {
     const cohort = formData.get("cohort") as string
 
     const message = formData.get("message") as string
+    const applicantId = formData.get("applicantId") as string // User ID for notifications
 
-    console.log("[Applications API] POST - jobId:", jobId, "employerId from form:", employerId)
+    console.log("[Applications API] POST - jobId:", jobId, "employerId from form:", employerId, "applicantId:", applicantId)
 
     // If employerId not provided, try to lookup from job in MongoDB
     if (!employerId && jobId) {
@@ -79,6 +80,7 @@ export async function POST(request: Request) {
       jobTitle,
       companyName,
       employerId: employerId || null, // Store the resolved employerId
+      applicantId: applicantId || null, // Store user ID for notifications
       fullname,
       email,
       phone,
@@ -150,6 +152,25 @@ export async function POST(request: Request) {
         console.log("[Applications API] Created broadcast employer notification")
       } catch (notifError) {
         console.error("Failed to create broadcast employer notification:", notifError)
+      }
+    }
+
+    // 3. Notification for Student/Applicant (if applicantId exists - logged in user)
+    if (applicantId) {
+      try {
+        await notificationsCollection.insertOne({
+          userId: applicantId,
+          type: 'job',
+          title: 'Ứng tuyển thành công',
+          message: `Bạn đã ứng tuyển thành công vào vị trí ${jobTitle} tại ${companyName}. Chúc bạn may mắn!`,
+          read: false,
+          createdAt: new Date(),
+          link: `/dashboard/applications`,
+          applicationId: applicationId
+        })
+        console.log("[Applications API] Created student notification for:", applicantId)
+      } catch (notifError) {
+        console.error("Failed to create student notification:", notifError)
       }
     }
 

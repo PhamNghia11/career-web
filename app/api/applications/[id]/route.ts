@@ -52,6 +52,12 @@ export async function PATCH(
 
         const collection = await getCollection(COLLECTIONS.APPLICATIONS)
 
+        // Fetch application before update to get applicantId, jobTitle, etc.
+        const currentApplication = await collection.findOne({ _id: new ObjectId(id) })
+        if (!currentApplication) {
+            return NextResponse.json({ error: "Application not found" }, { status: 404 })
+        }
+
         const updateData: Record<string, any> = {
             updatedAt: new Date()
         }
@@ -62,6 +68,55 @@ export async function PATCH(
             { _id: new ObjectId(id) },
             { $set: updateData }
         )
+
+        // Create notification for student if status changed and applicantId exists
+        if (status && status !== currentApplication.status && currentApplication.applicantId) {
+            try {
+                const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+                const jobTitle = currentApplication.jobTitle || "công việc"
+
+                let notificationTitle = ""
+                let notificationMessage = ""
+                let notificationType: "job" | "interview" | "system" = "job"
+
+                switch (status) {
+                    case "reviewed":
+                        notificationTitle = "Hồ sơ đã được xem"
+                        notificationMessage = `Nhà tuyển dụng đã xem hồ sơ của bạn cho vị trí ${jobTitle}.`
+                        break
+                    case "interviewed":
+                        notificationTitle = "Mời phỏng vấn"
+                        notificationMessage = `Bạn có lời mời phỏng vấn cho vị trí ${jobTitle}. Vui lòng kiểm tra email hoặc điện thoại để biết chi tiết.`
+                        notificationType = "interview"
+                        break
+                    case "hired":
+                        notificationTitle = "Chúc mừng!"
+                        notificationMessage = `Chúc mừng! Bạn đã được nhận vào vị trí ${jobTitle}.`
+                        break
+                    case "rejected":
+                        notificationTitle = "Kết quả ứng tuyển"
+                        notificationMessage = `Cảm ơn bạn đã quan tâm. Rất tiếc hồ sơ vị trí ${jobTitle} chưa phù hợp lần này. Hẹn bạn ở cơ hội khác nhé!`
+                        break
+                }
+
+                if (notificationTitle) {
+                    await notificationsCollection.insertOne({
+                        userId: currentApplication.applicantId,
+                        type: notificationType,
+                        title: notificationTitle,
+                        message: notificationMessage,
+                        read: false,
+                        createdAt: new Date(),
+                        link: `/dashboard/applications`,
+                        applicationId: id
+                    })
+                    console.log(`[Applications API] Created ${status} notification for student:`, currentApplication.applicantId)
+                }
+            } catch (notifError) {
+                console.error("Failed to create student status notification:", notifError)
+                // Don't fail the main request if notification fails
+            }
+        }
 
         return NextResponse.json({
             success: true,

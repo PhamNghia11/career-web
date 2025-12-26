@@ -102,6 +102,8 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
             formData.append("companyName", companyName)
             if (jobId) formData.append("jobId", jobId)
             if (employerId) formData.append("employerId", employerId)
+            // Add applicantId for notification purposes (if user is logged in)
+            if (user?.id) formData.append("applicantId", user.id)
 
             formData.append("fullname", (form.elements.namedItem("fullname") as HTMLInputElement).value)
             formData.append("email", email)
