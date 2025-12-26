@@ -9,13 +9,16 @@ import { useToast } from "@/hooks/use-toast"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Empty, EmptyTitle, EmptyDescription } from "@/components/ui/empty"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/lib/auth-context"
 
 interface Notification {
   id: string
+  _id?: string
   type: "job" | "message" | "interview" | "system"
   title: string
   message: string
   timestamp: string
+  createdAt?: string
   read: boolean
 }
 
@@ -49,21 +52,27 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
+  const { user } = useAuth()
 
   useEffect(() => {
-    fetchNotifications()
-  }, [])
+    if (user?.id) {
+      fetchNotifications()
+    }
+  }, [user?.id])
 
   const fetchNotifications = async () => {
+    if (!user?.id) return
+
     setLoading(true)
     try {
-      const response = await fetch("/api/notifications")
+      const response = await fetch(`/api/notifications?userId=${user.id}&role=${user.role || ''}`)
       const result = await response.json()
 
       if (result.success) {
         const formattedData = result.data.map((notif: any) => ({
           ...notif,
-          timestamp: formatRelativeTime(notif.timestamp),
+          id: notif._id || notif.id,
+          timestamp: formatRelativeTime(notif.createdAt || notif.timestamp),
         }))
         setNotifications(formattedData)
       } else {
@@ -119,11 +128,13 @@ export default function NotificationsPage() {
   }
 
   const markAllAsRead = async () => {
+    if (!user?.id) return
+
     try {
       const response = await fetch("/api/notifications", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "mark_all_read" }),
+        body: JSON.stringify({ userId: user.id, action: "mark_all_read" }),
       })
 
       if (response.ok) {
