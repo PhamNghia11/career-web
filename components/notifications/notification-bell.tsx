@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Bell, Check, Trash2, Briefcase, MessageSquare, Calendar, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -40,6 +41,7 @@ const typeColors = {
 
 export function NotificationBell() {
     const { user } = useAuth()
+    const router = useRouter()
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [unreadCount, setUnreadCount] = useState(0)
     const [loading, setLoading] = useState(false)
@@ -186,7 +188,11 @@ export function NotificationBell() {
                                 onClick={() => {
                                     if (!notification.read) markAsRead(notification._id)
                                     if (notification.link) {
-                                        window.location.href = notification.link
+                                        if (notification.link.startsWith('http')) {
+                                            window.location.href = notification.link
+                                        } else {
+                                            router.push(notification.link)
+                                        }
                                         setOpen(false)
                                     }
                                 }}
