@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Loader2, Briefcase, MapPin, DollarSign, Building, ArrowLeft } from "lucide-react"
+import { Loader2, Briefcase, MapPin, DollarSign, Building, ArrowLeft, ImagePlus, X } from "lucide-react"
 
 // Constants (Duplicated from new/page.tsx for simplicity)
 const JOB_TYPES = [
@@ -64,6 +64,8 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
     const { toast } = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [isFetching, setIsFetching] = useState(true)
+    const [logoPreview, setLogoPreview] = useState<string | null>(null)
+    const [logoBase64, setLogoBase64] = useState<string | null>(null)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -85,6 +87,43 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
     })
 
     const isNegotiable = form.watch("isNegotiable")
+
+    const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"]
+        if (!validTypes.includes(file.type)) {
+            toast({
+                title: "Định dạng không hỗ trợ",
+                description: "Chỉ chấp nhận JPG, PNG, WEBP, GIF",
+                variant: "destructive",
+            })
+            return
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            toast({
+                title: "File quá lớn",
+                description: "Dung lượng tối đa 2MB",
+                variant: "destructive",
+            })
+            return
+        }
+
+        const reader = new FileReader()
+        reader.onloadend = () => {
+            const base64String = reader.result as string
+            setLogoPreview(base64String)
+            setLogoBase64(base64String)
+        }
+        reader.readAsDataURL(file)
+    }
+
+    const removeLogo = () => {
+        setLogoPreview(null)
+        setLogoBase64(null)
+    }
 
     useEffect(() => {
         const fetchJob = async () => {
@@ -110,6 +149,12 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                         requirements: Array.isArray(job.requirements) ? job.requirements.join('\n') : job.requirements || "",
                         detailedBenefits: Array.isArray(job.detailedBenefits) ? job.detailedBenefits.join('\n') : job.detailedBenefits || "",
                     })
+
+                    // Load existing logo
+                    if (job.logo && !job.logo.includes('placeholder')) {
+                        setLogoPreview(job.logo)
+                        setLogoBase64(job.logo)
+                    }
                 } else {
                     toast({ title: "Lỗi", description: "Không tìm thấy tin tuyển dụng", variant: "destructive" })
                     router.push("/dashboard/my-jobs")
@@ -148,6 +193,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                 salary: salaryString,
                 requirements: requirementsList,
                 detailedBenefits: detailedBenefitsList,
+                logo: logoBase64 || "/placeholder.svg?height=100&width=100",
             }
 
             const response = await fetch(`/api/jobs/${params.id}`, {
@@ -247,6 +293,44 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                                         </FormItem>
                                     )}
                                 />
+                            </div>
+
+                            {/* Logo Upload Section */}
+                            <div className="space-y-3">
+                                <FormLabel>Logo công ty</FormLabel>
+                                <div className="flex items-center gap-4">
+                                    {logoPreview ? (
+                                        <div className="relative">
+                                            <img
+                                                src={logoPreview}
+                                                alt="Logo preview"
+                                                className="w-24 h-24 object-contain rounded-lg border bg-white"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={removeLogo}
+                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <label className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                                            <ImagePlus className="w-8 h-8 text-gray-400" />
+                                            <span className="text-xs text-gray-500 mt-1">Thêm logo</span>
+                                            <input
+                                                type="file"
+                                                accept="image/jpeg,image/png,image/webp,image/gif"
+                                                onChange={handleLogoChange}
+                                                className="hidden"
+                                            />
+                                        </label>
+                                    )}
+                                    <div className="text-sm text-gray-500">
+                                        <p>Định dạng: JPG, PNG, WEBP, GIF</p>
+                                        <p>Dung lượng tối đa: 2MB</p>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
