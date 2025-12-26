@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get("userId")
-    const role = searchParams.get("role") // Get user role from params
+    const role = searchParams.get("role")?.toLowerCase() // Get user role from params and normalize
 
     console.log("[Notifications API] GET - userId:", userId, "role:", role)
 
