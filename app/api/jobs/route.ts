@@ -87,7 +87,7 @@ export async function POST(req: Request) {
       title, company, companyId, location, type, field,
       salary, salaryMin, salaryMax, isNegotiable,
       deadline, description, requirements, benefits,
-      relatedMajors, detailedBenefits, creatorId, role
+      relatedMajors, detailedBenefits, creatorId, role, website
     } = body
 
     // Validate permission (Only Employer or Admin)
@@ -99,6 +99,7 @@ export async function POST(req: Request) {
     const newJob = {
       title,
       company,
+      website: website || null,
       companyId: companyId || "unknown", // Should link to company profile
       logo: body.logo || "/placeholder.svg?height=100&width=100", // Default logo
       location,
