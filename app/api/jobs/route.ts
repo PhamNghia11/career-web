@@ -87,7 +87,7 @@ export async function POST(req: Request) {
       title, company, companyId, location, type, field,
       salary, salaryMin, salaryMax, isNegotiable,
       deadline, description, requirements, benefits,
-      relatedMajors, detailedBenefits, creatorId, role, website
+      relatedMajors, detailedBenefits, creatorId, role, website, quantity
     } = body
 
     // Validate permission (Only Employer or Admin)
@@ -120,7 +120,8 @@ export async function POST(req: Request) {
       status: role === 'admin' ? 'active' : 'pending', // Admin posts are active immediately
       applicants: 0,
       creatorId,
-      views: 0
+      views: 0,
+      quantity: quantity || 1
     }
 
     const result = await collection.insertOne(newJob)

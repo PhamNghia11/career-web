@@ -63,6 +63,10 @@ const formSchema = z.object({
     description: z.string().min(20, "Mô tả công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     requirements: z.string().min(20, "Yêu cầu công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     detailedBenefits: z.string().optional(),
+    deadline: z.string().refine((val) => !isNaN(Date.parse(val)), {
+        message: "Vui lòng chọn ngày hợp lệ",
+    }),
+    quantity: z.coerce.number().min(1, "Số lượng phải lớn hơn 0"),
 })
 
 export default function PostJobPage() {
@@ -90,6 +94,8 @@ export default function PostJobPage() {
             description: "",
             requirements: "",
             detailedBenefits: "",
+            deadline: "",
+            quantity: 1,
         },
     })
 
@@ -154,8 +160,13 @@ export default function PostJobPage() {
             const requirementsList = values.requirements.split('\n').filter(line => line.trim() !== "")
             const detailedBenefitsList = values.detailedBenefits ? values.detailedBenefits.split('\n').filter(line => line.trim() !== "") : []
 
+            // Format deadline to DD/MM/YYYY
+            const deadlineDate = new Date(values.deadline)
+            const formattedDeadline = `${deadlineDate.getDate().toString().padStart(2, '0')}/${(deadlineDate.getMonth() + 1).toString().padStart(2, '0')}/${deadlineDate.getFullYear()}`
+
             const payload = {
                 ...values,
+                deadline: formattedDeadline,
                 salary: salaryString,
                 requirements: requirementsList,
                 detailedBenefits: detailedBenefitsList,
@@ -323,6 +334,35 @@ export default function PostJobPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
+                                    name="deadline"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Hạn nộp hồ sơ <span className="text-red-500">*</span></FormLabel>
+                                            <FormControl>
+                                                <Input type="date" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="quantity"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Số lượng tuyển <span className="text-red-500">*</span></FormLabel>
+                                            <FormControl>
+                                                <Input type="number" min="1" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
                                     name="type"
                                     render={({ field }) => (
                                         <FormItem>
@@ -378,8 +418,8 @@ export default function PostJobPage() {
                                                                     <div
                                                                         key={major}
                                                                         className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all border select-none ${isSelected
-                                                                                ? "bg-blue-600 text-white border-blue-600 shadow-sm hover:bg-blue-700"
-                                                                                : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                                                                            ? "bg-blue-600 text-white border-blue-600 shadow-sm hover:bg-blue-700"
+                                                                            : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
                                                                             }`}
                                                                         onClick={() => {
                                                                             if (isSelected) {
