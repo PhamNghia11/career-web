@@ -31,26 +31,18 @@ const JOB_TYPES = [
     { value: "internship", label: "Thực tập" },
 ]
 
-const MAJORS = [
-    // Công nghệ Thông tin
-    "Công nghệ thông tin", "Kỹ thuật Phần mềm", "Trí tuệ Nhân tạo", "Mạng máy tính",
-    // Kinh doanh
-    "Kinh doanh Quốc tế", "Kinh doanh Thương mại", "Thương mại Điện tử",
-    // Quản trị - Quản lý
-    "Quản trị Kinh doanh", "Marketing", "Quản trị Khách sạn", "Quản trị Du lịch & Lữ hành", "Logistics",
-    // Truyền thông
-    "Truyền thông Đa phương tiện", "Công nghệ Truyền thông", "Quan hệ Công chúng",
-    // Tài chính - Kế toán
-    "Tài chính - Ngân hàng", "Công nghệ Tài chính", "Kế toán",
-    // Luật
-    "Luật", "Luật Kinh tế",
-    // Ngôn ngữ & Khoa học Xã hội
-    "Ngôn ngữ Anh", "Đông Phương học", "Tâm lý học", "Ngôn ngữ Trung Quốc",
-    // Sức khỏe
-    "Điều dưỡng", "Kỹ thuật Phục hồi Chức năng",
-    // Khác
-    "Thiết kế đồ họa",
-]
+// Cấu trúc phân cấp: Lĩnh vực → Chuyên ngành
+const FIELDS_AND_MAJORS: Record<string, string[]> = {
+    "Công nghệ Thông tin": ["Công nghệ thông tin", "Kỹ thuật Phần mềm", "Trí tuệ Nhân tạo", "Mạng máy tính"],
+    "Kinh doanh": ["Kinh doanh Quốc tế", "Kinh doanh Thương mại", "Thương mại Điện tử"],
+    "Quản trị - Quản lý": ["Quản trị Kinh doanh", "Marketing", "Quản trị Khách sạn", "Quản trị Du lịch & Lữ hành", "Logistics"],
+    "Truyền thông": ["Truyền thông Đa phương tiện", "Công nghệ Truyền thông", "Quan hệ Công chúng"],
+    "Tài chính - Ngân hàng": ["Tài chính - Ngân hàng", "Công nghệ Tài chính", "Kế toán"],
+    "Luật": ["Luật", "Luật Kinh tế"],
+    "Ngôn ngữ & Khoa học Xã hội": ["Ngôn ngữ Anh", "Đông Phương học", "Tâm lý học", "Ngôn ngữ Trung Quốc"],
+    "Sức khỏe": ["Điều dưỡng", "Kỹ thuật Phục hồi Chức năng"],
+    "Thiết kế": ["Thiết kế đồ họa"],
+}
 
 const COMMON_BENEFITS = [
     "Bảo hiểm y tế/XH", "Thưởng tháng 13", "Du lịch hàng năm", "Laptop làm việc",
@@ -388,41 +380,79 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
 
                             <div className="space-y-3">
                                 <FormLabel>Ngành học liên quan</FormLabel>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                    {MAJORS.map((major) => (
-                                        <FormField
-                                            key={major}
-                                            control={form.control}
-                                            name="relatedMajors"
-                                            render={({ field }) => {
-                                                const current = field.value || []
-                                                return (
-                                                    <FormItem
-                                                        key={major}
-                                                        className="flex flex-row items-start space-x-3 space-y-0"
-                                                    >
-                                                        <FormControl>
-                                                            <Checkbox
-                                                                checked={current.includes(major)}
-                                                                onCheckedChange={(checked) => {
-                                                                    return checked
-                                                                        ? field.onChange([...current, major])
-                                                                        : field.onChange(
-                                                                            current.filter(
-                                                                                (value) => value !== major
-                                                                            )
-                                                                        )
+                                <div className="space-y-2">
+                                    {Object.entries(FIELDS_AND_MAJORS).map(([fieldName, majors]) => {
+                                        const selectedMajorsInField = majors.filter(m => form.watch("relatedMajors")?.includes(m))
+                                        const isExpanded = selectedMajorsInField.length > 0
+
+                                        return (
+                                            <div key={fieldName} className="border rounded-lg overflow-hidden">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="relatedMajors"
+                                                    render={({ field }) => {
+                                                        const allSelected = majors.every(m => field.value?.includes(m))
+                                                        const someSelected = majors.some(m => field.value?.includes(m))
+
+                                                        return (
+                                                            <div
+                                                                className={`flex items-center gap-3 p-3 cursor-pointer transition-colors ${someSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
+                                                                    }`}
+                                                                onClick={() => {
+                                                                    if (allSelected) {
+                                                                        field.onChange(field.value?.filter(v => !majors.includes(v)) || [])
+                                                                    } else {
+                                                                        const newValues = [...(field.value || []), ...majors.filter(m => !field.value?.includes(m))]
+                                                                        field.onChange(newValues)
+                                                                    }
                                                                 }}
-                                                            />
-                                                        </FormControl>
-                                                        <FormLabel className="font-normal text-sm cursor-pointer">
-                                                            {major}
-                                                        </FormLabel>
-                                                    </FormItem>
-                                                )
-                                            }}
-                                        />
-                                    ))}
+                                                            >
+                                                                <Checkbox
+                                                                    checked={allSelected}
+                                                                    className={someSelected && !allSelected ? "opacity-50" : ""}
+                                                                />
+                                                                <span className="font-medium text-sm flex-1">{fieldName}</span>
+                                                                <span className="text-xs text-gray-500">
+                                                                    {selectedMajorsInField.length}/{majors.length} ngành
+                                                                </span>
+                                                            </div>
+                                                        )
+                                                    }}
+                                                />
+
+                                                {isExpanded && (
+                                                    <div className="bg-gray-50 px-3 pb-3 pt-1 border-t">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                                                            {majors.map((major) => (
+                                                                <FormField
+                                                                    key={major}
+                                                                    control={form.control}
+                                                                    name="relatedMajors"
+                                                                    render={({ field }) => (
+                                                                        <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                                                            <FormControl>
+                                                                                <Checkbox
+                                                                                    checked={field.value?.includes(major)}
+                                                                                    onCheckedChange={(checked) => {
+                                                                                        return checked
+                                                                                            ? field.onChange([...field.value, major])
+                                                                                            : field.onChange(field.value?.filter(v => v !== major))
+                                                                                    }}
+                                                                                />
+                                                                            </FormControl>
+                                                                            <FormLabel className="font-normal text-sm cursor-pointer text-gray-700">
+                                                                                {major}
+                                                                            </FormLabel>
+                                                                        </FormItem>
+                                                                    )}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                                 <FormMessage>{form.formState.errors.relatedMajors?.message}</FormMessage>
                             </div>
