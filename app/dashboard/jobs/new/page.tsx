@@ -361,83 +361,54 @@ export default function PostJobPage() {
 
                             <div className="space-y-3">
                                 <FormLabel>Ngành học liên quan (Cho phép sinh viên lọc)</FormLabel>
-                                <div className="space-y-2">
-                                    {Object.entries(FIELDS_AND_MAJORS).map(([fieldName, majors]) => {
-                                        const selectedMajorsInField = majors.filter(m => form.watch("relatedMajors")?.includes(m))
-                                        const isExpanded = selectedMajorsInField.length > 0
+                                <FormField
+                                    control={form.control}
+                                    name="relatedMajors"
+                                    render={({ field }) => {
+                                        const selectedMajors = field.value || []
 
                                         return (
-                                            <div key={fieldName} className="border rounded-lg overflow-hidden">
-                                                {/* Field Header */}
-                                                <FormField
-                                                    control={form.control}
-                                                    name="relatedMajors"
-                                                    render={({ field }) => {
-                                                        const allSelected = majors.every(m => field.value?.includes(m))
-                                                        const someSelected = majors.some(m => field.value?.includes(m))
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                                {Object.entries(FIELDS_AND_MAJORS).map(([fieldName, majors]) => {
+                                                    const selectedInField = majors.filter(m => selectedMajors.includes(m))
+                                                    const allSelected = majors.every(m => selectedMajors.includes(m))
+                                                    const someSelected = selectedInField.length > 0
 
-                                                        return (
-                                                            <div
-                                                                className={`flex items-center gap-3 p-3 cursor-pointer transition-colors ${someSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
-                                                                    }`}
-                                                                onClick={() => {
-                                                                    // Toggle all majors in this field
-                                                                    if (allSelected) {
-                                                                        field.onChange(field.value?.filter(v => !majors.includes(v)) || [])
-                                                                    } else {
-                                                                        const newValues = [...(field.value || []), ...majors.filter(m => !field.value?.includes(m))]
-                                                                        field.onChange(newValues)
-                                                                    }
-                                                                }}
-                                                            >
+                                                    return (
+                                                        <div
+                                                            key={fieldName}
+                                                            className={`border rounded-lg p-3 cursor-pointer transition-all ${someSelected
+                                                                    ? 'bg-blue-50 border-blue-300 ring-1 ring-blue-200'
+                                                                    : 'hover:bg-gray-50 hover:border-gray-300'
+                                                                }`}
+                                                            onClick={() => {
+                                                                if (allSelected) {
+                                                                    // Deselect all in this field
+                                                                    field.onChange(selectedMajors.filter(v => !majors.includes(v)))
+                                                                } else {
+                                                                    // Select all in this field
+                                                                    const newValues = [...selectedMajors, ...majors.filter(m => !selectedMajors.includes(m))]
+                                                                    field.onChange(newValues)
+                                                                }
+                                                            }}
+                                                        >
+                                                            <div className="flex items-center gap-2">
                                                                 <Checkbox
                                                                     checked={allSelected}
-                                                                    className={someSelected && !allSelected ? "opacity-50" : ""}
+                                                                    className={someSelected && !allSelected ? "opacity-60" : ""}
                                                                 />
-                                                                <span className="font-medium text-sm flex-1">{fieldName}</span>
-                                                                <span className="text-xs text-gray-500">
-                                                                    {selectedMajorsInField.length}/{majors.length} ngành
-                                                                </span>
+                                                                <span className="font-medium text-sm">{fieldName}</span>
                                                             </div>
-                                                        )
-                                                    }}
-                                                />
-
-                                                {/* Expanded Majors */}
-                                                {isExpanded && (
-                                                    <div className="bg-gray-50 px-3 pb-3 pt-1 border-t">
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-                                                            {majors.map((major) => (
-                                                                <FormField
-                                                                    key={major}
-                                                                    control={form.control}
-                                                                    name="relatedMajors"
-                                                                    render={({ field }) => (
-                                                                        <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                                                                            <FormControl>
-                                                                                <Checkbox
-                                                                                    checked={field.value?.includes(major)}
-                                                                                    onCheckedChange={(checked) => {
-                                                                                        return checked
-                                                                                            ? field.onChange([...field.value, major])
-                                                                                            : field.onChange(field.value?.filter(v => v !== major))
-                                                                                    }}
-                                                                                />
-                                                                            </FormControl>
-                                                                            <FormLabel className="font-normal text-sm cursor-pointer text-gray-700">
-                                                                                {major}
-                                                                            </FormLabel>
-                                                                        </FormItem>
-                                                                    )}
-                                                                />
-                                                            ))}
+                                                            <div className="text-xs text-gray-500 mt-1 ml-6">
+                                                                {selectedInField.length}/{majors.length} chuyên ngành
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                )}
+                                                    )
+                                                })}
                                             </div>
                                         )
-                                    })}
-                                </div>
+                                    }}
+                                />
                                 <FormMessage>{form.formState.errors.relatedMajors?.message}</FormMessage>
                             </div>
                         </CardContent>
