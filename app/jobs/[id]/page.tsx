@@ -210,7 +210,7 @@ export default async function JobPage(props: JobPageProps) {
                                                     </div>
                                                     <div>
                                                         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Số lượng</p>
-                                                        <p className="text-gray-900 font-bold">--</p>
+                                                        <p className="text-gray-900 font-bold">{job.quantity ? `${job.quantity} người` : "1 người"}</p>
                                                     </div>
                                                 </div>
                                             </div>
