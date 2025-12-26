@@ -170,7 +170,7 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
 
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[600px]">
                 {isSuccess ? (
                     <div className="flex flex-col items-center justify-center py-6 text-center space-y-6">
                         <div className="h-20 w-20 bg-green-100 rounded-full flex items-center justify-center animate-in zoom-in duration-300">
@@ -230,7 +230,7 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                                 Ứng tuyển vị trí <span className="font-semibold text-foreground">{jobTitle}</span> tại {companyName}.
                             </DialogDescription>
                         </DialogHeader>
-                        <div className="grid gap-4 py-4">
+                        <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto px-1">
                             <div className="grid gap-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
