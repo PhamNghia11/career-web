@@ -136,7 +136,7 @@ export async function POST(req: Request) {
           message: `${company} vừa đăng tin tuyển dụng: ${title}`,
           read: false,
           createdAt: new Date(),
-          link: '/dashboard', // Dẫn admin về trang duyệt tin
+          link: '/dashboard/jobs', // Dẫn admin về trang duyệt tin
         })
       } catch (notifError) {
         console.error("Failed to create admin notification:", notifError)

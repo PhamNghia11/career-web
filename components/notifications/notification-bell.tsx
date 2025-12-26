@@ -191,7 +191,12 @@ export function NotificationBell() {
                                         if (notification.link.startsWith('http')) {
                                             window.location.href = notification.link
                                         } else {
-                                            router.push(notification.link)
+                                            // Fix for existing notifications linking to generic dashboard
+                                            if (notification.type === 'job' && notification.link === '/dashboard') {
+                                                router.push('/dashboard/jobs')
+                                            } else {
+                                                router.push(notification.link)
+                                            }
                                         }
                                         setOpen(false)
                                     }
