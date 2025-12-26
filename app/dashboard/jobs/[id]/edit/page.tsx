@@ -62,6 +62,8 @@ const formSchema = z.object({
     description: z.string().min(20, "Mô tả công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     requirements: z.string().min(20, "Yêu cầu công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     detailedBenefits: z.string().optional(),
+    deadline: z.string().optional(),
+    quantity: z.coerce.number().min(1, "Số lượng phải lớn hơn 0").optional(),
 })
 
 export default function EditJobPage({ params }: { params: { id: string } }) {
@@ -89,6 +91,8 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             description: "",
             requirements: "",
             detailedBenefits: "",
+            deadline: "",
+            quantity: 1,
         },
     })
 
@@ -154,6 +158,8 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                         description: job.description,
                         requirements: Array.isArray(job.requirements) ? job.requirements.join('\n') : job.requirements || "",
                         detailedBenefits: Array.isArray(job.detailedBenefits) ? job.detailedBenefits.join('\n') : job.detailedBenefits || "",
+                        deadline: job.deadline ? job.deadline.split('/').reverse().join('-') : "",
+                        quantity: job.quantity || 1,
                     })
 
                     // Load existing logo
@@ -194,8 +200,18 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             const requirementsList = values.requirements.split('\n').filter(line => line.trim() !== "")
             const detailedBenefitsList = values.detailedBenefits ? values.detailedBenefits.split('\n').filter(line => line.trim() !== "") : []
 
+            // Format deadline to DD/MM/YYYY
+            let formattedDeadline = values.deadline
+            if (values.deadline && values.deadline.includes('-')) {
+                const deadlineDate = new Date(values.deadline)
+                if (!isNaN(deadlineDate.getTime())) {
+                    formattedDeadline = `${deadlineDate.getDate().toString().padStart(2, '0')}/${(deadlineDate.getMonth() + 1).toString().padStart(2, '0')}/${deadlineDate.getFullYear()}`
+                }
+            }
+
             const payload = {
                 ...values,
+                deadline: formattedDeadline,
                 salary: salaryString,
                 requirements: requirementsList,
                 detailedBenefits: detailedBenefitsList,
@@ -342,6 +358,35 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
+                                    name="deadline"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Hạn nộp hồ sơ</FormLabel>
+                                            <FormControl>
+                                                <Input type="date" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="quantity"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Số lượng tuyển</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" min="1" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
                                     name="type"
                                     render={({ field }) => (
                                         <FormItem>
@@ -397,8 +442,8 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                                                                     <div
                                                                         key={major}
                                                                         className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all border select-none ${isSelected
-                                                                                ? "bg-blue-600 text-white border-blue-600 shadow-sm hover:bg-blue-700"
-                                                                                : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                                                                            ? "bg-blue-600 text-white border-blue-600 shadow-sm hover:bg-blue-700"
+                                                                            : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
                                                                             }`}
                                                                         onClick={() => {
                                                                             if (isSelected) {
