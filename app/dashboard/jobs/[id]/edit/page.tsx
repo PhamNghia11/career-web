@@ -32,9 +32,24 @@ const JOB_TYPES = [
 ]
 
 const MAJORS = [
-    "Công nghệ thông tin", "Kinh tế - Quản trị", "Marketing", "Kế toán - Tài chính",
-    "Ngôn ngữ Anh", "Thiết kế đồ họa", "Du lịch - Khách sạn", "Logistics", "Đông phương học",
-    "Luật", "Điện - Điện tử"
+    // Công nghệ Thông tin
+    "Công nghệ thông tin", "Kỹ thuật Phần mềm", "Trí tuệ Nhân tạo", "Mạng máy tính",
+    // Kinh doanh
+    "Kinh doanh Quốc tế", "Kinh doanh Thương mại", "Thương mại Điện tử",
+    // Quản trị - Quản lý
+    "Quản trị Kinh doanh", "Marketing", "Quản trị Khách sạn", "Quản trị Du lịch & Lữ hành", "Logistics",
+    // Truyền thông
+    "Truyền thông Đa phương tiện", "Công nghệ Truyền thông", "Quan hệ Công chúng",
+    // Tài chính - Kế toán
+    "Tài chính - Ngân hàng", "Công nghệ Tài chính", "Kế toán",
+    // Luật
+    "Luật", "Luật Kinh tế",
+    // Ngôn ngữ & Khoa học Xã hội
+    "Ngôn ngữ Anh", "Đông Phương học", "Tâm lý học", "Ngôn ngữ Trung Quốc",
+    // Sức khỏe
+    "Điều dưỡng", "Kỹ thuật Phục hồi Chức năng",
+    // Khác
+    "Thiết kế đồ họa",
 ]
 
 const COMMON_BENEFITS = [
