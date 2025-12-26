@@ -51,6 +51,7 @@ const COMMON_BENEFITS = [
 const formSchema = z.object({
     title: z.string().min(5, "Tiêu đề phải có ít nhất 5 ký tự"),
     company: z.string().min(2, "Tên công ty phải có ít nhất 2 ký tự"),
+    website: z.string().url("Vui lòng nhập đúng định dạng URL (http://...)").optional().or(z.literal("")),
     location: z.string().min(5, "Địa điểm phải có ít nhất 5 ký tự"),
     type: z.enum(["full-time", "part-time", "internship"]),
     field: z.string().min(2, "Vui lòng chọn hoặc nhập ngành nghề"),
@@ -80,6 +81,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
         defaultValues: {
             title: "",
             company: "",
+            website: "",
             location: "",
             type: "full-time",
             field: "",
@@ -147,6 +149,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                     form.reset({
                         title: job.title,
                         company: job.company,
+                        website: job.website || "",
                         location: job.location,
                         type: job.type || "full-time",
                         field: job.field,
@@ -354,6 +357,20 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                                     </div>
                                 </div>
                             </div>
+
+                            <FormField
+                                control={form.control}
+                                name="website"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Website công ty</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="https://website-cong-ty.com" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
