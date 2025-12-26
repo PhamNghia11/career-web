@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useAuth } from "@/lib/auth-context"
 import { FileText, Mail, Phone, Calendar, User, CheckCircle, XCircle, Clock, Eye } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
 interface Application {
@@ -117,6 +118,44 @@ export default function ApplicationsPage() {
     }
   }
 
+  // Handle status change by admin/employer
+  const handleStatusChange = async (appId: string, newStatus: string) => {
+    try {
+      const res = await fetch(`/api/applications/${appId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      })
+
+      if (res.ok) {
+        // Update local state
+        setApplications(prev =>
+          prev.map(app => app._id === appId ? { ...app, status: newStatus as Application["status"] } : app)
+        )
+
+        const statusText: Record<string, string> = {
+          reviewed: "Đã xem",
+          interviewed: "Mời phỏng vấn",
+          hired: "Đã tuyển",
+          rejected: "Từ chối"
+        }
+
+        toast({
+          title: "Cập nhật thành công",
+          description: `Trạng thái đã chuyển thành "${statusText[newStatus] || newStatus}". Thông báo đã được gửi đến ứng viên.`,
+        })
+      } else {
+        throw new Error("Failed to update status")
+      }
+    } catch (error) {
+      toast({
+        title: "Lỗi",
+        description: "Không thể cập nhật trạng thái",
+        variant: "destructive"
+      })
+    }
+  }
+
   if (isLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -219,7 +258,51 @@ export default function ApplicationsPage() {
                           </Button>
                         </TableCell>
                         <TableCell>
-                          {getStatusBadge(app.status)}
+                          {/* Students see badge, Admin/Employer see dropdown to change status */}
+                          {user?.role === "student" ? (
+                            getStatusBadge(app.status)
+                          ) : (
+                            <Select
+                              value={app.status}
+                              onValueChange={(value) => handleStatusChange(app._id, value)}
+                            >
+                              <SelectTrigger className="w-[140px] h-8">
+                                <SelectValue>{getStatusBadge(app.status)}</SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="new">
+                                  <span className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                    Mới
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="reviewed">
+                                  <span className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                    Đã xem
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="interviewed">
+                                  <span className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                                    Mời phỏng vấn
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="hired">
+                                  <span className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                                    Đã tuyển
+                                  </span>
+                                </SelectItem>
+                                <SelectItem value="rejected">
+                                  <span className="flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                                    Từ chối
+                                  </span>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          )}
                         </TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="icon">
