@@ -54,12 +54,12 @@ export function Footer() {
             <ul className="space-y-4 text-base">
               <li className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-secondary" />
-                <span>371 Nguyen Kiem, Go Vap, TP.HCM</span>
+                <span>371 Nguyễn Kiệm, Phường Hạnh Thông, Tp. Hồ Chí Minh</span>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-secondary" />
-                <a href="mailto:tuyendung@gdu.edu.vn" className="hover:text-secondary transition-colors">
-                  tuyendung@gdu.edu.vn
+                <a href="mailto:Studentcentre@giaidinh.edu.vn" className="hover:text-secondary transition-colors">
+                  Studentcentre@giaidinh.edu.vn
                 </a>
               </li>
             </ul>
@@ -128,7 +128,7 @@ export function Footer() {
               </a>
               <div className="hidden md:block h-12 w-px bg-primary-foreground/20"></div>
               <a
-                href="mailto:tuyendung@gdu.edu.vn"
+                href="mailto:Studentcentre@giaidinh.edu.vn"
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"
               >
                 <div className="bg-secondary p-3 rounded-full">
@@ -136,7 +136,7 @@ export function Footer() {
                 </div>
                 <div>
                   <p className="text-sm text-primary-foreground/80 mb-1">Email liên hệ</p>
-                  <span className="text-xl font-bold">tuyendung@gdu.edu.vn</span>
+                  <span className="text-xl font-bold">Studentcentre@giaidinh.edu.vn</span>
                 </div>
               </a>
             </div>
