@@ -266,7 +266,7 @@ export default function CompanyDetailPage() {
                                                         <h3 className="text-xl font-bold text-slate-900 mb-4">Tại sao bạn sẽ thích làm việc tại đây?</h3>
                                                         <div className="grid md:grid-cols-2 gap-4">
                                                             {company.benefits.map((benefit, i) => (
-                                                                <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-blue-300 hover:shadow-md transition-all">
+                                                                <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-blue-300 hover:shadow-md transition-all h-full">
                                                                     <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
                                                                         <CheckCircle className="h-5 w-5 text-blue-600" />
                                                                     </div>
@@ -275,6 +275,33 @@ export default function CompanyDetailPage() {
                                                             ))}
                                                         </div>
                                                     </div>
+
+                                                    {/* Hiring Process Section - New Addition */}
+                                                    <div>
+                                                        <h3 className="text-xl font-bold text-slate-900 mb-6">Quy trình tuyển dụng</h3>
+                                                        <div className="relative">
+                                                            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-slate-200 hidden md:block"></div>
+                                                            <div className="space-y-8">
+                                                                {[
+                                                                    { title: "Gửi hồ sơ", desc: "Ứng viên gửi CV trực tuyến thông qua website hoặc email." },
+                                                                    { title: "Sàng lọc & Phỏng vấn sơ bộ", desc: "Bộ phận nhân sự sẽ xem xét hồ sơ và liên hệ trao đổi qua điện thoại." },
+                                                                    { title: "Phỏng vấn chuyên sâu", desc: "Trao đổi trực tiếp với quản lý chuyên môn về kỹ năng và kinh nghiệm." },
+                                                                    { title: "Thỏa thuận & Nhận việc", desc: "Thống nhất chế độ đãi ngộ và chào đón thành viên mới." }
+                                                                ].map((step, idx) => (
+                                                                    <div key={idx} className="flex gap-4 md:gap-6 relative">
+                                                                        <div className="h-16 w-16 md:h-16 md:w-16 rounded-full bg-white border-4 border-blue-50 flex items-center justify-center shrink-0 z-10 shadow-sm relative">
+                                                                            <span className="text-lg font-bold text-blue-600">{idx + 1}</span>
+                                                                        </div>
+                                                                        <div className="flex-1 pt-2">
+                                                                            <h4 className="text-lg font-bold text-slate-900 mb-1">{step.title}</h4>
+                                                                            <p className="text-slate-500">{step.desc}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                             </TabsContent>
 
