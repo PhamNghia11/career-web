@@ -10,6 +10,13 @@ const partners = [
   { name: "IPS Independent", logo: "/logos/ips.png" },
   { name: "TekNix Corporation", logo: "/logos/teknix.png" },
   { name: "Cohota", logo: "/logos/cohota.png" },
+  { name: "ALTA Group", logo: "/logos/alta.png" },
+  { name: "Gia Nguyễn", logo: "/logos/gianguyen.png" },
+  { name: "Kênh Tài Trợ", logo: "/logos/kenhtaitro.png" },
+  { name: "MIA Solutions", logo: "/logos/miasolution.png" },
+  { name: "Nhân Kiệt", logo: "/logos/nhankiet.png" },
+  { name: "Quốc Law", logo: "/logos/quoclaw.png" },
+  { name: "TV Media", logo: "/logos/tvmedia.png" },
 ]
 
 export function PartnersSection() {
