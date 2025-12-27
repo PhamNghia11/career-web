@@ -19,7 +19,7 @@ export function Footer() {
                 <img
                   src="/gdu-footer-logo.png"
                   alt="Gia Dinh University"
-                  className="h-24 w-auto brightness-0 invert opacity-90 hover:opacity-100 transition-opacity duration-300"
+                  className="h-24 w-auto opacity-90 hover:opacity-100 transition-opacity duration-300"
                 />
               </div>
             </Link>
