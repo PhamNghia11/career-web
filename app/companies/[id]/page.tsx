@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { MapPin, Users, Briefcase, Star, CheckCircle, ArrowLeft, Globe, Mail, Phone, Building, Share2, Heart, ExternalLink } from "lucide-react"
+import { MapPin, Users, Briefcase, Star, CheckCircle, ArrowLeft, Globe, Mail, Phone, Building, Share2, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -28,6 +28,38 @@ interface Company {
     website?: string
     email?: string
     phone?: string
+}
+
+// Industry-specific cover images
+const getCoverImage = (company: Company) => {
+    const industryImages: Record<string, string> = {
+        "Công nghệ thông tin": "https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?auto=format&fit=crop&q=80", // Tech office
+        "Ngân hàng": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80", // Skyscrapers
+        "Pháp luật": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80", // Gavel/Law
+        "Luật": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80",
+        "Marketing": "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80", // Creative meeting
+        "Giáo dục": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80", // University
+        "Bất động sản": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80", // Modern building
+        "Nhân sự": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80", // People shaking hands
+        "Sản xuất": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80", // Factory/Industry
+    }
+
+    // Direct match or fallback to generic high-quality office images
+    if (industryImages[company.industry]) {
+        return industryImages[company.industry]
+    }
+
+    // Deterministic fallback based on ID
+    const fallbacks = [
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80"
+    ]
+
+    // Simple hash of ID to pick a fallback
+    const index = company.id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % fallbacks.length
+    return fallbacks[index]
 }
 
 export default function CompanyDetailPage() {
@@ -128,15 +160,20 @@ export default function CompanyDetailPage() {
         )
     }
 
+    const coverImage = getCoverImage(company)
+
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
             <Header />
 
             <main className="flex-1 pb-16">
-                {/* Hero Banner Area */}
+                {/* Hero Banner Area - Dynamic Background */}
                 <div className="relative h-[250px] md:h-[300px] bg-slate-900 overflow-hidden group">
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700"></div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80" />
+                    <div
+                        className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700"
+                        style={{ backgroundImage: `url('${coverImage}')` }}
+                    ></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
 
                     <div className="container mx-auto px-4 h-full relative">
                         <Button
@@ -275,33 +312,6 @@ export default function CompanyDetailPage() {
                                                             ))}
                                                         </div>
                                                     </div>
-
-                                                    {/* Hiring Process Section - New Addition */}
-                                                    <div>
-                                                        <h3 className="text-xl font-bold text-slate-900 mb-6">Quy trình tuyển dụng</h3>
-                                                        <div className="relative">
-                                                            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-slate-200 hidden md:block"></div>
-                                                            <div className="space-y-8">
-                                                                {[
-                                                                    { title: "Gửi hồ sơ", desc: "Ứng viên gửi CV trực tuyến thông qua website hoặc email." },
-                                                                    { title: "Sàng lọc & Phỏng vấn sơ bộ", desc: "Bộ phận nhân sự sẽ xem xét hồ sơ và liên hệ trao đổi qua điện thoại." },
-                                                                    { title: "Phỏng vấn chuyên sâu", desc: "Trao đổi trực tiếp với quản lý chuyên môn về kỹ năng và kinh nghiệm." },
-                                                                    { title: "Thỏa thuận & Nhận việc", desc: "Thống nhất chế độ đãi ngộ và chào đón thành viên mới." }
-                                                                ].map((step, idx) => (
-                                                                    <div key={idx} className="flex gap-4 md:gap-6 relative">
-                                                                        <div className="h-16 w-16 md:h-16 md:w-16 rounded-full bg-white border-4 border-blue-50 flex items-center justify-center shrink-0 z-10 shadow-sm relative">
-                                                                            <span className="text-lg font-bold text-blue-600">{idx + 1}</span>
-                                                                        </div>
-                                                                        <div className="flex-1 pt-2">
-                                                                            <h4 className="text-lg font-bold text-slate-900 mb-1">{step.title}</h4>
-                                                                            <p className="text-slate-500">{step.desc}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
                                                 </div>
                                             </TabsContent>
 
