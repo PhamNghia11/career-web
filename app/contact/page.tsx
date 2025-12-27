@@ -39,7 +39,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-2 text-foreground">Địa chỉ</h3>
-                    <p className="text-muted-foreground">371 Nguyễn Kiệm, Phường 3, Quận Gò Vấp, TP.HCM</p>
+                    <p className="text-muted-foreground">371 Nguyễn Kiệm, Phường Hạnh Thông, Tp. Hồ Chí Minh</p>
                   </div>
                 </div>
               </Card>
@@ -87,8 +87,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-2 text-foreground">Email</h3>
-                    <p className="text-muted-foreground">tuyendung@gdu.edu.vn</p>
-                    <p className="text-muted-foreground">ctsv@gdu.edu.vn</p>
+                    <p className="text-muted-foreground">Studentcentre@giaidinh.edu.vn</p>
                   </div>
                 </div>
               </Card>
