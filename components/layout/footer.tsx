@@ -70,7 +70,7 @@ export function Footer() {
             <h4 className="font-bold text-lg mb-4">Kết nối</h4>
             <div className="flex gap-3">
               <a
-                href="https://www.facebook.com/TruongDaihocGiaDinh"
+                href="https://www.facebook.com/GDUStudentCenter"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-primary-foreground/10 hover:bg-secondary p-3 rounded-full transition-colors"
@@ -79,7 +79,7 @@ export function Footer() {
                 <Facebook className="h-5 w-5" />
               </a>
               <a
-                href="https://zalo.me/0961121018"
+                href="https://zalo.me/0796079423"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-primary-foreground/10 hover:bg-secondary p-3 rounded-full transition-colors flex items-center justify-center"
@@ -98,7 +98,7 @@ export function Footer() {
           <div className="bg-secondary/20 rounded-lg p-6 mb-4">
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
               <a
-                href="https://www.facebook.com/messages/t/TruongDaihocGiaDinh"
+                href="https://www.facebook.com/GDUStudentCenter"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"
@@ -113,7 +113,7 @@ export function Footer() {
               </a>
               <div className="hidden md:block h-12 w-px bg-primary-foreground/20"></div>
               <a
-                href="https://zalo.me/0961121018"
+                href="https://zalo.me/0796079423"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity"

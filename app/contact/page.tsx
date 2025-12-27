@@ -46,7 +46,7 @@ export default function ContactPage() {
 
               <Card className="p-6 bg-gradient-to-br from-blue-500/10 to-purple-500/5 border-blue-500/20">
                 <a
-                  href="https://www.facebook.com/messages/t/TruongDaihocGiaDinh"
+                  href="https://www.facebook.com/GDUStudentCenter"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start gap-4 hover:opacity-80 transition-opacity"
@@ -64,7 +64,7 @@ export default function ContactPage() {
 
               <Card className="p-6 bg-gradient-to-br from-[#0068FF]/10 to-[#0068FF]/5 border-[#0068FF]/20">
                 <a
-                  href="https://zalo.me/0961121018"
+                  href="https://zalo.me/0796079423"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start gap-4 hover:opacity-80 transition-opacity"

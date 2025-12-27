@@ -119,7 +119,7 @@ export function DashboardSidebar() {
         {user?.role !== "admin" && (
           <div className="px-3 pb-2 space-y-1">
             <a
-              href="https://www.facebook.com/TruongDaihocGiaDinh"
+              href="https://www.facebook.com/GDUStudentCenter"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full hover:bg-sidebar-accent text-sidebar-foreground/80 hover:text-[#1877F2] transition-colors"
@@ -129,7 +129,7 @@ export function DashboardSidebar() {
               <span>Facebook Trường</span>
             </a>
             <a
-              href="https://zalo.me/0961121018"
+              href="https://zalo.me/0796079423"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full hover:bg-sidebar-accent text-sidebar-foreground/80 hover:text-[#0068FF] transition-colors"

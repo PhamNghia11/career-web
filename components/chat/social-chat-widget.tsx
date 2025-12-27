@@ -10,12 +10,12 @@ export function SocialChatWidget() {
 
   // Direct links - click to open immediately
   const handleZaloClick = () => {
-    window.open("https://zalo.me/0961121018", "_blank")
+    window.open("https://zalo.me/0796079423", "_blank")
     setIsOpen(false)
   }
 
   const handleMessengerClick = () => {
-    window.open("https://www.facebook.com/messages/t/TruongDaihocGiaDinh", "_blank")
+    window.open("https://www.facebook.com/GDUStudentCenter", "_blank")
     setIsOpen(false)
   }
 
