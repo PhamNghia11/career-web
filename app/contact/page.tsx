@@ -118,7 +118,7 @@ export default function ContactPage() {
           {/* Map */}
           <Card className="mt-8 overflow-hidden shadow-lg">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.8587435831793!2d106.68427931533468!3d10.822158761307583!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317528bf37160855%3A0x9fa6f0c23e7d!2zVHLGsOG7nW5nIMSQ4bqhaSBI4buNYyBHaWEgxJDhu4luaA!5e0!3m2!1svi!2s!4v1653045678901!5m2!1svi!2s"
+              src="https://maps.google.com/maps?q=371%20Nguy%E1%BB%85n%20Ki%E1%BB%87m%2C%20Ph%C6%B0%E1%BB%9Dng%20H%E1%BA%A1nh%20Th%C3%B4ng%2C%20Tp.%20H%E1%BB%93%20Ch%C3%AD%20Minh&t=&z=15&ie=UTF8&iwloc=&output=embed"
               width="100%"
               height="450"
               style={{ border: 0 }}
