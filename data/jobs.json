@@ -845,6 +845,336 @@
             "applicants": 14,
             "education": "bachelor",
             "experience": "no-exp"
+        },
+        {
+            "_id": "job_26",
+            "title": "Event Manager",
+            "company": "TV MEDIA",
+            "companyId": "7",
+            "logo": "/logos/tvmedia.png",
+            "location": "Hà Đông, Hà Nội",
+            "type": "full-time",
+            "field": "marketing",
+            "salary": "15-25 triệu",
+            "deadline": "2026-01-30",
+            "postedAt": "2025-12-28",
+            "description": "Lập kế hoạch và quản lý vận hành các sự kiện lớn. Điều phối nhân sự, làm việc với đối tác cung ứng.",
+            "skills": [
+                "Event Planning",
+                "Team Management",
+                "Budgeting",
+                "Communication"
+            ],
+            "requirements": [
+                "Có 2+ năm kinh nghiệm tổ chức sự kiện",
+                "Chịu được áp lực cao"
+            ],
+            "benefits": [
+                "Thưởng theo dự án",
+                "Môi trường năng động",
+                "Du lịch"
+            ],
+            "status": "active",
+            "applicants": 12,
+            "education": "bachelor",
+            "experience": "2-5"
+        },
+        {
+            "_id": "job_27",
+            "title": "Marketing Intern",
+            "company": "KÊNH TÀI TRỢ",
+            "companyId": "8",
+            "logo": "/logos/kenhtaitro.png",
+            "location": "TP.HCM",
+            "type": "internship",
+            "field": "marketing",
+            "salary": "3-5 triệu",
+            "deadline": "2026-01-15",
+            "postedAt": "2025-12-28",
+            "description": "Hỗ trợ triển khai các chiến dịch Campus Marketing, làm việc với các CLB sinh viên.",
+            "skills": [
+                "Social Media",
+                "Communication",
+                "Canva",
+                "Teamwork"
+            ],
+            "requirements": [
+                "Sinh viên năm 3, 4 yêu thích Marketing",
+                "Năng động, sáng tạo"
+            ],
+            "benefits": [
+                "Dấu mộc thực tập",
+                "Học hỏi từ thực tế",
+                "Cơ hội lên chính thức"
+            ],
+            "status": "active",
+            "applicants": 5,
+            "education": "bachelor",
+            "experience": "no-exp"
+        },
+        {
+            "_id": "job_28",
+            "title": "Chuyên viên Tuyển dụng",
+            "company": "NHÂN KIỆT",
+            "companyId": "10",
+            "logo": "/logos/nhankiet.png",
+            "location": "TP.HCM",
+            "type": "full-time",
+            "field": "hr",
+            "salary": "10-15 triệu",
+            "deadline": "2026-01-20",
+            "postedAt": "2025-12-28",
+            "description": "Tuyển dụng lao động phổ thông số lượng lớn cho các nhà máy, kho vận.",
+            "skills": [
+                "Recruitment",
+                "Mass Recruitment",
+                "Interviewing",
+                "Sourcing"
+            ],
+            "requirements": [
+                "Tốt nghiệp CĐ/ĐH",
+                "Có kinh nghiệm tuyển dụng mass là lợi thế"
+            ],
+            "benefits": [
+                "Thưởng doanh số",
+                "Bảo hiểm đầy đủ",
+                "Môi trường ổn định"
+            ],
+            "status": "active",
+            "applicants": 20,
+            "education": "bachelor",
+            "experience": "no-exp"
+        },
+        {
+            "_id": "job_29",
+            "title": "Facebook Ads Optimizer",
+            "company": "GIA NGUYỄN ADS",
+            "companyId": "11",
+            "logo": "/logos/gianguyen.png",
+            "location": "TP.HCM",
+            "type": "full-time",
+            "field": "marketing",
+            "salary": "12-20 triệu",
+            "deadline": "2026-01-31",
+            "postedAt": "2025-12-28",
+            "description": "Lên kế hoạch và tối ưu hóa các chiến dịch quảng cáo Facebook cho khách hàng.",
+            "skills": [
+                "Facebook Ads",
+                "Digital Marketing",
+                "Content",
+                "Data Analysis"
+            ],
+            "requirements": [
+                "Có kinh nghiệm chạy ads 1 năm trở lên",
+                "Có tư duy marketing tốt"
+            ],
+            "benefits": [
+                "Thưởng hiệu quả",
+                "Đào tạo chuyên sâu",
+                "Team building"
+            ],
+            "status": "active",
+            "applicants": 8,
+            "education": "bachelor",
+            "experience": "1-2"
+        },
+        {
+            "_id": "job_30",
+            "title": "Software Engineer (Java)",
+            "company": "ALTA GROUP",
+            "companyId": "13",
+            "logo": "/logos/alta.png",
+            "location": "TP.HCM",
+            "type": "full-time",
+            "field": "it",
+            "salary": "15-25 triệu",
+            "deadline": "2026-02-15",
+            "postedAt": "2025-12-28",
+            "description": "Phát triển các phần mềm quản lý doanh nghiệp, tích hợp hệ thống.",
+            "skills": [
+                "Java",
+                "Spring Boot",
+                "SQL",
+                "Microservices"
+            ],
+            "requirements": [
+                "Tốt nghiệp ĐH chuyên ngành CNTT",
+                "Có kiến thức nền tảng tốt"
+            ],
+            "benefits": [
+                "Môi trường chuyên nghiệp",
+                "Cơ hội thăng tiến",
+                "Đãi ngộ tốt"
+            ],
+            "status": "active",
+            "applicants": 15,
+            "education": "bachelor",
+            "experience": "no-exp"
+        },
+        {
+            "_id": "job_31",
+            "title": ".NET Developer",
+            "company": "MIA SOLUTION",
+            "companyId": "14",
+            "logo": "/logos/miasolution.png",
+            "location": "TP.HCM",
+            "type": "full-time",
+            "field": "it",
+            "salary": "18-30 triệu",
+            "deadline": "2026-01-30",
+            "postedAt": "2025-12-28",
+            "description": "Tham gia phát triển các dự án outsource cho khách hàng nước ngoài sử dụng .NET Core.",
+            "skills": [
+                ".NET Core",
+                "C#",
+                "SQL Server",
+                "Entity Framework"
+            ],
+            "requirements": [
+                "Có 2+ năm kinh nghiệm .NET",
+                "Tiếng Anh đọc hiểu tốt"
+            ],
+            "benefits": [
+                "Lương tháng 13",
+                "Review lương 2 lần/năm",
+                "Du lịch công ty"
+            ],
+            "status": "active",
+            "applicants": 10,
+            "education": "bachelor",
+            "experience": "2-5"
+        },
+        {
+            "_id": "job_32",
+            "title": "Nhân viên Kinh doanh Kỹ thuật",
+            "company": "ĐỊA LONG",
+            "companyId": "15",
+            "logo": "/logos/dialong.png",
+            "location": "TP.HCM",
+            "type": "full-time",
+            "field": "sales",
+            "salary": "10-20 triệu",
+            "deadline": "2026-01-25",
+            "postedAt": "2025-12-28",
+            "description": "Tư vấn và bán các thiết bị đo đạc trắc địa cho các công ty xây dựng.",
+            "skills": [
+                "Sales B2B",
+                "Technical Sales",
+                "Communication",
+                "Negotiation"
+            ],
+            "requirements": [
+                "Tốt nghiệp ngành Trắc địa hoặc QTKD",
+                "Yêu thích kinh doanh"
+            ],
+            "benefits": [
+                "Hoa hồng cao",
+                "Được đào tạo kỹ thuật",
+                "Công tác phí"
+            ],
+            "status": "active",
+            "applicants": 6,
+            "education": "bachelor",
+            "experience": "no-exp"
+        },
+        {
+            "_id": "job_33",
+            "title": "Trợ lý Luật sư",
+            "company": "QUỐC & CỘNG SỰ",
+            "companyId": "9",
+            "logo": "/logos/quoclaw.png",
+            "location": "TP.HCM",
+            "type": "full-time",
+            "field": "law",
+            "salary": "8-12 triệu",
+            "deadline": "2026-01-20",
+            "postedAt": "2025-12-28",
+            "description": "Hỗ trợ luật sư soạn thảo văn bản, nghiên cứu hồ sơ vụ việc, liên hệ khách hàng.",
+            "skills": [
+                "Legal Research",
+                "Drafting",
+                "Communication",
+                "Office"
+            ],
+            "requirements": [
+                "Cử nhân Luật",
+                "Chăm chỉ, cẩn thận"
+            ],
+            "benefits": [
+                "Được hướng dẫn bởi LS giỏi",
+                "Cơ hội học việc",
+                "Môi trường chuyên nghiệp"
+            ],
+            "status": "active",
+            "applicants": 18,
+            "education": "bachelor",
+            "experience": "no-exp"
+        },
+        {
+            "_id": "job_34",
+            "title": "Chuyên viên Tư vấn Luật",
+            "company": "TALENT LAW FIRM",
+            "companyId": "12",
+            "logo": "/logos/talentlaw.png",
+            "location": "TP.HCM",
+            "type": "full-time",
+            "field": "law",
+            "salary": "15-25 triệu",
+            "deadline": "2026-02-10",
+            "postedAt": "2025-12-28",
+            "description": "Tư vấn pháp lý cho doanh nghiệp về đầu tư, lao động, thương mại.",
+            "skills": [
+                "Corporate Law",
+                "Consulting",
+                "English",
+                "Legal Advice"
+            ],
+            "requirements": [
+                "Có thẻ Luật sư hoặc kinh nghiệm tương đương",
+                "Tiếng Anh tốt"
+            ],
+            "benefits": [
+                "Lương thưởng hấp dẫn",
+                "Khách hàng đa quốc gia",
+                "Phát triển sự nghiệp"
+            ],
+            "status": "active",
+            "applicants": 7,
+            "education": "bachelor",
+            "experience": "2-5"
+        },
+        {
+            "_id": "job_35",
+            "title": "Luật sư Tranh tụng",
+            "company": "DANH TIẾNG LAW FIRM",
+            "companyId": "16",
+            "logo": "/logos/danhtieng.png",
+            "location": "TP.HCM",
+            "type": "full-time",
+            "field": "law",
+            "salary": "20-40 triệu",
+            "deadline": "2026-02-05",
+            "postedAt": "2025-12-28",
+            "description": "Tham gia tranh tụng tại tòa án các vụ án dân sự, hình sự. Bảo vệ quyền lợi cho thân chủ.",
+            "skills": [
+                "Litigation",
+                "Argumentation",
+                "Criminal Law",
+                "Civil Law"
+            ],
+            "requirements": [
+                "Có thẻ Luật sư",
+                "Có kinh nghiệm tranh tụng thực tế"
+            ],
+            "benefits": [
+                "Chia sẻ phí dịch vụ",
+                "Môi trường làm việc độc lập",
+                "Thử thách bản thân"
+            ],
+            "status": "active",
+            "applicants": 5,
+            "education": "bachelor",
+            "experience": "2-5"
         }
     ]
 }
