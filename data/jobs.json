@@ -1045,39 +1045,6 @@
             "experience": "2-5"
         },
         {
-            "_id": "job_32",
-            "title": "Nhân viên Kinh doanh Kỹ thuật",
-            "company": "ĐỊA LONG",
-            "companyId": "15",
-            "logo": "/logos/dialong.png",
-            "location": "TP.HCM",
-            "type": "full-time",
-            "field": "sales",
-            "salary": "10-20 triệu",
-            "deadline": "2026-01-25",
-            "postedAt": "2025-12-28",
-            "description": "Tư vấn và bán các thiết bị đo đạc trắc địa cho các công ty xây dựng.",
-            "skills": [
-                "Sales B2B",
-                "Technical Sales",
-                "Communication",
-                "Negotiation"
-            ],
-            "requirements": [
-                "Tốt nghiệp ngành Trắc địa hoặc QTKD",
-                "Yêu thích kinh doanh"
-            ],
-            "benefits": [
-                "Hoa hồng cao",
-                "Được đào tạo kỹ thuật",
-                "Công tác phí"
-            ],
-            "status": "active",
-            "applicants": 6,
-            "education": "bachelor",
-            "experience": "no-exp"
-        },
-        {
             "_id": "job_33",
             "title": "Trợ lý Luật sư",
             "company": "QUỐC & CỘNG SỰ",
@@ -1140,39 +1107,6 @@
             ],
             "status": "active",
             "applicants": 7,
-            "education": "bachelor",
-            "experience": "2-5"
-        },
-        {
-            "_id": "job_35",
-            "title": "Luật sư Tranh tụng",
-            "company": "DANH TIẾNG LAW FIRM",
-            "companyId": "16",
-            "logo": "/logos/danhtieng.png",
-            "location": "TP.HCM",
-            "type": "full-time",
-            "field": "law",
-            "salary": "20-40 triệu",
-            "deadline": "2026-02-05",
-            "postedAt": "2025-12-28",
-            "description": "Tham gia tranh tụng tại tòa án các vụ án dân sự, hình sự. Bảo vệ quyền lợi cho thân chủ.",
-            "skills": [
-                "Litigation",
-                "Argumentation",
-                "Criminal Law",
-                "Civil Law"
-            ],
-            "requirements": [
-                "Có thẻ Luật sư",
-                "Có kinh nghiệm tranh tụng thực tế"
-            ],
-            "benefits": [
-                "Chia sẻ phí dịch vụ",
-                "Môi trường làm việc độc lập",
-                "Thử thách bản thân"
-            ],
-            "status": "active",
-            "applicants": 5,
             "education": "bachelor",
             "experience": "2-5"
         }

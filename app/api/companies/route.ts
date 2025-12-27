@@ -184,32 +184,6 @@ const companies = [
     verified: true,
     benefits: ["Dự án Tech thú vị", "Học hỏi công nghệ mới", "Môi trường thân thiện", "Thưởng dự án"],
   },
-  {
-    id: "15",
-    name: "ĐỊA LONG",
-    logo: "/logos/dialong.png",
-    industry: "Kỹ thuật - Trắc địa",
-    size: "10-50 nhân viên",
-    location: "TP.HCM & Hà Nội",
-    description: "Chuyên cung cấp, phân phối, sửa chữa và hiệu chuẩn các thiết bị đo đạc trắc địa chuyên dụng như máy toàn đạc, máy thủy bình, GPS/GNSS RTK.",
-    openPositions: 4,
-    rating: 4.0,
-    verified: true,
-    benefits: ["Kỹ thuật chuyên sâu", "Đi công tác", "Chế độ ổn định", "Đào tạo kỹ thuật"],
-  },
-  {
-    id: "16",
-    name: "DANH TIẾNG LAW FIRM",
-    logo: "/logos/danhtieng.png",
-    industry: "Pháp luật",
-    size: "10-20 nhân viên",
-    location: "TP.HCM",
-    description: "Tổ chức hành nghề luật chuyên cung cấp dịch vụ pháp lý và tranh tụng trong các vụ án hình sự, dân sự, đất đai. Chú trọng giải pháp pháp lý thực tiễn.",
-    openPositions: 2,
-    rating: 4.6,
-    verified: true,
-    benefits: ["Va chạm thực tế", "Học hỏi từ Luật sư giỏi", "Môi trường chuyên nghiệp", "Cơ hội phát triển"],
-  },
 ]
 
 export async function GET(request: Request) {
