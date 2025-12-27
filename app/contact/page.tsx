@@ -100,7 +100,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold mb-2 text-foreground">Giờ làm việc</h3>
                     <p className="text-muted-foreground">Thứ 2 - Thứ 6: 8:00 - 17:00</p>
-                    <p className="text-muted-foreground">Thứ 7: 8:00 - 12:00</p>
+
                   </div>
                 </div>
               </Card>
