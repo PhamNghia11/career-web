@@ -55,7 +55,7 @@ export function Footer() {
             <ul className="space-y-3">
               <FooterLink href="/jobs">Tìm việc làm</FooterLink>
               <FooterLink href="/companies">Doanh nghiệp</FooterLink>
-              <FooterLink href="/reviews">Đánh giá GDU</FooterLink>
+
               <FooterLink href="/about">Về chúng tôi</FooterLink>
             </ul>
           </div>
