@@ -84,14 +84,7 @@ export function Footer() {
                   Studentcentre@giaidinh.edu.vn
                 </a>
               </li>
-              <li className="flex items-center gap-3 group">
-                <div className="p-2 bg-slate-800/50 rounded-lg group-hover:bg-green-500/20 transition-colors">
-                  <Phone className="h-5 w-5 text-green-400" />
-                </div>
-                <a href="tel:0796079423" className="text-sm hover:text-white transition-colors">
-                  0796079423 (Hotline)
-                </a>
-              </li>
+
             </ul>
           </div>
         </div>
