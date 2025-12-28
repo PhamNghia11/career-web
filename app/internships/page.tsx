@@ -45,8 +45,8 @@ const benefits = [
 ]
 
 const stats = [
-    { number: "15+", label: "Năm kinh nghiệm đào tạo" },
-    { number: "10,000+", label: "Sinh viên đã tốt nghiệp" },
+    { number: "18+", label: "Năm kinh nghiệm đào tạo" },
+    { number: "69+", label: "Ngành/Chuyên ngành" },
     { number: "100+", label: "Doanh nghiệp đối tác" },
     { number: "95%", label: "Sinh viên có việc làm" }
 ]

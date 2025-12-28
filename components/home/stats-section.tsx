@@ -1,10 +1,10 @@
 import { Users, Briefcase, Building2, Award } from "lucide-react"
 
 const stats = [
-  { icon: Users, value: "15,000+", label: "Sinh viên đăng ký", color: "from-blue-500 to-blue-600" },
-  { icon: Briefcase, value: "2,500+", label: "Việc làm đã đăng", color: "from-green-500 to-green-600" },
-  { icon: Building2, value: "500+", label: "Doanh nghiệp đối tác", color: "from-purple-500 to-purple-600" },
-  { icon: Award, value: "8,000+", label: "Ứng tuyển thành công", color: "from-orange-500 to-orange-600" },
+  { icon: Users, value: "18+", label: "Năm kinh nghiệm đào tạo", color: "from-blue-500 to-blue-600" },
+  { icon: Briefcase, value: "69+", label: "Ngành/Chuyên ngành", color: "from-green-500 to-green-600" },
+  { icon: Building2, value: "100+", label: "Doanh nghiệp đối tác", color: "from-purple-500 to-purple-600" },
+  { icon: Award, value: "95%", label: "Sinh viên có việc làm", color: "from-orange-500 to-orange-600" },
 ]
 
 export function StatsSection() {
