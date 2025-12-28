@@ -18,14 +18,14 @@ const slides = [
     subtitle: "Hơn 500+ vị trí thực tập tại các công ty hàng đầu đang chờ bạn",
     image: "/internship-program-students-learning.jpg",
     cta: "Xem vị trí thực tập",
-    link: "/jobs?type=internship",
+    link: "/internships",
   },
   {
     title: "Hội chợ việc làm GDU 2025",
     subtitle: "Sự kiện kết nối sinh viên với 100+ doanh nghiệp - Đăng ký ngay!",
     image: "/job-fair-event-with-students-and-employers.jpg",
     cta: "Đăng ký tham gia",
-    link: "/contact",
+    link: "/register",
   },
 ]
 
