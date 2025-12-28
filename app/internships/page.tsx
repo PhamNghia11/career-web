@@ -71,7 +71,9 @@ export default function InternshipsPage() {
             try {
                 const response = await fetch("/api/jobs")
                 if (response.ok) {
-                    const allJobs = await response.json()
+                    const result = await response.json()
+                    // API returns { success: true, data: { jobs: [...] } }
+                    const allJobs = result.data?.jobs || result || []
                     // Filter for internship jobs (by type or title containing "thực tập" or "intern")
                     const filtered = allJobs.filter((job: Job) => {
                         const titleLower = job.title.toLowerCase()
