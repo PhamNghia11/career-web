@@ -5,6 +5,13 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import { JobsListClient } from "@/components/jobs/jobs-list-client"
+import { ApplyJobDialog } from "@/components/jobs/apply-job-dialog"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { useAuth } from "@/lib/auth-context"
+import { useToast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation"
 import {
     Briefcase,
     GraduationCap,
@@ -63,8 +70,18 @@ const majors = [
 ]
 
 export default function InternshipsPage() {
+    const router = useRouter()
+    const { user } = useAuth()
+    const { toast } = useToast()
     const [internshipJobs, setInternshipJobs] = useState<Job[]>([])
     const [loading, setLoading] = useState(true)
+    const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
+    const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string } | null>(null)
+
+    const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string) => {
+        setSelectedJob({ title: jobTitle, company: company, jobId: jobId, creatorId: creatorId })
+        setIsApplyDialogOpen(true)
+    }
 
     useEffect(() => {
         async function fetchInternships() {
@@ -289,15 +306,91 @@ export default function InternshipsPage() {
                         </Link>
                     </div>
 
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                            Vị trí thực tập nổi bật
+                        </h2>
+                        <p className="text-gray-600">
+                            Danh sách các cơ hội thực tập tốt nhất dành cho sinh viên GDU
+                        </p>
+                    </div>
+
                     {loading ? (
                         <div className="text-center py-20">
                             <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-[#0077B6] border-t-transparent"></div>
                             <p className="mt-4 text-gray-600">Đang tải danh sách thực tập...</p>
                         </div>
                     ) : internshipJobs.length > 0 ? (
-                        <Suspense fallback={<div className="text-center py-20">Đang tải...</div>}>
-                            <JobsListClient dbJobs={internshipJobs} />
-                        </Suspense>
+                        <>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {internshipJobs.map((job) => (
+                                    <Card key={job._id} className="group hover:border-[#0077B6]/50 transition-all duration-300 bg-white border-gray-100 shadow-sm hover:shadow-md cursor-pointer h-full" onClick={() => router.push(`/jobs/${job._id}`)}>
+                                        <CardContent className="p-6">
+                                            <div className="flex items-start gap-4">
+                                                <div className="w-16 h-16 rounded-lg border border-gray-100 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                                                    {job.logo ? (
+                                                        <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
+                                                    ) : (
+                                                        <Building2 className="h-8 w-8 text-gray-400" />
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                                        <div>
+                                                            <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#0077B6] transition-colors line-clamp-1">
+                                                                {job.title}
+                                                            </h3>
+                                                            <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+                                                                <Building2 className="h-3.5 w-3.5" />
+                                                                {job.company}
+                                                            </div>
+                                                        </div>
+                                                        <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-transparent hover:bg-blue-100 whitespace-nowrap">
+                                                            {job.type === 'internship' ? 'Thực tập' : (job.type === 'part-time' ? 'Bán thời gian' : job.type)}
+                                                        </Badge>
+                                                    </div>
+
+                                                    <div className="flex flex-wrap gap-y-2 gap-x-4 text-sm text-gray-500 mb-4">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <MapPin className="h-3.5 w-3.5" />
+                                                            {job.location}
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5">
+                                                            <TrendingUp className="h-3.5 w-3.5" />
+                                                            <span className="text-green-600 font-medium">{job.salary}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
+                                                        <span className="text-xs text-gray-400">
+                                                            Đăng ngày: {new Date(job.postedAt).toLocaleDateString('vi-VN')}
+                                                        </span>
+                                                        <Button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                handleApply(job._id, job.title, job.company, job.creatorId)
+                                                            }}
+                                                            className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white shadow-sm h-9 px-4 text-sm"
+                                                        >
+                                                            Ứng tuyển
+                                                            <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                            <ApplyJobDialog
+                                isOpen={isApplyDialogOpen}
+                                onClose={() => setIsApplyDialogOpen(false)}
+                                jobTitle={selectedJob?.title || ""}
+                                companyName={selectedJob?.company || ""}
+                                jobId={selectedJob?.jobId}
+                                employerId={selectedJob?.creatorId}
+                            />
+                        </>
                     ) : (
                         <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
                             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
