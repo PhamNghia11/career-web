@@ -25,7 +25,7 @@ const slides = [
     subtitle: "Sự kiện kết nối sinh viên với 100+ doanh nghiệp - Đăng ký ngay!",
     image: "/job-fair-event-with-students-and-employers.jpg",
     cta: "Đăng ký tham gia",
-    link: "/register",
+    link: "/contact",
   },
 ]
 
