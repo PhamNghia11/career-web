@@ -104,8 +104,8 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const { toast } = useToast()
   const { user } = useAuth()
 
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "")
-  const [selectedType, setSelectedType] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || searchParams.get("jobTitle") || "")
+  const [selectedType, setSelectedType] = useState<string | null>(searchParams.get("type") || null)
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null)
   const [selectedSalary, setSelectedSalary] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<string>("newest")
