@@ -19,14 +19,31 @@ export async function POST(request: Request) {
 
     const contactsCollection = await getCollection(COLLECTIONS.CONTACTS)
 
-    await contactsCollection.insertOne({
+
+
+    const result = await contactsCollection.insertOne({
       name,
       email,
       phone,
       subject,
       message,
       createdAt: new Date(),
-      status: "new", // new, read, replied
+      status: "new",
+    })
+
+    const contactId = result.insertedId.toString()
+
+    // Create Notification for Admin
+    const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+    await notificationsCollection.insertOne({
+      targetRole: 'admin',
+      type: 'message', // Keep type as 'message' for icon logic logic
+      title: 'Liên hệ mới',
+      message: `${name} vừa gửi một liên hệ mới: ${subject}`,
+      read: false,
+      createdAt: new Date(),
+      link: `/dashboard/messages`,
+      contactId: contactId
     })
 
     return NextResponse.json(

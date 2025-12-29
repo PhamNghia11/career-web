@@ -269,14 +269,8 @@ export async function GET(request: Request) {
     } else if (role === "admin") {
       query = {} // All
     } else if (role === "employer" && employerId) {
-      // Show applications for this employer OR applications for static jobs (employerId is null)
-      query = {
-        $or: [
-          { employerId: employerId },
-          { employerId: null },
-          { employerId: { $exists: false } }
-        ]
-      }
+      // Show applications ONLY for this employer
+      query = { employerId: employerId }
     } else {
       if (email) query = { email: email }
       else query = {}
