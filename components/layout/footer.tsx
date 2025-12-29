@@ -134,8 +134,8 @@ export function Footer() {
         <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>&copy; {new Date().getFullYear()} Gia Dinh University. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link href="#" className="hover:text-slate-300 transition-colors">Điều khoản sử dụng</Link>
-            <Link href="#" className="hover:text-slate-300 transition-colors">Chính sách bảo mật</Link>
+            <Link href="/terms" className="hover:text-slate-300 transition-colors">Điều khoản sử dụng</Link>
+            <Link href="/privacy" className="hover:text-slate-300 transition-colors">Chính sách bảo mật</Link>
           </div>
         </div>
       </div>
