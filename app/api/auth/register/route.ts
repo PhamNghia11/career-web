@@ -20,39 +20,38 @@ export async function POST(request: Request) {
     const { name, email, password, phone, role, studentId, major } = body
 
     // Validate required fields
-    if (!name || (!email && !phone) || !password) {
+    if (!name || !email || !password) {
       return NextResponse.json({ error: "Vui lòng điền đầy đủ thông tin" }, { status: 400 })
     }
 
     const collection = await getCollection(COLLECTIONS.USERS)
 
-    // Check if email already exists (only if email is provided)
-    if (email) {
-      const existingUser = await collection.findOne({ email })
-      if (existingUser) {
-        // If user exists but not verified, allow re-sending OTP
-        if (!existingUser.emailVerified) {
-          // Generate new OTP
-          const otp = generateOTP()
-          const hashedOTP = hashOTP(otp)
-          const expiresAt = new Date(Date.now() + 5 * 60 * 1000)
+    // Check if email already exists
+    const existingUser = await collection.findOne({ email })
+    if (existingUser) {
+      // If user exists but not verified, allow re-sending OTP
+      if (!existingUser.emailVerified) {
+        // Generate new OTP
+        const otp = generateOTP()
+        const hashedOTP = hashOTP(otp)
+        const expiresAt = new Date(Date.now() + 5 * 60 * 1000)
 
-          await collection.updateOne(
-            { email },
-            {
-              $set: {
-                emailOtp: hashedOTP,
-                emailOtpExpires: expiresAt,
-              },
-            }
-          )
+        await collection.updateOne(
+          { email },
+          {
+            $set: {
+              emailOtp: hashedOTP,
+              emailOtpExpires: expiresAt,
+            },
+          }
+        )
 
-          // Send OTP email
-          try {
-            await sendEmail({
-              to: email,
-              subject: "Mã xác minh tài khoản GDU Career",
-              html: `
+        // Send OTP email
+        try {
+          await sendEmail({
+            to: email,
+            subject: "Mã xác minh tài khoản GDU Career",
+            html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                   <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8a 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
                     <h1 style="margin: 0; font-size: 24px;">GDU Career Portal</h1>
@@ -68,71 +67,19 @@ export async function POST(request: Request) {
                   </div>
                 </div>
               `,
-            })
-          } catch (emailError) {
-            console.error("Failed to send OTP email:", emailError)
-          }
-
-          return NextResponse.json({
-            success: true,
-            needsVerification: true,
-            email: email,
-            message: "Tài khoản đã tồn tại nhưng chưa xác minh. Mã OTP mới đã được gửi.",
           })
-        }
-        return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 })
-      }
-    }
-
-    // Check if phone already exists (only if phone is provided)
-    // Check if phone already exists (only if phone is provided)
-    if (phone) {
-      const existingUserPhone = await collection.findOne({ phone })
-      if (existingUserPhone) {
-        // If user exists but phone is NOT verified, allow claiming this account/resending OTP
-        if (!existingUserPhone.phoneVerified) {
-          // Generate new OTP for phone
-          const otp = generateOTP()
-          const hashedOTP = hashOTP(otp)
-          const expiresAt = new Date(Date.now() + 5 * 60 * 1000)
-
-          await collection.updateOne(
-            { phone },
-            {
-              $set: {
-                phoneOtp: hashedOTP,
-                phoneOtpExpires: expiresAt,
-                // Update other fields if they decided to change name/password in the new attempt?
-                // For security, maybe we should ONLY update OTP. 
-                // But if they messed up their name, they might want to fix it.
-                // Let's update basics.
-                name: name,
-                password: await bcrypt.hash(password, 10),
-                updatedAt: new Date()
-              }
-            }
-          )
-
-          // We need to send the SMS here OR rely on the frontend to call send-otp?
-          // To be consistent with the "new user" flow, we'll return needsPhoneVerification: true
-          // AND we should probably trigger the SMS send here to be helpful. 
-
-          // Send via SMS immediately
-          const { sendSMS } = await import("@/lib/sms")
-          const message = `Ma xac minh GDU Career cua ban la: ${otp}. Ma se het han sau 5 phut.`
-          await sendSMS(phone, message)
-
-          return NextResponse.json({
-            success: true,
-            needsVerification: true,
-            needsPhoneVerification: true,
-            phone: phone,
-            message: "Số điện thoại đã đăng ký nhưng chưa xác minh. Mã OTP mới đã được gửi.",
-          })
+        } catch (emailError) {
+          console.error("Failed to send OTP email:", emailError)
         }
 
-        return NextResponse.json({ error: "Số điện thoại đã được sử dụng" }, { status: 409 })
+        return NextResponse.json({
+          success: true,
+          needsVerification: true,
+          email: email,
+          message: "Tài khoản đã tồn tại nhưng chưa xác minh. Mã OTP mới đã được gửi.",
+        })
       }
+      return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 })
     }
 
     // Hash password
@@ -143,10 +90,10 @@ export async function POST(request: Request) {
       name,
       password: hashedPassword,
       role: role || "student",
-      phone: phone || "",
+      email,
+      emailVerified: false,
       avatar: `/placeholder.svg?height=100&width=100&query=${encodeURIComponent(name)}`,
       createdAt: new Date(),
-      phoneVerified: false,
     }
 
     // Add student specific fields
@@ -155,50 +102,20 @@ export async function POST(request: Request) {
       newUser.major = major || ""
     }
 
-    // Prepare email verification if email exists
-    if (email) {
-      newUser.email = email
-      newUser.emailVerified = false
-      const otp = generateOTP()
-      newUser.emailOtp = hashOTP(otp)
-      newUser.emailOtpExpires = new Date(Date.now() + 5 * 60 * 1000)
-    }
+    // Prepare email verification
+    const otp = generateOTP()
+    newUser.emailOtp = hashOTP(otp)
+    newUser.emailOtpExpires = new Date(Date.now() + 5 * 60 * 1000)
 
     // Insert user
-    const result = await collection.insertOne(newUser)
-
-    // Post-creation actions: Send Email OTP if applicable
-    if (email) {
-      // We need to regenerate the OTP plain text because we only stored the hash in newUser
-      // Or cleaner: Generate OTP before creating object.
-      // Let's just generate a new one? No, we must send the one that matches the hash.
-      // I'll recalculate the 'otp' variable properly in the block above?
-      // Actually, simpler to just re-do logic slightly.
-    }
-
-
-    // REFACTORING TO FIX OTP VARIABLE SCOPE
-    let emailOtpPlain = "";
-    if (email) {
-      emailOtpPlain = generateOTP();
-      newUser.emailOtp = hashOTP(emailOtpPlain);
-      newUser.emailOtpExpires = new Date(Date.now() + 5 * 60 * 1000);
-    }
-
-    let phoneOtpPlain = "";
-    if (phone && !email) {
-      phoneOtpPlain = generateOTP();
-      newUser.phoneOtp = hashOTP(phoneOtpPlain);
-      newUser.phoneOtpExpires = new Date(Date.now() + 5 * 60 * 1000);
-    }
+    await collection.insertOne(newUser)
 
     // Send Email OTP
-    if (email && emailOtpPlain) {
-      try {
-        await sendEmail({
-          to: email,
-          subject: "Mã xác minh tài khoản GDU Career",
-          html: `
+    try {
+      await sendEmail({
+        to: email,
+        subject: "Mã xác minh tài khoản GDU Career",
+        html: `
                   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8a 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
                       <h1 style="margin: 0; font-size: 24px;">GDU Career Portal</h1>
@@ -210,7 +127,7 @@ export async function POST(request: Request) {
                         Cảm ơn bạn đã đăng ký tài khoản. Vui lòng nhập mã xác minh dưới đây để hoàn tất:
                       </p>
                       <div style="background: #1e3a5f; color: white; font-size: 32px; font-weight: bold; text-align: center; padding: 20px; border-radius: 8px; letter-spacing: 8px; margin: 20px 0;">
-                        ${emailOtpPlain}
+                        ${otp}
                       </div>
                       <p style="color: #999; font-size: 14px; text-align: center;">
                         Mã này sẽ hết hạn sau <strong>5 phút</strong>
@@ -222,30 +139,13 @@ export async function POST(request: Request) {
                     </div>
                   </div>
                 `,
-        })
-        console.log("[register] Sent OTP email to:", email)
-      } catch (emailError) {
-        console.error("Failed to send OTP email:", emailError)
-      }
+      })
+      console.log("[register] Sent OTP email to:", email)
+    } catch (emailError) {
+      console.error("Failed to send OTP email:", emailError)
     }
 
-    // If Phone registration (no email), we should probably send SMS OTP immediately?
-    // Or return success and let frontend call 'send-otp' immediately?
-    // The previous design relies on frontend calling 'send-otp' or receiving a response that prompts it.
-    // If we just created the user, they need verification.
-
-    if (phone && !email && phoneOtpPlain) {
-      try {
-        const { sendSMS } = await import("@/lib/sms")
-        const message = `Ma xac minh GDU Career cua ban la: ${phoneOtpPlain}. Ma se het han sau 5 phut.`
-        await sendSMS(phone, message)
-        console.log("[register] Sent OTP SMS to:", phone)
-      } catch (smsError) {
-        console.error("Failed to send OTP SMS:", smsError)
-      }
-    }
-
-    // Send notification to Admin (only if email is available for now, or use a default?)
+    // Send notification to Admin
     if (process.env.ADMIN_EMAIL) {
       try {
         await sendEmail({
@@ -257,8 +157,7 @@ export async function POST(request: Request) {
               <p>Thông tin chi tiết:</p>
               <ul>
                 <li><strong>Họ tên:</strong> ${name}</li>
-                <li><strong>Email:</strong> ${email || "Không có (Đăng ký bằng SĐT)"}</li>
-                <li><strong>SĐT:</strong> ${phone || "Không có"}</li>
+                <li><strong>Email:</strong> ${email}</li>
                 <li><strong>Vai trò:</strong> ${role || "student"}</li>
                 <li><strong>Thời gian:</strong> ${(() => {
               const now = new Date()
@@ -287,9 +186,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       needsVerification: true,
-      needsPhoneVerification: !!(phone && !email), // Explicit flag for phone-only flow
       email: email,
-      phone: phone,
       message: "Đăng ký thành công! Vui lòng xác minh tài khoản.",
     })
   } catch (error) {
