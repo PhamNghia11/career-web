@@ -199,7 +199,7 @@ export default function InternshipsPage() {
 
                                 <div className="flex items-center gap-3 text-gray-600 mb-4">
                                     <MapPin className="h-5 w-5 text-[#0077B6]" />
-                                    <span>371 Nguyễn Kiệm, Phường 3, Gò Vấp, TP.HCM</span>
+                                    <span>371 Nguyễn Kiệm, Phường Hạnh Thông, Gò Vấp, TP.HCM</span>
                                 </div>
 
                                 <div className="flex flex-wrap gap-2 mt-6">

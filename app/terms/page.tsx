@@ -77,7 +77,7 @@ export default function TermsPage() {
                             </p>
                             <ul className="mt-2 text-sm text-gray-600">
                                 <li><strong>Trung tâm Trải nghiệm & Việc làm - Đại học Gia Định</strong></li>
-                                <li>Địa chỉ: 371 Nguyễn Kiệm, Phường 3, Quận Gò Vấp, TP.HCM</li>
+                                <li>Địa chỉ: 371 Nguyễn Kiệm, Phường Hạnh Thông, Quận Gò Vấp, TP.HCM</li>
                                 <li>Email: Studentcentre@giaidinh.edu.vn</li>
                             </ul>
                         </section>
