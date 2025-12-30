@@ -39,7 +39,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-2 text-foreground">Địa chỉ</h3>
-                    <p className="text-muted-foreground">371 Nguyễn Kiệm, Phường Hạnh Thông, Tp. Hồ Chí Minh</p>
+                    <p className="text-muted-foreground">371 Nguyễn Kiệm, Phường 3, Gò Vấp, TP.HCM</p>
                   </div>
                 </div>
               </Card>
@@ -118,7 +118,7 @@ export default function ContactPage() {
           {/* Map */}
           <Card className="mt-8 overflow-hidden shadow-lg">
             <iframe
-              src="https://maps.google.com/maps?q=371%20Nguy%E1%BB%85n%20Ki%E1%BB%87m%2C%20Ph%C6%B0%E1%BB%9Dng%20H%E1%BA%A1nh%20Th%C3%B4ng%2C%20Tp.%20H%E1%BB%93%20Ch%C3%AD%20Minh&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              src="https://maps.google.com/maps?q=371%20Nguy%E1%BB%85n%20Ki%E1%BB%87m%2C%20Ph%C6%B0%E1%BB%9Dng%203%2C%20Tp.%20H%E1%BB%93%20Ch%C3%AD%20Minh&t=&z=15&ie=UTF8&iwloc=&output=embed"
               width="100%"
               height="450"
               style={{ border: 0 }}

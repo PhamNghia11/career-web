@@ -73,7 +73,7 @@ export function Footer() {
                 </div>
                 <div className="text-sm">
                   <span className="block text-white mb-1 font-medium">Trung tâm Trải nghiệm & Việc làm</span>
-                  <span className="text-slate-400">371 Nguyễn Kiệm, Phường Hạnh Thông, Tp. Hồ Chí Minh</span>
+                  <span className="text-slate-400">371 Nguyễn Kiệm, Phường 3, Gò Vấp, TP.HCM</span>
                 </div>
               </li>
               <li className="flex items-center gap-3 group">
