@@ -133,7 +133,7 @@ export default function InternshipsPage() {
 
                     <div className="container mx-auto px-4 text-center relative z-10">
                         <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-5 py-2.5 rounded-full mb-6 border border-white/20">
-                            <img src="/gdu-logo.png" alt="GDU" className="h-8 w-auto object-contain bg-white rounded-md p-1" />
+                            <img src="/gdu-logo.png" alt="GDU" className="h-8 w-auto object-contain" />
                             <span className="text-white font-medium">Trường Đại học Gia Định</span>
                         </div>
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white tracking-tight leading-tight">
