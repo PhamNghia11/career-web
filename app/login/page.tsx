@@ -64,7 +64,6 @@ export default function LoginPage() {
               alt="GDU Logo"
               className="h-24 w-auto object-contain"
             />
-            <span className="font-bold text-2xl text-red-600 tracking-tight uppercase">Đại Học Gia Định</span>
           </Link>
         </div>
 
