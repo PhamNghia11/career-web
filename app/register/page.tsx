@@ -80,11 +80,13 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 group">
-            <div className="bg-red-600 text-white font-bold px-3 py-2 rounded-lg group-hover:bg-red-700 transition-colors shadow-sm">
-              <span className="text-xl">GDU</span>
-            </div>
-            <span className="font-bold text-2xl text-gray-900 tracking-tight">Career</span>
+          <Link href="/" className="inline-flex flex-col items-center gap-2 group">
+            <img
+              src="/gdu-logo.png"
+              alt="GDU Logo"
+              className="h-24 w-auto object-contain"
+            />
+            <span className="font-bold text-2xl text-red-600 tracking-tight uppercase">Đại Học Gia Định</span>
           </Link>
         </div>
 
