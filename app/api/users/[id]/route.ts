@@ -13,8 +13,10 @@ export async function DELETE(
             return NextResponse.json({ error: "Invalid user ID" }, { status: 400 })
         }
 
+        console.log("[API DELETE User] Request ID:", id)
         const collection = await getCollection(COLLECTIONS.USERS)
         const result = await collection.deleteOne({ _id: new ObjectId(id) })
+        console.log("[API DELETE User] Result:", result)
 
         if (result.deletedCount === 0) {
             return NextResponse.json({ error: "User not found" }, { status: 404 })

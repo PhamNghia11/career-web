@@ -19,8 +19,7 @@ export async function GET(request: Request) {
         }
 
         // Only show verified users
-        // Use $ne: false to include users who might not have the field (legacy) or explicitly true
-        query.emailVerified = { $ne: false }
+        query.emailVerified = true
 
         const users = await collection
             .find(query)
