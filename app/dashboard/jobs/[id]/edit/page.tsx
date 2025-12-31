@@ -99,6 +99,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
     })
 
     const isNegotiable = form.watch("isNegotiable")
+    const jobType = form.watch("type")
 
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -191,12 +192,31 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             // Format data logic same as POST
             let salaryString = "Thỏa thuận"
             if (!values.isNegotiable) {
-                if (values.salaryMin && values.salaryMax) {
-                    salaryString = `${(values.salaryMin / 1000000).toLocaleString()} - ${(values.salaryMax / 1000000).toLocaleString()} triệu`
-                } else if (values.salaryMin) {
-                    salaryString = `Từ ${(values.salaryMin / 1000000).toLocaleString()} triệu`
-                } else if (values.salaryMax) {
-                    salaryString = `Đến ${(values.salaryMax / 1000000).toLocaleString()} triệu`
+                const min = values.salaryMin || 0
+                const max = values.salaryMax || 0
+
+                if (values.type === "part-time") {
+                    if (min && max) {
+                        salaryString = `${min.toLocaleString()} - ${max.toLocaleString()} VNĐ/giờ`
+                    } else if (min) {
+                        salaryString = `Từ ${min.toLocaleString()} VNĐ/giờ`
+                    } else if (max) {
+                        salaryString = `Đến ${max.toLocaleString()} VNĐ/giờ`
+                    }
+                } else {
+                    // Full-time / Internship (Assume monthly)
+                    const formatMoney = (val: number) => {
+                        if (val >= 1000000) return `${(val / 1000000).toLocaleString()} triệu`;
+                        return `${val.toLocaleString()} VNĐ`;
+                    }
+
+                    if (min && max) {
+                        salaryString = `${formatMoney(min)} - ${formatMoney(max)}/tháng`
+                    } else if (min) {
+                        salaryString = `Từ ${formatMoney(min)}/tháng`
+                    } else if (max) {
+                        salaryString = `Đến ${formatMoney(max)}/tháng`
+                    }
                 }
             }
 
@@ -531,7 +551,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                                             name="salaryMin"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Tối thiểu (VNĐ)</FormLabel>
+                                                    <FormLabel>Tối thiểu ({jobType === "part-time" ? "VNĐ/giờ" : "VNĐ/tháng"})</FormLabel>
                                                     <FormControl>
                                                         <Input type="number" placeholder="0" {...field} />
                                                     </FormControl>
@@ -544,7 +564,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                                             name="salaryMax"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Tối đa (VNĐ)</FormLabel>
+                                                    <FormLabel>Tối đa ({jobType === "part-time" ? "VNĐ/giờ" : "VNĐ/tháng"})</FormLabel>
                                                     <FormControl>
                                                         <Input type="number" placeholder="0" {...field} />
                                                     </FormControl>
