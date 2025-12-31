@@ -389,9 +389,20 @@ export default function PostJobPage() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Lĩnh vực / Ngành nghề <span className="text-red-500">*</span></FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="VD: IT Phần mềm" {...field} />
-                                            </FormControl>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Chọn lĩnh vực" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {Object.keys(FIELDS_AND_MAJORS).map((key) => (
+                                                        <SelectItem key={key} value={key}>
+                                                            {key}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                             <FormMessage />
                                         </FormItem>
                                     )}
