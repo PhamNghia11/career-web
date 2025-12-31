@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Building, Globe, MapPin, Upload } from "lucide-react"
+import { Building, Globe, MapPin, Upload, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -16,6 +16,9 @@ import { UserProfileForm } from "@/components/dashboard/user-profile-form"
 export default function CompanyPage() {
     const { user } = useAuth()
     const { toast } = useToast()
+
+    const [isUploading, setIsUploading] = useState(false)
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     // Mock initial state - in real app, fetch from User profile or Company collection
     const [formData, setFormData] = useState({
@@ -28,6 +31,24 @@ export default function CompanyPage() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
+    }
+
+    const handleLogoClick = () => {
+        fileInputRef.current?.click()
+    }
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        setIsUploading(true)
+        // In a real app, this would be a separate API endpoint for company logos
+
+        // Simulating upload for UI feedback
+        setTimeout(() => {
+            setIsUploading(false)
+            toast({ title: "Thành công", description: "Logo công ty đã được cập nhật." })
+        }, 1500)
     }
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -63,14 +84,24 @@ export default function CompanyPage() {
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit} className="space-y-4">
-                                {/* Logo Upload - integrated here for simplicity */}
+                                {/* Logo Upload */}
                                 <div className="flex items-center gap-4 mb-6">
-                                    <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center border-2 border-dashed relative group cursor-pointer overflow-hidden flex-shrink-0">
+                                    <div
+                                        className="w-20 h-20 bg-muted rounded-full flex items-center justify-center border-2 border-dashed relative group cursor-pointer overflow-hidden flex-shrink-0"
+                                        onClick={handleLogoClick}
+                                    >
                                         <Building className="h-8 w-8 text-muted-foreground group-hover:hidden" />
                                         <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center text-white text-[10px] font-medium text-center p-1">
-                                            Đổi Logo
+                                            {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Đổi Logo"}
                                         </div>
                                     </div>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="hidden"
+                                        accept="image/png, image/jpeg, image/webp"
+                                        onChange={handleFileChange}
+                                    />
                                     <div className="space-y-1">
                                         <h4 className="font-medium text-sm">Logo công ty</h4>
                                         <p className="text-xs text-muted-foreground">Khuyến nghị: Tỉ lệ 1:1, tối đa 2MB.</p>
