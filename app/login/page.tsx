@@ -90,12 +90,15 @@ export default function LoginPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="email@gdu.edu.vn"
+                    placeholder="example@gmail.com"
                     className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
                     required
                     autoComplete="email"
                   />
                 </div>
+                <p className="text-xs text-muted-foreground mt-1 ml-1">
+                  Hỗ trợ: @student.giadinh.edu.vn, @gmail.com, @outlook.com...
+                </p>
               </div>
 
               <div className="space-y-2">
