@@ -39,7 +39,7 @@ const FIELDS_AND_MAJORS: Record<string, string[]> = {
     "Tài chính - Ngân hàng": ["Tài chính - Ngân hàng", "Công nghệ Tài chính", "Kế toán"],
     "Luật": ["Luật", "Luật Kinh tế"],
     "Ngôn ngữ & Xã hội": ["Ngôn ngữ Anh", "Đông Phương học", "Tâm lý học", "Ngôn ngữ Trung Quốc"],
-    "Sức khỏe": ["Điều dưỡng", "Kỹ thuật Phục hồi Chức năng"],
+    "Sức khỏe": ["Răng – Hàm – Mặt"],
     "Thiết kế": ["Thiết kế đồ họa"],
 }
 
