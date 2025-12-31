@@ -68,7 +68,7 @@ export default function UsersManagementPage() {
         return
       }
       setLoading(true)
-      const response = await fetch('/api/users')
+      const response = await fetch('/api/users', { cache: "no-store", headers: { "Pragma": "no-cache" } })
       const data = await response.json()
       if (data.success) {
         setUsers(data.users)

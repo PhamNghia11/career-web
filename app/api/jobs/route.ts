@@ -94,6 +94,21 @@ export async function POST(req: Request) {
     // Ideally use session check here, but relying on payload for now as per context
     // if (role === 'student') return NextResponse.json({ error: "Students cannot post jobs" }, { status: 403 })
 
+    // Security check: Verify user exists in DB
+    const usersCollection = await getCollection(COLLECTIONS.USERS)
+    let userExists = null
+    try {
+      if (ObjectId.isValid(creatorId)) {
+        userExists = await usersCollection.findOne({ _id: new ObjectId(creatorId) })
+      }
+    } catch (e) {
+      console.error("Invalid creatorId format", e)
+    }
+
+    if (!userExists) { // User might have been deleted
+      return NextResponse.json({ error: "Tài khoản không tồn tại hoặc đã bị xóa." }, { status: 401 })
+    }
+
     const collection = await getCollection(COLLECTIONS.JOBS)
 
     const newJob = {
