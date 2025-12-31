@@ -39,7 +39,8 @@ export default function RegisterPage() {
     // Validation
     if (!formData.name.trim()) return setError("Vui lòng nhập họ và tên")
     if (!formData.email.trim()) return setError("Vui lòng nhập email")
-    if (!formData.email.endsWith("@gmail.com")) return setError("Vui lòng sử dụng địa chỉ Gmail (@gmail.com)")
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) return setError("Vui lòng nhập địa chỉ email hợp lệ")
     if (formData.password !== formData.confirmPassword) return setError("Mật khẩu xác nhận không khớp")
     if (formData.password.length < 6) return setError("Mật khẩu phải có ít nhất 6 ký tự")
 
@@ -146,7 +147,7 @@ export default function RegisterPage() {
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="email@gdu.edu.vn"
+                    placeholder="email@example.com"
                     className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
                     required
                   />
