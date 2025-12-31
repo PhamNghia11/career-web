@@ -572,9 +572,8 @@ export default function PostJobPage() {
                                     <FormItem>
                                         <FormLabel>Mô tả công việc (Làm những gì?) <span className="text-red-500">*</span></FormLabel>
                                         <FormControl>
-                                            <Textarea placeholder="Mô tả chi tiết công việc hàng ngày..." className="h-32" {...field} />
+                                            <Textarea className="h-32" {...field} />
                                         </FormControl>
-                                        <FormDescription>Gợi ý: Xuống dòng để tách các ý.</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -587,7 +586,7 @@ export default function PostJobPage() {
                                     <FormItem>
                                         <FormLabel>Yêu cầu công việc (Kỹ năng, Kinh nghiệm) <span className="text-red-500">*</span></FormLabel>
                                         <FormControl>
-                                            <Textarea placeholder="- Ít nhất 1 năm kinh nghiệm&#10;- Thành thạo ReactJS..." className="h-32" {...field} />
+                                            <Textarea className="h-32" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -599,9 +598,9 @@ export default function PostJobPage() {
                                 name="detailedBenefits"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Phúc lợi chi tiết (Ngoài các mục đã chọn ở trên)</FormLabel>
+                                        <FormLabel>Phúc lợi chi tiết</FormLabel>
                                         <FormControl>
-                                            <Textarea placeholder="- Môi trường làm việc trẻ trung&#10;- Team building hàng tháng..." className="h-24" {...field} />
+                                            <Textarea className="h-24" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
