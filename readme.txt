@@ -51,7 +51,25 @@ III. VẬN HÀNH
    > npm start
    - Website sẽ chạy và tối ưu hóa cho môi trường thực tế.
 
-IV. LƯU Ý QUAN TRỌNG
+IV. KHỞI TẠO DỮ LIỆU (SEEDING)
+Để có dữ liệu ban đầu (Tài khoản mẫu), hãy thực hiện:
+1. Truy cập đường dẫn: `your-domain/api/auth/seed` (VD: `http://localhost:3000/api/auth/seed`)
+2. Các tài khoản mẫu sẽ được tạo:
+   - Admin: `admin@gdu.edu.vn` / `admin123`
+   - Sinh viên: `student@gdu.edu.vn` / `student123`
+   - Nhà tuyển dụng: `employer@company.com` / `employer123`
+
+V. TRIỂN KHAI LÊN VERCEL
+1. Push code lên GitHub/GitLab.
+2. Tạo dự án mới trên Vercel và import repository.
+3. Trong phần "Environment Variables", thêm đầy đủ các biến như trong file `.env.local` (trừ `ESMS` đã bỏ).
+   - `MONGODB_URI`
+   - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`
+   - `NEXTAUTH_URL` (là domain của Vercel sau khi deploy, VD: `https://your-project.vercel.app`)
+   - `NEXTAUTH_SECRET`
+4. Bấm "Deploy".
+
+VI. LƯU Ý QUAN TRỌNG
 - MongoDB: Đảm bảo IP của server đã được Whitelist trên MongoDB Atlas nếu dùng cloud.
 - Email: Nếu dùng Gmail, cần bật "2-Step Verification" và tạo "App Password" để điền vào SMTP_PASSWORD.
 - Bảo mật: Không bao giờ commit file .env.local lên git.

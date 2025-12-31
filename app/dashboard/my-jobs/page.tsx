@@ -178,12 +178,16 @@ export default function MyJobsPage() {
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem>
-                                                            <Eye className="mr-2 h-4 w-4" /> Xem chi tiết
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem>
-                                                            <FileText className="mr-2 h-4 w-4" /> Xem ứng viên
-                                                        </DropdownMenuItem>
+                                                        <Link href={`/jobs/${job._id}`} target="_blank">
+                                                            <DropdownMenuItem>
+                                                                <Eye className="mr-2 h-4 w-4" /> Xem chi tiết
+                                                            </DropdownMenuItem>
+                                                        </Link>
+                                                        <Link href={`/dashboard/applications?jobId=${job._id}`}>
+                                                            <DropdownMenuItem>
+                                                                <FileText className="mr-2 h-4 w-4" /> Xem ứng viên
+                                                            </DropdownMenuItem>
+                                                        </Link>
                                                         <Link href={`/dashboard/jobs/${job._id}/edit`}>
                                                             <DropdownMenuItem>
                                                                 <Edit className="mr-2 h-4 w-4" /> Chỉnh sửa

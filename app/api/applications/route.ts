@@ -260,6 +260,7 @@ export async function GET(request: Request) {
     const email = searchParams.get("email")
     const role = searchParams.get("role")
     const employerId = searchParams.get("employerId")
+    const jobId = searchParams.get("jobId")
 
     const collection = await getCollection(COLLECTIONS.APPLICATIONS)
     let query: Record<string, any> = {}
@@ -274,6 +275,11 @@ export async function GET(request: Request) {
     } else {
       if (email) query = { email: email }
       else query = {}
+    }
+
+    // Add jobId filter if provided
+    if (jobId) {
+      query.jobId = jobId
     }
 
     // Don't return cvBase64 in list to save bandwidth

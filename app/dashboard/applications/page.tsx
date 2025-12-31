@@ -58,6 +58,12 @@ export default function ApplicationsPage() {
         queryParams.set("employerId", user?.id || "")
       }
 
+      // Support filtering by jobId from URL
+      const jobIdFromUrl = searchParams.get("jobId")
+      if (jobIdFromUrl) {
+        queryParams.set("jobId", jobIdFromUrl)
+      }
+
       const res = await fetch(`/api/applications?${queryParams.toString()}`)
       const data = await res.json()
 
