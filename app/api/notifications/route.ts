@@ -32,24 +32,52 @@ export async function GET(request: Request) {
     // Build query based on role
     let query: any = { userId }
 
+    // For students and other roles, default query { userId } is used
+
+    // Fetch user created date to filter out old broadcast notifications
+    const usersCollection = await getCollection(COLLECTIONS.USERS)
+    let userCreatedAt = new Date(0); // Default to epoch if user not found (shouldn't happen)
+    try {
+      if (userId) {
+        const { ObjectId } = await import("mongodb")
+        // Ensure userId is valid ObjectId before querying
+        if (ObjectId.isValid(userId)) {
+          const currentUser = await usersCollection.findOne({ _id: new ObjectId(userId) })
+          if (currentUser?.createdAt) {
+            userCreatedAt = new Date(currentUser.createdAt)
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Error fetching user for notification filter", e)
+    }
+
     if (role === 'admin') {
       // Admin sees: their own notifications + all admin-targeted notifications
+      // For admins, maybe we want to show ALL history? Or valid history?
+      // Let's assume admins should see everything for context, OR just their timeline.
+      // For now, let's filter by timeline too to reduce noise.
       query = {
         $or: [
           { userId },
-          { targetRole: 'admin' }
+          {
+            targetRole: 'admin',
+            createdAt: { $gte: userCreatedAt }
+          }
         ]
       }
     } else if (role === 'employer') {
-      // Employer sees: their own notifications OR notifications targeted at 'employer' role (e.g. for static jobs)
+      // Employer sees: their own notifications OR notifications targeted at 'employer' role
       query = {
         $or: [
           { userId },
-          { targetRole: 'employer' }
+          {
+            targetRole: 'employer',
+            createdAt: { $gte: userCreatedAt }
+          }
         ]
       }
     }
-    // For students and other roles, default query { userId } is used
 
     console.log("[Notifications API] Query:", JSON.stringify(query))
 

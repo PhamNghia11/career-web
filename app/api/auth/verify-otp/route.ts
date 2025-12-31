@@ -58,6 +58,49 @@ export async function POST(request: Request) {
             }
         )
 
+        // Send notification to Admin after verification
+        if (process.env.ADMIN_EMAIL) {
+            try {
+                import("@/lib/email").then(async ({ sendEmail }) => {
+                    try {
+                        await sendEmail({
+                            to: process.env.ADMIN_EMAIL!, // Verified from check above
+                            subject: `✨ Người dùng mới đã xác minh: ${user.name}`,
+                            html: `
+                          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                            <h2 style="color: #0F52BA;">Người dùng mới đã xác minh tài khoản</h2>
+                            <p>Thông tin chi tiết:</p>
+                            <ul>
+                              <li><strong>Họ tên:</strong> ${user.name}</li>
+                              <li><strong>Email:</strong> ${user.email}</li>
+                              <li><strong>Vai trò:</strong> ${user.role || "student"}</li>
+                              <li><strong>Thời gian xác minh:</strong> ${(() => {
+                                    const now = new Date()
+                                    const vnTime = new Date(now.getTime() + (7 * 60 * 60 * 1000))
+                                    const hours = vnTime.getUTCHours().toString().padStart(2, '0')
+                                    const minutes = vnTime.getUTCMinutes().toString().padStart(2, '0')
+                                    const day = vnTime.getUTCDate().toString().padStart(2, '0')
+                                    const month = (vnTime.getUTCMonth() + 1).toString().padStart(2, '0')
+                                    const year = vnTime.getUTCFullYear()
+                                    return `${hours}:${minutes} ngày ${day}/${month}/${year}`
+                                })()}</li>
+                            </ul>
+                            <a href="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/users" 
+                               style="background-color: #0F52BA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                               Quản lý người dùng
+                            </a>
+                          </div>
+                        `
+                        })
+                    } catch (e) {
+                        console.error("Failed to send async admin email:", e)
+                    }
+                })
+            } catch (emailError) {
+                console.error("Failed to trigger admin notification:", emailError)
+            }
+        }
+
         // Get updated user
         const updatedUser = await collection.findOne({ email })
 

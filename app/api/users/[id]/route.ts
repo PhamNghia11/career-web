@@ -20,6 +20,20 @@ export async function DELETE(
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
 
+        // Cleanup related data
+        try {
+            const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+            await notificationsCollection.deleteMany({ userId: id })
+
+            // Optional: Delete applications made by this user??? 
+            // Maybe keep valid applications but anonymize? 
+            // For now, let's strictly follow the request "xóa khỏi hệ thống". 
+            // If we delete applications, it might affect employers seeing "null" applicants.
+            // Let's just delete notifications for now as requested.
+        } catch (cleanupError) {
+            console.error("Cleanup error:", cleanupError)
+        }
+
         return NextResponse.json({ success: true, message: "User deleted successfully" })
     } catch (error) {
         console.error("Delete user error:", error)
