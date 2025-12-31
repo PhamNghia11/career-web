@@ -38,6 +38,7 @@ const employerNav = [
   { name: "Quản lý tin đăng", href: "/dashboard/my-jobs", icon: FileText },
   { name: "Hồ sơ ứng tuyển", href: "/dashboard/applications", icon: Users },
   { name: "Công ty", href: "/dashboard/company", icon: Building },
+  { name: "Hồ sơ cá nhân", href: "/dashboard/profile", icon: User },
   { name: "Thông báo", href: "/dashboard/notifications", icon: Bell },
   { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },
 ]
@@ -51,6 +52,7 @@ const adminNav = [
   { name: "Khách truy cập", href: "/dashboard/visitors", icon: Eye },
   { name: "Thống kê", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Liên hệ", href: "/dashboard/messages", icon: MessageSquare },
+  { name: "Hồ sơ cá nhân", href: "/dashboard/profile", icon: User },
   { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },
 ]
 
@@ -78,7 +80,7 @@ export function DashboardSidebar() {
 
         {/* User info */}
         <div className="px-6 py-4 border-b border-sidebar-border">
-          <div className="flex items-center gap-3">
+          <Link href="/dashboard/profile" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="w-10 h-10 rounded-full bg-sidebar-accent flex items-center justify-center overflow-hidden border border-sidebar-border">
               {user?.avatar ? (
                 <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
@@ -90,7 +92,7 @@ export function DashboardSidebar() {
               <p className="font-medium truncate">{user?.name}</p>
               <p className="text-sm text-sidebar-foreground/70">{roleLabel}</p>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Navigation */}
