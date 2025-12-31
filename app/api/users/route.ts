@@ -18,6 +18,10 @@ export async function GET(request: Request) {
             query.role = role
         }
 
+        // Only show verified users
+        // Use $ne: false to include users who might not have the field (legacy) or explicitly true
+        query.emailVerified = { $ne: false }
+
         const users = await collection
             .find(query)
             .sort({ createdAt: -1 })
