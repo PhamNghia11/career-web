@@ -46,7 +46,7 @@ export default function ContactPage() {
 
               <Card className="p-6 bg-gradient-to-br from-blue-500/10 to-purple-500/5 border-blue-500/20">
                 <a
-                  href="https://www.facebook.com/GDUStudentCenter"
+                  href="https://m.me/GDUStudentCenter"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start gap-4 hover:opacity-80 transition-opacity"

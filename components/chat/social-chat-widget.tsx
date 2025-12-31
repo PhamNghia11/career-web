@@ -15,7 +15,7 @@ export function SocialChatWidget() {
   }
 
   const handleMessengerClick = () => {
-    window.open("https://www.facebook.com/GDUStudentCenter", "_blank")
+    window.open("https://m.me/GDUStudentCenter", "_blank")
     setIsOpen(false)
   }
 

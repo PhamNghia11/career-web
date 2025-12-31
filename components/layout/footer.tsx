@@ -102,7 +102,7 @@ export function Footer() {
 
             <div className="flex flex-wrap items-center justify-center gap-4 z-10">
               <a
-                href="https://www.facebook.com/GDUStudentCenter"
+                href="https://m.me/GDUStudentCenter"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1877F2] hover:bg-[#1864c9] text-white rounded-lg font-medium transition-all shadow-lg shadow-blue-900/20 hover:shadow-blue-900/40 text-sm"
