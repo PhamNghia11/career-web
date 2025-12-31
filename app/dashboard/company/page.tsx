@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { UserProfileForm } from "@/components/dashboard/user-profile-form"
 
 export default function CompanyPage() {
-    const { user } = useAuth()
+    const { user, updateProfile } = useAuth()
     const { toast } = useToast()
 
     const [isUploading, setIsUploading] = useState(false)
@@ -39,16 +39,33 @@ export default function CompanyPage() {
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
-        if (!file) return
+        if (!file || !user) return
 
         setIsUploading(true)
-        // In a real app, this would be a separate API endpoint for company logos
+        const formData = new FormData()
+        formData.append("file", file)
+        formData.append("userId", user.id || "")
 
-        // Simulating upload for UI feedback
-        setTimeout(() => {
+        try {
+            const response = await fetch("/api/user/upload-avatar", {
+                method: "POST",
+                body: formData,
+            })
+            const data = await response.json()
+
+            if (data.success) {
+                await updateProfile({ avatar: data.url })
+                toast({ title: "Thành công", description: "Logo công ty đã được cập nhật." })
+            } else {
+                toast({ title: "Lỗi", description: data.error, variant: "destructive" })
+            }
+        } catch (error) {
+            console.error("Upload error:", error)
+            toast({ title: "Lỗi", description: "Không thể tải ảnh lên.", variant: "destructive" })
+        } finally {
             setIsUploading(false)
-            toast({ title: "Thành công", description: "Logo công ty đã được cập nhật." })
-        }, 1500)
+            if (fileInputRef.current) fileInputRef.current.value = ""
+        }
     }
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -90,7 +107,11 @@ export default function CompanyPage() {
                                         className="w-20 h-20 bg-muted rounded-full flex items-center justify-center border-2 border-dashed relative group cursor-pointer overflow-hidden flex-shrink-0"
                                         onClick={handleLogoClick}
                                     >
-                                        <Building className="h-8 w-8 text-muted-foreground group-hover:hidden" />
+                                        {user?.avatar ? (
+                                            <img src={user.avatar} alt="Logo" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <Building className="h-8 w-8 text-muted-foreground group-hover:hidden" />
+                                        )}
                                         <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center text-white text-[10px] font-medium text-center p-1">
                                             {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Đổi Logo"}
                                         </div>
@@ -177,6 +198,7 @@ export default function CompanyPage() {
                     <UserProfileForm
                         title="Thông tin người đại diện"
                         description="Thông tin cá nhân của người quản lý tài khoản này"
+                        showAvatar={false}
                     />
                 </TabsContent>
             </Tabs>

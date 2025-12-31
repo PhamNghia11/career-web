@@ -13,12 +13,14 @@ interface UserProfileFormProps {
     title?: string
     description?: string
     className?: string
+    showAvatar?: boolean
 }
 
 export function UserProfileForm({
     title = "Thông tin cá nhân",
     description = "Cập nhật thông tin cá nhân của bạn",
-    className
+    className,
+    showAvatar = true
 }: UserProfileFormProps) {
     const { user, updateProfile } = useAuth()
     const [isEditing, setIsEditing] = useState(false)
@@ -124,28 +126,30 @@ export function UserProfileForm({
             <CardContent>
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Avatar Section */}
-                    <div className="flex-shrink-0 flex flex-col items-center gap-3">
-                        <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
-                            <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-3xl font-bold overflow-hidden border-2 border-background shadow-md">
-                                {user?.avatar ? (
-                                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    user?.name?.charAt(0) || "U"
-                                )}
+                    {showAvatar && (
+                        <div className="flex-shrink-0 flex flex-col items-center gap-3">
+                            <div className="relative group cursor-pointer" onClick={handleAvatarClick}>
+                                <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-3xl font-bold overflow-hidden border-2 border-background shadow-md">
+                                    {user?.avatar ? (
+                                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        user?.name?.charAt(0) || "U"
+                                    )}
+                                </div>
+                                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    {isUploading ? <Loader2 className="h-6 w-6 text-white animate-spin" /> : <Upload className="h-6 w-6 text-white" />}
+                                </div>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/png, image/jpeg, image/webp"
+                                    onChange={handleFileChange}
+                                />
                             </div>
-                            <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                {isUploading ? <Loader2 className="h-6 w-6 text-white animate-spin" /> : <Upload className="h-6 w-6 text-white" />}
-                            </div>
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                className="hidden"
-                                accept="image/png, image/jpeg, image/webp"
-                                onChange={handleFileChange}
-                            />
+                            <p className="text-xs text-muted-foreground">Chạm để đổi ảnh</p>
                         </div>
-                        <p className="text-xs text-muted-foreground">Chạm để đổi ảnh</p>
-                    </div>
+                    )}
 
                     {/* Fields Section */}
                     <div className="flex-1 space-y-4 w-full">
