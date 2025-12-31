@@ -35,16 +35,6 @@ export const fieldsData: Field[] = [
                 name: "Răng – Hàm – Mặt",
                 specializations: [],
             },
-            {
-                id: "rehabilitation",
-                name: "Kỹ thuật phục hồi chức năng",
-                specializations: [],
-            },
-            {
-                id: "nursing",
-                name: "Điều dưỡng",
-                specializations: [],
-            },
         ],
     },
     {
