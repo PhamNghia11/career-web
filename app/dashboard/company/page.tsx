@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Building, Globe, MapPin, Upload } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { UserProfileForm } from "@/components/dashboard/user-profile-form"
 
 export default function CompanyPage() {
@@ -48,109 +49,106 @@ export default function CompanyPage() {
                 </p>
             </div>
 
-            {/* Representative Info Section */}
-            <UserProfileForm
-                title="Thông tin người đại diện"
-                description="Thông tin cá nhân của người quản lý tài khoản này"
-            />
+            <Tabs defaultValue="company" className="space-y-4">
+                <TabsList>
+                    <TabsTrigger value="company">Thông tin công ty</TabsTrigger>
+                    <TabsTrigger value="representative">Thông tin người đại diện</TabsTrigger>
+                </TabsList>
 
-            <div className="grid gap-6 lg:grid-cols-3">
-                {/* Left Column: Logo & Basic Info */}
-                <Card className="lg:col-span-1 h-fit">
-                    <CardHeader className="text-center">
-                        <div className="w-24 h-24 mx-auto bg-muted rounded-full flex items-center justify-center mb-4 border-2 border-dashed relative group cursor-pointer overflow-hidden">
-                            <Building className="h-10 w-10 text-muted-foreground group-hover:hidden" />
-                            <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center text-white text-xs font-medium">
-                                Đổi Logo
-                            </div>
-                        </div>
-                        <CardTitle>{formData.companyName || "Tên công ty"}</CardTitle>
-                        <CardDescription>Nhà tuyển dụng</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Globe className="h-4 w-4" />
-                            {formData.website || "Chưa có website"}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <MapPin className="h-4 w-4" />
-                            {formData.address || "Chưa cập nhật địa chỉ"}
-                        </div>
-                    </CardContent>
-                </Card>
+                <TabsContent value="company" className="space-y-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Chỉnh sửa thông tin</CardTitle>
+                            <CardDescription>Thông tin này sẽ hiển thị trên các tin tuyển dụng của bạn.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                {/* Logo Upload - integrated here for simplicity */}
+                                <div className="flex items-center gap-4 mb-6">
+                                    <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center border-2 border-dashed relative group cursor-pointer overflow-hidden flex-shrink-0">
+                                        <Building className="h-8 w-8 text-muted-foreground group-hover:hidden" />
+                                        <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center text-white text-[10px] font-medium text-center p-1">
+                                            Đổi Logo
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <h4 className="font-medium text-sm">Logo công ty</h4>
+                                        <p className="text-xs text-muted-foreground">Khuyến nghị: Tỉ lệ 1:1, tối đa 2MB.</p>
+                                    </div>
+                                </div>
 
-                {/* Right Column: Edit Form */}
-                <Card className="lg:col-span-2">
-                    <CardHeader>
-                        <CardTitle>Chỉnh sửa thông tin</CardTitle>
-                        <CardDescription>Thông tin này sẽ hiển thị trên các tin tuyển dụng của bạn.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="companyName">Tên công ty</Label>
-                                <Input
-                                    id="companyName"
-                                    name="companyName"
-                                    value={formData.companyName}
-                                    onChange={handleChange}
-                                    placeholder="Nhập tên công ty"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="website">Website</Label>
+                                    <Label htmlFor="companyName">Tên công ty</Label>
                                     <Input
-                                        id="website"
-                                        name="website"
-                                        value={formData.website}
+                                        id="companyName"
+                                        name="companyName"
+                                        value={formData.companyName}
                                         onChange={handleChange}
-                                        placeholder="https://example.com"
+                                        placeholder="Nhập tên công ty"
                                     />
                                 </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="website">Website</Label>
+                                        <Input
+                                            id="website"
+                                            name="website"
+                                            value={formData.website}
+                                            onChange={handleChange}
+                                            placeholder="https://example.com"
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="size">Quy mô công ty</Label>
+                                        <Input
+                                            id="size"
+                                            name="size"
+                                            value={formData.size}
+                                            onChange={handleChange}
+                                            placeholder="Ví dụ: 50-100 nhân viên"
+                                        />
+                                    </div>
+                                </div>
+
                                 <div className="grid gap-2">
-                                    <Label htmlFor="size">Quy mô công ty</Label>
+                                    <Label htmlFor="address">Địa chỉ trụ sở</Label>
                                     <Input
-                                        id="size"
-                                        name="size"
-                                        value={formData.size}
+                                        id="address"
+                                        name="address"
+                                        value={formData.address}
                                         onChange={handleChange}
-                                        placeholder="Ví dụ: 50-100 nhân viên"
+                                        placeholder="Số nhà, đường, quận/huyện..."
                                     />
                                 </div>
-                            </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="address">Địa chỉ trụ sở</Label>
-                                <Input
-                                    id="address"
-                                    name="address"
-                                    value={formData.address}
-                                    onChange={handleChange}
-                                    placeholder="Số nhà, đường, quận/huyện..."
-                                />
-                            </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="description">Giới thiệu về công ty</Label>
+                                    <Textarea
+                                        id="description"
+                                        name="description"
+                                        value={formData.description}
+                                        onChange={handleChange}
+                                        placeholder="Mô tả ngắn gọn về công ty, văn hóa, lĩnh vực hoạt động..."
+                                        rows={5}
+                                    />
+                                </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="description">Giới thiệu về công ty</Label>
-                                <Textarea
-                                    id="description"
-                                    name="description"
-                                    value={formData.description}
-                                    onChange={handleChange}
-                                    placeholder="Mô tả ngắn gọn về công ty, văn hóa, lĩnh vực hoạt động..."
-                                    rows={5}
-                                />
-                            </div>
+                                <div className="flex justify-end pt-2">
+                                    <Button type="submit">Lưu thay đổi</Button>
+                                </div>
+                            </form>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
 
-                            <div className="flex justify-end pt-2">
-                                <Button type="submit">Lưu thay đổi</Button>
-                            </div>
-                        </form>
-                    </CardContent>
-                </Card>
-            </div>
+                <TabsContent value="representative">
+                    <UserProfileForm
+                        title="Thông tin người đại diện"
+                        description="Thông tin cá nhân của người quản lý tài khoản này"
+                    />
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }
