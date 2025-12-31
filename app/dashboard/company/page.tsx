@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Building, Globe, MapPin, Upload } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
+import { UserProfileForm } from "@/components/dashboard/user-profile-form"
+
 export default function CompanyPage() {
     const { user } = useAuth()
     const { toast } = useToast()
@@ -45,6 +47,12 @@ export default function CompanyPage() {
                     Cập nhật thông tin công ty để thu hút ứng viên
                 </p>
             </div>
+
+            {/* Representative Info Section */}
+            <UserProfileForm
+                title="Thông tin người đại diện"
+                description="Thông tin cá nhân của người quản lý tài khoản này"
+            />
 
             <div className="grid gap-6 lg:grid-cols-3">
                 {/* Left Column: Logo & Basic Info */}

@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/lib/auth-context"
+import { UserProfileForm } from "@/components/dashboard/user-profile-form"
 
 export default function SettingsPage() {
   const { user } = useAuth()
@@ -135,6 +136,11 @@ export default function SettingsPage() {
         <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Cài đặt</h1>
         <p className="text-muted-foreground mt-1">Quản lý cài đặt tài khoản và hệ thống</p>
       </div>
+
+      <UserProfileForm
+        title="Thông tin tài khoản"
+        description="Cập nhật thông tin cá nhân của quản trị viên"
+      />
 
       {/* Security Settings - Moved to top */}
       <Card>
