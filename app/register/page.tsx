@@ -146,11 +146,14 @@ export default function RegisterPage() {
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="email@example.com"
+                    placeholder="example@gmail.com"
                     className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
                     required
                   />
                 </div>
+                <p className="text-xs text-muted-foreground mt-1 ml-1">
+                  Hỗ trợ: @student.giadinh.edu.vn, @gmail.com, @outlook.com...
+                </p>
               </div>
 
               {formData.role === "student" && (
