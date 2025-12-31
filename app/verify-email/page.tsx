@@ -97,7 +97,16 @@ function VerifyEmailContent() {
                 body: JSON.stringify({ email, otp: otpCode, type: "email" }),
             })
 
-            const data = await response.json()
+            let data
+            const contentType = response.headers.get("content-type")
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                data = await response.json()
+            } else {
+                // If not JSON, it's likely a 404/500 HTML page
+                const text = await response.text()
+                console.error("Non-JSON response:", text)
+                throw new Error(`Server returned ${response.status}: ${response.statusText}`)
+            }
 
             if (data.success) {
                 setIsSuccess(true)
@@ -125,9 +134,9 @@ function VerifyEmailContent() {
                 setOtp(["", "", "", "", "", ""])
                 inputRefs.current[0]?.focus()
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error("Verify error:", err)
-            setError("Có lỗi xảy ra. Vui lòng thử lại.")
+            setError(`Lỗi: ${err.message || "Không thể kết nối đến máy chủ"}`)
         } finally {
             setIsLoading(false)
         }
