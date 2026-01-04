@@ -377,39 +377,52 @@ export default function PostJobPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <div className="space-y-2">
-                                    <div className="flex items-center space-x-2">
-                                        <FormField
-                                            control={form.control}
-                                            name="unlimitedQuantity"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-center space-x-2 space-y-0 mt-8">
-                                                    <FormControl>
-                                                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                                    </FormControl>
-                                                    <FormLabel className="font-normal cursor-pointer">
-                                                        Không giới hạn số lượng
-                                                    </FormLabel>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                    {!unlimitedQuantity && (
-                                        <FormField
-                                            control={form.control}
-                                            name="quantity"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Số lượng tuyển <span className="text-red-500">*</span></FormLabel>
-                                                    <FormControl>
-                                                        <Input type="number" min="1" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                <FormField
+                                    control={form.control}
+                                    name="quantity"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <div className="flex items-center justify-between">
+                                                <FormLabel>Số lượng tuyển <span className="text-red-500">*</span></FormLabel>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="unlimitedQuantity"
+                                                    render={({ field: checkField }) => (
+                                                        <div className="flex items-center space-x-2">
+                                                            <Checkbox
+                                                                id="unlimited-new"
+                                                                checked={checkField.value}
+                                                                onCheckedChange={(checked) => {
+                                                                    checkField.onChange(checked);
+                                                                    if (checked) {
+                                                                        form.setValue("quantity", 1);
+                                                                        form.clearErrors("quantity");
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <label
+                                                                htmlFor="unlimited-new"
+                                                                className="text-sm font-normal text-gray-500 cursor-pointer select-none"
+                                                            >
+                                                                Không giới hạn
+                                                            </label>
+                                                        </div>
+                                                    )}
+                                                />
+                                            </div>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min="1"
+                                                    {...field}
+                                                    disabled={form.watch("unlimitedQuantity")}
+                                                    className={form.watch("unlimitedQuantity") ? "bg-gray-50 text-gray-400" : ""}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
                                     )}
-                                </div>
+                                />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
