@@ -64,7 +64,16 @@ const formSchema = z.object({
     requirements: z.string().min(20, "Yêu cầu công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     detailedBenefits: z.string().optional(),
     deadline: z.string().optional(),
-    quantity: z.coerce.number().min(1, "Số lượng phải lớn hơn 0").optional(),
+    quantity: z.coerce.number().optional(),
+    unlimitedQuantity: z.boolean().default(false),
+}).refine((data) => {
+    if (!data.unlimitedQuantity && (!data.quantity || data.quantity < 1)) {
+        return false
+    }
+    return true
+}, {
+    message: "Số lượng phải lớn hơn 0",
+    path: ["quantity"],
 })
 
 export default function EditJobPage({ params }: { params: { id: string } }) {
@@ -95,10 +104,12 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             detailedBenefits: "",
             deadline: "",
             quantity: 1,
+            unlimitedQuantity: false,
         },
     })
 
     const isNegotiable = form.watch("isNegotiable")
+    const unlimitedQuantity = form.watch("unlimitedQuantity")
     const jobType = form.watch("type")
 
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,8 +173,8 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                         description: job.description,
                         requirements: Array.isArray(job.requirements) ? job.requirements.join('\n') : job.requirements || "",
                         detailedBenefits: Array.isArray(job.detailedBenefits) ? job.detailedBenefits.join('\n') : job.detailedBenefits || "",
-                        deadline: job.deadline ? job.deadline.split('/').reverse().join('-') : "",
-                        quantity: job.quantity || 1,
+                        quantity: job.quantity === -1 ? 1 : (job.quantity || 1),
+                        unlimitedQuantity: job.quantity === -1,
                     })
 
                     // Load existing logo
@@ -234,6 +245,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
 
             const payload = {
                 ...values,
+                quantity: values.unlimitedQuantity ? -1 : values.quantity,
                 deadline: formattedDeadline,
                 salary: salaryString,
                 requirements: requirementsList,
@@ -406,19 +418,39 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="quantity"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Số lượng tuyển</FormLabel>
-                                            <FormControl>
-                                                <Input type="number" min="1" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
+                                <div className="space-y-2">
+                                    <div className="flex items-center space-x-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="unlimitedQuantity"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-center space-x-2 space-y-0 mt-8">
+                                                    <FormControl>
+                                                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal cursor-pointer">
+                                                        Không giới hạn số lượng
+                                                    </FormLabel>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    {!unlimitedQuantity && (
+                                        <FormField
+                                            control={form.control}
+                                            name="quantity"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Số lượng tuyển</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" min="1" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
                                     )}
-                                />
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

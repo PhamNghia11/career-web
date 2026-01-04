@@ -66,7 +66,16 @@ const formSchema = z.object({
     deadline: z.string().refine((val) => !isNaN(Date.parse(val)), {
         message: "Vui lòng chọn ngày hợp lệ",
     }),
-    quantity: z.coerce.number().min(1, "Số lượng phải lớn hơn 0"),
+    quantity: z.coerce.number().optional(),
+    unlimitedQuantity: z.boolean().default(false),
+}).refine((data) => {
+    if (!data.unlimitedQuantity && (!data.quantity || data.quantity < 1)) {
+        return false
+    }
+    return true
+}, {
+    message: "Số lượng phải lớn hơn 0",
+    path: ["quantity"],
 })
 
 export default function PostJobPage() {
@@ -96,10 +105,12 @@ export default function PostJobPage() {
             detailedBenefits: "",
             deadline: "",
             quantity: 1,
+            unlimitedQuantity: false,
         },
     })
 
     const isNegotiable = form.watch("isNegotiable")
+    const unlimitedQuantity = form.watch("unlimitedQuantity")
     const jobType = form.watch("type")
 
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,7 +157,6 @@ export default function PostJobPage() {
         setIsLoading(true)
         try {
             // Format data
-            // Format data
             let salaryString = "Thỏa thuận"
             if (!values.isNegotiable) {
                 const min = values.salaryMin || 0
@@ -187,6 +197,7 @@ export default function PostJobPage() {
 
             const payload = {
                 ...values,
+                quantity: values.unlimitedQuantity ? -1 : values.quantity,
                 deadline: formattedDeadline,
                 salary: salaryString,
                 requirements: requirementsList,
@@ -366,19 +377,39 @@ export default function PostJobPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="quantity"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Số lượng tuyển <span className="text-red-500">*</span></FormLabel>
-                                            <FormControl>
-                                                <Input type="number" min="1" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
+                                <div className="space-y-2">
+                                    <div className="flex items-center space-x-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="unlimitedQuantity"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-center space-x-2 space-y-0 mt-8">
+                                                    <FormControl>
+                                                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal cursor-pointer">
+                                                        Không giới hạn số lượng
+                                                    </FormLabel>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                    {!unlimitedQuantity && (
+                                        <FormField
+                                            control={form.control}
+                                            name="quantity"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Số lượng tuyển <span className="text-red-500">*</span></FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" min="1" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
                                     )}
-                                />
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
