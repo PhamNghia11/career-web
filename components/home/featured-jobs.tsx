@@ -87,7 +87,10 @@ export function FeaturedJobs() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredJobs.map((job) => (
-            <Card key={job._id} className="hover:shadow-xl transition-all bg-card/80 backdrop-blur-sm border-border/50 h-full flex flex-col">
+            <Card
+              key={job._id}
+              className={`hover:shadow-xl transition-all bg-card/80 backdrop-blur-sm border-border/50 h-full flex flex-col ${hoveredJob?._id === job._id ? 'z-50 relative' : 'relative'}`}
+            >
               <CardContent className="p-6 flex-1">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-14 h-14 rounded-lg bg-white border flex items-center justify-center p-2 flex-shrink-0">
