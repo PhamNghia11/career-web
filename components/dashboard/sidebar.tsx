@@ -45,7 +45,8 @@ const employerNav = [
 const adminNav = [
   { name: "Tổng quan", href: "/dashboard", icon: Home },
   { name: "Quản lý người dùng", href: "/dashboard/users", icon: Users },
-  { name: "Quản lý việc làm", href: "/dashboard/jobs", icon: Briefcase },
+  { name: "Đăng tin tuyển dụng", href: "/dashboard/jobs/new", icon: Briefcase },
+  { name: "Quản lý việc làm", href: "/dashboard/jobs", icon: FileText },
   { name: "Đơn ứng tuyển", href: "/dashboard/applications", icon: FileText },
   { name: "Đánh giá Google", href: "/dashboard/reviews", icon: Star },
   { name: "Khách truy cập", href: "/dashboard/visitors", icon: Eye },
