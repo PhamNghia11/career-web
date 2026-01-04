@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { ApplyJobDialog } from "@/components/jobs/apply-job-dialog"
+import { JobPreviewPanel } from "@/components/jobs/job-preview-panel"
 import { getFeaturedJobs, Job } from "@/lib/jobs-data"
 
 const typeColors = {
@@ -25,6 +26,7 @@ const typeLabels = {
 
 export function FeaturedJobs() {
   const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string } | null>(null)
+  const [hoveredJob, setHoveredJob] = useState<Job | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
   const [featuredJobs, setFeaturedJobs] = useState<Job[]>(getFeaturedJobs(4))
   const [loading, setLoading] = useState(true)
@@ -101,9 +103,29 @@ export function FeaturedJobs() {
                     </Badge>
                   </div>
                 </div>
-                <Link href={`/jobs/${job._id}`} className="group-hover:text-primary transition-colors block">
-                  <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-foreground group-hover:text-primary transition-colors">{job.title}</h3>
-                </Link>
+
+                <div
+                  className="relative inline-block w-full"
+                  onMouseEnter={() => setHoveredJob(job)}
+                  onMouseLeave={() => setHoveredJob(null)}
+                >
+                  <Link href={`/jobs/${job._id}`} className="group-hover:text-primary transition-colors block">
+                    <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-foreground group-hover:text-primary transition-colors">{job.title}</h3>
+                  </Link>
+
+                  {/* Quick View Popover */}
+                  {hoveredJob?._id === job._id && (
+                    <div className="absolute top-full left-0 z-50 mt-2 w-[350px] shadow-xl rounded-lg border border-gray-200 bg-white animate-in fade-in zoom-in-95 duration-200">
+                      <JobPreviewPanel
+                        job={hoveredJob}
+                        onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId)}
+                        onSave={() => { }}
+                        isSaved={false}
+                      />
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <Building className="h-4 w-4 text-primary" />
