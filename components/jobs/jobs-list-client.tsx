@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/lib/auth-context"
 
+import { JobPreviewPanel } from "./job-preview-panel"
 import { allJobs, Job } from "@/lib/jobs-data"
 import { ApplyJobDialog } from "./apply-job-dialog"
 
@@ -112,6 +113,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const [savedJobs, setSavedJobs] = useState<string[]>([])
   const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string } | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
+  const [hoveredJob, setHoveredJob] = useState<Job | null>(null)
 
   // Advanced filter states
   const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null)
@@ -804,103 +806,91 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
             </div>
           </div>
 
-          <div className="space-y-4">
-            {sortedJobs.map((job) => (
-              <Card key={job._id} className="group hover:border-primary/50 transition-all duration-300 bg-white border-gray-100 shadow-sm hover:shadow-md cursor-pointer" onClick={() => router.push(`/jobs/${job._id}`)}>
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row gap-6">
-                    {/* Logo */}
-                    <div className="w-16 h-16 rounded-lg border border-gray-100 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-                      {job.logo ? (
-                        <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
-                      ) : (
-                        <Building className="h-8 w-8 text-gray-400" />
-                      )}
-                    </div>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 relative">
+            {/* Job List Column */}
+            <div className="space-y-4">
+              {sortedJobs.map((job) => (
+                <Card
+                  key={job._id}
+                  className={`group transition-all duration-300 bg-white border-gray-100 shadow-sm hover:shadow-md cursor-pointer ${hoveredJob?._id === job._id ? "border-primary/50 ring-1 ring-primary/20 bg-primary/5" : ""}`}
+                  onClick={() => router.push(`/jobs/${job._id}`)}
+                  onMouseEnter={() => setHoveredJob(job)}
+                >
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex flex-col md:flex-row gap-4">
+                      {/* Logo */}
+                      <div className="w-14 h-14 md:w-16 md:h-16 rounded-lg border border-gray-100 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                        {job.logo ? (
+                          <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
+                        ) : (
+                          <Building className="h-6 w-6 md:h-8 md:w-8 text-gray-400" />
+                        )}
+                      </div>
 
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-2">
-                        <div>
-                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#1e3a5f] transition-colors mb-1">
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col gap-1 mb-2">
+                          <h3 className="text-base md:text-lg font-bold text-gray-900 group-hover:text-[#1e3a5f] transition-colors line-clamp-2">
                             {job.title}
                           </h3>
-                          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-                            <Building className="h-4 w-4" />
+                          <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600 font-medium line-clamp-1">
+                            <Building className="h-3.5 w-3.5" />
                             {job.company}
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <Badge variant="secondary" className={typeColors[job.type as keyof typeof typeColors]}>
+
+                        <div className="flex flex-wrap gap-y-2 gap-x-4 text-xs md:text-sm text-gray-500 mb-3">
+                          <Badge variant="secondary" className={`${typeColors[job.type as keyof typeof typeColors]} text-xs py-0.5 px-2`}>
                             {typeLabels[job.type as keyof typeof typeLabels]}
                           </Badge>
-                          <span className="text-sm text-gray-500 font-medium">{job.postedAt}</span>
+                          <div className="flex items-center gap-1">
+                            <DollarSign className="h-3.5 w-3.5" />
+                            <span className="text-green-600 font-medium">{job.salary}</span>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="flex flex-wrap gap-y-2 gap-x-6 text-sm text-gray-500 mb-4">
-                        <div className="flex items-center gap-1.5">
-                          <MapPin className="h-4 w-4" />
-                          {job.location}
+                        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                          <div className="text-xs text-gray-400">
+                            {job.postedAt}
+                          </div>
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleApply(job._id, job.title, job.company, job.creatorId)
+                            }}
+                            size="sm"
+                            className="h-8 text-xs bg-[#1e3a5f] hover:bg-[#1e3a5f]/90"
+                          >
+                            Ứng tuyển
+                          </Button>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <DollarSign className="h-4 w-4" />
-                          <span className="text-green-600 font-medium">{job.salary}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="h-4 w-4" />
-                          Hạn: {job.deadline}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {job.skills?.map((skill) => (
-                          <span key={skill} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-gray-500 hover:text-primary hover:bg-transparent -ml-2 font-medium"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleSave(job._id, job.title)
-                          }}
-                        >
-                          <Bookmark className={`h-5 w-5 mr-2 ${savedJobs.includes(job._id) ? "fill-primary text-primary" : ""}`} />
-                          {savedJobs.includes(job._id) ? "Đã lưu" : "Lưu tin"}
-                        </Button>
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleApply(job._id, job.title, job.company, job.creatorId)
-                          }}
-                          className="bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white shadow-sm px-6"
-                        >
-                          Ứng tuyển ngay
-                          <ChevronRight className="h-4 w-4 ml-1" />
-                        </Button>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
 
-          {sortedJobs.length === 0 && (
-            <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300">
-              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="h-8 w-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-1">Không tìm thấy kết quả</h3>
-              <p className="text-gray-500">Vui lòng thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+              {sortedJobs.length === 0 && (
+                <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300">
+                  <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-1">Không tìm thấy kết quả</h3>
+                  <p className="text-gray-500">Vui lòng thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Preview Panel Column - Only visible on XL screens and up */}
+            <div className="hidden xl:block">
+              <JobPreviewPanel
+                job={hoveredJob}
+                onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId)}
+                onSave={(job) => handleSave(job._id, job.title)}
+                isSaved={hoveredJob ? savedJobs.includes(hoveredJob._id) : false}
+              />
+            </div>
+          </div>
         </div>
         <ApplyJobDialog
           isOpen={isApplyDialogOpen}
