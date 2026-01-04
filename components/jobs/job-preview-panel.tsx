@@ -27,9 +27,8 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
     }
 
     return (
-    return (
-        <Card className="h-full flex flex-col overflow-hidden shadow-none rounded-none bg-white">
-            <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+        <Card className="h-full flex flex-col overflow-hidden shadow-none rounded-none border-none bg-white">
+            <div className="p-4 pb-0">
                 <div className="flex items-start gap-3">
                     <div className="w-12 h-12 bg-white rounded-lg border border-gray-100 p-1.5 flex items-center justify-center shadow-sm shrink-0">
                         {job.logo ? (
@@ -41,7 +40,7 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
                     <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                             <h2 className="text-base font-bold text-gray-900 leading-tight line-clamp-2">{job.title}</h2>
-                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 shrink-0 whitespace-nowrap bg-white">
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 shrink-0 whitespace-nowrap bg-white border-gray-200 font-normal text-gray-500">
                                 {job.type === 'full-time' ? 'Toàn thời gian' : job.type === 'part-time' ? 'Bán thời gian' : job.type === 'internship' ? 'Thực tập' : 'Freelance'}
                             </Badge>
                         </div>
@@ -54,18 +53,18 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
             </div>
 
             <ScrollArea className="flex-1 bg-white">
-                <div className="p-4 space-y-4">
+                <div className="p-4 pt-3 space-y-4">
                     {/* Key Stats */}
                     <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-100">
-                            <div className="flex items-center gap-1.5 text-gray-500 text-[10px] font-bold uppercase mb-1">
+                        <div className="bg-white p-0 rounded-none border-none">
+                            <div className="flex items-center gap-1.5 text-gray-400 text-[10px] font-bold uppercase mb-0.5">
                                 <DollarSign className="h-3 w-3" />
                                 Mức lương
                             </div>
                             <div className="font-semibold text-gray-900 text-sm">{job.salary}</div>
                         </div>
-                        <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-100">
-                            <div className="flex items-center gap-1.5 text-gray-500 text-[10px] font-bold uppercase mb-1">
+                        <div className="bg-white p-0 rounded-none border-none">
+                            <div className="flex items-center gap-1.5 text-gray-400 text-[10px] font-bold uppercase mb-0.5">
                                 <MapPin className="h-3 w-3" />
                                 Địa điểm
                             </div>
@@ -74,14 +73,13 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
                     </div>
 
                     {/* Quick Info */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         {/* Description */}
                         <div>
-                            <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-2">
-                                <Briefcase className="h-4 w-4 text-primary" />
+                            <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-1.5 text-xs uppercase tracking-wider">
                                 Mô tả công việc
                             </h4>
-                            <p className="text-sm text-gray-600 leading-relaxed line-clamp-4">
+                            <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
                                 {job.description}
                             </p>
                         </div>
@@ -89,9 +87,8 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
                         {/* Requirements Preview */}
                         {job.requirements && job.requirements.length > 0 && (
                             <div>
-                                <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-2">
-                                    <CheckCircle2 className="h-4 w-4 text-primary" />
-                                    Yêu cầu (Tóm tắt)
+                                <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-1.5 text-xs uppercase tracking-wider">
+                                    Yêu cầu
                                 </h4>
                                 <ul className="space-y-1">
                                     {job.requirements.slice(0, 3).map((req: string, i: number) => (
@@ -110,13 +107,12 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
                         {/* Benefits Preview */}
                         {job.benefits && job.benefits.length > 0 && (
                             <div>
-                                <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-2">
-                                    <Award className="h-4 w-4 text-primary" />
+                                <h4 className="font-semibold text-gray-900 flex items-center gap-2 mb-1.5 text-xs uppercase tracking-wider">
                                     Quyền lợi
                                 </h4>
                                 <div className="flex flex-wrap gap-2">
-                                    {job.benefits.slice(0, 4).map((ben: string, i: number) => (
-                                        <span key={i} className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-md border border-blue-100">
+                                    {job.benefits.slice(0, 3).map((ben: string, i: number) => (
+                                        <span key={i} className="text-xs px-2 py-1 bg-gray-50 text-gray-600 rounded-full border border-gray-100">
                                             {ben}
                                         </span>
                                     ))}
@@ -127,18 +123,18 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
                 </div>
             </ScrollArea>
 
-            <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3 shrink-0">
+            <div className="p-4 pt-0 flex gap-3 shrink-0">
                 <Button
-                    className="flex-1 bg-[#1e3a5f] hover:bg-[#1e3a5f]/90"
+                    className="flex-1 bg-black hover:bg-black/90 text-white h-9 text-sm"
                     onClick={(e) => {
                         e.stopPropagation()
                         onApply(job)
                     }}
                 >
-                    Ứng tuyển ngay
+                    Ứng tuyển
                 </Button>
                 <Link href={`/jobs/${job._id}`} className="flex-1">
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full h-9 text-sm border-gray-200">
                         Xem chi tiết
                     </Button>
                 </Link>
