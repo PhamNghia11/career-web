@@ -27,7 +27,7 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
     }
 
     return (
-        <Card className="h-[calc(100vh-8rem)] sticky top-24 flex flex-col overflow-hidden border-2 border-primary/5 shadow-lg animate-in fade-in slide-in-from-right-4 duration-300">
+        <Card className="h-full flex flex-col overflow-hidden border-l border-primary/10 shadow-none rounded-none bg-white">
             <div className="bg-gradient-to-r from-[#1e3a5f] to-[#2b528a] p-6 text-white shrink-0">
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="w-16 h-16 bg-white rounded-xl p-2 flex items-center justify-center shadow-md">
