@@ -825,18 +825,35 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                       )}
                     </div>
 
-                    {/* Content - Trigger Hover Here */}
+                    {/* Content */}
                     <div
                       className="flex-1 min-w-0"
-                      onMouseEnter={() => setHoveredJob(job)}
-                      onMouseLeave={() => setHoveredJob(null)}
                     >
                       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-2">
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#1e3a5f] transition-colors mb-1 w-fit">
-                            {job.title}
-                          </h3>
-                          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium w-fit">
+                          <div
+                            className="relative inline-block"
+                            onMouseEnter={() => setHoveredJob(job)}
+                            onMouseLeave={() => setHoveredJob(null)}
+                          >
+                            <h3 className="text-lg font-bold text-gray-900 hover:text-[#1e3a5f] transition-colors mb-1 w-fit cursor-pointer border-b border-transparent hover:border-gray-300">
+                              {job.title}
+                            </h3>
+
+                            {/* Quick View Popover */}
+                            {hoveredJob?._id === job._id && (
+                              <div className="absolute top-full left-0 z-50 mt-2 w-[450px] md:w-[600px] shadow-2xl rounded-xl border border-gray-200 bg-white animate-in fade-in zoom-in-95 duration-200">
+                                <JobPreviewPanel
+                                  job={job}
+                                  onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId)}
+                                  onSave={(job) => handleSave(job._id, job.title)}
+                                  isSaved={savedJobs.includes(job._id)}
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium w-fit mt-1">
                             <Building className="h-4 w-4" />
                             {job.company}
                           </div>
@@ -911,22 +928,6 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                 <p className="text-gray-500">Vui lòng thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
               </div>
             )}
-          </div>
-
-          {/* Preview Panel - Floating Card */}
-          <div
-            className={`hidden xl:block fixed top-24 right-[5%] z-50 transform transition-all duration-300 ease-in-out ${hoveredJob ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10 pointer-events-none'}`}
-          >
-            <div className="w-[450px] shadow-2xl rounded-xl overflow-hidden border border-gray-200">
-              {hoveredJob && (
-                <JobPreviewPanel
-                  job={hoveredJob}
-                  onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId)}
-                  onSave={(job) => handleSave(job._id, job.title)}
-                  isSaved={savedJobs.includes(hoveredJob._id)}
-                />
-              )}
-            </div>
           </div>
         </div>
       </div>
