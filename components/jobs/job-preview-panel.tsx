@@ -27,24 +27,29 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
     }
 
     return (
+    return (
         <Card className="h-full flex flex-col overflow-hidden shadow-none rounded-none bg-white">
-            <div className="bg-gradient-to-r from-[#1e3a5f] to-[#2b528a] p-4 text-white shrink-0">
-                <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="w-12 h-12 bg-white rounded-lg p-1.5 flex items-center justify-center shadow-md">
+            <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+                <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 bg-white rounded-lg border border-gray-100 p-1.5 flex items-center justify-center shadow-sm shrink-0">
                         {job.logo ? (
                             <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
                         ) : (
-                            <Building className="h-6 w-6 text-gray-400" />
+                            <Building className="h-6 w-6 text-gray-300" />
                         )}
                     </div>
-                    <Badge variant="secondary" className="bg-white/20 text-white hover:bg-white/30 border-none text-xs px-2 py-0.5 h-6">
-                        {job.type === 'full-time' ? 'Toàn thời gian' : job.type === 'part-time' ? 'Bán thời gian' : job.type === 'internship' ? 'Thực tập' : 'Freelance'}
-                    </Badge>
-                </div>
-                <h2 className="text-lg font-bold mb-1 leading-tight line-clamp-2">{job.title}</h2>
-                <div className="flex items-center gap-2 text-blue-100 text-xs font-medium">
-                    <Building className="h-3.5 w-3.5" />
-                    {job.company}
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                            <h2 className="text-base font-bold text-gray-900 leading-tight line-clamp-2">{job.title}</h2>
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 shrink-0 whitespace-nowrap bg-white">
+                                {job.type === 'full-time' ? 'Toàn thời gian' : job.type === 'part-time' ? 'Bán thời gian' : job.type === 'internship' ? 'Thực tập' : 'Freelance'}
+                            </Badge>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-gray-500 text-xs font-medium mt-1">
+                            <Building className="h-3 w-3" />
+                            <span className="truncate">{job.company}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
