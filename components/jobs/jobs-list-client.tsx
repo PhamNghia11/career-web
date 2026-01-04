@@ -813,8 +813,6 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                 key={job._id}
                 className={`group hover:border-primary/50 transition-all duration-300 bg-white border-gray-100 shadow-sm hover:shadow-md cursor-pointer ${hoveredJob?._id === job._id ? "border-primary ring-1 ring-primary/20" : ""}`}
                 onClick={() => router.push(`/jobs/${job._id}`)}
-                onMouseEnter={() => setHoveredJob(job)}
-                onMouseLeave={() => setHoveredJob(null)}
               >
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row gap-6">
@@ -827,14 +825,18 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                       )}
                     </div>
 
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
+                    {/* Content - Trigger Hover Here */}
+                    <div
+                      className="flex-1 min-w-0"
+                      onMouseEnter={() => setHoveredJob(job)}
+                      onMouseLeave={() => setHoveredJob(null)}
+                    >
                       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-2">
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#1e3a5f] transition-colors mb-1">
+                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#1e3a5f] transition-colors mb-1 w-fit">
                             {job.title}
                           </h3>
-                          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium">
+                          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium w-fit">
                             <Building className="h-4 w-4" />
                             {job.company}
                           </div>
@@ -847,7 +849,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-y-2 gap-x-6 text-sm text-gray-500 mb-4">
+                      <div className="flex flex-wrap gap-y-2 gap-x-6 text-sm text-gray-500 mb-4 w-fit">
                         <div className="flex items-center gap-1.5">
                           <MapPin className="h-4 w-4" />
                           {job.location}
@@ -911,19 +913,20 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
             )}
           </div>
 
-          {/* Preview Panel Drawer - Visible on hover, slides in from right */}
+          {/* Preview Panel - Floating Card */}
           <div
-            className={`hidden xl:block fixed right-0 top-0 bottom-0 w-[500px] z-50 transform transition-transform duration-300 ease-in-out shadow-2xl ${hoveredJob ? 'translate-x-0' : 'translate-x-full'}`}
-            style={{ paddingTop: '80px' }} // Account for header
+            className={`hidden xl:block fixed top-24 right-[5%] z-50 transform transition-all duration-300 ease-in-out ${hoveredJob ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10 pointer-events-none'}`}
           >
-            {hoveredJob && (
-              <JobPreviewPanel
-                job={hoveredJob}
-                onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId)}
-                onSave={(job) => handleSave(job._id, job.title)}
-                isSaved={savedJobs.includes(hoveredJob._id)}
-              />
-            )}
+            <div className="w-[450px] shadow-2xl rounded-xl overflow-hidden border border-gray-200">
+              {hoveredJob && (
+                <JobPreviewPanel
+                  job={hoveredJob}
+                  onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId)}
+                  onSave={(job) => handleSave(job._id, job.title)}
+                  isSaved={savedJobs.includes(hoveredJob._id)}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
