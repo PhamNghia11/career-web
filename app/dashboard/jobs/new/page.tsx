@@ -64,9 +64,7 @@ const formSchema = z.object({
     description: z.string().min(20, "Mô tả công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     requirements: z.string().min(20, "Yêu cầu công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     detailedBenefits: z.string().optional(),
-    deadline: z.string().refine((val) => !isNaN(Date.parse(val)), {
-        message: "Vui lòng chọn ngày hợp lệ",
-    }),
+    deadline: z.string().optional(),
     quantity: z.coerce.number().optional(),
     unlimitedQuantity: z.boolean().default(false),
 }).refine((data) => {
@@ -193,8 +191,13 @@ export default function PostJobPage() {
             const detailedBenefitsList = values.detailedBenefits ? values.detailedBenefits.split('\n').filter(line => line.trim() !== "") : []
 
             // Format deadline to DD/MM/YYYY
-            const deadlineDate = new Date(values.deadline)
-            const formattedDeadline = `${deadlineDate.getDate().toString().padStart(2, '0')}/${(deadlineDate.getMonth() + 1).toString().padStart(2, '0')}/${deadlineDate.getFullYear()}`
+            let formattedDeadline = ""
+            if (values.deadline) {
+                const deadlineDate = new Date(values.deadline)
+                if (!isNaN(deadlineDate.getTime())) {
+                    formattedDeadline = `${deadlineDate.getDate().toString().padStart(2, '0')}/${(deadlineDate.getMonth() + 1).toString().padStart(2, '0')}/${deadlineDate.getFullYear()}`
+                }
+            }
 
             const payload = {
                 ...values,
@@ -370,7 +373,7 @@ export default function PostJobPage() {
                                     name="deadline"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Hạn nộp hồ sơ <span className="text-red-500">*</span></FormLabel>
+                                            <FormLabel>Hạn nộp hồ sơ</FormLabel>
                                             <FormControl>
                                                 <Input type="date" {...field} />
                                             </FormControl>
