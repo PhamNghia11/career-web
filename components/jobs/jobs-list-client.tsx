@@ -877,7 +877,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Clock className="h-4 w-4" />
-                          Hạn: {job.deadline}
+                          {job.deadline ? `Hạn: ${job.deadline}` : "Vô thời hạn"}
                         </div>
                       </div>
 

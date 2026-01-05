@@ -176,6 +176,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                         detailedBenefits: Array.isArray(job.detailedBenefits) ? job.detailedBenefits.join('\n') : job.detailedBenefits || "",
                         quantity: job.quantity === -1 ? 1 : (job.quantity || 1),
                         unlimitedQuantity: job.quantity === -1,
+                        deadline: job.deadline ? job.deadline.split('/').reverse().join('-') : "",
                     })
 
                     // Load existing logo

@@ -198,7 +198,7 @@ export default async function JobPage(props: JobPageProps) {
                                                     </div>
                                                     <div>
                                                         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Hạn nộp</p>
-                                                        <p className="text-gray-900 font-bold">{job.deadline}</p>
+                                                        <p className="text-gray-900 font-bold">{job.deadline || "Vô thời hạn"}</p>
                                                     </div>
                                                 </div>
                                             </div>
