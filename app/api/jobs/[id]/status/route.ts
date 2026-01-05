@@ -62,7 +62,7 @@ export async function PATCH(
                     const reason = feedback || body.adminFeedback || body.reason || ""
 
                     if (reason) {
-                        message = `Tin tuyển dụng "${job.title}" đã bị từ chối/gỡ bỏ. Lý do: ${reason}`
+                        message = `Từ chối: ${reason}. (Tin: "${job.title}")`
                     } else {
                         message = `Tin tuyển dụng "${job.title}" của bạn cần được chỉnh sửa trước khi đăng. Vui lòng kiểm tra và cập nhật lại.`
                     }

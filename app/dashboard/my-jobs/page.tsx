@@ -17,13 +17,20 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
 import {
+    DialogHeader,
+    DialogTitle,
     Dialog,
     DialogContent,
     DialogDescription,
     DialogFooter,
-    DialogHeader,
-    DialogTitle,
 } from "@/components/ui/dialog"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Info } from "lucide-react"
 
 export default function MyJobsPage() {
     const { user } = useAuth()
@@ -157,9 +164,25 @@ export default function MyJobsPage() {
                                                 <div className="text-xs text-muted-foreground">{job.location} • {job.type}</div>
                                             </td>
                                             <td className="p-4 align-middle">
-                                                <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : 'outline'}>
-                                                    {job.status === 'active' ? 'Hoạt động' : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'rejected' ? 'Từ chối' : 'Đóng'}
-                                                </Badge>
+                                                {(job.status === 'rejected' || job.status === 'request_changes') && job.adminFeedback ? (
+                                                    <TooltipProvider>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Badge variant="destructive" className="cursor-help inline-flex items-center gap-1.5 pr-2.5">
+                                                                    {job.status === 'rejected' ? 'Từ chối' : 'Cần sửa'}
+                                                                    <Info className="h-3.5 w-3.5" />
+                                                                </Badge>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p className="max-w-[250px] text-sm">{job.adminFeedback}</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+                                                ) : (
+                                                    <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : job.status === 'closed' ? 'outline' : 'destructive'}>
+                                                        {job.status === 'active' ? 'Hoạt động' : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'closed' ? 'Đã đóng' : 'Từ chối'}
+                                                    </Badge>
+                                                )}
                                             </td>
                                             <td className="p-4 align-middle">
                                                 <div className="flex items-center gap-1">
