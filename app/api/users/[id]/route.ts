@@ -65,6 +65,11 @@ export async function PATCH(
             return NextResponse.json({ error: "Invalid role" }, { status: 400 })
         }
 
+        // Validate phone number if present
+        if (body.phone && !/^0\d{9,10}$/.test(body.phone)) {
+            return NextResponse.json({ error: "Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số" }, { status: 400 })
+        }
+
         // Filter out fields that shouldn't be updated directly via this API if needed
         // For now allow upgrading body fields
         const updateData = {

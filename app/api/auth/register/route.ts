@@ -24,6 +24,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Vui lòng điền đầy đủ thông tin" }, { status: 400 })
     }
 
+    // Validate phone number format
+    if (phone && !/^0\d{9,10}$/.test(phone)) {
+      return NextResponse.json({ error: "Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số" }, { status: 400 })
+    }
+
     const collection = await getCollection(COLLECTIONS.USERS)
 
     // Check if email already exists

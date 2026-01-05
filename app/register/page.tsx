@@ -42,6 +42,7 @@ export default function RegisterPage() {
     if (!formData.email.trim()) return setError("Vui lòng nhập email")
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(formData.email)) return setError("Vui lòng nhập địa chỉ email hợp lệ")
+    if (formData.phone && !/^0\d{9,10}$/.test(formData.phone)) return setError("Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số")
     if (formData.password !== formData.confirmPassword) return setError("Mật khẩu xác nhận không khớp")
     if (formData.password.length < 6) return setError("Mật khẩu phải có ít nhất 6 ký tự")
 
@@ -53,7 +54,6 @@ export default function RegisterPage() {
         // For email register, we explicitly exclude phone to avoid any confusion or validation errors
         body: JSON.stringify({
           ...formData,
-          phone: ""
         }),
       })
 
@@ -154,6 +154,22 @@ export default function RegisterPage() {
                 <p className="text-xs text-muted-foreground mt-1 ml-1">
                   Hỗ trợ: @student.giadinh.edu.vn, @gmail.com, @outlook.com...
                 </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-gray-700 font-medium">Số điện thoại</Label>
+                <div className="relative group">
+                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="0912345678"
+                    className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
+                  />
+                </div>
               </div>
 
               {formData.role === "student" && (
