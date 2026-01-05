@@ -82,6 +82,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 })
     }
 
+    // Check if studentId already exists (only for students)
+    if (role === "student") {
+      if (!studentId || !/^\d{8}$/.test(studentId)) {
+        return NextResponse.json({ error: "Mã số sinh viên phải có đủ 8 số" }, { status: 400 })
+      }
+
+      const existingStudentId = await collection.findOne({ studentId })
+      if (existingStudentId) {
+        return NextResponse.json({ error: "Mã số sinh viên đã được đăng ký" }, { status: 409 })
+      }
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
