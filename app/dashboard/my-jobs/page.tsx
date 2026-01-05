@@ -24,13 +24,7 @@ import {
     DialogDescription,
     DialogFooter,
 } from "@/components/ui/dialog"
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { Info } from "lucide-react"
+
 
 export default function MyJobsPage() {
     const { user } = useAuth()
@@ -146,6 +140,7 @@ export default function MyJobsPage() {
                                 <tr className="border-b bg-muted/50 transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Vị trí tuyển dụng</th>
                                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Trạng thái</th>
+                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-1/4">Phản hồi</th>
                                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Ứng viên</th>
                                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Ngày đăng</th>
                                     <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Thao tác</th>
@@ -153,9 +148,9 @@ export default function MyJobsPage() {
                             </thead>
                             <tbody>
                                 {loading ? (
-                                    <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">Đang tải dữ liệu...</td></tr>
+                                    <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Đang tải dữ liệu...</td></tr>
                                 ) : filteredJobs.length === 0 ? (
-                                    <tr><td colSpan={5} className="py-8 text-center text-muted-foreground">Không tìm thấy tin đăng nào.</td></tr>
+                                    <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Không tìm thấy tin đăng nào.</td></tr>
                                 ) : (
                                     filteredJobs.map((job) => (
                                         <tr key={job._id} className="border-b transition-colors hover:bg-muted/50">
@@ -164,24 +159,15 @@ export default function MyJobsPage() {
                                                 <div className="text-xs text-muted-foreground">{job.location} • {job.type}</div>
                                             </td>
                                             <td className="p-4 align-middle">
+                                                <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : job.status === 'closed' ? 'outline' : 'destructive'}>
+                                                    {job.status === 'active' ? 'Hoạt động' : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'closed' ? 'Đã đóng' : 'Từ chối'}
+                                                </Badge>
+                                            </td>
+                                            <td className="p-4 align-middle text-sm">
                                                 {(job.status === 'rejected' || job.status === 'request_changes') && job.adminFeedback ? (
-                                                    <TooltipProvider>
-                                                        <Tooltip>
-                                                            <TooltipTrigger asChild>
-                                                                <Badge variant="destructive" className="cursor-help inline-flex items-center gap-1.5 pr-2.5">
-                                                                    {job.status === 'rejected' ? 'Từ chối' : 'Cần sửa'}
-                                                                    <Info className="h-3.5 w-3.5" />
-                                                                </Badge>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                <p className="max-w-[250px] text-sm">{job.adminFeedback}</p>
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
+                                                    <span className="text-destructive font-medium">{job.adminFeedback}</span>
                                                 ) : (
-                                                    <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : job.status === 'closed' ? 'outline' : 'destructive'}>
-                                                        {job.status === 'active' ? 'Hoạt động' : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'closed' ? 'Đã đóng' : 'Từ chối'}
-                                                    </Badge>
+                                                    <span className="text-muted-foreground">-</span>
                                                 )}
                                             </td>
                                             <td className="p-4 align-middle">
