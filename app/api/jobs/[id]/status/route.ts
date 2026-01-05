@@ -46,14 +46,40 @@ export async function PATCH(
             )
         }
 
-        // Send email notification to employer if creatorId exists (and we can find their email)
-        // For now, if we don't have user email easily, we skip or use a placeholder
-        // In a real app, we would look up the user by creatorId
+        // Notification Logic: Notify Employer
+        if (job.creatorId && status && status !== job.status) {
+            try {
+                const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+                let message = ""
+                let title = ""
 
-        // TODO: Look up user email by job.creatorId and send email
-        // const usersCollection = await getCollection(COLLECTIONS.USERS)
-        // const user = await usersCollection.findOne({ _id: new ObjectId(job.creatorId) })
-        // if (user && user.email) { ... sendEmail ... }
+                if (status === 'active') {
+                    title = "Tin tuyển dụng được duyệt"
+                    message = `Tin tuyển dụng "${job.title}" của bạn đã được phê duyệt và hiển thị công khai.`
+                } else if (status === 'rejected' || status === 'request_changes') {
+                    title = "Tin tuyển dụng cần chỉnh sửa"
+                    if (feedback) {
+                        message = `Tin tuyển dụng "${job.title}" cần chỉnh sửa thêm. Lý do: ${feedback}`
+                    } else {
+                        message = `Tin tuyển dụng "${job.title}" của bạn cần được chỉnh sửa trước khi đăng. Vui lòng kiểm tra và cập nhật lại.`
+                    }
+                }
+
+                if (title) {
+                    await notifCollection.insertOne({
+                        userId: job.creatorId,
+                        type: 'system',
+                        title: title,
+                        message: message,
+                        read: false,
+                        createdAt: new Date(),
+                        link: `/dashboard/my-jobs`,
+                    })
+                }
+            } catch (err) {
+                console.error("Failed to create status notification:", err)
+            }
+        }
 
         return NextResponse.json({
             success: true,
