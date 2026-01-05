@@ -24,7 +24,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
-import { Check, X, Loader2 } from "lucide-react"
+import { Check, X, Loader2, Trash2 } from "lucide-react"
 
 // Types matching API response
 type Job = {
@@ -104,6 +104,33 @@ export default function AdminJobsPage() {
             toast({
                 title: "Lỗi cập nhật",
                 description: "Không thể cập nhật trạng thái.",
+                variant: "destructive"
+            })
+        }
+    }
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Bạn có chắc chắn muốn xóa tin tuyển dụng này không? Hành động này không thể hoàn tác.")) return
+
+        try {
+            const response = await fetch(`/api/jobs/${id}`, {
+                method: 'DELETE'
+            })
+            const data = await response.json()
+
+            if (data.success) {
+                toast({
+                    title: "Xóa thành công",
+                    description: "Tin tuyển dụng đã được xóa khỏi hệ thống.",
+                })
+                setJobs(prev => prev.filter(job => job._id !== id))
+            } else {
+                throw new Error(data.error)
+            }
+        } catch (error) {
+            toast({
+                title: "Lỗi xóa tin",
+                description: "Không thể xóa tin tuyển dụng.",
                 variant: "destructive"
             })
         }
@@ -208,6 +235,18 @@ export default function AdminJobsPage() {
                                                         onClick={() => openRejectDialog(job._id)}
                                                     >
                                                         Gỡ bài
+                                                    </Button>
+                                                )}
+
+                                                {(job.status === 'rejected' || job.status === 'closed' || job.status === 'request_changes') && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-red-50"
+                                                        onClick={() => handleDelete(job._id)}
+                                                        title="Xóa vĩnh viễn"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 )}
                                             </div>
