@@ -51,6 +51,11 @@ export function UserProfileForm({
     }
 
     const handleSave = async () => {
+        if (formData.phone && !/^0\d{9,10}$/.test(formData.phone)) {
+            setPhoneError("Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số")
+            return
+        }
+
         setIsSaving(true)
         await updateProfile({
             name: formData.name,
@@ -181,17 +186,25 @@ export function UserProfileForm({
                                         value={formData.phone}
                                         onChange={(e) => {
                                             const val = e.target.value
-                                            if (/\D/.test(val)) {
-                                                setPhoneError("Số điện thoại chỉ được chứa các chữ số")
+                                            // Only allow digits
+                                            if (/\D/.test(val)) return
+
+                                            setFormData({ ...formData, phone: val })
+
+                                            if (val.length > 0) {
+                                                if (!val.startsWith('0')) {
+                                                    setPhoneError("Số điện thoại phải bắt đầu bằng số 0")
+                                                } else if (val.length < 10 || val.length > 11) {
+                                                    setPhoneError("Số điện thoại phải có 10-11 số")
+                                                } else {
+                                                    setPhoneError("")
+                                                }
                                             } else {
                                                 setPhoneError("")
                                             }
-                                            const numericVal = val.replace(/\D/g, '')
-                                            // Just simple update, strict validation can be added on save if needed
-                                            setFormData({ ...formData, phone: numericVal })
                                         }}
                                         disabled={!isEditing}
-                                        className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed"
+                                        className={phoneError ? "w-full pl-10 pr-4 py-2 border border-red-500 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-muted disabled:cursor-not-allowed" : "w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed"}
                                     />
                                 </div>
                                 {phoneError && <p className="text-red-500 text-xs mt-1">{phoneError}</p>}
