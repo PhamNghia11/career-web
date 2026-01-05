@@ -18,6 +18,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { MoneyInput } from "@/components/ui/money-input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -560,7 +561,7 @@ export default function PostJobPage() {
                                                 <FormItem>
                                                     <FormLabel>Mức lương tối thiểu ({jobType === "part-time" ? "VNĐ/giờ" : "VNĐ/tháng"})</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="0" {...field} />
+                                                        <MoneyInput placeholder="0" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -573,7 +574,7 @@ export default function PostJobPage() {
                                                 <FormItem>
                                                     <FormLabel>Mức lương tối đa ({jobType === "part-time" ? "VNĐ/giờ" : "VNĐ/tháng"})</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="0" {...field} />
+                                                        <MoneyInput placeholder="0" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
