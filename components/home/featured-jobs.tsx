@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { MapPin, Clock, DollarSign, Building, ArrowRight } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -30,6 +30,7 @@ export function FeaturedJobs() {
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
   const [featuredJobs, setFeaturedJobs] = useState<Job[]>(getFeaturedJobs(4))
   const [loading, setLoading] = useState(true)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Fetch jobs from MongoDB and merge with static JSON
   useEffect(() => {
@@ -109,8 +110,15 @@ export function FeaturedJobs() {
 
                 <div
                   className="relative inline-block w-full"
-                  onMouseEnter={() => setHoveredJob(job)}
-                  onMouseLeave={() => setHoveredJob(null)}
+                  onMouseEnter={() => {
+                    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+                    setHoveredJob(job)
+                  }}
+                  onMouseLeave={() => {
+                    timeoutRef.current = setTimeout(() => {
+                      setHoveredJob(null)
+                    }, 300)
+                  }}
                 >
                   <Link href={`/jobs/${job._id}`} className="group-hover:text-primary transition-colors block">
                     <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-foreground group-hover:text-primary transition-colors">{job.title}</h3>

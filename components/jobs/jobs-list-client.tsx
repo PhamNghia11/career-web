@@ -114,6 +114,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string } | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
   const [hoveredJob, setHoveredJob] = useState<Job | null>(null)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Advanced filter states
   const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null)
@@ -833,8 +834,15 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                         <div>
                           <div
                             className="relative inline-block"
-                            onMouseEnter={() => setHoveredJob(job)}
-                            onMouseLeave={() => setHoveredJob(null)}
+                            onMouseEnter={() => {
+                              if (timeoutRef.current) clearTimeout(timeoutRef.current)
+                              setHoveredJob(job)
+                            }}
+                            onMouseLeave={() => {
+                              timeoutRef.current = setTimeout(() => {
+                                setHoveredJob(null)
+                              }, 300)
+                            }}
                           >
                             <h3 className="text-lg font-bold text-gray-900 hover:text-[#1e3a5f] transition-colors mb-1 w-fit cursor-pointer border-b border-transparent hover:border-gray-300">
                               {job.title}
