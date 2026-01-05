@@ -18,8 +18,8 @@ export async function GET(request: Request) {
             query.role = role
         }
 
-        // Only show verified users
-        query.emailVerified = true
+        // Show all users regardless of verification status
+        // query.emailVerified = true
 
         const users = await collection
             .find(query)
