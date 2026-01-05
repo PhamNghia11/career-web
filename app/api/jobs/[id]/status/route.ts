@@ -58,8 +58,11 @@ export async function PATCH(
                     message = `Tin tuyển dụng "${job.title}" của bạn đã được phê duyệt và hiển thị công khai.`
                 } else if (status === 'rejected' || status === 'request_changes') {
                     title = "Tin tuyển dụng cần chỉnh sửa"
-                    if (feedback) {
-                        message = `Tin tuyển dụng "${job.title}" cần chỉnh sửa thêm. Lý do: ${feedback}`
+                    // Try to get reason from multiple potential fields
+                    const reason = feedback || body.adminFeedback || body.reason || ""
+
+                    if (reason) {
+                        message = `Tin tuyển dụng "${job.title}" đã bị từ chối/gỡ bỏ. Lý do: ${reason}`
                     } else {
                         message = `Tin tuyển dụng "${job.title}" của bạn cần được chỉnh sửa trước khi đăng. Vui lòng kiểm tra và cập nhật lại.`
                     }
