@@ -15,14 +15,15 @@ export async function GET() {
         const duplicates = []
 
         for (const job of jobs) {
-            const title = (job.title || "").trim().toLowerCase()
-            const company = (job.company || "").trim().toLowerCase()
-            const type = (job.type || "").trim().toLowerCase()
+            // Aggressive normalization: lowercase and remove ALL non-alphanumeric chars
+            const normalize = (str: any) => (str || "").toString().toLowerCase().replace(/[^a-z0-9]/g, "")
 
-            // Identifier based on title, company, and type
-            // We use this key to identify unique jobs. 
-            // Since we sorted by postedAt DESC, we keep the latest one and remove older duplicates.
-            const key = `${title}|${company}|${type}`
+            const titleNorm = normalize(job.title)
+            const companyNorm = normalize(job.company)
+            const typeNorm = normalize(job.type)
+
+            // Identifier based on normalized fields
+            const key = `${titleNorm}|${companyNorm}|${typeNorm}`
 
             if (key === "||") continue; // Skip empty jobs
 
