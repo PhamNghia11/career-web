@@ -25,6 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Loader2, Briefcase, MapPin, DollarSign, Building, ArrowLeft, ImagePlus, X, ChevronDown, Eye } from "lucide-react"
 import { JobPreview } from "@/components/jobs/job-preview"
+import { DatePicker } from "@/components/ui/date-picker"
 
 // Constants (Duplicated from new/page.tsx for simplicity)
 const JOB_TYPES = [
@@ -66,7 +67,7 @@ const formSchema = z.object({
     description: z.string().min(20, "Mô tả công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     requirements: z.string().min(20, "Yêu cầu công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     detailedBenefits: z.string().optional(),
-    deadline: z.string().optional(),
+    deadline: z.date().optional(),
     quantity: z.coerce.number().optional(),
     unlimitedQuantity: z.boolean().default(false),
 }).refine((data) => {
@@ -107,7 +108,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             description: "",
             requirements: "",
             detailedBenefits: "",
-            deadline: "",
+            deadline: undefined,
             quantity: 1,
             unlimitedQuantity: false,
         },
@@ -180,7 +181,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                         detailedBenefits: Array.isArray(job.detailedBenefits) ? job.detailedBenefits.join('\n') : job.detailedBenefits || "",
                         quantity: job.quantity === -1 ? 1 : (job.quantity || 1),
                         unlimitedQuantity: job.quantity === -1,
-                        deadline: job.deadline ? job.deadline.split('/').reverse().join('-') : "",
+                        deadline: job.deadline ? new Date(job.deadline.split('/').reverse().join('-')) : undefined, // Parse DD/MM/YYYY to Date
                     })
 
                     // Load existing logo
@@ -240,13 +241,13 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             const requirementsList = values.requirements.split('\n').filter(line => line.trim() !== "")
             const detailedBenefitsList = values.detailedBenefits ? values.detailedBenefits.split('\n').filter(line => line.trim() !== "") : []
 
-            // Format deadline to DD/MM/YYYY
-            let formattedDeadline = values.deadline
-            if (values.deadline && values.deadline.includes('-')) {
-                const deadlineDate = new Date(values.deadline)
-                if (!isNaN(deadlineDate.getTime())) {
-                    formattedDeadline = `${deadlineDate.getDate().toString().padStart(2, '0')}/${(deadlineDate.getMonth() + 1).toString().padStart(2, '0')}/${deadlineDate.getFullYear()}`
-                }
+            // Format deadline to DD/MM/YYYY for API
+            let formattedDeadline = ""
+            if (values.deadline) {
+                const day = values.deadline.getDate().toString().padStart(2, '0')
+                const month = (values.deadline.getMonth() + 1).toString().padStart(2, '0')
+                const year = values.deadline.getFullYear()
+                formattedDeadline = `${day}/${month}/${year}`
             }
 
             const payload = {
@@ -445,11 +446,13 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                                     control={form.control}
                                     name="deadline"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="flex flex-col">
                                             <FormLabel>Hạn nộp hồ sơ</FormLabel>
-                                            <FormControl>
-                                                <Input type="date" {...field} />
-                                            </FormControl>
+                                            <DatePicker
+                                                date={field.value}
+                                                setDate={field.onChange}
+                                                placeholder="dd/mm/yyyy"
+                                            />
                                             <FormMessage />
                                         </FormItem>
                                     )}

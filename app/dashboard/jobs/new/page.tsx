@@ -25,6 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Loader2, Briefcase, MapPin, DollarSign, Building, ImagePlus, X, ChevronDown, Eye } from "lucide-react"
 import { JobPreview } from "@/components/jobs/job-preview"
+import { DatePicker } from "@/components/ui/date-picker"
 
 // Constants
 const JOB_TYPES = [
@@ -66,7 +67,7 @@ const formSchema = z.object({
     description: z.string().min(20, "Mô tả công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     requirements: z.string().min(20, "Yêu cầu công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     detailedBenefits: z.string().optional(),
-    deadline: z.string().optional(),
+    deadline: z.date().optional(),
     quantity: z.coerce.number().optional(),
     unlimitedQuantity: z.boolean().default(false),
 }).refine((data) => {
@@ -106,7 +107,7 @@ export default function PostJobPage() {
             description: "",
             requirements: "",
             detailedBenefits: "",
-            deadline: "",
+            deadline: undefined,
             quantity: 1,
             unlimitedQuantity: false,
         },
@@ -194,13 +195,20 @@ export default function PostJobPage() {
             const requirementsList = values.requirements.split('\n').filter(line => line.trim() !== "")
             const detailedBenefitsList = values.detailedBenefits ? values.detailedBenefits.split('\n').filter(line => line.trim() !== "") : []
 
-            // Format deadline to DD/MM/YYYY
+            // Format deadline to dd/MM/yyyy string for API (backend expects string based on current logic which splits by /)
+            // Wait, previous logic was: deadline: values.deadline.split('-').reverse().join('/')
+            // If values.deadline is Date, we format it.
             let formattedDeadline = ""
             if (values.deadline) {
-                const deadlineDate = new Date(values.deadline)
-                if (!isNaN(deadlineDate.getTime())) {
-                    formattedDeadline = `${deadlineDate.getDate().toString().padStart(2, '0')}/${(deadlineDate.getMonth() + 1).toString().padStart(2, '0')}/${deadlineDate.getFullYear()}`
-                }
+                const day = values.deadline.getDate().toString().padStart(2, '0')
+                const month = (values.deadline.getMonth() + 1).toString().padStart(2, '0')
+                const year = values.deadline.getFullYear()
+                formattedDeadline = `${year}-${month}-${day}` // Standard ISO for DB or whatever backend expects?
+                // Looking at old code: `values.deadline` was likely YYYY-MM-DD from input[date].
+                // And payload used `deadline: values.deadline.split('-').reverse().join('/')` -> DD/MM/YYYY.
+                // So backend expects DD/MM/YYYY?
+                // Let's verify backend or just match old behavior:
+                formattedDeadline = `${day}/${month}/${year}`
             }
 
             const payload = {
@@ -210,9 +218,7 @@ export default function PostJobPage() {
                 salary: salaryString,
                 requirements: requirementsList,
                 detailedBenefits: detailedBenefitsList,
-                role: user?.role,
-                creatorId: user?._id || "unknown",
-                logo: logoBase64 || "/placeholder.svg?height=100&width=100"
+                logo: logoBase64 || "/placeholder.svg?height=100&width=100",
             }
 
             const response = await fetch("/api/jobs", {
@@ -407,11 +413,13 @@ export default function PostJobPage() {
                                     control={form.control}
                                     name="deadline"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="flex flex-col">
                                             <FormLabel>Hạn nộp hồ sơ</FormLabel>
-                                            <FormControl>
-                                                <Input type="date" {...field} />
-                                            </FormControl>
+                                            <DatePicker
+                                                date={field.value}
+                                                setDate={field.onChange}
+                                                placeholder="dd/mm/yyyy"
+                                            />
                                             <FormMessage />
                                         </FormItem>
                                     )}
