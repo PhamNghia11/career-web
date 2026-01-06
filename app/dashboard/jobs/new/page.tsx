@@ -23,7 +23,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Loader2, Briefcase, MapPin, DollarSign, Building, ImagePlus, X, ChevronDown } from "lucide-react"
+import { Loader2, Briefcase, MapPin, DollarSign, Building, ImagePlus, X, ChevronDown, Eye } from "lucide-react"
+import { JobPreview } from "@/components/jobs/job-preview"
 
 // Constants
 const JOB_TYPES = [
@@ -85,6 +86,8 @@ export default function PostJobPage() {
     const [isLoading, setIsLoading] = useState(false)
     const [logoPreview, setLogoPreview] = useState<string | null>(null)
     const [logoBase64, setLogoBase64] = useState<string | null>(null)
+    const [showPreview, setShowPreview] = useState(false)
+    const [previewData, setPreviewData] = useState<any>(null)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -239,6 +242,37 @@ export default function PostJobPage() {
         } finally {
             setIsLoading(false)
         }
+    }
+
+    const handlePreview = async () => {
+        // Trigger validation
+        const isValid = await form.trigger()
+        if (isValid) {
+            const values = form.getValues()
+            setPreviewData({
+                ...values,
+                logoPreview: logoPreview || logoBase64
+            })
+            setShowPreview(true)
+            window.scrollTo(0, 0)
+        } else {
+            toast({
+                title: "Thông tin chưa đầy đủ",
+                description: "Vui lòng điền đầy đủ các trường bắt buộc trước khi xem trước.",
+                variant: "destructive",
+            })
+        }
+    }
+
+    if (showPreview && previewData) {
+        return (
+            <JobPreview
+                data={previewData}
+                onBack={() => setShowPreview(false)}
+                onSubmit={form.handleSubmit(onSubmit)}
+                isLoading={isLoading}
+            />
+        )
     }
 
     if (user?.role === "student") {
@@ -681,6 +715,9 @@ export default function PostJobPage() {
 
                     <div className="flex justify-end gap-4">
                         <Button type="button" variant="outline" onClick={() => router.back()}>Hủy bỏ</Button>
+                        <Button type="button" variant="secondary" onClick={handlePreview} className="gap-2">
+                            <Eye className="w-4 h-4" /> Xem trước
+                        </Button>
                         <Button type="submit" disabled={isLoading} className="bg-blue-600 hover:bg-blue-700">
                             {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang xử lý...</> : "Đăng tin tuyển dụng"}
                         </Button>
