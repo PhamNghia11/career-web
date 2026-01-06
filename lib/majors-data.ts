@@ -7,6 +7,7 @@ import {
     Scale,
     Languages,
     Landmark,
+    MoreHorizontal,
 } from "lucide-react"
 
 export interface Major {
@@ -239,6 +240,19 @@ export const fieldsData: Field[] = [
             },
         ],
     },
+    {
+        id: "other",
+        name: "Khác",
+        icon: "MoreHorizontal",
+        color: "from-gray-500 to-slate-500",
+        majors: [
+            {
+                id: "other-general",
+                name: "Khác",
+                specializations: [],
+            },
+        ],
+    },
 ]
 
 // Icon mapping for dynamic rendering
@@ -251,4 +265,5 @@ export const fieldIcons = {
     Scale,
     Languages,
     Landmark,
+    MoreHorizontal,
 }
