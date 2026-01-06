@@ -160,9 +160,33 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
 
   // Merge jobs from MongoDB (dbJobs) with static JSON (allJobs)
   // MongoDB jobs take priority (appear first), then JSON jobs that aren't duplicates
+  // Merge jobs from MongoDB (dbJobs) with static JSON (allJobs)
+  // MongoDB jobs take priority (appear first).
+  // We deduplicate based on normalized Title + Company to avoid showing the same job from both sources.
   const mergedJobs = useMemo(() => {
-    const dbJobIds = new Set(dbJobs.map(job => job._id))
-    const uniqueJsonJobs = allJobs.filter(job => !dbJobIds.has(job._id))
+    // 1. Create a map of content-based keys from DB jobs
+    const seenKeys = new Set<string>()
+    const normalize = (str: string) => (str || "").toLowerCase().replace(/[^a-z0-9]/g, "")
+
+    // Process DB jobs first (keep them)
+    dbJobs.forEach(job => {
+      const key = `${normalize(job.title)}|${normalize(job.company)}`
+      seenKeys.add(key)
+    })
+
+    // 2. Filter JSON jobs that duplicate DB content
+    const uniqueJsonJobs = allJobs.filter(job => {
+      // Also skip if ID exists (handled by previous logic, but good to keep)
+      if (dbJobs.some(dbJob => dbJob._id === job._id)) return false
+
+      const key = `${normalize(job.title)}|${normalize(job.company)}`
+      if (seenKeys.has(key)) return false
+
+      // If unique, add to seen so we don't add duplicate JSON jobs either
+      seenKeys.add(key)
+      return true
+    })
+
     return [...dbJobs, ...uniqueJsonJobs]
   }, [dbJobs])
 
