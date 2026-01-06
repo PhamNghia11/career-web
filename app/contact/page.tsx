@@ -87,7 +87,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold mb-2 text-foreground">Email</h3>
-                    <p className="text-muted-foreground">Studentcentre@giaidinh.edu.vn</p>
+                    <p className="text-muted-foreground">Studentcentre@giadinh.edu.vn</p>
                   </div>
                 </div>
               </Card>

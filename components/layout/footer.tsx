@@ -80,8 +80,8 @@ export function Footer() {
                 <div className="p-2 bg-slate-800/50 rounded-lg group-hover:bg-purple-500/20 transition-colors">
                   <Mail className="h-5 w-5 text-purple-400" />
                 </div>
-                <a href="mailto:Studentcentre@giaidinh.edu.vn" className="text-sm hover:text-white transition-colors">
-                  Studentcentre@giaidinh.edu.vn
+                <a href="mailto:Studentcentre@giadinh.edu.vn" className="text-sm hover:text-white transition-colors">
+                  Studentcentre@giadinh.edu.vn
                 </a>
               </li>
 
@@ -120,7 +120,7 @@ export function Footer() {
                 <span>Chat Zalo</span>
               </a>
               <a
-                href="mailto:Studentcentre@giaidinh.edu.vn"
+                href="mailto:Studentcentre@giadinh.edu.vn"
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-all text-sm"
               >
                 <Mail className="h-4 w-4" />

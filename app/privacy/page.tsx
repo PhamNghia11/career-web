@@ -80,7 +80,7 @@ export default function PrivacyPage() {
                             </p>
                             <ul className="mt-2 text-sm text-gray-600">
                                 <li><strong>Trung tâm Trải nghiệm & Việc làm - Đại học Gia Định</strong></li>
-                                <li>Email: Studentcentre@giaidinh.edu.vn</li>
+                                <li>Email: Studentcentre@giadinh.edu.vn</li>
                             </ul>
                         </section>
                     </div>
