@@ -14,6 +14,7 @@ const companies = [
     rating: 4.2,
     verified: true,
     benefits: ["Lương thưởng hấp dẫn", "Bảo hiểm cao cấp", "Đào tạo chuyên nghiệp", "Môi trường quốc tế"],
+    website: "https://techcombank.com/",
   },
   {
     id: "2",
@@ -27,6 +28,7 @@ const companies = [
     rating: 4.5,
     verified: true,
     benefits: ["Đào tạo chuyên sâu", "Cơ hội quốc tế", "Lương cạnh tranh", "Team building"],
+    website: "https://tuyendung.frt.vn/",
   },
   {
     id: "3",
@@ -40,6 +42,7 @@ const companies = [
     rating: 4.3,
     verified: true,
     benefits: ["Môi trường học thuật", "Hỗ trợ khởi nghiệp", "Networking", "Đào tạo"],
+    website: "https://itp.vn/",
   },
   {
     id: "4",
@@ -53,6 +56,7 @@ const companies = [
     rating: 4.1,
     verified: true,
     benefits: ["Môi trường chuyên nghiệp", "Đào tạo nghiệp vụ", "Phúc lợi tốt", "Thăng tiến rõ ràng"],
+    website: "https://firstindependent.vn/",
   },
   {
     id: "5",
@@ -66,6 +70,7 @@ const companies = [
     rating: 4.4,
     verified: true,
     benefits: ["Công nghệ mới nhất", "Start-up culture", "Remote work", "Thưởng dự án"],
+    website: "https://www.teknixcorp.com/",
   },
   {
     id: "6",
@@ -79,6 +84,7 @@ const companies = [
     rating: 4.2,
     verified: true,
     benefits: ["Môi trường sáng tạo", "Học hỏi liên tục", "Flexible hours", "Stock options"],
+    website: "https://cohota.com/",
   },
   {
     id: "7",
@@ -113,11 +119,12 @@ const companies = [
     industry: "Pháp luật",
     size: "10-20 nhân viên",
     location: "TP.HCM",
-    description: "Tổ chức hành nghề luật chuyên cung cấp các dịch vụ tư vấn pháp lý và tranh tụng cho cá nhân và doanh nghiệp trong các lĩnh vực dân sự, hình sự, đất đai, kinh doanh thương mại.",
+    description: "Tổ chức hành nghề luật chuyên cung cấp các giải pháp tư vấn pháp lý và tranh tụng cho cá nhân và doanh nghiệp trong các lĩnh vực dân sự, hình sự, đất đai, kinh doanh thương mại.",
     openPositions: 4,
     rating: 4.8,
     verified: true,
     benefits: ["Đào tạo pháp lý chuyên sâu", "Làm việc với luật sư giỏi", "Môi trường chuyên nghiệp", "Cơ hội thăng tiến"],
+    website: "https://quoclaw.vn/vi/category/tuyen-dung/",
   },
   {
     id: "10",
@@ -131,6 +138,7 @@ const companies = [
     rating: 4.2,
     verified: true,
     benefits: ["Quy mô lớn", "Ổn định", "Chế độ đầy đủ", "Đào tạo nghiệp vụ"],
+    website: "https://nhankiet.vn/",
   },
   {
     id: "11",
@@ -144,6 +152,7 @@ const companies = [
     rating: 4.3,
     verified: true,
     benefits: ["Tiếp cận công nghệ mới", "Dự án đa dạng", "Thưởng hiệu quả", "Môi trường sáng tạo"],
+    website: "https://gianguyenads.com/vi/",
   },
   {
     id: "12",
@@ -157,6 +166,7 @@ const companies = [
     rating: 4.7,
     verified: true,
     benefits: ["Chuyên môn cao", "Môi trường quốc tế", "Lương thưởng hấp dẫn", "Phát triển sự nghiệp"],
+    website: "https://www.talentlawfirm.vn/tuyen-dung/",
   },
   {
     id: "13",
@@ -170,6 +180,7 @@ const companies = [
     rating: 4.4,
     verified: true,
     benefits: ["Tập đoàn lớn", "Công nghệ cao", "Đãi ngộ tốt", "Cơ hội đa ngành"],
+    website: "https://alta.com.vn/",
   },
   {
     id: "14",
@@ -183,6 +194,7 @@ const companies = [
     rating: 4.1,
     verified: true,
     benefits: ["Dự án Tech thú vị", "Học hỏi công nghệ mới", "Môi trường thân thiện", "Thưởng dự án"],
+    website: "https://miasolution.vn/",
   },
 ]
 

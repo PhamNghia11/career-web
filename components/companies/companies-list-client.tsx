@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Search, MapPin, Users, Briefcase, Star, CheckCircle } from "lucide-react"
+import { Search, MapPin, Users, Briefcase, Star, CheckCircle, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -21,6 +21,7 @@ interface Company {
   rating: number
   verified: boolean
   benefits: string[]
+  website?: string
 }
 
 export function CompaniesListClient() {
@@ -130,7 +131,7 @@ export function CompaniesListClient() {
       ) : (
         <div className="grid md:grid-cols-2 gap-6">
           {companies.map((company) => (
-            <Card key={company.id} className="p-6 hover:shadow-lg transition-shadow bg-card">
+            <Card key={company.id} className="p-6 hover:shadow-lg transition-shadow bg-card flex flex-col">
               <div className="flex gap-4">
                 <img
                   src={company.logo || "/placeholder.svg?height=56&width=56"}
@@ -154,7 +155,7 @@ export function CompaniesListClient() {
                 </div>
               </div>
 
-              <p className="text-sm text-muted-foreground mt-4 line-clamp-2">{company.description}</p>
+              <p className="text-sm text-muted-foreground mt-4 line-clamp-2 flex-grow">{company.description}</p>
 
               <div className="mt-4 space-y-2 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
@@ -179,12 +180,24 @@ export function CompaniesListClient() {
                 ))}
               </div>
 
-              <Button
-                onClick={() => handleViewDetails(company.id)}
-                className="w-full mt-4 bg-primary hover:bg-primary/90"
-              >
-                Xem chi tiết
-              </Button>
+              <div className="flex gap-3 mt-4">
+                <Button
+                  onClick={() => handleViewDetails(company.id)}
+                  className="flex-1 bg-primary hover:bg-primary/90"
+                >
+                  Xem chi tiết
+                </Button>
+                {company.website && (
+                  <Button
+                    variant="outline"
+                    className="aspect-square p-0"
+                    onClick={() => window.open(company.website, "_blank")}
+                    title="Truy cập website"
+                  >
+                    <Globe className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </Card>
           ))}
         </div>
