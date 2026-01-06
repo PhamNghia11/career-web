@@ -15,8 +15,16 @@ export async function GET() {
         const duplicates = []
 
         for (const job of jobs) {
+            const title = (job.title || "").trim().toLowerCase()
+            const company = (job.company || "").trim().toLowerCase()
+            const type = (job.type || "").trim().toLowerCase()
+
             // Identifier based on title, company, and type
-            const key = `${job.title}|${job.company}|${job.type}`.toLowerCase()
+            // We use this key to identify unique jobs. 
+            // Since we sorted by postedAt DESC, we keep the latest one and remove older duplicates.
+            const key = `${title}|${company}|${type}`
+
+            if (key === "||") continue; // Skip empty jobs
 
             if (seen.has(key)) {
                 duplicates.push(job._id)
@@ -32,14 +40,15 @@ export async function GET() {
 
             return NextResponse.json({
                 success: true,
-                message: `Cleaned up ${result.deletedCount} duplicate jobs`,
-                deletedIds: duplicates
+                message: `Found and deleted ${result.deletedCount} duplicate jobs`,
+                count: result.deletedCount,
+                duplicateIds: duplicates
             })
         }
 
         return NextResponse.json({
             success: true,
-            message: "No duplicates found"
+            message: "No duplicates found. Database is clean."
         })
 
     } catch (error) {
