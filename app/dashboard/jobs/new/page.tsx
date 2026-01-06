@@ -219,6 +219,8 @@ export default function PostJobPage() {
                 requirements: requirementsList,
                 detailedBenefits: detailedBenefitsList,
                 logo: logoBase64 || "/placeholder.svg?height=100&width=100",
+                creatorId: user?._id,
+                role: user?.role,
             }
 
             const response = await fetch("/api/jobs", {
