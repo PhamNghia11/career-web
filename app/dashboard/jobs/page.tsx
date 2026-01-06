@@ -24,19 +24,11 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
-import { Check, X, Loader2, Trash2 } from "lucide-react"
+import { Check, X, Loader2, Trash2, Eye } from "lucide-react"
+import { JobPreviewDialog, type Job } from "./job-preview-dialog"
 
 // Types matching API response
-type Job = {
-    _id: string
-    title: string
-    company: string
-    status: "active" | "closed" | "pending" | "rejected" | "request_changes"
-    postedAt: string
-    type: string
-    salary: string
-    creatorId?: string
-}
+// Use imported Job type from ./job-preview-dialog
 
 export default function AdminJobsPage() {
     const { user, isLoading: authLoading } = useAuth()
@@ -44,6 +36,7 @@ export default function AdminJobsPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
     const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
+    const [previewJob, setPreviewJob] = useState<Job | null>(null)
     const [feedback, setFeedback] = useState("")
     const { toast } = useToast()
     const router = useRouter()
@@ -205,6 +198,15 @@ export default function AdminJobsPage() {
                                         <TableCell>{getStatusBadge(job.status)}</TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="h-8 w-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                                                    onClick={() => setPreviewJob(job)}
+                                                    title="Xem chi tiết"
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                </Button>
                                                 {job.status === 'pending' && (
                                                     <>
                                                         <Button
@@ -281,6 +283,12 @@ export default function AdminJobsPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <JobPreviewDialog
+                job={previewJob}
+                open={!!previewJob}
+                onOpenChange={(open) => !open && setPreviewJob(null)}
+            />
         </div>
     )
 }
