@@ -44,7 +44,7 @@ const FIELDS_AND_MAJORS: Record<string, string[]> = {
     "Ngôn ngữ & Xã hội": ["Ngôn ngữ Anh", "Đông Phương học", "Tâm lý học", "Ngôn ngữ Trung Quốc"],
     "Sức khỏe": ["Răng – Hàm – Mặt"],
     "Thiết kế": ["Thiết kế đồ họa"],
-    "Khác": ["Khác"],
+    "Khác": ["Ngành khác"],
 }
 
 const COMMON_BENEFITS = [

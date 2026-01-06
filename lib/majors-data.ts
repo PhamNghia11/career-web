@@ -248,7 +248,7 @@ export const fieldsData: Field[] = [
         majors: [
             {
                 id: "other-general",
-                name: "Khác",
+                name: "Ngành khác",
                 specializations: [],
             },
         ],
