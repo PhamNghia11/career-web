@@ -179,40 +179,6 @@
             "experience": "2-5"
         },
         {
-            "_id": "job_6",
-            "title": "Backend Developer",
-            "company": "FPT Software",
-            "companyId": "2",
-            "logo": "/logos/fpt.png",
-            "location": "Hà Nội",
-            "type": "full-time",
-            "field": "it",
-            "salary": "18-30 triệu",
-            "deadline": "2025-12-31",
-            "postedAt": "2025-12-18",
-            "description": "Phát triển và bảo trì các API, microservices cho các dự án outsourcing quốc tế.",
-            "skills": [
-                "Java",
-                "Spring Boot",
-                "AWS",
-                "Microservices",
-                "Docker"
-            ],
-            "requirements": [
-                "Tốt nghiệp ĐH chuyên ngành CNTT",
-                "Có ít nhất 2 năm kinh nghiệm Java/Spring"
-            ],
-            "benefits": [
-                "Lương cạnh tranh theo năng lực",
-                "Cơ hội onsite nước ngoài",
-                "Đào tạo chứng chỉ quốc tế"
-            ],
-            "status": "active",
-            "applicants": 56,
-            "education": "bachelor",
-            "experience": "2-5"
-        },
-        {
             "_id": "job_7",
             "title": "UI/UX Designer",
             "company": "TekNix Corporation",
