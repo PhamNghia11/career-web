@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Menu, X, Search, User, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -24,6 +24,7 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("")
   const { user, logout } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
 
   const navigation = [
     { name: "Trang chủ", href: "/" },
@@ -67,15 +68,21 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="px-5 py-3 rounded-md hover:bg-primary/10 transition-colors font-semibold text-lg text-gray-800 hover:text-primary"
-              >
-                {item.name}
-              </Link>
-            ))}
+            {navigation.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`px-5 py-3 transition-colors font-semibold text-lg border-b-2 ${isActive
+                      ? "border-primary text-primary bg-primary/5"
+                      : "border-transparent text-gray-800 hover:text-primary hover:bg-primary/10"
+                    }`}
+                >
+                  {item.name}
+                </Link>
+              )
+            })}
           </nav>
 
           {/* Right side */}
