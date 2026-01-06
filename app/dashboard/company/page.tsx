@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { UserProfileForm } from "@/components/dashboard/user-profile-form"
+import { useEffect } from "react"
 
 export default function CompanyPage() {
     const { user, updateProfile } = useAuth()
@@ -20,14 +21,45 @@ export default function CompanyPage() {
     const [isUploading, setIsUploading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    // Mock initial state - in real app, fetch from User profile or Company collection
+    const [isLoading, setIsLoading] = useState(false)
+
+    // Initial state
     const [formData, setFormData] = useState({
-        companyName: "Công ty của " + (user?.name || ""),
+        companyName: "",
         website: "",
         address: "",
         description: "",
-        size: "10-50 nhân viên"
+        size: ""
     })
+
+    // Fetch latest data on mount
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (!user) return;
+            const userId = user._id || user.id
+            if (!userId) return
+
+            try {
+                const res = await fetch(`/api/users/${userId}`)
+                const data = await res.json()
+
+                if (data.success && data.user) {
+                    const u = data.user
+                    setFormData({
+                        companyName: u.companyName || "Công ty của " + (u.name || ""),
+                        website: u.website || "",
+                        address: u.address || "",
+                        description: u.description || "",
+                        size: u.size || "10-50 nhân viên"
+                    })
+                }
+            } catch (error) {
+                console.error("Failed to fetch fresh user data:", error)
+            }
+        }
+
+        fetchUserData()
+    }, [user?.id, user?._id]) // Depend on ID change, not entire user object to avoid loops if not careful
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -68,12 +100,36 @@ export default function CompanyPage() {
         }
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        // Simulate API call
-        setTimeout(() => {
-            toast({ title: "Thành công", description: "Thông tin công ty đã được cập nhật." })
-        }, 1000)
+        if (!user) return
+
+        setIsLoading(true)
+        const userId = user._id || user.id
+
+        try {
+            // Update to API
+            const response = await fetch(`/api/users/${userId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            })
+
+            const data = await response.json()
+
+            if (response.ok) {
+                // Update local context
+                await updateProfile(formData)
+                toast({ title: "Thành công", description: "Thông tin công ty đã được cập nhật." })
+            } else {
+                toast({ title: "Lỗi", description: data.error || "Có lỗi xảy ra", variant: "destructive" })
+            }
+        } catch (error) {
+            console.error(error)
+            toast({ title: "Lỗi", description: "Không thể lưu thay đổi", variant: "destructive" })
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -187,7 +243,9 @@ export default function CompanyPage() {
                                 </div>
 
                                 <div className="flex justify-end pt-2">
-                                    <Button type="submit">Lưu thay đổi</Button>
+                                    <Button type="submit" disabled={isLoading}>
+                                        {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang lưu...</> : "Lưu thay đổi"}
+                                    </Button>
                                 </div>
                             </form>
                         </CardContent>

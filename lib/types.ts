@@ -10,6 +10,12 @@ export interface User {
   major?: string
   createdAt: Date
   updatedAt: Date
+  // Company fields
+  companyName?: string
+  website?: string
+  address?: string
+  description?: string
+  size?: string
 }
 
 export interface Job {

@@ -2,6 +2,40 @@ import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 
+export async function GET(
+    req: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await params
+
+        if (!ObjectId.isValid(id)) {
+            return NextResponse.json({ error: "Invalid user ID" }, { status: 400 })
+        }
+
+        const collection = await getCollection(COLLECTIONS.USERS)
+        const user = await collection.findOne({ _id: new ObjectId(id) }, { projection: { password: 0 } })
+
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 })
+        }
+
+        return NextResponse.json({
+            success: true,
+            user: {
+                ...user,
+                _id: user._id.toString(),
+            }
+        })
+    } catch (error) {
+        console.error("Get user error:", error)
+        return NextResponse.json(
+            { success: false, error: "Failed to fetch user" },
+            { status: 500 }
+        )
+    }
+}
+
 export async function DELETE(
     req: Request,
     { params }: { params: Promise<{ id: string }> }
