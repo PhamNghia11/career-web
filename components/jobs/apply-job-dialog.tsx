@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/lib/auth-context"
 import { Upload, CheckCircle2 } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface ApplyJobDialogProps {
     isOpen: boolean
@@ -28,6 +29,8 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [dragActive, setDragActive] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [faculty, setFaculty] = useState("")
+    const [cohort, setCohort] = useState("")
     const inputRef = useRef<HTMLInputElement>(null)
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,10 +83,11 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!selectedFile) {
-            setError("Vui lòng đính kèm CV của bạn")
-            return
-        }
+        // Optional CV check removed
+        // if (!selectedFile) {
+        //     setError("Vui lòng đính kèm CV của bạn")
+        //     return
+        // }
 
         setIsSubmitting(true)
 
@@ -110,11 +114,13 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
             formData.append("phone", (form.elements.namedItem("phone") as HTMLInputElement).value)
             formData.append("mssv", (form.elements.namedItem("mssv") as HTMLInputElement).value)
             formData.append("major", (form.elements.namedItem("major") as HTMLInputElement).value)
-            formData.append("faculty", (form.elements.namedItem("faculty") as HTMLInputElement).value)
-            formData.append("cohort", (form.elements.namedItem("cohort") as HTMLInputElement).value)
+            formData.append("faculty", faculty)
+            formData.append("cohort", cohort)
 
             formData.append("message", (form.elements.namedItem("message") as HTMLTextAreaElement).value)
-            formData.append("cv", selectedFile)
+            if (selectedFile) {
+                formData.append("cv", selectedFile)
+            }
 
             const response = await fetch("/api/applications", {
                 method: "POST",
@@ -253,11 +259,34 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
                                         <Label htmlFor="faculty">Khoa / Viện <span className="text-gray-400 font-normal">(Tùy chọn)</span></Label>
-                                        <Input id="faculty" placeholder="Khoa CNTT" />
+                                        <Select name="faculty" value={faculty} onValueChange={setFaculty}>
+                                            <SelectTrigger id="faculty">
+                                                <SelectValue placeholder="Chọn Khoa / Viện" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Khoa Công nghệ thông tin">Khoa Công nghệ thông tin</SelectItem>
+                                                <SelectItem value="Khoa Kinh tế - Quản trị">Khoa Kinh tế - Quản trị</SelectItem>
+                                                <SelectItem value="Khoa Khoa học xã hội - Ngôn ngữ">Khoa Khoa học xã hội - Ngôn ngữ</SelectItem>
+                                                <SelectItem value="Viện Đào tạo Quốc tế">Viện Đào tạo Quốc tế</SelectItem>
+                                                <SelectItem value="Khác">Khác</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="grid gap-2">
                                         <Label htmlFor="cohort">Khóa <span className="text-gray-400 font-normal">(Tùy chọn)</span></Label>
-                                        <Input id="cohort" placeholder="K15" />
+                                        <Select name="cohort" value={cohort} onValueChange={setCohort}>
+                                            <SelectTrigger id="cohort">
+                                                <SelectValue placeholder="Chọn Khóa" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="K14">K14</SelectItem>
+                                                <SelectItem value="K15">K15</SelectItem>
+                                                <SelectItem value="K16">K16</SelectItem>
+                                                <SelectItem value="K17">K17</SelectItem>
+                                                <SelectItem value="K18">K18</SelectItem>
+                                                <SelectItem value="K19">K19</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
 
@@ -310,7 +339,7 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                                 </div>
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="cv">CV / Hồ sơ đính kèm</Label>
+                                <Label htmlFor="cv">CV / Hồ sơ đính kèm (Tùy chọn)</Label>
                                 <div
                                     className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center transition-colors cursor-pointer group 
                                         ${dragActive ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:bg-gray-50"}
