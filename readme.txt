@@ -32,8 +32,6 @@ II. CÀI ĐẶT VÀ CẤU HÌNH
    SMTP_USER="your-email@gmail.com"
    SMTP_PASSWORD="your-app-password"
 
-
-
    # Cấu hình NextAuth (Tùy chọn nếu mở rộng sau này)
    NEXTAUTH_URL="http://localhost:3000"
    NEXTAUTH_SECRET="your-random-secret-key"
@@ -62,18 +60,27 @@ IV. KHỞI TẠO DỮ LIỆU (SEEDING)
 V. TRIỂN KHAI LÊN VERCEL
 1. Push code lên GitHub/GitLab.
 2. Tạo dự án mới trên Vercel và import repository.
-3. Trong phần "Environment Variables", thêm đầy đủ các biến như trong file `.env.local` (trừ `ESMS` đã bỏ).
+3. Trong phần "Environment Variables", thêm đầy đủ các biến như trong file `.env.local`.
    - `MONGODB_URI`
    - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`
    - `NEXTAUTH_URL` (là domain của Vercel sau khi deploy, VD: `https://your-project.vercel.app`)
    - `NEXTAUTH_SECRET`
 4. Bấm "Deploy".
 
-VI. LƯU Ý QUAN TRỌNG
+VI. CẤU TRÚC THƯ MỤC CHÍNH
+- /app           -> Các trang và API routes (Next.js App Router)
+- /components    -> Các component React dùng chung
+- /lib           -> Các utility (kết nối MongoDB, email, auth context)
+- /data          -> Dữ liệu JSON (jobs, reviews)
+- /public        -> Tài nguyên tĩnh (logo, ảnh)
+- /scripts       -> Các script tiện ích (import data, debug)
+- /hooks         -> Custom React hooks
+
+VII. LƯU Ý QUAN TRỌNG
 - MongoDB: Đảm bảo IP của server đã được Whitelist trên MongoDB Atlas nếu dùng cloud.
 - Email: Nếu dùng Gmail, cần bật "2-Step Verification" và tạo "App Password" để điền vào SMTP_PASSWORD.
 - Bảo mật: Không bao giờ commit file .env.local lên git.
 
 ---------------------------
 Hỗ trợ kỹ thuật: Liên hệ Admin hoặc Dev Team.
-Ngày cập nhật: 30/12/2025
+Ngày cập nhật: 06/01/2026
