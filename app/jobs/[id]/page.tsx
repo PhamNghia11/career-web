@@ -198,7 +198,13 @@ export default async function JobPage(props: JobPageProps) {
                                                     </div>
                                                     <div>
                                                         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Hạn nộp</p>
-                                                        <p className="text-gray-900 font-bold">{job.deadline || "Vô thời hạn"}</p>
+                                                        <p className="text-gray-900 font-bold">
+                                                            {job.deadline
+                                                                ? (isNaN(new Date(job.deadline).getTime())
+                                                                    ? job.deadline
+                                                                    : new Date(job.deadline).toLocaleDateString('vi-VN'))
+                                                                : "Vô thời hạn"}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -222,7 +228,7 @@ export default async function JobPage(props: JobPageProps) {
                                                     </div>
                                                     <div>
                                                         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Ngày đăng</p>
-                                                        <p className="text-gray-900 font-bold">{new Date(job.postedAt).toLocaleDateString('vi-VN')}</p>
+                                                        <p className="text-gray-900 font-bold">{new Date(job.postedAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                                                     </div>
                                                 </div>
                                             </div>

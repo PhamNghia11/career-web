@@ -99,7 +99,25 @@ interface JobsListClientProps {
   dbJobs?: Job[]
 }
 
+// Helper function to format date and time in Vietnamese format
+const formatDateTime = (dateString: string): string => {
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return dateString
+    return date.toLocaleString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    })
+  } catch {
+    return dateString
+  }
+}
+
 export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
+
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
@@ -391,12 +409,6 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     const jobs = [...filteredJobs]
 
     switch (sortBy) {
-      case "newest":
-        // Sort by postedAt date, newest first
-        return jobs.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
-      case "salary":
-        // Sort by max salary, highest first
-        return jobs.sort((a, b) => parseMaxSalary(b.salary) - parseMaxSalary(a.salary))
       case "deadline":
         // Sort by deadline, soonest first
         return jobs.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
@@ -404,6 +416,21 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
         return jobs
     }
   }, [filteredJobs, sortBy])
+
+  // Simple helper for deadline display (no time needed)
+  const formatDeadline = (dateString: string): string => {
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return dateString
+      return date.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      })
+    } catch {
+      return dateString
+    }
+  }
 
   const handleTypeChange = (type: string) => {
     setSelectedType(prev => prev === type ? null : type)
@@ -890,11 +917,13 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                             {job.company}
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                           <Badge variant="secondary" className={typeColors[job.type as keyof typeof typeColors]}>
                             {typeLabels[job.type as keyof typeof typeLabels]}
                           </Badge>
-                          <span className="text-sm text-gray-500 font-medium">{job.postedAt}</span>
+                          <span className="text-[13px] text-gray-400 font-medium italic whitespace-nowrap">
+                            Đăng lúc: {formatDateTime(job.postedAt)}
+                          </span>
                         </div>
                       </div>
 
@@ -909,7 +938,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Clock className="h-4 w-4" />
-                          {job.deadline ? `Hạn: ${job.deadline}` : "Vô thời hạn"}
+                          {job.deadline ? `Hạn: ${formatDeadline(job.deadline)}` : "Vô thời hạn"}
                         </div>
                       </div>
 
