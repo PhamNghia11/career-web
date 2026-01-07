@@ -87,7 +87,8 @@ export async function POST(req: Request) {
       title, company, companyId, location, type, field,
       salary, salaryMin, salaryMax, isNegotiable,
       deadline, description, requirements, benefits,
-      relatedMajors, detailedBenefits, creatorId, role, website, quantity
+      relatedMajors, detailedBenefits, creatorId, role, website, quantity,
+      contactEmail, contactPhone
     } = body
 
     // Validate permission (Only Employer or Admin)
@@ -136,7 +137,9 @@ export async function POST(req: Request) {
       applicants: 0,
       creatorId,
       views: 0,
-      quantity: quantity || 1
+      quantity: quantity || 1,
+      contactEmail: contactEmail || null,
+      contactPhone: contactPhone || null
     }
 
     const result = await collection.insertOne(newJob)

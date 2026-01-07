@@ -109,7 +109,8 @@ const formatDateTime = (dateString: string): string => {
       minute: "2-digit",
       day: "2-digit",
       month: "2-digit",
-      year: "numeric"
+      year: "numeric",
+      timeZone: "Asia/Ho_Chi_Minh"
     })
   } catch {
     return dateString

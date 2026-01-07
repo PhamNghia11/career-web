@@ -29,6 +29,8 @@ export type Job = {
     creatorId?: string // Link to employer user
     views?: number
     website?: string
+    contactEmail?: string
+    contactPhone?: string
     quantity?: number
 }
 

@@ -70,6 +70,8 @@ const formSchema = z.object({
     deadline: z.date().optional(),
     quantity: z.coerce.number().optional(),
     unlimitedQuantity: z.boolean().default(false),
+    contactEmail: z.string().email("Vui lòng nhập đúng định dạng email").optional().or(z.literal("")),
+    contactPhone: z.string().optional(),
 }).refine((data) => {
     if (!data.unlimitedQuantity && (!data.quantity || data.quantity < 1)) {
         return false
@@ -111,6 +113,8 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             deadline: undefined,
             quantity: 1,
             unlimitedQuantity: false,
+            contactEmail: "",
+            contactPhone: "",
         },
     })
 
@@ -182,6 +186,8 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                         quantity: job.quantity === -1 ? 1 : (job.quantity || 1),
                         unlimitedQuantity: job.quantity === -1,
                         deadline: job.deadline ? new Date(job.deadline.split('/').reverse().join('-')) : undefined, // Parse DD/MM/YYYY to Date
+                        contactEmail: job.contactEmail || "",
+                        contactPhone: job.contactPhone || "",
                     })
 
                     // Load existing logo
@@ -440,6 +446,35 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                                     </FormItem>
                                 )}
                             />
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="contactEmail"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Email nhận hồ sơ / liên hệ</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="tuyendung@congty.com" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="contactPhone"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Số điện thoại liên hệ</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="0901 234 567" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField

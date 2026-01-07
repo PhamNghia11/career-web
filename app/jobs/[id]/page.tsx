@@ -228,7 +228,7 @@ export default async function JobPage(props: JobPageProps) {
                                                     </div>
                                                     <div>
                                                         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Ngày đăng</p>
-                                                        <p className="text-gray-900 font-bold">{new Date(job.postedAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+                                                        <p className="text-gray-900 font-bold">{new Date(job.postedAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' })}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -240,6 +240,9 @@ export default async function JobPage(props: JobPageProps) {
                                             jobId={job._id}
                                             jobTitle={job.title}
                                             company={job.company}
+                                            companyEmail={job.contactEmail}
+                                            companyPhone={job.contactPhone}
+                                            companyWebsite={job.website}
                                         />
 
                                         <p className="text-center text-xs text-gray-400 mt-3">

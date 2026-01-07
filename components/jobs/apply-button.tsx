@@ -10,9 +10,19 @@ interface ApplyButtonProps {
     jobId: string
     jobTitle: string
     company: string
+    companyEmail?: string
+    companyPhone?: string
+    companyWebsite?: string
 }
 
-export function ApplyButton({ jobId, jobTitle, company }: ApplyButtonProps) {
+export function ApplyButton({
+    jobId,
+    jobTitle,
+    company,
+    companyEmail,
+    companyPhone,
+    companyWebsite
+}: ApplyButtonProps) {
     const { user } = useAuth()
     const router = useRouter()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -40,7 +50,10 @@ export function ApplyButton({ jobId, jobTitle, company }: ApplyButtonProps) {
                 jobTitle={jobTitle}
                 companyName={company}
                 jobId={jobId}
-                employerId={(user as any)?.role === 'employer' ? (user as any)?.id : undefined} // Logic might need check, but existing logic used jobId mostly
+                employerId={(user as any)?.role === 'employer' ? (user as any)?.id : undefined}
+                companyEmail={companyEmail}
+                companyPhone={companyPhone}
+                companyWebsite={companyWebsite}
             />
         </>
     )

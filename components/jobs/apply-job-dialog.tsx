@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/lib/auth-context"
-import { Upload, CheckCircle2 } from "lucide-react"
+import { Upload, CheckCircle2, Globe, Mail, Phone } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface ApplyJobDialogProps {
@@ -18,9 +18,22 @@ interface ApplyJobDialogProps {
     companyName: string
     jobId?: string
     employerId?: string
+    companyEmail?: string
+    companyPhone?: string
+    companyWebsite?: string
 }
 
-export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, employerId }: ApplyJobDialogProps) {
+export function ApplyJobDialog({
+    isOpen,
+    onClose,
+    jobTitle,
+    companyName,
+    jobId,
+    employerId,
+    companyEmail,
+    companyPhone,
+    companyWebsite
+}: ApplyJobDialogProps) {
     const { toast } = useToast()
     const { user } = useAuth()
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -142,16 +155,17 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                 description: `Hồ sơ của bạn đã được gửi đến ${companyName}.`,
             })
 
-            // Close dialog after a delay or let user close it
-            setTimeout(() => {
-                onClose()
-                // Reset state after closing
-                setTimeout(() => {
-                    setIsSuccess(false)
-                    setSelectedFile(null)
-                    setError(null)
-                }, 300)
-            }, 2000)
+            setIsSubmitting(false)
+            setIsSuccess(true)
+
+            // Show toast confirmation
+            toast({
+                title: "Ứng tuyển thành công!",
+                description: `Hồ sơ của bạn đã được gửi đến ${companyName}.`,
+            })
+
+            // Auto-close removed as per user request
+            // We let the user see the contact info and close manually
         } catch (err: any) {
             setIsSubmitting(false)
             toast({
@@ -205,18 +219,39 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                                     <p className="font-medium text-gray-900 truncate" title={companyName}>{companyName}</p>
                                 </div>
                                 <div>
-                                    <p className="text-gray-500">Hình thức</p>
-                                    <p className="font-medium text-blue-600">Trực tuyến (Online)</p>
+                                    <p className="text-gray-500">Trạng thái hồ sơ</p>
+                                    <p className="font-medium text-green-600">Đã gửi thành công</p>
                                 </div>
                                 <div>
-                                    <p className="text-gray-500">Trạng thái</p>
-                                    <p className="font-medium text-green-600">Đã gửi hồ sơ</p>
+                                    <p className="text-gray-500">Thời gian</p>
+                                    <p className="font-medium text-gray-900">{new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {new Date().toLocaleDateString('vi-VN')}</p>
+                                </div>
+                            </div>
+
+                            <h3 className="font-semibold text-gray-900 border-b border-gray-200 pb-2 pt-2">Thông tin liên hệ nhà tuyển dụng</h3>
+                            <div className="grid grid-cols-1 gap-3 text-sm">
+                                <div className="flex items-center gap-2">
+                                    <Globe className="h-4 w-4 text-gray-400" />
+                                    <p className="text-gray-500 w-20">Website:</p>
+                                    <a href={companyWebsite || "#"} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 hover:underline truncate">
+                                        {companyWebsite || "N/A"}
+                                    </a>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Mail className="h-4 w-4 text-gray-400" />
+                                    <p className="text-gray-500 w-20">Email:</p>
+                                    <p className="font-medium text-gray-900">{companyEmail || "N/A"}</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Phone className="h-4 w-4 text-gray-400" />
+                                    <p className="text-gray-500 w-20">Điện thoại:</p>
+                                    <p className="font-medium text-gray-900">{companyPhone || "N/A"}</p>
                                 </div>
                             </div>
 
                             <div className="pt-2 border-t border-gray-200 mt-2">
                                 <p className="text-xs text-gray-500 italic">
-                                    * Nhà tuyển dụng sẽ liên hệ lại với bạn qua Email hoặc Số điện thoại nếu hồ sơ phù hợp.
+                                    * Bạn có thể chủ động liên hệ với nhà tuyển dụng qua các kênh trên để được phản hồi nhanh hơn.
                                 </p>
                             </div>
                         </div>
