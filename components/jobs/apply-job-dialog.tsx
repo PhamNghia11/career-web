@@ -155,15 +155,6 @@ export function ApplyJobDialog({
                 description: `Hồ sơ của bạn đã được gửi đến ${companyName}.`,
             })
 
-            setIsSubmitting(false)
-            setIsSuccess(true)
-
-            // Show toast confirmation
-            toast({
-                title: "Ứng tuyển thành công!",
-                description: `Hồ sơ của bạn đã được gửi đến ${companyName}.`,
-            })
-
             // Auto-close removed as per user request
             // We let the user see the contact info and close manually
         } catch (err: any) {
@@ -192,7 +183,15 @@ export function ApplyJobDialog({
 
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent
+                className="sm:max-w-[600px]"
+                onPointerDownOutside={(e) => {
+                    if (isSuccess) e.preventDefault();
+                }}
+                onEscapeKeyDown={(e) => {
+                    if (isSuccess) e.preventDefault();
+                }}
+            >
                 {isSuccess ? (
                     <div className="flex flex-col items-center justify-center py-6 text-center space-y-6">
                         <div className="h-20 w-20 bg-green-100 rounded-full flex items-center justify-center animate-in zoom-in duration-300">
