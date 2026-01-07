@@ -1,6 +1,7 @@
 "use client"
 
-import { TrendingUp, Users, Briefcase, Eye, ArrowUpRight, ArrowDownRight } from "lucide-react"
+import { useEffect, useState } from "react"
+import { TrendingUp, Users, Briefcase, Eye, ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   LineChart,
@@ -16,40 +17,80 @@ import {
   Bar,
 } from "recharts"
 
-const trafficData = [
-  { name: "T1", visitors: 4200, pageViews: 12500 },
-  { name: "T2", visitors: 4800, pageViews: 14200 },
-  { name: "T3", visitors: 5100, pageViews: 15800 },
-  { name: "T4", visitors: 4900, pageViews: 14900 },
-  { name: "T5", visitors: 5600, pageViews: 17200 },
-  { name: "T6", visitors: 6200, pageViews: 19500 },
-  { name: "T7", visitors: 6800, pageViews: 21200 },
-  { name: "T8", visitors: 7100, pageViews: 22800 },
-  { name: "T9", visitors: 7500, pageViews: 24500 },
-  { name: "T10", visitors: 8200, pageViews: 26800 },
-  { name: "T11", visitors: 8900, pageViews: 29200 },
-  { name: "T12", visitors: 9500, pageViews: 31500 },
-]
-
-const jobCategoryData = [
-  { name: "CNTT", jobs: 850, applications: 4200 },
-  { name: "Marketing", jobs: 420, applications: 2100 },
-  { name: "Kinh doanh", jobs: 380, applications: 1900 },
-  { name: "Tài chính", jobs: 290, applications: 1450 },
-  { name: "Kế toán", jobs: 220, applications: 1100 },
-  { name: "Khác", jobs: 340, applications: 1700 },
-]
-
-const userGrowthData = [
-  { name: "T7", students: 8500, employers: 320 },
-  { name: "T8", students: 9200, employers: 350 },
-  { name: "T9", students: 10100, employers: 385 },
-  { name: "T10", students: 11200, employers: 420 },
-  { name: "T11", students: 12800, employers: 465 },
-  { name: "T12", students: 14500, employers: 510 },
-]
+interface AnalyticsData {
+  summary: {
+    totalVisitors: number
+    visitorsThisMonth: number
+    visitorsChange: number
+    newStudents: number
+    studentsChange: number
+    newJobs: number
+    jobsChange: number
+    applicationRate: number
+    rateChange: number
+    totalApplications: number
+  }
+  trafficData: Array<{ name: string; visitors: number; pageViews: number }>
+  userGrowthData: Array<{ name: string; students: number; employers: number }>
+  jobCategoryData: Array<{ name: string; jobs: number; applications: number }>
+}
 
 export default function AnalyticsPage() {
+  const [data, setData] = useState<AnalyticsData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const res = await fetch("/api/analytics")
+        const result = await res.json()
+
+        if (result.success) {
+          setData(result.data)
+        } else {
+          setError(result.error || "Không thể tải dữ liệu thống kê")
+        }
+      } catch (err) {
+        console.error("Error fetching analytics:", err)
+        setError("Đã xảy ra lỗi khi tải dữ liệu")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAnalytics()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Đang tải dữ liệu thống kê...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !data) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-red-500 font-medium">{error || "Không có dữ liệu"}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 text-primary hover:underline"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const { summary, trafficData, userGrowthData, jobCategoryData } = data
+
   return (
     <div className="space-y-6">
       <div>
@@ -64,15 +105,19 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Lượt truy cập</p>
-                <p className="text-2xl font-bold">45,200</p>
+                <p className="text-2xl font-bold">{summary.totalVisitors.toLocaleString()}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
                 <Eye className="h-5 w-5 text-blue-600" />
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2 text-sm text-green-600">
-              <ArrowUpRight className="h-4 w-4" />
-              <span>+18% so với tháng trước</span>
+            <div className={`flex items-center gap-1 mt-2 text-sm ${summary.visitorsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {summary.visitorsChange >= 0 ? (
+                <ArrowUpRight className="h-4 w-4" />
+              ) : (
+                <ArrowDownRight className="h-4 w-4" />
+              )}
+              <span>{summary.visitorsChange >= 0 ? '+' : ''}{summary.visitorsChange}% so với tháng trước</span>
             </div>
           </CardContent>
         </Card>
@@ -82,15 +127,19 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Sinh viên mới</p>
-                <p className="text-2xl font-bold">1,250</p>
+                <p className="text-2xl font-bold">{summary.newStudents.toLocaleString()}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
                 <Users className="h-5 w-5 text-green-600" />
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2 text-sm text-green-600">
-              <ArrowUpRight className="h-4 w-4" />
-              <span>+24% so với tháng trước</span>
+            <div className={`flex items-center gap-1 mt-2 text-sm ${summary.studentsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {summary.studentsChange >= 0 ? (
+                <ArrowUpRight className="h-4 w-4" />
+              ) : (
+                <ArrowDownRight className="h-4 w-4" />
+              )}
+              <span>{summary.studentsChange >= 0 ? '+' : ''}{summary.studentsChange}% so với tháng trước</span>
             </div>
           </CardContent>
         </Card>
@@ -100,15 +149,19 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Việc làm đăng mới</p>
-                <p className="text-2xl font-bold">186</p>
+                <p className="text-2xl font-bold">{summary.newJobs.toLocaleString()}</p>
               </div>
               <div className="p-3 bg-purple-100 rounded-full">
                 <Briefcase className="h-5 w-5 text-purple-600" />
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2 text-sm text-green-600">
-              <ArrowUpRight className="h-4 w-4" />
-              <span>+12% so với tháng trước</span>
+            <div className={`flex items-center gap-1 mt-2 text-sm ${summary.jobsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {summary.jobsChange >= 0 ? (
+                <ArrowUpRight className="h-4 w-4" />
+              ) : (
+                <ArrowDownRight className="h-4 w-4" />
+              )}
+              <span>{summary.jobsChange >= 0 ? '+' : ''}{summary.jobsChange}% so với tháng trước</span>
             </div>
           </CardContent>
         </Card>
@@ -118,15 +171,19 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Tỷ lệ ứng tuyển</p>
-                <p className="text-2xl font-bold">68%</p>
+                <p className="text-2xl font-bold">{summary.applicationRate}%</p>
               </div>
               <div className="p-3 bg-orange-100 rounded-full">
                 <TrendingUp className="h-5 w-5 text-orange-600" />
               </div>
             </div>
-            <div className="flex items-center gap-1 mt-2 text-sm text-red-600">
-              <ArrowDownRight className="h-4 w-4" />
-              <span>-3% so với tháng trước</span>
+            <div className={`flex items-center gap-1 mt-2 text-sm ${summary.rateChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {summary.rateChange >= 0 ? (
+                <ArrowUpRight className="h-4 w-4" />
+              ) : (
+                <ArrowDownRight className="h-4 w-4" />
+              )}
+              <span>{summary.rateChange >= 0 ? '+' : ''}{summary.rateChange}% so với tháng trước</span>
             </div>
           </CardContent>
         </Card>
@@ -141,30 +198,38 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trafficData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area
-                    type="monotone"
-                    dataKey="pageViews"
-                    stackId="1"
-                    stroke="hsl(var(--primary))"
-                    fill="hsl(var(--primary))"
-                    fillOpacity={0.2}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="visitors"
-                    stackId="2"
-                    stroke="hsl(var(--secondary))"
-                    fill="hsl(var(--secondary))"
-                    fillOpacity={0.2}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              {trafficData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={trafficData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Area
+                      type="monotone"
+                      dataKey="pageViews"
+                      stackId="1"
+                      stroke="hsl(var(--primary))"
+                      fill="hsl(var(--primary))"
+                      fillOpacity={0.2}
+                      name="Lượt xem trang"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="visitors"
+                      stackId="2"
+                      stroke="hsl(var(--secondary))"
+                      fill="hsl(var(--secondary))"
+                      fillOpacity={0.2}
+                      name="Lượt truy cập"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  Chưa có dữ liệu lưu lượng truy cập
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -172,33 +237,41 @@ export default function AnalyticsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Tăng trưởng người dùng</CardTitle>
-            <CardDescription>Số lượng sinh viên và nhà tuyển dụng mới</CardDescription>
+            <CardDescription>Số lượng sinh viên và nhà tuyển dụng theo thời gian</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={userGrowthData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis yAxisId="left" />
-                  <YAxis yAxisId="right" orientation="right" />
-                  <Tooltip />
-                  <Line
-                    yAxisId="left"
-                    type="monotone"
-                    dataKey="students"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
-                  />
-                  <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="employers"
-                    stroke="hsl(var(--secondary))"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              {userGrowthData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={userGrowthData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis yAxisId="left" />
+                    <YAxis yAxisId="right" orientation="right" />
+                    <Tooltip />
+                    <Line
+                      yAxisId="left"
+                      type="monotone"
+                      dataKey="students"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2}
+                      name="Sinh viên"
+                    />
+                    <Line
+                      yAxisId="right"
+                      type="monotone"
+                      dataKey="employers"
+                      stroke="hsl(var(--secondary))"
+                      strokeWidth={2}
+                      name="Nhà tuyển dụng"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  Chưa có dữ liệu người dùng
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -212,16 +285,22 @@ export default function AnalyticsPage() {
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={jobCategoryData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" width={80} />
-                <Tooltip />
-                <Bar dataKey="jobs" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} name="Việc làm" />
-                <Bar dataKey="applications" fill="hsl(var(--secondary))" radius={[0, 4, 4, 0]} name="Ứng tuyển" />
-              </BarChart>
-            </ResponsiveContainer>
+            {jobCategoryData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={jobCategoryData} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" width={100} />
+                  <Tooltip />
+                  <Bar dataKey="jobs" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} name="Việc làm" />
+                  <Bar dataKey="applications" fill="hsl(var(--secondary))" radius={[0, 4, 4, 0]} name="Ứng tuyển" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                Chưa có dữ liệu việc làm theo ngành
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
