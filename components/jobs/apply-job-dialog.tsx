@@ -339,11 +339,14 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                                 </div>
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="cv">CV / Hồ sơ đính kèm (Tùy chọn)</Label>
+                                <Label htmlFor="cv" className="flex justify-between items-center">
+                                    <span>CV / Hồ sơ đính kèm</span>
+                                    <span className="text-xs font-normal text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full">Không bắt buộc</span>
+                                </Label>
                                 <div
                                     className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center transition-colors cursor-pointer group 
                                         ${dragActive ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:bg-gray-50"}
-                                        ${error ? "border-red-500 bg-red-50" : ""}
+                                        ${error && !selectedFile ? "border-red-500 bg-red-50" : ""}
                                     `}
                                     onDragEnter={handleDrag}
                                     onDragLeave={handleDrag}
@@ -375,6 +378,7 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     setSelectedFile(null);
+                                                    setError(null);
                                                 }}
                                             >
                                                 Xóa file
@@ -383,13 +387,13 @@ export function ApplyJobDialog({ isOpen, onClose, jobTitle, companyName, jobId, 
                                     ) : (
                                         <>
                                             <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center mb-2 group-hover:bg-gray-200 transition-colors">
-                                                <Upload className={`h-5 w-5 ${error ? "text-red-500" : "text-gray-500"}`} />
+                                                <Upload className={`h-5 w-5 ${error && !selectedFile ? "text-red-500" : "text-gray-500"}`} />
                                             </div>
-                                            <p className={`text-sm font-medium ${error ? "text-red-600" : "text-gray-900"}`}>
-                                                {error ? error : "Nhấn để tải lên CV"}
+                                            <p className={`text-sm font-medium ${error && !selectedFile ? "text-red-600" : "text-gray-900"}`}>
+                                                {error && !selectedFile ? error : "Nhấn để tải lên CV"}
                                             </p>
                                             <p className="text-xs text-gray-500 mt-1">
-                                                {dragActive ? "Thả file vào đây" : "PDF, DOC, DOCX (Max 5MB)"}
+                                                {dragActive ? "Thả file vào đây" : "PDF, DOC, DOCX (Tối đa 5MB)"}
                                             </p>
                                         </>
                                     )}

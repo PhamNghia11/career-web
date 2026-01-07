@@ -49,29 +49,38 @@ export async function POST(request: Request) {
     }
 
     // Extract file
-    const file = formData.get("cv") as File
+    const file = formData.get("cv") as File | null
 
-    // Validate required fields
-    if (!fullname || !email || !phone || !file || !mssv || !major) {
+    // Validate required fields (file is now optional)
+    if (!fullname || !email || !phone || !mssv || !major) {
       return NextResponse.json({ error: "Thiếu thông tin bắt buộc" }, { status: 400 })
     }
 
-    // Validate file type
-    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
-    if (!validTypes.includes(file.type)) {
-      return NextResponse.json({ error: "Loại file không hợp lệ" }, { status: 400 })
-    }
+    let cvDataUrl = null
+    let cvOriginalName = null
+    let cvMimeType = null
 
-    // Validate file size (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: "File quá lớn (>5MB)" }, { status: 400 })
-    }
+    // Process file only if it exists
+    if (file && file.size > 0 && typeof file.arrayBuffer === 'function') {
+      // Validate file type
+      const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+      if (!validTypes.includes(file.type)) {
+        return NextResponse.json({ error: "Loại file không hợp lệ" }, { status: 400 })
+      }
 
-    // Convert CV to Base64 for storage in MongoDB
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const cvBase64 = buffer.toString("base64")
-    const cvDataUrl = `data:${file.type};base64,${cvBase64}`
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        return NextResponse.json({ error: "File quá lớn (>5MB)" }, { status: 400 })
+      }
+
+      // Convert CV to Base64
+      const bytes = await file.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      const cvBase64 = buffer.toString("base64")
+      cvDataUrl = `data:${file.type};base64,${cvBase64}`
+      cvOriginalName = file.name
+      cvMimeType = file.type
+    }
 
     const applicationsCollection = await getCollection(COLLECTIONS.APPLICATIONS)
 
@@ -79,8 +88,8 @@ export async function POST(request: Request) {
       jobId,
       jobTitle,
       companyName,
-      employerId: employerId || null, // Store the resolved employerId
-      applicantId: applicantId || null, // Store user ID for notifications
+      employerId: employerId || null,
+      applicantId: applicantId || null,
       fullname,
       email,
       phone,
@@ -90,10 +99,10 @@ export async function POST(request: Request) {
       cohort,
       message,
       cvBase64: cvDataUrl,
-      cvOriginalName: file.name,
-      cvMimeType: file.type,
+      cvOriginalName: cvOriginalName,
+      cvMimeType: cvMimeType,
       createdAt: new Date(),
-      status: "new", // new, reviewed, interviewed, rejected, hired
+      status: "new",
     }
 
     const result = await applicationsCollection.insertOne(applicationData)
@@ -193,7 +202,7 @@ export async function POST(request: Request) {
             <li style="padding: 8px 0;"><strong>Số điện thoại:</strong> ${phone}</li>
             <li style="padding: 8px 0;"><strong>MSSV:</strong> ${mssv}</li>
             <li style="padding: 8px 0;"><strong>Ngành:</strong> ${major}</li>
-            <li style="padding: 8px 0;"><strong>CV:</strong> ${file.name}</li>
+            <li style="padding: 8px 0;"><strong>CV:</strong> ${cvOriginalName || 'Không đính kèm'}</li>
             ${message ? `<li style="padding: 8px 0;"><strong>Lời nhắn:</strong> ${message}</li>` : ''}
           </ul>
           <p style="margin-top: 20px;">
