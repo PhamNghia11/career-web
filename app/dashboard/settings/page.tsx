@@ -115,7 +115,7 @@ export default function SettingsPage() {
 
       if (result.success) {
         setPasswordStatus("success")
-        setPasswordMessage("🎉 Đổi mật khẩu thành công!")
+        setPasswordMessage("Đổi mật khẩu thành công!")
         // Clear form
         setCurrentPassword("")
         setNewPassword("")
@@ -163,7 +163,7 @@ export default function SettingsPage() {
                 }`}
             >
               {passwordStatus === "loading" && <RefreshCw className="h-5 w-5 animate-spin" />}
-              {passwordStatus === "success" && <Check className="h-5 w-5" />}
+              {/* Icon removed per user request */}
               {passwordStatus === "error" && <AlertCircle className="h-5 w-5" />}
               <span className="font-medium">{passwordStatus === "loading" ? "Đang xử lý..." : passwordMessage}</span>
             </div>
