@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/lib/auth-context"
 
 export default function RegisterPage() {
+  const { user, register: authRegister } = useAuth()
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -48,25 +49,12 @@ export default function RegisterPage() {
 
     setIsLoading(true)
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // For email register, we explicitly exclude phone to avoid any confusion or validation errors
-        body: JSON.stringify({
-          ...formData,
-        }),
-      })
+      const success = await authRegister(formData)
 
-      const data = await response.json()
-
-      if (data.success) {
-        if (data.needsVerification) {
-          router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
-        } else {
-          router.push("/login")
-        }
+      if (success) {
+        router.push("/")
       } else {
-        setError(data.error || "Email đã được sử dụng")
+        setError("Đăng ký không thành công. Email có thể đã được sử dụng.")
       }
     } catch (err) {
       console.error("Register error:", err)
