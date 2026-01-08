@@ -10,6 +10,7 @@ interface ApplyButtonProps {
     jobId: string
     jobTitle: string
     company: string
+    employerId?: string
     companyEmail?: string
     companyPhone?: string
     companyWebsite?: string
@@ -19,6 +20,7 @@ export function ApplyButton({
     jobId,
     jobTitle,
     company,
+    employerId,
     companyEmail,
     companyPhone,
     companyWebsite
@@ -50,7 +52,7 @@ export function ApplyButton({
                 jobTitle={jobTitle}
                 companyName={company}
                 jobId={jobId}
-                employerId={(user as any)?.role === 'employer' ? (user as any)?.id : undefined}
+                employerId={employerId}
                 companyEmail={companyEmail}
                 companyPhone={companyPhone}
                 companyWebsite={companyWebsite}

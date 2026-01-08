@@ -240,6 +240,7 @@ export default async function JobPage(props: JobPageProps) {
                                             jobId={job._id}
                                             jobTitle={job.title}
                                             company={job.company}
+                                            employerId={(job as any).creatorId}
                                             companyEmail={job.contactEmail}
                                             companyPhone={job.contactPhone}
                                             companyWebsite={job.website}
