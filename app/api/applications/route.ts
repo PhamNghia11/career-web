@@ -120,7 +120,7 @@ export async function POST(request: Request) {
         message: `${fullname} vừa ứng tuyển vị trí ${jobTitle} tại ${companyName}`,
         read: false,
         createdAt: new Date(),
-        link: `/dashboard/applications`,
+        link: `/dashboard/manage-applications`,
         applicationId: applicationId
       })
       console.log("[Applications API] Created admin notification")
@@ -138,7 +138,7 @@ export async function POST(request: Request) {
           message: `${fullname} vừa ứng tuyển vị trí ${jobTitle}`,
           read: false,
           createdAt: new Date(),
-          link: `/dashboard/applications`,
+          link: `/dashboard/manage-applications`,
           applicationId: applicationId
         })
         console.log("[Applications API] Created employer notification for:", employerId)
@@ -155,7 +155,7 @@ export async function POST(request: Request) {
           message: `${fullname} vừa ứng tuyển vị trí ${jobTitle} (Demo)`,
           read: false,
           createdAt: new Date(),
-          link: `/dashboard/applications`,
+          link: `/dashboard/manage-applications`,
           applicationId: applicationId
         })
         console.log("[Applications API] Created broadcast employer notification")
@@ -206,7 +206,7 @@ export async function POST(request: Request) {
             ${message ? `<li style="padding: 8px 0;"><strong>Lời nhắn:</strong> ${message}</li>` : ''}
           </ul>
           <p style="margin-top: 20px;">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://career-web-three.vercel.app'}/dashboard/applications/${applicationId}" 
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://career-web-three.vercel.app'}/dashboard/manage-applications?id=${applicationId}" 
                style="background: #1e3a5f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
               Xem hồ sơ chi tiết
             </a>
