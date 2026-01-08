@@ -129,7 +129,8 @@ export async function POST(request: Request) {
     }
 
     // 2. Notification for Employer (if employerId exists)
-    if (employerId) {
+    // Only send if the applicant is NOT the employer themselves (self-application)
+    if (employerId && employerId !== applicantId) {
       try {
         await notificationsCollection.insertOne({
           userId: employerId,
@@ -145,23 +146,10 @@ export async function POST(request: Request) {
       } catch (notifError) {
         console.error("Failed to create employer notification:", notifError)
       }
-    } else {
-      // If no employerId (Static Job), notify ALL employers
-      try {
-        await notificationsCollection.insertOne({
-          targetRole: 'employer',
-          type: 'job',
-          title: 'Ứng viên mới (Sample Job)',
-          message: `${fullname} vừa ứng tuyển vị trí ${jobTitle} (Demo)`,
-          read: false,
-          createdAt: new Date(),
-          link: `/dashboard/manage-applications`,
-          applicationId: applicationId
-        })
-        console.log("[Applications API] Created broadcast employer notification")
-      } catch (notifError) {
-        console.error("Failed to create broadcast employer notification:", notifError)
-      }
+    } else if (!employerId) {
+      // If no employerId (Static/System Job), we don't broadcast to all employers anymore
+      // Only the Admin notification (created above) is sufficient for system jobs
+      console.log("[Applications API] No employerId found, skipping employer broadcast.")
     }
 
     // 3. Notification for Student/Applicant (if applicantId exists - logged in user)
