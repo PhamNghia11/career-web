@@ -62,7 +62,10 @@ export async function PATCH(
         const isAdmin = updaterRole === 'admin'
         const isOwner = updaterRole === 'employer' && currentApplication.employerId === updaterId
 
+        console.log(`[Auth Debug] App: ${id}, Updater: ${updaterId}, Role: ${updaterRole}, Owner: ${currentApplication.employerId}`)
+
         if (!isAdmin && !isOwner) {
+            console.log("[Auth Debug] ACCESS DENIED")
             return NextResponse.json({ error: "Bạn không có quyền cập nhật trạng thái này" }, { status: 403 })
         }
 

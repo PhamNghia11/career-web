@@ -274,16 +274,23 @@ export async function GET(request: Request) {
     const collection = await getCollection(COLLECTIONS.APPLICATIONS)
     let query: Record<string, any> = {}
 
-    if (role === "student" && email) {
-      query = { email: email }
-    } else if (role === "admin") {
-      query = {} // All
-    } else if (role === "employer" && employerId) {
-      // Show applications ONLY for this employer
-      query = { employerId: employerId }
+    if (role === "admin") {
+      query = {} // All for admins
+    } else if (role === "employer") {
+      if (employerId) {
+        query = { employerId: employerId }
+      } else {
+        // If role is employer but no ID, return empty list to prevent leakage
+        return NextResponse.json({ success: true, data: [] })
+      }
     } else {
-      if (email) query = { email: email }
-      else query = {}
+      // Default to student view: filter by email
+      if (email) {
+        query = { email: email }
+      } else {
+        // No email provided for student? Return empty
+        return NextResponse.json({ success: true, data: [] })
+      }
     }
 
     // Add jobId filter if provided
