@@ -101,15 +101,26 @@ export async function POST(request: Request) {
             }
         }
 
-        // Get updated user
-        const updatedUser = await collection.findOne({ email })
+        // Get updated user WITHOUT password
+        const updatedUser = await collection.findOne({ email }, { projection: { password: 0 } })
+
+        if (!updatedUser) {
+            return NextResponse.json({ error: "Lỗi sau khi cập nhật xác minh" }, { status: 500 })
+        }
+
+        const userResponse = {
+            ...updatedUser,
+            id: updatedUser._id.toString(),
+            _id: updatedUser._id.toString(),
+            emailVerified: true
+        }
 
         return NextResponse.json({
             success: true,
             message: "Xác minh thành công",
             data: {
-                user: updatedUser,
-                needsPhoneVerification: false // Can extend this logic later if needed
+                user: userResponse,
+                needsPhoneVerification: false
             }
         })
 

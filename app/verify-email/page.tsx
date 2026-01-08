@@ -8,10 +8,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 
+import { useAuth } from "@/lib/auth-context"
+
 function VerifyEmailContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const { toast } = useToast()
+    const { setAuthUser } = useAuth()
 
     const email = searchParams.get("email") || ""
 
@@ -113,22 +116,21 @@ function VerifyEmailContent() {
 
                 // Store user data for auto-login
                 if (data.data?.user) {
-                    localStorage.setItem("gdu_user", JSON.stringify(data.data.user))
+                    setAuthUser(data.data.user)
                 }
 
                 toast({
                     title: "Xác minh thành công!",
-                    description: "Tài khoản của bạn đã được kích hoạt.",
+                    description: "Chào mừng bạn gia nhập GDU Career.",
                 })
 
                 // Redirect after success
-                setTimeout(() => {
-                    if (data.data?.needsPhoneVerification) {
-                        router.push(`/verify-phone?email=${encodeURIComponent(email)}`)
-                    } else {
-                        router.push("/dashboard")
-                    }
-                }, 2000)
+                if (data.data?.needsPhoneVerification) {
+                    router.push(`/verify-phone?email=${encodeURIComponent(email)}`)
+                } else {
+                    // Redirect to home page as requested
+                    router.push("/")
+                }
             } else {
                 setError(data.error || "Mã OTP không đúng")
                 setOtp(["", "", "", "", "", ""])
@@ -209,7 +211,7 @@ function VerifyEmailContent() {
                                     <CheckCircle2 className="h-10 w-10 text-green-600" />
                                 </div>
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Xác minh thành công!</h2>
-                                <p className="text-gray-600 mb-4">Đang chuyển hướng đến Dashboard...</p>
+                                <p className="text-gray-600 mb-4">Đang chuyển hướng...</p>
                                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                             </div>
                         </CardContent>

@@ -10,6 +10,7 @@ interface AuthContextType {
   register: (data: Partial<User> & { password: string }) => Promise<boolean>
   logout: () => void
   updateProfile: (data: Partial<User>) => Promise<boolean>
+  setAuthUser: (userData: User) => void
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -120,8 +121,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const setAuthUser = (userData: User) => {
+    setUser(userData)
+    localStorage.setItem("gdu_user", JSON.stringify(userData))
+  }
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, updateProfile, setAuthUser }}>
       {children}
     </AuthContext.Provider>
   )
