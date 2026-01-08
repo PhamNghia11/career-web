@@ -130,7 +130,11 @@ export default function ApplicationsPage() {
       const res = await fetch(`/api/applications/${appId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({
+          status: newStatus,
+          updaterId: user?.id,
+          updaterRole: user?.role
+        })
       })
 
       if (res.ok) {

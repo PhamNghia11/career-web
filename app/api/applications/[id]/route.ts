@@ -39,7 +39,7 @@ export async function PATCH(
     try {
         const { id } = await params
         const body = await request.json()
-        const { status, notes } = body
+        const { status, notes, updaterId, updaterRole } = body
 
         if (!id || !ObjectId.isValid(id)) {
             return NextResponse.json({ error: "Invalid application ID" }, { status: 400 })
@@ -52,10 +52,18 @@ export async function PATCH(
 
         const collection = await getCollection(COLLECTIONS.APPLICATIONS)
 
-        // Fetch application before update to get applicantId, jobTitle, etc.
+        // Fetch application before update to check permissions and get metadata
         const currentApplication = await collection.findOne({ _id: new ObjectId(id) })
         if (!currentApplication) {
             return NextResponse.json({ error: "Application not found" }, { status: 404 })
+        }
+
+        // Authorization check
+        const isAdmin = updaterRole === 'admin'
+        const isOwner = updaterRole === 'employer' && currentApplication.employerId === updaterId
+
+        if (!isAdmin && !isOwner) {
+            return NextResponse.json({ error: "Bạn không có quyền cập nhật trạng thái này" }, { status: 403 })
         }
 
         const updateData: Record<string, any> = {
