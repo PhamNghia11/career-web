@@ -102,6 +102,29 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
+    // DEFENSIVE CLEANUP: Ensure no leftover data for this email exists from previous deleted accounts
+    try {
+      const applicationsCollection = await getCollection(COLLECTIONS.APPLICATIONS)
+
+      // Find old apps to see if we can extract an old applicantId for more cleanup
+      const oldApps = await applicationsCollection.find({ email: email }).toArray()
+      const oldUserIds = Array.from(new Set(oldApps.map(a => a.applicantId).filter(Boolean)))
+
+      // Clean applications by email
+      await applicationsCollection.deleteMany({ email: email })
+
+      const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+      const savedJobsCollection = await getCollection(COLLECTIONS.SAVED_JOBS)
+
+      // If we found old user IDs, clean them too
+      if (oldUserIds.length > 0) {
+        await notificationsCollection.deleteMany({ userId: { $in: oldUserIds } })
+        await savedJobsCollection.deleteMany({ userId: { $in: oldUserIds } })
+      }
+    } catch (cleanupErr) {
+      console.error("[Register] Defensive cleanup error:", cleanupErr)
+    }
+
     // Prepare new user object
     const newUser: any = {
       name,

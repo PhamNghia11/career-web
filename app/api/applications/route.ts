@@ -24,6 +24,15 @@ export async function POST(request: Request) {
     const message = formData.get("message") as string
     const applicantId = formData.get("applicantId") as string // User ID for notifications
 
+    // Verify applicant still exists if logged in
+    if (applicantId && ObjectId.isValid(applicantId)) {
+      const usersCollection = await getCollection(COLLECTIONS.USERS)
+      const userExists = await usersCollection.findOne({ _id: new ObjectId(applicantId) })
+      if (!userExists) {
+        return NextResponse.json({ error: "Tài khoản của bạn không tồn tại hoặc đã bị xóa. Vui lòng đăng xuất và đăng ký lại." }, { status: 401 })
+      }
+    }
+
     console.log("[Applications API] POST - jobId:", jobId, "employerId from form:", employerId, "applicantId:", applicantId)
 
     // If employerId not provided, try to lookup from job in MongoDB

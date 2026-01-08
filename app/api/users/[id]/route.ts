@@ -80,23 +80,26 @@ export async function DELETE(
             const reviewCommentsCollection = await getCollection(COLLECTIONS.REVIEW_COMMENTS)
             await reviewCommentsCollection.deleteMany({ userId: id })
 
-            // Applications submitted BY this user (Search by ID or Email to be safe)
+            // Applications submitted BY this user OR applications for jobs OWNED BY this user
             const applicationsCollection = await getCollection(COLLECTIONS.APPLICATIONS)
-            await applicationsCollection.deleteMany({
+            const appDeleteResult = await applicationsCollection.deleteMany({
                 $or: [
                     { applicantId: id },
-                    { email: userEmail }
+                    { email: userEmail },
+                    { employerId: id }
                 ]
             })
+            console.log(`[Cleanup] Deleted ${appDeleteResult.deletedCount} applications`)
 
             // Cleanup Contact messages
             const contactsCollection = await getCollection(COLLECTIONS.CONTACTS)
-            await contactsCollection.deleteMany({
+            const contactDeleteResult = await contactsCollection.deleteMany({
                 $or: [
                     { userId: id },
                     { email: userEmail }
                 ]
             })
+            console.log(`[Cleanup] Deleted ${contactDeleteResult.deletedCount} contacts`)
 
             // If Employer/Admin, delete their jobs and applications specifically for those jobs
             if (userRole === "employer" || userRole === "admin") {

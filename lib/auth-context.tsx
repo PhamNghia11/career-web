@@ -19,15 +19,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("gdu_user")
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser))
-      } catch (e) {
-        localStorage.removeItem("gdu_user")
+    const checkAuth = async () => {
+      const savedUser = localStorage.getItem("gdu_user")
+      if (savedUser) {
+        try {
+          const parsedUser = JSON.parse(savedUser)
+
+          // Verify with server if user still exists
+          if (parsedUser.id) {
+            const res = await fetch(`/api/users/${parsedUser.id}`)
+            if (res.status === 404) {
+              console.warn("[Auth] User not found on server, logging out.")
+              logout()
+              return
+            }
+          }
+
+          setUser(parsedUser)
+        } catch (e) {
+          localStorage.removeItem("gdu_user")
+        }
       }
+      setIsLoading(false)
     }
-    setIsLoading(false)
+
+    checkAuth()
   }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {
