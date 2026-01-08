@@ -47,30 +47,92 @@ export async function DELETE(
             return NextResponse.json({ error: "Invalid user ID" }, { status: 400 })
         }
 
-        console.log("[API DELETE User] Request ID:", id)
-        const collection = await getCollection(COLLECTIONS.USERS)
-        const result = await collection.deleteOne({ _id: new ObjectId(id) })
-        console.log("[API DELETE User] Result:", result)
+        const usersCollection = await getCollection(COLLECTIONS.USERS)
 
-        if (result.deletedCount === 0) {
+        // 1. Fetch user to get context (email, role) for deep cleanup
+        const userToDelete = await usersCollection.findOne({ _id: new ObjectId(id) })
+        if (!userToDelete) {
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
 
-        // Cleanup related data
+        const userEmail = userToDelete.email
+        const userRole = userToDelete.role
+
+        console.log(`[API DELETE User] Deleting user ${id} (${userEmail}, ${userRole}) and all related data`)
+
+        // 2. Cascade cleanup related data
         try {
+            // Notifications for this user
             const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
             await notificationsCollection.deleteMany({ userId: id })
 
-            // Optional: Delete applications made by this user??? 
-            // Maybe keep valid applications but anonymize? 
-            // For now, let's strictly follow the request "xóa khỏi hệ thống". 
-            // If we delete applications, it might affect employers seeing "null" applicants.
-            // Let's just delete notifications for now as requested.
+            // Saved jobs
+            const savedJobsCollection = await getCollection(COLLECTIONS.SAVED_JOBS)
+            await savedJobsCollection.deleteMany({ userId: id })
+
+            // User reviews, likes and comments
+            const userReviewsCollection = await getCollection(COLLECTIONS.USER_REVIEWS)
+            await userReviewsCollection.deleteMany({ userId: id })
+
+            const reviewLikesCollection = await getCollection(COLLECTIONS.REVIEW_LIKES)
+            await reviewLikesCollection.deleteMany({ userId: id })
+
+            const reviewCommentsCollection = await getCollection(COLLECTIONS.REVIEW_COMMENTS)
+            await reviewCommentsCollection.deleteMany({ userId: id })
+
+            // Applications submitted BY this user (Search by ID or Email to be safe)
+            const applicationsCollection = await getCollection(COLLECTIONS.APPLICATIONS)
+            await applicationsCollection.deleteMany({
+                $or: [
+                    { applicantId: id },
+                    { email: userEmail }
+                ]
+            })
+
+            // Cleanup Contact messages
+            const contactsCollection = await getCollection(COLLECTIONS.CONTACTS)
+            await contactsCollection.deleteMany({
+                $or: [
+                    { userId: id },
+                    { email: userEmail }
+                ]
+            })
+
+            // If Employer/Admin, delete their jobs and applications specifically for those jobs
+            if (userRole === "employer" || userRole === "admin") {
+                const jobsCollection = await getCollection(COLLECTIONS.JOBS)
+
+                // Find IDs of jobs to delete for application cleanup
+                const jobsToDelete = await jobsCollection.find({ creatorId: id }).toArray()
+                const jobIds = jobsToDelete.map(j => j._id.toString())
+
+                if (jobIds.length > 0) {
+                    // Delete applications to these jobs
+                    await applicationsCollection.deleteMany({ jobId: { $in: jobIds } })
+                    // Delete the jobs
+                    await jobsCollection.deleteMany({ creatorId: id })
+                }
+
+                // Delete company profile
+                const companiesCollection = await getCollection(COLLECTIONS.COMPANIES)
+                await companiesCollection.deleteMany({ creatorId: id })
+            }
         } catch (cleanupError) {
-            console.error("Cleanup error:", cleanupError)
+            console.error("[API DELETE User] Cleanup error:", cleanupError)
+            // Continue with user deletion even if cleanup fails partially
         }
 
-        return NextResponse.json({ success: true, message: "User deleted successfully" })
+        // 3. Finally delete the user record itself
+        const result = await usersCollection.deleteOne({ _id: new ObjectId(id) })
+
+        if (result.deletedCount === 0) {
+            return NextResponse.json({ error: "Failed to delete user record" }, { status: 500 })
+        }
+
+        return NextResponse.json({
+            success: true,
+            message: "Tài khoản và toàn bộ dữ liệu liên quan đã được xóa sạch."
+        })
     } catch (error) {
         console.error("Delete user error:", error)
         return NextResponse.json(

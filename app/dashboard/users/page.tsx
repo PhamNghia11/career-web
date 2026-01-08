@@ -90,7 +90,7 @@ export default function UsersManagementPage() {
       const data = await response.json()
 
       if (data.success) {
-        toast({ title: "Xóa thành công", description: "Người dùng đã được xóa khỏi hệ thống." })
+        toast({ title: "Xóa thành công", description: "Tài khoản và toàn bộ dữ liệu liên quan đã được dọn dẹp sạch sẽ." })
         setUsers(prev => prev.filter(u => u._id !== userToDelete))
       } else {
         throw new Error(data.error)
@@ -312,14 +312,14 @@ export default function UsersManagementPage() {
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Xác nhận xóa người dùng</DialogTitle>
+            <DialogTitle>Xác nhận xóa tài khoản</DialogTitle>
             <DialogDescription>
-              Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa người dùng này không?
+              Hành động này sẽ xóa <strong>VĨNH VIỄN</strong> tài khoản này cùng toàn bộ dữ liệu liên quan (tin đăng, hồ sơ ứng tuyển, thông báo, v.v.). Bạn có chắc chắn muốn tiếp tục?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Hủy</Button>
-            <Button variant="destructive" onClick={handleDeleteUser}>Xóa người dùng</Button>
+            <Button variant="destructive" onClick={handleDeleteUser}>Xóa và dọn dẹp dữ liệu</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
