@@ -149,6 +149,34 @@ export default function NotificationsPage() {
     }
   }
 
+  const deleteAllNotifications = async () => {
+    if (!user?.id) return
+
+    if (!confirm("Bạn có chắc chắn muốn xóa tất cả thông báo không?")) return
+
+    try {
+      const response = await fetch(`/api/notifications?action=delete_all&userId=${user.id}&role=${user.role || ''}`, {
+        method: "DELETE"
+      })
+      const result = await response.json()
+
+      if (result.success) {
+        setNotifications([])
+        toast({
+          title: "Đã xóa tất cả",
+          description: "Đã xóa tất cả thông báo",
+        })
+      }
+    } catch (error) {
+      console.error("[v0] Failed to delete all notifications:", error)
+      toast({
+        title: "Lỗi",
+        description: "Không thể xóa tất cả thông báo",
+        variant: "destructive",
+      })
+    }
+  }
+
   const unreadCount = notifications.filter((n) => !n.read).length
 
   if (loading) {
@@ -180,12 +208,20 @@ export default function NotificationsPage() {
             Bạn có <span className="font-semibold text-foreground">{unreadCount}</span> thông báo chưa đọc
           </p>
         </div>
-        {unreadCount > 0 && (
-          <Button variant="outline" onClick={markAllAsRead}>
-            <Check className="h-4 w-4 mr-2" />
-            Đánh dấu tất cả
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {unreadCount > 0 && (
+            <Button variant="outline" onClick={markAllAsRead}>
+              <Check className="h-4 w-4 mr-2" />
+              Đọc tất cả
+            </Button>
+          )}
+          {notifications.length > 0 && (
+            <Button variant="outline" onClick={deleteAllNotifications} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Xóa tất cả
+            </Button>
+          )}
+        </div>
       </div>
 
       {notifications.length === 0 ? (

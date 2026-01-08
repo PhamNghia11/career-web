@@ -199,12 +199,66 @@ export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const notificationId = searchParams.get("id")
+    const action = searchParams.get("action")
+    const userId = searchParams.get("userId")
+    const role = searchParams.get("role")?.toLowerCase()
+
+    const collection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+
+    if (action === "delete_all") {
+      if (!userId) {
+        return NextResponse.json({ success: false, error: "userId is required for delete_all" }, { status: 400 })
+      }
+
+      // Reconstruct query matching GET logic to ensuring we delete what the user sees
+      // Fetch user created date for filter
+      const usersCollection = await getCollection(COLLECTIONS.USERS)
+      let userCreatedAt = new Date(0);
+      try {
+        const { ObjectId } = await import("mongodb")
+        if (ObjectId.isValid(userId)) {
+          const currentUser = await usersCollection.findOne({ _id: new ObjectId(userId) })
+          if (currentUser?.createdAt) {
+            userCreatedAt = new Date(currentUser.createdAt)
+          }
+        }
+      } catch (e) { }
+
+      let query: any = { userId }
+      if (role === 'admin') {
+        query = {
+          $or: [
+            { userId },
+            {
+              targetRole: 'admin',
+              createdAt: { $gte: userCreatedAt }
+            }
+          ]
+        }
+      } else if (role === 'employer') {
+        query = {
+          $or: [
+            { userId },
+            {
+              targetRole: 'employer',
+              createdAt: { $gte: userCreatedAt }
+            }
+          ]
+        }
+      }
+
+      const result = await collection.deleteMany(query)
+
+      return NextResponse.json({
+        success: true,
+        message: `Deleted ${result.deletedCount} notifications`,
+      })
+    }
 
     if (!notificationId) {
       return NextResponse.json({ success: false, error: "Notification ID is required" }, { status: 400 })
     }
 
-    const collection = await getCollection(COLLECTIONS.NOTIFICATIONS)
     await collection.deleteOne({ _id: new ObjectId(notificationId) })
 
     return NextResponse.json({
