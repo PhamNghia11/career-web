@@ -164,8 +164,21 @@ export async function PATCH(request: Request) {
     }
 
     if (action === "mark_all_read" && userId) {
+      const { role } = await request.json().catch(() => ({ role: null }))
+
+      let query: any = { userId, read: false }
+
+      if (role === 'admin' || role === 'employer') {
+        query = {
+          $or: [
+            { userId, read: false },
+            { targetRole: role, read: false }
+          ]
+        }
+      }
+
       await collection.updateMany(
-        { userId, read: false },
+        query,
         { $set: { read: true } }
       )
       return NextResponse.json({

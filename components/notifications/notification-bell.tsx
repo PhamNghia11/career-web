@@ -96,7 +96,7 @@ export function NotificationBell() {
             await fetch("/api/notifications", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: user.id, action: "mark_all_read" }),
+                body: JSON.stringify({ userId: user.id, action: "mark_all_read", role: user.role }),
             })
             setNotifications(prev => prev.map(n => ({ ...n, read: true })))
             setUnreadCount(0)
