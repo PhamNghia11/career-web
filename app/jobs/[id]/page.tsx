@@ -9,6 +9,7 @@ import Link from "next/link"
 import { allJobs } from "@/lib/jobs-data"
 import { ApplyButton } from "@/components/jobs/apply-button"
 import { Separator } from "@/components/ui/separator"
+import { ViewTracker } from "@/components/jobs/view-tracker"
 
 interface JobPageProps {
     params: Promise<{
@@ -280,6 +281,7 @@ export default async function JobPage(props: JobPageProps) {
             </main>
             <Footer />
             <SocialChatWidget />
+            <ViewTracker jobId={job._id} />
         </div>
     )
 }

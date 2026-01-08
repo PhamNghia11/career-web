@@ -26,22 +26,27 @@ export function EmployerDashboardContent() {
             try {
                 setLoading(true)
                 // Fetch jobs created by this employer
-                const res = await fetch(`/api/jobs?creatorId=${user._id}`)
-                const data = await res.json()
+                const jobsRes = await fetch(`/api/jobs?creatorId=${user._id}`)
+                const jobsData = await jobsRes.json()
 
-                if (data.success) {
-                    const jobs = data.data.jobs || []
+                // Fetch applications for this employer
+                const appsRes = await fetch(`/api/applications?role=employer&employerId=${user._id}`)
+                const appsData = await appsRes.json()
+                const realApplicationCount = appsData.success && Array.isArray(appsData.data) ? appsData.data.length : 0
+
+                if (jobsData.success) {
+                    const jobs = jobsData.data.jobs || []
 
                     // Calculate stats
                     const active = jobs.filter((j: any) => j.status === 'active').length
                     const pending = jobs.filter((j: any) => j.status === 'pending').length
                     const views = jobs.reduce((acc: number, j: any) => acc + (j.views || 0), 0)
-                    const applications = jobs.reduce((acc: number, j: any) => acc + (j.applicants || 0), 0)
+                    // Use real count from applications API
 
                     setStats({
                         activeJobs: active,
                         pendingJobs: pending,
-                        totalApplications: applications,
+                        totalApplications: realApplicationCount,
                         totalViews: views
                     })
 
