@@ -56,4 +56,5 @@ export const COLLECTIONS = {
   CONTACTS: "contacts",
   NOTIFICATIONS: "notifications",
   VISITORS: "visitors",
+  REPORTS: "reports",
 } as const

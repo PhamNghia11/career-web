@@ -10,6 +10,7 @@ import { allJobs } from "@/lib/jobs-data"
 import { ApplyButton } from "@/components/jobs/apply-button"
 import { Separator } from "@/components/ui/separator"
 import { ViewTracker } from "@/components/jobs/view-tracker"
+import { ReportJobDialog } from "@/components/jobs/report-job-dialog"
 
 interface JobPageProps {
     params: Promise<{
@@ -275,6 +276,11 @@ export default async function JobPage(props: JobPageProps) {
                                     </div>
                                 </CardContent>
                             </Card>
+                            <ReportJobDialog
+                                jobId={job._id}
+                                jobTitle={job.title}
+                                companyName={job.company}
+                            />
                         </div>
                     </div>
                 </div>
