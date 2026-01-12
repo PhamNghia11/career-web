@@ -410,6 +410,10 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     const jobs = [...filteredJobs]
 
     switch (sortBy) {
+      case "newest":
+        return jobs.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
+      case "salary":
+        return jobs.sort((a, b) => parseMaxSalary(b.salary) - parseMaxSalary(a.salary))
       case "deadline":
         // Sort by deadline, soonest first
         return jobs.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
