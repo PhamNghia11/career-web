@@ -203,7 +203,7 @@ export async function POST(request: Request) {
             ${message ? `<li style="padding: 8px 0;"><strong>Lời nhắn:</strong> ${message}</li>` : ''}
           </ul>
           <p style="margin-top: 20px;">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://career-web-three.vercel.app'}/dashboard/manage-applications?id=${applicationId}" 
+            <a href="${(process.env.NEXT_PUBLIC_APP_URL || 'https://career-web-three.vercel.app').replace(/\/$/, '')}/dashboard/manage-applications?id=${applicationId}" 
                style="background: #1e3a5f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
               Xem hồ sơ chi tiết
             </a>
