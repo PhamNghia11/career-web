@@ -245,6 +245,49 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     }
   }
 
+  // Helper function to parse minimum salary from string
+  const parseMinSalary = (salary: string): number => {
+    const s = salary.toLowerCase().trim()
+    if (!s) return 0
+
+    let value = 0
+    let timeMultiplier = 1
+
+    // Determine time multiplier (normalize to monthly)
+    if (s.includes("/giờ") || s.includes("/h") || s.includes("hr")) {
+      timeMultiplier = 160
+    }
+
+    // Case 1: "Triệu"
+    if (s.includes("triệu")) {
+      const matches = s.match(/[0-9]+([.,][0-9]+)?/g)
+      if (matches && matches.length > 0) {
+        // First number is usually the min
+        const nums = matches.map(m => parseFloat(m.replace(',', '.')))
+        value = Math.min(...nums) * 1000000
+      }
+    }
+    // Case 2: USD
+    else if (s.includes("usd") || s.includes("$")) {
+      const matches = s.match(/[0-9]+([.,][0-9]+)?/g)
+      if (matches && matches.length > 0) {
+        const nums = matches.map(m => parseFloat(m.replace(/,/g, '')))
+        value = Math.min(...nums) * 25300
+      }
+    }
+    // Case 3: Raw VND or other numeric
+    else {
+      const clean = s.replace(/[.,]/g, '')
+      const matches = clean.match(/\d+/g)
+      if (matches && matches.length > 0) {
+        const nums = matches.map(Number)
+        value = Math.min(...nums)
+      }
+    }
+
+    return value * timeMultiplier
+  }
+
   // Helper function to parse maximum salary from string like "5-8 triệu", "20-35 triệu", or "40.000 - 90.000 VND/giờ"
   const parseMaxSalary = (salary: string): number => {
     const s = salary.toLowerCase().trim()
@@ -454,7 +497,17 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
       case "newest":
         return jobs.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
       case "salary":
-        return jobs.sort((a, b) => parseMaxSalary(b.salary) - parseMaxSalary(a.salary))
+        return jobs.sort((a, b) => {
+          const maxA = parseMaxSalary(a.salary)
+          const maxB = parseMaxSalary(b.salary)
+          if (maxA !== maxB) {
+            return maxB - maxA // Sort by max salary descending
+          }
+          // If max salaries are equal, sort by min salary descending
+          const minA = parseMinSalary(a.salary)
+          const minB = parseMinSalary(b.salary)
+          return minB - minA
+        })
       case "deadline":
         // Sort by deadline, soonest first
         return jobs.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
