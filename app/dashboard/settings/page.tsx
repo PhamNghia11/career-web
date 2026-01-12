@@ -98,17 +98,21 @@ export default function SettingsPage() {
 
     setPasswordStatus("loading")
 
+    const payload = {
+      userId: user?._id || user?.id,
+      currentPassword,
+      newPassword,
+    }
+
+    console.log("Sending change password request:", payload)
+
     try {
       const response = await fetch("/api/user/change-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userId: user?._id || user?.id,
-          currentPassword,
-          newPassword,
-        }),
+        body: JSON.stringify(payload),
       })
 
       const result = await response.json()

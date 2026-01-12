@@ -8,6 +8,12 @@ export async function POST(request: Request) {
         const body = await request.json()
         const { userId, currentPassword, newPassword } = body
 
+        console.log("[API] Change Password Request:", {
+            userId,
+            hasCurrentPass: !!currentPassword,
+            hasNewPass: !!newPassword
+        })
+
         if (!userId || !currentPassword || !newPassword) {
             return NextResponse.json(
                 { error: "Vui lòng điền đầy đủ thông tin" },
@@ -27,6 +33,7 @@ export async function POST(request: Request) {
         const user = await collection.findOne({ _id: new ObjectId(userId) })
 
         if (!user) {
+            console.log("[API] User not found for ID:", userId)
             return NextResponse.json(
                 { error: "Không tìm thấy người dùng" },
                 { status: 404 }
@@ -37,6 +44,7 @@ export async function POST(request: Request) {
         const isPasswordValid = await bcrypt.compare(currentPassword, user.password)
 
         if (!isPasswordValid) {
+            console.log("[API] Invalid current password for user:", userId)
             return NextResponse.json(
                 { error: "Mật khẩu hiện tại không đúng" },
                 { status: 401 }
