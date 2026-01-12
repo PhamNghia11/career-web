@@ -105,7 +105,7 @@ export default function SettingsPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: user?.id,
+          userId: user?._id || user?.id,
           currentPassword,
           newPassword,
         }),
