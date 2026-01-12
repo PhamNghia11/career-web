@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/lib/mongodb"
-import userModel from "@/lib/user-model"
 import { sendEmail } from "@/lib/email"
-import crypto from "crypto"
 
 export async function POST(req: Request) {
     try {
@@ -16,57 +14,48 @@ export async function POST(req: Request) {
         const user = await collection.findOne({ email })
 
         if (!user) {
-            // For security, don't reveal if email exists or not
-            // But for this project, checking is fine, or simulate success
-            return NextResponse.json({ success: true, message: "Nếu email tồn tại, link đã được gửi." })
+            return NextResponse.json({ error: "Email này chưa được đăng ký tài khoản." }, { status: 404 })
         }
 
-        // Generate token
-        const resetToken = crypto.randomBytes(32).toString("hex")
-        const resetExpires = new Date(Date.now() + 3600000) // 1 hour
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        const resetExpires = new Date(Date.now() + 15 * 60 * 1000) // 15 minutes validity
 
-        // Save token to user
+        // Save OTP to user (reusing resetPasswordToken field)
         await collection.updateOne(
             { email },
             {
                 $set: {
-                    resetPasswordToken: resetToken,
+                    resetPasswordToken: otp,
                     resetPasswordExpires: resetExpires
                 }
             }
         )
 
-        // Create reset link
-        // Assuming the app is hosted at process.env.NEXT_PUBLIC_APP_URL or we use req.url based hostname
-        // For simplicity in this env, we construct from origin if possible, otherwise hardcode or use env
-        const urlObj = new URL(req.url)
-        const baseUrl = `${urlObj.protocol}//${urlObj.host}`
-        const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`
-
-        // Send email
+        // Send email with OTP
         const emailResult = await sendEmail({
             to: email,
-            subject: "Khôi phục mật khẩu - GDU Career",
+            subject: "Mã xác nhận khôi phục mật khẩu - GDU Career",
             html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #d32f2f;">Yêu cầu đặt lại mật khẩu</h2>
-                    <p>Bạn (hoặc ai đó) vừa yêu cầu đặt lại mật khẩu cho tài khoản GDU Career của mình.</p>
-                    <p>Vui lòng nhấn vào nút bên dưới để đặt mật khẩu mới:</p>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    <h2 style="color: #d32f2f; text-align: center;">Mã xác nhận</h2>
+                    <p>Xin chào,</p>
+                    <p>Bạn đang thực hiện yêu cầu đặt lại mật khẩu. Vui lòng sử dụng mã OTP dưới đây để tiếp tục:</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="${resetUrl}" style="background-color: #d32f2f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Đặt lại mật khẩu</a>
+                        <span style="background-color: #f5f5f5; color: #333; padding: 15px 30px; font-size: 24px; font-weight: bold; letter-spacing: 5px; border-radius: 5px; border: 1px solid #ccc;">${otp}</span>
                     </div>
-                    <p>Link này sẽ hết hạn sau 1 giờ.</p>
-                    <p>Nếu bạn không yêu cầu điều này, vui lòng bỏ qua email này.</p>
+                    <p style="text-align: center; color: #666;">Mã này sẽ hết hạn sau 15 phút.</p>
+                    <p>Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email.</p>
                 </div>
             `
         })
 
         if (!emailResult.success) {
             console.error("Failed to send email:", emailResult.error)
-            return NextResponse.json({ error: "Không thể gửi email. Vui lòng thử lại sau." }, { status: 500 })
+            return NextResponse.json({ error: `Lỗi gửi email: ${JSON.stringify(emailResult.error)}` }, { status: 500 })
         }
 
-        return NextResponse.json({ success: true, message: "Email sent" })
+        return NextResponse.json({ success: true, message: "OTP sent" })
 
     } catch (error) {
         console.error("Forgot password error:", error)

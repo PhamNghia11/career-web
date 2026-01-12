@@ -4,9 +4,9 @@ import bcrypt from "bcryptjs"
 
 export async function POST(req: Request) {
     try {
-        const { token, newPassword } = await req.json()
+        const { email, otp, newPassword } = await req.json()
 
-        if (!token || !newPassword) {
+        if (!email || !otp || !newPassword) {
             return NextResponse.json({ error: "Thiếu thông tin" }, { status: 400 })
         }
 
@@ -16,14 +16,15 @@ export async function POST(req: Request) {
 
         const collection = await getCollection(COLLECTIONS.USERS)
 
-        // Find user with valid token and expiration
+        // Find user with matching email, OTP and valid expiration
         const user = await collection.findOne({
-            resetPasswordToken: token,
+            email: email,
+            resetPasswordToken: otp,
             resetPasswordExpires: { $gt: new Date() }
         })
 
         if (!user) {
-            return NextResponse.json({ error: "Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn" }, { status: 400 })
+            return NextResponse.json({ error: "Mã OTP không chính xác hoặc đã hết hạn" }, { status: 400 })
         }
 
         // Hash new password
