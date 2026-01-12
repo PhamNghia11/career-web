@@ -27,6 +27,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Mã OTP không chính xác hoặc đã hết hạn" }, { status: 400 })
         }
 
+        // Check if new password is same as old password
+        const isSamePassword = await bcrypt.compare(newPassword, user.password)
+        if (isSamePassword) {
+            return NextResponse.json({ error: "Mật khẩu mới không được trùng với mật khẩu cũ" }, { status: 400 })
+        }
+
         // Hash new password
         const hashedPassword = await bcrypt.hash(newPassword, 10)
 
