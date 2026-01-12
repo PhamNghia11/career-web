@@ -181,6 +181,9 @@ export async function POST(request: Request) {
     }
 
     // 3. Send Email Notifications
+    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://career-web-three.vercel.app').replace(/\/$/, '')
+    const applicationLink = `${baseUrl}/dashboard/manage-applications?id=${applicationId}`
+
     const emailSubject = `[GDU Career] Hồ sơ ứng tuyển mới: ${jobTitle}`
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -202,11 +205,15 @@ export async function POST(request: Request) {
             <li style="padding: 8px 0;"><strong>CV:</strong> ${cvOriginalName || 'Không đính kèm'}</li>
             ${message ? `<li style="padding: 8px 0;"><strong>Lời nhắn:</strong> ${message}</li>` : ''}
           </ul>
-          <p style="margin-top: 20px;">
-            <a href="${(process.env.NEXT_PUBLIC_APP_URL || 'https://career-web-three.vercel.app').replace(/\/$/, '')}/dashboard/manage-applications?id=${applicationId}" 
-               style="background: #1e3a5f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+          <div style="margin-top: 30px; text-align: center;">
+            <a href="${applicationLink}" 
+               style="background-color: #1e3a5f; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
               Xem hồ sơ chi tiết
             </a>
+          </div>
+          <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
+            Nếu nút trên không hoạt động, vui lòng copy đường dẫn sau:<br>
+            <a href="${applicationLink}" style="color: #1e3a5f;">${applicationLink}</a>
           </p>
         </div>
         <div style="padding: 15px; text-align: center; color: #666; font-size: 12px;">
