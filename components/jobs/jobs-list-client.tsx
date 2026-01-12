@@ -245,11 +245,52 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     }
   }
 
-  // Helper function to parse maximum salary from string like "5-8 triệu" or "20-35 triệu"
+  // Helper function to parse maximum salary from string like "5-8 triệu", "20-35 triệu", or "40.000 - 90.000 VND/giờ"
   const parseMaxSalary = (salary: string): number => {
-    const numbers = salary.match(/\d+/g)?.map(Number)
-    if (!numbers || numbers.length === 0) return 0
-    return Math.max(...numbers)
+    const s = salary.toLowerCase().trim()
+    if (!s) return 0
+
+    let value = 0
+    let timeMultiplier = 1
+
+    // Determine time multiplier (normalize to monthly)
+    // Assuming standard 160 working hours per month for hourly rates
+    if (s.includes("/giờ") || s.includes("/h") || s.includes("hr")) {
+      timeMultiplier = 160
+    }
+
+    // Case 1: "Triệu" (e.g., "10-15 triệu")
+    if (s.includes("triệu")) {
+      const matches = s.match(/[0-9]+([.,][0-9]+)?/g)
+      if (matches) {
+        // Replace comma with dot for decimal parsing if needed
+        const nums = matches.map(m => parseFloat(m.replace(',', '.')))
+        value = Math.max(...nums) * 1000000
+      }
+    }
+    // Case 2: USD (e.g., "$1000", "1000 USD")
+    else if (s.includes("usd") || s.includes("$")) {
+      const matches = s.match(/[0-9]+([.,][0-9]+)?/g)
+      if (matches) {
+        // Remove commas before parsing (for thousands)
+        const nums = matches.map(m => parseFloat(m.replace(/,/g, '')))
+        value = Math.max(...nums) * 25300 // Approx exchange rate
+      }
+    }
+    // Case 3: Raw VND or other numeric (e.g., "40.000 - 90.000", "5000000")
+    else {
+      // Remove dots and commas which might be separators
+      // For VND "40.000" usually means 40,000. So removing dot results in 40000 which is correct.
+      // We assume raw numbers without "triệu" suffix are in VND.
+      const clean = s.replace(/[.,]/g, '')
+      const matches = clean.match(/\d+/g)
+      if (matches) {
+        const nums = matches.map(Number)
+        value = Math.max(...nums)
+      }
+    }
+
+    return value * timeMultiplier
   }
 
   // Helper function to check if job matches industry filter
