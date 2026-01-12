@@ -245,6 +245,23 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     }
   }
 
+  // Helper function to safely parse date strings (handles DD/MM/YYYY and ISO)
+  const parseDateHelper = (dateString: string): number => {
+    if (!dateString) return 0
+    try {
+      // Check if DD/MM/YYYY format
+      if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        const [day, month, year] = dateString.split('/').map(Number)
+        return new Date(year, month - 1, day).getTime()
+      }
+      // Fallback to standard parsing
+      const date = new Date(dateString)
+      return isNaN(date.getTime()) ? 0 : date.getTime()
+    } catch {
+      return 0
+    }
+  }
+
   // Helper function to parse minimum salary from string
   const parseMinSalary = (salary: string): number => {
     const s = salary.toLowerCase().trim()
@@ -509,8 +526,20 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
           return minB - minA
         })
       case "deadline":
-        // Sort by deadline, soonest first
-        return jobs.sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
+      // Sort by deadline, soonest first
+      case "deadline":
+        // Sort by deadline, soonest first (and process valid deadlines only or push invalid to end)
+        return jobs.sort((a, b) => {
+          const timeA = parseDateHelper(a.deadline)
+          const timeB = parseDateHelper(b.deadline)
+
+          // Push jobs with no deadline to the bottom
+          if (!timeA && !timeB) return 0
+          if (!timeA) return 1
+          if (!timeB) return -1
+
+          return timeA - timeB
+        })
       default:
         return jobs
     }
