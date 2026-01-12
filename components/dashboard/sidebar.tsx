@@ -90,7 +90,7 @@ export function DashboardSidebar() {
               {user?.avatar ? (
                 <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
               ) : (
-                <User className="h-5 w-5" />
+                <img src="/default-avatar.png" alt="Default Avatar" className="w-full h-full object-cover" />
               )}
             </div>
             <div className="flex-1 min-w-0">

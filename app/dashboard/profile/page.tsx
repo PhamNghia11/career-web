@@ -102,7 +102,7 @@ export default function ProfilePage() {
                 {user?.avatar ? (
                   <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                 ) : (
-                  user?.name?.charAt(0) || "U"
+                  <img src="/default-avatar.png" alt="Default Avatar" className="w-full h-full object-cover" />
                 )}
               </div>
               <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
