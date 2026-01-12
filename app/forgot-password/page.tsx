@@ -12,7 +12,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { useToast } from "@/hooks/use-toast"
 
 export default function ForgotPasswordPage() {
-    const [step, setStep] = useState<1 | 2>(1)
+    const [step, setStep] = useState<1 | 2 | 3>(1)
     const [email, setEmail] = useState("")
     const [otp, setOtp] = useState("")
     const [newPassword, setNewPassword] = useState("")
@@ -61,17 +61,56 @@ export default function ForgotPasswordPage() {
         }
     }
 
-    // Step 2: Verify OTP and Reset Password
+    // Step 2: Verify OTP
+    const handleVerifyOtp = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        if (otp.length !== 6) {
+            toast({ title: "Lỗi", description: "Vui lòng nhập đầy đủ 6 số OTP.", variant: "destructive" })
+            return
+        }
+
+        setIsLoading(true)
+
+        try {
+            const response = await fetch("/api/auth/verify-reset-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, otp }),
+            })
+
+            const data = await response.json()
+
+            if (data.success) {
+                setStep(3)
+                toast({
+                    title: "OTP Hợp lệ",
+                    description: "Vui lòng nhập mật khẩu mới.",
+                })
+            } else {
+                toast({
+                    title: "Lỗi",
+                    description: data.error || "Mã OTP không đúng hoặc đã hết hạn.",
+                    variant: "destructive",
+                })
+            }
+        } catch (error) {
+            toast({
+                title: "Lỗi kết nối",
+                description: "Có lỗi xảy ra.",
+                variant: "destructive",
+            })
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    // Step 3: Reset Password
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault()
 
         if (newPassword !== confirmPassword) {
             toast({ title: "Lỗi", description: "Mật khẩu xác nhận không khớp.", variant: "destructive" })
-            return
-        }
-
-        if (otp.length !== 6) {
-            toast({ title: "Lỗi", description: "Vui lòng nhập đầy đủ 6 số OTP.", variant: "destructive" })
             return
         }
 
@@ -96,7 +135,7 @@ export default function ForgotPasswordPage() {
             } else {
                 toast({
                     title: "Lỗi",
-                    description: data.error || "Mã OTP không đúng hoặc đã hết hạn.",
+                    description: data.error || "Đã xảy ra lỗi khi đổi mật khẩu.",
                     variant: "destructive",
                 })
             }
@@ -146,16 +185,18 @@ export default function ForgotPasswordPage() {
                 <Card className="shadow-xl border-0 ring-1 ring-gray-200/50 bg-white/80 backdrop-blur-sm">
                     <CardHeader className="text-center pb-6">
                         <CardTitle className="text-2xl font-bold tracking-tight text-gray-900">
-                            {step === 1 ? "Quên mật khẩu?" : "Đặt lại mật khẩu"}
+                            {step === 1 && "Quên mật khẩu?"}
+                            {step === 2 && "Nhập mã xác thực"}
+                            {step === 3 && "Đặt lại mật khẩu"}
                         </CardTitle>
                         <CardDescription className="text-base">
-                            {step === 1
-                                ? "Nhập email để nhận mã xác thực (OTP)"
-                                : `Nhập mã OTP đã gửi đến ${email}`}
+                            {step === 1 && "Nhập email để nhận mã xác thực (OTP)"}
+                            {step === 2 && `Nhập mã OTP 6 số đã gửi đến ${email}`}
+                            {step === 3 && "Nhập mật khẩu mới cho tài khoản của bạn"}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        {step === 1 ? (
+                        {step === 1 && (
                             <form onSubmit={handleSendOtp} className="space-y-5">
                                 <div className="space-y-2">
                                     <Label htmlFor="email" className="text-gray-700 font-medium">Email đăng ký</Label>
@@ -181,11 +222,12 @@ export default function ForgotPasswordPage() {
                                     {isLoading ? "Đang gửi..." : "Gửi mã xác thực"}
                                 </Button>
                             </form>
-                        ) : (
-                            <form onSubmit={handleResetPassword} className="space-y-5">
+                        )}
+
+                        {step === 2 && (
+                            <form onSubmit={handleVerifyOtp} className="space-y-5">
                                 <div className="space-y-2">
-                                    <Label className="text-gray-700 font-medium">Mã xác thực (OTP)</Label>
-                                    <div className="flex justify-center">
+                                    <div className="flex justify-center py-4">
                                         <InputOTP maxLength={6} value={otp} onChange={(value) => setOtp(value)}>
                                             <InputOTPGroup>
                                                 <InputOTPSlot index={0} />
@@ -199,6 +241,26 @@ export default function ForgotPasswordPage() {
                                     </div>
                                 </div>
 
+                                <Button
+                                    type="submit"
+                                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-red-600/20 transition-all hover:shadow-red-600/30 active:scale-[0.98]"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? "Đang xác thực..." : "Tiếp tục"}
+                                </Button>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setStep(1)}
+                                    className="w-full text-sm text-gray-500 hover:text-gray-700 underline"
+                                >
+                                    Gửi lại mã OTP
+                                </button>
+                            </form>
+                        )}
+
+                        {step === 3 && (
+                            <form onSubmit={handleResetPassword} className="space-y-5">
                                 <div className="space-y-2">
                                     <Label htmlFor="newPassword">Mật khẩu mới</Label>
                                     <div className="relative group">
@@ -245,14 +307,6 @@ export default function ForgotPasswordPage() {
                                 >
                                     {isLoading ? "Đang xử lý..." : "Đổi mật khẩu"}
                                 </Button>
-
-                                <button
-                                    type="button"
-                                    onClick={() => setStep(1)}
-                                    className="w-full text-sm text-gray-500 hover:text-gray-700 underline"
-                                >
-                                    Gửi lại mã OTP
-                                </button>
                             </form>
                         )}
                     </CardContent>
