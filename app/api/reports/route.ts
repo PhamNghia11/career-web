@@ -3,6 +3,30 @@ import { NextResponse } from 'next/server'
 import { getCollection, COLLECTIONS } from '@/lib/mongodb'
 import { ObjectId } from 'mongodb'
 
+export async function GET(req: Request) {
+    try {
+        const { searchParams } = new URL(req.url)
+        const status = searchParams.get('status')
+
+        const collection = await getCollection(COLLECTIONS.REPORTS)
+
+        const query: any = {}
+        if (status && status !== 'all') {
+            query.status = status
+        }
+
+        const reports = await collection.find(query).sort({ createdAt: -1 }).toArray()
+
+        return NextResponse.json({ success: true, reports })
+    } catch (error) {
+        console.error('Error fetching reports:', error)
+        return NextResponse.json(
+            { success: false, error: 'Đã xảy ra lỗi khi tải danh sách báo cáo' },
+            { status: 500 }
+        )
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const body = await req.json()

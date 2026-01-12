@@ -19,6 +19,7 @@ import {
   MessageCircle,
   ArrowLeft,
   Eye,
+  Flag,
 } from "lucide-react"
 import { useAuth } from "@/lib/auth-context"
 import { cn } from "@/lib/utils"
@@ -52,6 +53,7 @@ const adminNav = [
   { name: "Đơn ứng tuyển", href: "/dashboard/applications", icon: FileText },
   { name: "Đánh giá Google", href: "/dashboard/reviews", icon: Star },
   { name: "Khách truy cập", href: "/dashboard/visitors", icon: Eye },
+  { name: "Báo cáo vi phạm", href: "/dashboard/admin/reports", icon: Flag },
   { name: "Thống kê", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Liên hệ", href: "/dashboard/messages", icon: MessageSquare },
   { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },
