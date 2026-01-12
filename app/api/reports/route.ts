@@ -31,6 +31,23 @@ export async function POST(req: Request) {
 
         await collection.insertOne(report)
 
+        // Notify admins
+        try {
+            const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+            await notifCollection.insertOne({
+                targetRole: 'admin',
+                type: 'system',
+                title: 'Báo cáo tin tuyển dụng mới',
+                message: `Tin tuyển dụng ${jobTitle} của ${companyName} vừa bị báo cáo bởi ${reporterName}.`,
+                read: false,
+                createdAt: new Date(),
+                link: '/dashboard/admin/reports' // Assuming there will be a page to view reports
+            })
+        } catch (err) {
+            console.error('Failed to create admin notification for report:', err)
+            // Continue success response even if notification fails
+        }
+
         return NextResponse.json({ success: true, message: 'Gửi báo cáo thành công' })
 
     } catch (error) {
