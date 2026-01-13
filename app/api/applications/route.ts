@@ -182,7 +182,7 @@ export async function POST(request: Request) {
 
     // 3. Send Email Notifications
     const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://career-web-three.vercel.app').replace(/\/$/, '')
-    const applicationLink = `${baseUrl}/dashboard/manage-applications?id=${applicationId}`
+    const applicationLink = `${baseUrl}/dashboard/applicants-manager?id=${applicationId}`
 
     const emailSubject = `[GDU Career] Hồ sơ ứng tuyển mới: ${jobTitle}`
     const emailHtml = `
