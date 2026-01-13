@@ -107,10 +107,12 @@ export function ApplyJobDialog({
         try {
             // Get form values
             const form = e.target as HTMLFormElement
-            const email = (form.elements.namedItem("email") as HTMLInputElement).value
+            const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim()
+            const phone = (form.elements.namedItem("phone") as HTMLInputElement).value.trim()
 
-            if (!email.endsWith("@gmail.com")) {
+            if (!email.toLowerCase().endsWith("@gmail.com")) {
                 setError("Email phải là địa chỉ Gmail (@gmail.com)")
+                setIsSubmitting(false)
                 return
             }
 
@@ -122,13 +124,13 @@ export function ApplyJobDialog({
             // Add applicantId for notification purposes (if user is logged in)
             if (user?.id) formData.append("applicantId", user.id)
 
-            formData.append("fullname", (form.elements.namedItem("fullname") as HTMLInputElement).value)
+            formData.append("fullname", (form.elements.namedItem("fullname") as HTMLInputElement).value.trim())
             formData.append("email", email)
-            formData.append("phone", (form.elements.namedItem("phone") as HTMLInputElement).value)
-            formData.append("mssv", (form.elements.namedItem("mssv") as HTMLInputElement).value)
-            formData.append("major", (form.elements.namedItem("major") as HTMLInputElement).value)
-            formData.append("faculty", faculty)
-            formData.append("cohort", cohort)
+            formData.append("phone", phone)
+            formData.append("mssv", (form.elements.namedItem("mssv") as HTMLInputElement).value.trim())
+            formData.append("major", (form.elements.namedItem("major") as HTMLInputElement).value.trim())
+            formData.append("faculty", faculty.trim())
+            formData.append("cohort", cohort.trim())
 
             formData.append("message", (form.elements.namedItem("message") as HTMLTextAreaElement).value)
             if (selectedFile) {
