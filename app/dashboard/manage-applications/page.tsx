@@ -46,6 +46,18 @@ export default function ManageApplicationsPage() {
         }
     }, [isLoading, user])
 
+    // Deep linking: Check for 'id' in URL and auto-open that application
+    useEffect(() => {
+        const idFromUrl = searchParams.get("id")
+        if (idFromUrl && applications.length > 0) {
+            const targetApp = applications.find(app => app._id === idFromUrl)
+            if (targetApp) {
+                console.log("Deep linking to application:", idFromUrl)
+                handleViewCV(targetApp)
+            }
+        }
+    }, [searchParams, applications])
+
     const fetchApplications = async () => {
         try {
             const role = user?.role || "student"
@@ -58,6 +70,8 @@ export default function ManageApplicationsPage() {
             } else if (role === "employer") {
                 queryParams.set("employerId", user?.id || "")
             }
+
+            console.log("Fetching applications with params:", queryParams.toString())
 
             // Support filtering by jobId from URL
             const jobIdFromUrl = searchParams.get("jobId")
