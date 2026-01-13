@@ -6,6 +6,15 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async redirects() {
+    return [
+      {
+        source: '/dashboard/manage-applications',
+        destination: '/dashboard/applicants-manager',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 export default nextConfig

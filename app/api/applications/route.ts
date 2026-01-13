@@ -129,7 +129,7 @@ export async function POST(request: Request) {
         message: `${fullname} vừa ứng tuyển vị trí ${jobTitle} tại ${companyName}`,
         read: false,
         createdAt: new Date(),
-        link: `/dashboard/manage-applications`,
+        link: `/dashboard/applicants-manager`,
         applicationId: applicationId
       })
       console.log("[Applications API] Created admin notification")
@@ -148,7 +148,7 @@ export async function POST(request: Request) {
           message: `${fullname} vừa ứng tuyển vị trí ${jobTitle}`,
           read: false,
           createdAt: new Date(),
-          link: `/dashboard/manage-applications`,
+          link: `/dashboard/applicants-manager`,
           applicationId: applicationId
         })
         console.log("[Applications API] Created employer notification for:", employerId)

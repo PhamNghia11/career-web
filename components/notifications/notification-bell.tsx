@@ -235,7 +235,13 @@ export function NotificationBell() {
                 {notifications.length > 10 && (
                     <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-center text-primary text-sm py-2">
+                        <DropdownMenuItem
+                            className="text-center text-primary text-sm py-2 cursor-pointer"
+                            onClick={() => {
+                                router.push('/dashboard/notifications')
+                                setOpen(false)
+                            }}
+                        >
                             Xem tất cả thông báo
                         </DropdownMenuItem>
                     </>

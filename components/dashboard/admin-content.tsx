@@ -144,7 +144,7 @@ export function AdminDashboardContent() {
                             </Link>
                         </Button>
                         <Button variant="outline" className="h-24 flex flex-col gap-2 hover:border-primary hover:text-primary" asChild>
-                            <Link href="/dashboard/manage-applications">
+                            <Link href="/dashboard/applicants-manager">
                                 <FileText className="h-6 w-6" />
                                 Quản lý hồ sơ
                             </Link>
