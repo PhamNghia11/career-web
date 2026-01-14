@@ -9,21 +9,19 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 
 const statusLabels: Record<string, string> = {
-    pending: "Đang chờ",
-    reviewing: "Đang xem",
-    interview: "Phỏng vấn",
+    new: "Mới gửi",
+    reviewed: "Đã xem",
+    interviewed: "Mời phỏng vấn",
+    hired: "Đã trúng tuyển",
     rejected: "Từ chối",
-    accepted: "Đã nhận",
-    new: "Mới gửi"
 }
 
 const statusColors: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-800",
-    reviewing: "bg-blue-100 text-blue-800",
-    interview: "bg-purple-100 text-purple-800",
+    new: "bg-blue-100 text-blue-800",
+    reviewed: "bg-yellow-100 text-yellow-800",
+    interviewed: "bg-purple-100 text-purple-800",
+    hired: "bg-green-100 text-green-800",
     rejected: "bg-red-100 text-red-800",
-    accepted: "bg-green-100 text-green-800",
-    new: "bg-gray-100 text-gray-800"
 }
 
 export function StudentDashboardContent() {
@@ -50,9 +48,9 @@ export function StudentDashboardContent() {
         fetchApps()
     }, [user])
 
-    const pendingCount = applications.filter(a => ['pending', 'new', 'reviewing'].includes(a.status)).length
-    const interviewCount = applications.filter(a => a.status === 'interview').length
-    const acceptedCount = applications.filter(a => a.status === 'accepted').length
+    const pendingCount = applications.filter(a => ['new', 'reviewed'].includes(a.status)).length
+    const interviewCount = applications.filter(a => a.status === 'interviewed').length
+    const hiredCount = applications.filter(a => a.status === 'hired').length
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
@@ -95,7 +93,7 @@ export function StudentDashboardContent() {
                 </Card>
                 <Card>
                     <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-                        <div className="text-3xl font-bold text-green-600 mb-1">{acceptedCount}</div>
+                        <div className="text-3xl font-bold text-green-600 mb-1">{hiredCount}</div>
                         <div className="text-sm text-muted-foreground">Đã trúng tuyển</div>
                     </CardContent>
                 </Card>
