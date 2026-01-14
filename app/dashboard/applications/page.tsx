@@ -1,8 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -113,82 +111,78 @@ export default function MyApplicationsPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Việc làm đã ứng tuyển</h1>
-            <p className="text-muted-foreground mt-2">
-              Theo dõi trạng thái và kết quả ứng tuyển các vị trí của bạn
-            </p>
-          </div>
+    <div className="flex-1 space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Việc làm đã ứng tuyển</h1>
+          <p className="text-muted-foreground mt-2">
+            Theo dõi trạng thái và kết quả ứng tuyển các vị trí của bạn
+          </p>
         </div>
+      </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Đơn ứng tuyển của bạn ({applications.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {applications.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FileText className="h-8 w-8 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-1">Chưa có hồ sơ nào</h3>
-                <p className="text-gray-500">Bạn chưa nộp hồ sơ vào vị trí nào.</p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Đơn ứng tuyển của bạn ({applications.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {applications.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="h-8 w-8 text-gray-400" />
               </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Vị trí & Công ty</TableHead>
-                      <TableHead>Ngày nộp</TableHead>
-                      <TableHead>Hồ sơ đã nộp</TableHead>
-                      <TableHead>Trạng thái</TableHead>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">Chưa có hồ sơ nào</h3>
+              <p className="text-gray-500">Bạn chưa nộp hồ sơ vào vị trí nào.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Vị trí & Công ty</TableHead>
+                    <TableHead>Ngày nộp</TableHead>
+                    <TableHead>Hồ sơ đã nộp</TableHead>
+                    <TableHead>Trạng thái</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {applications.map((app) => (
+                    <TableRow key={app._id}>
+                      <TableCell>
+                        <div className="font-bold text-[#1e3a5f]">{app.jobTitle}</div>
+                        <div className="flex items-center gap-1 text-sm text-gray-500 mt-1">
+                          <Building className="h-3 w-3" />
+                          {app.companyName}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(app.createdAt).toLocaleDateString("vi-VN")}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-blue-600 h-auto p-0 hover:bg-transparent"
+                          onClick={() => handleViewCV(app)}
+                        >
+                          <FileText className="h-4 w-4 mr-1" />
+                          {app.cvOriginalName || "Xem CV"}
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        {getStatusBadge(app.status)}
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {applications.map((app) => (
-                      <TableRow key={app._id}>
-                        <TableCell>
-                          <div className="font-bold text-[#1e3a5f]">{app.jobTitle}</div>
-                          <div className="flex items-center gap-1 text-sm text-gray-500 mt-1">
-                            <Building className="h-3 w-3" />
-                            {app.companyName}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <Calendar className="h-3 w-3" />
-                            {new Date(app.createdAt).toLocaleDateString("vi-VN")}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-blue-600 h-auto p-0 hover:bg-transparent"
-                            onClick={() => handleViewCV(app)}
-                          >
-                            <FileText className="h-4 w-4 mr-1" />
-                            {app.cvOriginalName || "Xem CV"}
-                          </Button>
-                        </TableCell>
-                        <TableCell>
-                          {getStatusBadge(app.status)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </main>
-      <Footer />
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Dialog open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
         <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
