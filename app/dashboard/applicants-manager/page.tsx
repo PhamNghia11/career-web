@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { Header } from "@/components/layout/header"
-import { Footer } from "@/components/layout/footer"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -205,7 +203,6 @@ export default function ManageApplicationsPage() {
     if (user.role === 'student') {
         return (
             <div className="min-h-screen flex flex-col bg-gray-50">
-                <Header />
                 <main className="flex-1 container mx-auto px-4 py-8">
                     <Card className="p-12 text-center">
                         <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
@@ -213,14 +210,12 @@ export default function ManageApplicationsPage() {
                         <p className="text-gray-500 mt-2">Bạn không có quyền truy cập trang này.</p>
                     </Card>
                 </main>
-                <Footer />
             </div>
         )
     }
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
-            <Header />
             <main className="flex-1 container mx-auto px-4 py-8">
                 <div className="flex items-center justify-between mb-8">
                     <div>
@@ -360,7 +355,6 @@ export default function ManageApplicationsPage() {
                     </CardContent>
                 </Card>
             </main>
-            <Footer />
 
             <Dialog open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
                 <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
