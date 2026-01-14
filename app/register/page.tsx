@@ -63,6 +63,8 @@ export default function RegisterPage() {
 
       const data = await response.json()
 
+      console.log("Register response:", data)
+
       if (data.success) {
         if (data.needsVerification) {
           router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)

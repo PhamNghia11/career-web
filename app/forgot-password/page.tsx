@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { useToast } from "@/hooks/use-toast"
 
 export default function ForgotPasswordPage() {
@@ -227,17 +226,41 @@ export default function ForgotPasswordPage() {
                         {step === 2 && (
                             <form onSubmit={handleVerifyOtp} className="space-y-5">
                                 <div className="space-y-2">
-                                    <div className="flex justify-center py-4">
-                                        <InputOTP maxLength={6} value={otp} onChange={(value) => setOtp(value)}>
-                                            <InputOTPGroup>
-                                                <InputOTPSlot index={0} />
-                                                <InputOTPSlot index={1} />
-                                                <InputOTPSlot index={2} />
-                                                <InputOTPSlot index={3} />
-                                                <InputOTPSlot index={4} />
-                                                <InputOTPSlot index={5} />
-                                            </InputOTPGroup>
-                                        </InputOTP>
+                                    <div className="flex justify-center py-4 gap-2">
+                                        {[0, 1, 2, 3, 4, 5].map((index) => (
+                                            <input
+                                                key={index}
+                                                type="text"
+                                                maxLength={1}
+                                                className="w-10 h-12 text-center text-xl font-bold border rounded-md focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all bg-white"
+                                                value={otp[index] || ""}
+                                                onChange={(e) => {
+                                                    const val = e.target.value
+                                                    if (!/^\d*$/.test(val)) return
+
+                                                    const newOtp = otp.split('')
+                                                    while (newOtp.length < 6) newOtp.push('')
+                                                    newOtp[index] = val
+                                                    const otpStr = newOtp.join('').slice(0, 6)
+                                                    setOtp(otpStr)
+
+                                                    // Auto focus next
+                                                    if (val && index < 5) {
+                                                        const nextInput = document.querySelector(`input[name='otp-${index + 1}']`) as HTMLInputElement
+                                                        if (nextInput) nextInput.focus()
+                                                    }
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Backspace" && !otp[index] && index > 0) {
+                                                        const prevInput = document.querySelector(`input[name='otp-${index - 1}']`) as HTMLInputElement
+                                                        if (prevInput) prevInput.focus()
+                                                    }
+                                                }}
+                                                name={`otp-${index}`}
+                                                inputMode="numeric"
+                                                autoComplete="one-time-code"
+                                            />
+                                        ))}
                                     </div>
                                 </div>
 
