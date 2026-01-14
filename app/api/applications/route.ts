@@ -117,6 +117,28 @@ export async function POST(request: Request) {
     const result = await applicationsCollection.insertOne(applicationData)
     const applicationId = result.insertedId.toString()
 
+    // Increment applicants count on the job
+    if (jobId) {
+      try {
+        const jobsCollection = await getCollection(COLLECTIONS.JOBS)
+        // Try ObjectId first, then string
+        try {
+          await jobsCollection.updateOne(
+            { _id: new ObjectId(jobId) },
+            { $inc: { applicants: 1 } }
+          )
+        } catch {
+          await jobsCollection.updateOne(
+            { _id: jobId as any },
+            { $inc: { applicants: 1 } }
+          )
+        }
+        console.log("[Applications API] Incremented applicants count for job:", jobId)
+      } catch (incError) {
+        console.error("[Applications API] Failed to increment applicants count:", incError)
+      }
+    }
+
     // Create Notifications
     const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
 
