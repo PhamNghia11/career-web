@@ -32,10 +32,24 @@ export function EmployerDashboardContent() {
                 // Fetch applications for this employer
                 const appsRes = await fetch(`/api/applications?role=employer&employerId=${user._id}`)
                 const appsData = await appsRes.json()
-                const realApplicationCount = appsData.success && Array.isArray(appsData.data) ? appsData.data.length : 0
+                const applications = appsData.success && Array.isArray(appsData.data) ? appsData.data : []
+                const realApplicationCount = applications.length
 
                 if (jobsData.success) {
                     const jobs = jobsData.data.jobs || []
+
+                    // Calculate applicant count per job from applications data
+                    const applicantCountPerJob: Record<string, number> = {}
+                    applications.forEach((app: any) => {
+                        const jobId = app.jobId?.toString() || ''
+                        applicantCountPerJob[jobId] = (applicantCountPerJob[jobId] || 0) + 1
+                    })
+
+                    // Attach real applicant count to each job
+                    const jobsWithCounts = jobs.map((job: any) => ({
+                        ...job,
+                        applicants: applicantCountPerJob[job._id?.toString()] || 0
+                    }))
 
                     // Calculate stats
                     const active = jobs.filter((j: any) => j.status === 'active').length
@@ -50,7 +64,7 @@ export function EmployerDashboardContent() {
                         totalViews: views
                     })
 
-                    setRecentJobs(jobs.slice(0, 5)) // Get top 5 recent
+                    setRecentJobs(jobsWithCounts.slice(0, 5)) // Get top 5 recent with real counts
                 }
             } catch (error) {
                 console.error("Failed to fetch employer dashboard data", error)
