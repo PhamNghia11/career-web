@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -30,6 +30,7 @@ interface Application {
 }
 
 export default function ManageApplicationsPage() {
+    const router = useRouter()
     const { user, isLoading } = useAuth()
     const searchParams = useSearchParams()
     const { toast } = useToast()
@@ -180,6 +181,15 @@ export default function ManageApplicationsPage() {
         }
     }
 
+    // Security: Only Admin and Employer can manage applications
+    // If user is not logged in, redirect to login
+    useEffect(() => {
+        if (!isLoading && !user) {
+            const returnUrl = encodeURIComponent(`/dashboard/applicants-manager?${searchParams.toString()}`)
+            router.push(`/login?returnUrl=${returnUrl}`)
+        }
+    }, [user, isLoading, router, searchParams])
+
     if (isLoading || loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -188,8 +198,11 @@ export default function ManageApplicationsPage() {
         )
     }
 
-    // Security: Only Admin and Employer can manage applications
-    if (user?.role === 'student') {
+    if (!user) {
+        return null // Will redirect
+    }
+
+    if (user.role === 'student') {
         return (
             <div className="min-h-screen flex flex-col bg-gray-50">
                 <Header />
