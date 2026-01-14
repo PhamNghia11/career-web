@@ -184,8 +184,8 @@ export default function ForgotPasswordPage() {
                 <Card className="shadow-xl border-0 ring-1 ring-gray-200/50 bg-white/80 backdrop-blur-sm">
                     <CardHeader className="text-center pb-6">
                         <CardTitle className="text-2xl font-bold tracking-tight text-gray-900">
-                            {step === 1 && "Quên mật khẩu?"}
-                            {step === 2 && "Nhập mã xác thực"}
+                            {step === 1 && "Quên mật khẩu? (v2)"}
+                            {step === 2 && "Nhập mã xác thực (v2)"}
                             {step === 3 && "Đặt lại mật khẩu"}
                         </CardTitle>
                         <CardDescription className="text-base">
