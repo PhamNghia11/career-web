@@ -184,8 +184,8 @@ export default function ForgotPasswordPage() {
                 <Card className="shadow-xl border-0 ring-1 ring-gray-200/50 bg-white/80 backdrop-blur-sm">
                     <CardHeader className="text-center pb-6">
                         <CardTitle className="text-2xl font-bold tracking-tight text-gray-900">
-                            {step === 1 && "Quên mật khẩu? (v2)"}
-                            {step === 2 && "Nhập mã xác thực (v2)"}
+                            {step === 1 && "Quên mật khẩu?"}
+                            {step === 2 && "Nhập mã xác thực"}
                             {step === 3 && "Đặt lại mật khẩu"}
                         </CardTitle>
                         <CardDescription className="text-base">
@@ -286,41 +286,26 @@ export default function ForgotPasswordPage() {
                             <form onSubmit={handleResetPassword} className="space-y-5">
                                 <div className="space-y-2">
                                     <Label htmlFor="newPassword">Mật khẩu mới</Label>
-                                    <div className="relative group">
-                                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
-                                        <Input
-                                            id="newPassword"
-                                            type={showPassword ? "text" : "password"}
-                                            value={newPassword}
-                                            onChange={(e) => setNewPassword(e.target.value)}
-                                            placeholder="Ít nhất 6 ký tự"
-                                            className="pl-11 pr-10"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                                        >
-                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                        </button>
-                                    </div>
+                                    <Input
+                                        id="newPassword"
+                                        type="password"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        placeholder="Ít nhất 6 ký tự"
+                                        required
+                                    />
                                 </div>
 
                                 <div className="space-y-2">
                                     <Label htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
-                                    <div className="relative group">
-                                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
-                                        <Input
-                                            id="confirmPassword"
-                                            type={showPassword ? "text" : "password"}
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            placeholder="Nhập lại mật khẩu mới"
-                                            className="pl-11 pr-10"
-                                            required
-                                        />
-                                    </div>
+                                    <Input
+                                        id="confirmPassword"
+                                        type="password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        placeholder="Nhập lại mật khẩu mới"
+                                        required
+                                    />
                                 </div>
 
                                 <Button
