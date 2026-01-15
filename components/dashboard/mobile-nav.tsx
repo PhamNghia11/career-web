@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Home, Briefcase, User, Settings, Bell, LogOut, FileText, Users, Building, BarChart3, Star, Eye, MessageSquare } from "lucide-react"
+import { Menu, X, Home, Briefcase, User, Settings, Bell, LogOut, FileText, Users, Building, BarChart3, Star, Eye, MessageSquare, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth-context"
 import { cn } from "@/lib/utils"
@@ -69,21 +69,16 @@ export function MobileNav() {
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm lg:hidden">
           <div className="fixed inset-y-0 left-0 w-3/4 max-w-xs bg-sidebar text-sidebar-foreground shadow-lg overflow-y-auto">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-sidebar-border">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground font-bold px-2 py-1 rounded">
-                  GDU
-                </div>
-                <span className="font-bold">Gia Dinh University</span>
-              </Link>
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-sidebar-border">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsOpen(false)}
-                className="text-sidebar-foreground hover:bg-sidebar-accent"
+                className="text-sidebar-foreground hover:bg-sidebar-accent -ml-2"
               >
-                <X className="h-6 w-6" />
+                <ChevronLeft className="h-6 w-6" />
               </Button>
+              <span className="font-bold text-lg">Gia Dinh University</span>
             </div>
 
             <div className="px-4 py-4 border-b border-sidebar-border">

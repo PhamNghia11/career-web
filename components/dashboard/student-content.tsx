@@ -55,17 +55,18 @@ export function StudentDashboardContent() {
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* Welcome Banner */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 text-white shadow-lg">
-                <h2 className="text-2xl font-bold mb-2">Xin chào, {user?.name}!</h2>
-                <p className="text-blue-100 mb-6 max-w-2xl">
-                    Chào mừng bạn quay trở lại. Bạn có <strong>{pendingCount} đơn ứng tuyển</strong> đang chờ phản hồi.
-                    Hãy tiếp tục tìm kiếm cơ hội nghề nghiệp phù hợp nhé.
+            {/* Welcome Banner */}
+            <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Xin chào, {user?.name}!</h2>
+                <p className="text-gray-600 mb-6 max-w-2xl">
+                    Chúc bạn một ngày tốt lành! Bạn có <strong>{pendingCount} đơn ứng tuyển</strong> đang chờ phản hồi.
+                    Hãy bắt đầu hành trình sự nghiệp của mình ngay hôm nay.
                 </p>
                 <div className="flex gap-3">
-                    <Button variant="secondary" asChild className="font-semibold">
+                    <Button className="bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white font-semibold" asChild>
                         <Link href="/jobs">Tìm việc ngay</Link>
                     </Button>
-                    <Button variant="outline" className="bg-transparent border-white/20 text-white hover:bg-white/10" asChild>
+                    <Button variant="outline" className="border-gray-200 text-gray-700 hover:bg-gray-50" asChild>
                         <Link href="/dashboard/profile">Cập nhật hồ sơ</Link>
                     </Button>
                 </div>
