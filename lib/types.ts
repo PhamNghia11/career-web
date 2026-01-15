@@ -16,6 +16,11 @@ export interface User {
   address?: string
   description?: string
   size?: string
+  notificationSettings?: {
+    email: boolean
+    push: boolean
+    newJobs: boolean
+  }
 }
 
 export interface Job {

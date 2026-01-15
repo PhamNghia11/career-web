@@ -109,6 +109,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateProfile = async (data: Partial<User>): Promise<boolean> => {
     try {
       if (user) {
+        const userId = user.id || user._id
+        if (!userId) {
+          throw new Error("User ID not found")
+        }
+
+        const response = await fetch(`/api/users/${userId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        })
+
+        if (!response.ok) {
+          throw new Error("Failed to update profile on server")
+        }
+
         const updatedUser = { ...user, ...data, updatedAt: new Date() }
         setUser(updatedUser)
         localStorage.setItem("gdu_user", JSON.stringify(updatedUser))
@@ -116,7 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       return false
     } catch (error) {
-      console.error("[v0] Update profile error:", error)
+      console.error("[Auth] Update profile error:", error)
       return false
     }
   }

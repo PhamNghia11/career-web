@@ -11,7 +11,7 @@ import { useAuth } from "@/lib/auth-context"
 import { UserProfileForm } from "@/components/dashboard/user-profile-form"
 
 export default function SettingsPage() {
-  const { user } = useAuth()
+  const { user, updateProfile } = useAuth()
   const [importStatus, setImportStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
   const [importMessage, setImportMessage] = useState("")
 
@@ -236,7 +236,17 @@ export default function SettingsPage() {
               <p className="text-sm text-muted-foreground">Nhận thông báo qua email</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" defaultChecked className="sr-only peer" />
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={user?.notificationSettings?.email ?? true}
+                onChange={(e) => updateProfile({
+                  notificationSettings: {
+                    ...(user?.notificationSettings || { email: true, push: false, newJobs: true }),
+                    email: e.target.checked
+                  }
+                })}
+              />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
@@ -247,7 +257,17 @@ export default function SettingsPage() {
               <p className="text-sm text-muted-foreground">Nhận thông báo trên trình duyệt</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" className="sr-only peer" />
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={user?.notificationSettings?.push ?? false}
+                onChange={(e) => updateProfile({
+                  notificationSettings: {
+                    ...(user?.notificationSettings || { email: true, push: false, newJobs: true }),
+                    push: e.target.checked
+                  }
+                })}
+              />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
@@ -258,7 +278,17 @@ export default function SettingsPage() {
               <p className="text-sm text-muted-foreground">Nhận thông báo khi có việc làm phù hợp</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" defaultChecked className="sr-only peer" />
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={user?.notificationSettings?.newJobs ?? true}
+                onChange={(e) => updateProfile({
+                  notificationSettings: {
+                    ...(user?.notificationSettings || { email: true, push: false, newJobs: true }),
+                    newJobs: e.target.checked
+                  }
+                })}
+              />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
@@ -266,137 +296,139 @@ export default function SettingsPage() {
       </Card>
 
       {/* Data Management - Admin Only */}
-      {user?.role === "admin" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Database className="h-5 w-5" />
-              Quản lý dữ liệu
-            </CardTitle>
-            <CardDescription>Import/Export dữ liệu CSV và quản lý MongoDB</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Import Status */}
-            {importStatus !== "idle" && (
-              <div
-                className={`p-4 rounded-lg flex items-center gap-3 ${importStatus === "loading"
-                  ? "bg-blue-50 text-blue-700"
-                  : importStatus === "success"
-                    ? "bg-green-50 text-green-700"
-                    : "bg-red-50 text-red-700"
-                  }`}
-              >
-                {importStatus === "loading" && <RefreshCw className="h-5 w-5 animate-spin" />}
-                {importStatus === "success" && <Check className="h-5 w-5" />}
-                {importStatus === "error" && <AlertCircle className="h-5 w-5" />}
-                <span>{importStatus === "loading" ? "Đang xử lý..." : importMessage}</span>
-              </div>
-            )}
+      {
+        user?.role === "admin" && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="h-5 w-5" />
+                Quản lý dữ liệu
+              </CardTitle>
+              <CardDescription>Import/Export dữ liệu CSV và quản lý MongoDB</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Import Status */}
+              {importStatus !== "idle" && (
+                <div
+                  className={`p-4 rounded-lg flex items-center gap-3 ${importStatus === "loading"
+                    ? "bg-blue-50 text-blue-700"
+                    : importStatus === "success"
+                      ? "bg-green-50 text-green-700"
+                      : "bg-red-50 text-red-700"
+                    }`}
+                >
+                  {importStatus === "loading" && <RefreshCw className="h-5 w-5 animate-spin" />}
+                  {importStatus === "success" && <Check className="h-5 w-5" />}
+                  {importStatus === "error" && <AlertCircle className="h-5 w-5" />}
+                  <span>{importStatus === "loading" ? "Đang xử lý..." : importMessage}</span>
+                </div>
+              )}
 
-            {/* Import Section */}
-            <div>
-              <Label className="text-base font-medium">Import dữ liệu CSV</Label>
-              <p className="text-sm text-muted-foreground mb-4">Upload file CSV để import dữ liệu vào hệ thống</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="import-jobs" className="text-sm">
-                    Import Việc làm
-                  </Label>
-                  <div className="mt-2">
-                    <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
-                      <Upload className="h-5 w-5 text-muted-foreground" />
-                      <span className="text-sm">Chọn file CSV</span>
-                      <input
-                        id="import-jobs"
-                        type="file"
-                        accept=".csv"
-                        className="hidden"
-                        onChange={(e) => handleFileImport(e, "jobs")}
-                      />
-                    </label>
+              {/* Import Section */}
+              <div>
+                <Label className="text-base font-medium">Import dữ liệu CSV</Label>
+                <p className="text-sm text-muted-foreground mb-4">Upload file CSV để import dữ liệu vào hệ thống</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="import-jobs" className="text-sm">
+                      Import Việc làm
+                    </Label>
+                    <div className="mt-2">
+                      <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
+                        <Upload className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm">Chọn file CSV</span>
+                        <input
+                          id="import-jobs"
+                          type="file"
+                          accept=".csv"
+                          className="hidden"
+                          onChange={(e) => handleFileImport(e, "jobs")}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="import-reviews" className="text-sm">
+                      Import Đánh giá
+                    </Label>
+                    <div className="mt-2">
+                      <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
+                        <Upload className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm">Chon file CSV</span>
+                        <input
+                          id="import-reviews"
+                          type="file"
+                          accept=".csv"
+                          className="hidden"
+                          onChange={(e) => handleFileImport(e, "reviews")}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="import-users" className="text-sm">
+                      Import Người dùng
+                    </Label>
+                    <div className="mt-2">
+                      <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
+                        <Upload className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm">Chon file CSV</span>
+                        <input
+                          id="import-users"
+                          type="file"
+                          accept=".csv"
+                          className="hidden"
+                          onChange={(e) => handleFileImport(e, "users")}
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                <div>
-                  <Label htmlFor="import-reviews" className="text-sm">
-                    Import Đánh giá
-                  </Label>
-                  <div className="mt-2">
-                    <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
-                      <Upload className="h-5 w-5 text-muted-foreground" />
-                      <span className="text-sm">Chon file CSV</span>
-                      <input
-                        id="import-reviews"
-                        type="file"
-                        accept=".csv"
-                        className="hidden"
-                        onChange={(e) => handleFileImport(e, "reviews")}
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="import-users" className="text-sm">
-                    Import Người dùng
-                  </Label>
-                  <div className="mt-2">
-                    <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
-                      <Upload className="h-5 w-5 text-muted-foreground" />
-                      <span className="text-sm">Chon file CSV</span>
-                      <input
-                        id="import-users"
-                        type="file"
-                        accept=".csv"
-                        className="hidden"
-                        onChange={(e) => handleFileImport(e, "users")}
-                      />
-                    </label>
-                  </div>
+              {/* Export Section */}
+              <div className="border-t pt-6">
+                <Label className="text-base font-medium">Export dữ liệu CSV</Label>
+                <p className="text-sm text-muted-foreground mb-4">Tải xuống dữ liệu dưới dạng file CSV</p>
+                <div className="flex flex-wrap gap-3">
+                  <Button variant="outline" onClick={() => handleExport("jobs")}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Việc làm
+                  </Button>
+                  <Button variant="outline" onClick={() => handleExport("reviews")}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Đánh giá
+                  </Button>
+                  <Button variant="outline" onClick={() => handleExport("users")}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Người dùng
+                  </Button>
                 </div>
               </div>
-            </div>
 
-            {/* Export Section */}
-            <div className="border-t pt-6">
-              <Label className="text-base font-medium">Export dữ liệu CSV</Label>
-              <p className="text-sm text-muted-foreground mb-4">Tải xuống dữ liệu dưới dạng file CSV</p>
-              <div className="flex flex-wrap gap-3">
-                <Button variant="outline" onClick={() => handleExport("jobs")}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Việc làm
-                </Button>
-                <Button variant="outline" onClick={() => handleExport("reviews")}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Đánh giá
-                </Button>
-                <Button variant="outline" onClick={() => handleExport("users")}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Người dùng
-                </Button>
+              {/* MongoDB Info */}
+              <div className="border-t pt-6">
+                <Label className="text-base font-medium">Kết nối MongoDB</Label>
+                <p className="text-sm text-muted-foreground mb-4">Thông tin kết nối cơ sở dữ liệu MongoDB</p>
+                <div className="bg-muted p-4 rounded-lg space-y-2 font-mono text-sm">
+                  <p>
+                    <span className="text-muted-foreground">URI:</span> mongodb://localhost:27017/gdu_career
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Database:</span> gdu_career
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Status:</span>{" "}
+                    <span className="text-green-600">Connected</span>
+                  </p>
+                </div>
               </div>
-            </div>
-
-            {/* MongoDB Info */}
-            <div className="border-t pt-6">
-              <Label className="text-base font-medium">Kết nối MongoDB</Label>
-              <p className="text-sm text-muted-foreground mb-4">Thông tin kết nối cơ sở dữ liệu MongoDB</p>
-              <div className="bg-muted p-4 rounded-lg space-y-2 font-mono text-sm">
-                <p>
-                  <span className="text-muted-foreground">URI:</span> mongodb://localhost:27017/gdu_career
-                </p>
-                <p>
-                  <span className="text-muted-foreground">Database:</span> gdu_career
-                </p>
-                <p>
-                  <span className="text-muted-foreground">Status:</span>{" "}
-                  <span className="text-green-600">Connected</span>
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        )
+      }
     </div>
   )
 }
