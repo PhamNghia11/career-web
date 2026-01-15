@@ -676,6 +676,20 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const hasAdvancedFilters = selectedIndustry || selectedExperience || selectedEducation || selectedPostedDate || selectedLocation
   const advancedFilterCount = [selectedIndustry, selectedExperience, selectedEducation, selectedPostedDate, selectedLocation].filter(Boolean).length
 
+  // State for collapsible sidebar sections
+  const [expandedSections, setExpandedSections] = useState({
+    company: true,
+    type: true,
+    salary: true
+  })
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }))
+  }
+
   // FilterDropdown component
   const FilterDropdown = ({
     label,
@@ -878,95 +892,110 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
 
                   {/* Company Filter */}
                   <div>
-                    <Label className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <Building2 className="h-4 w-4" />
-                      Công ty
-                    </Label>
-                    <div className="space-y-1 max-h-[220px] overflow-y-auto pr-1">
-                      {companies.map((company) => (
-                        <div
-                          key={company.name}
-                          className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedCompany === company.name
-                            ? "bg-primary/10 border border-primary/20"
-                            : "hover:bg-gray-50 border border-transparent"
-                            }`}
-                          onClick={() => handleCompanyChange(company.name)}
-                        >
-                          <div className="w-8 h-8 rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                            {company.logo ? (
-                              <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
-                            ) : (
-                              <Building className="h-4 w-4 text-gray-400" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <span className={`text-sm truncate block ${selectedCompany === company.name ? "font-semibold text-primary" : "font-medium"}`}>
-                              {company.name}
+                    <div className="flex items-center justify-between cursor-pointer mb-3" onClick={() => toggleSection('company')}>
+                      <Label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                        <Building2 className="h-4 w-4" />
+                        Công ty
+                      </Label>
+                      <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${expandedSections.company ? "rotate-180" : ""}`} />
+                    </div>
+                    {expandedSections.company && (
+                      <div className="space-y-1 max-h-[220px] overflow-y-auto pr-1 animate-in slide-in-from-top-2 duration-200">
+                        {companies.map((company) => (
+                          <div
+                            key={company.name}
+                            className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedCompany === company.name
+                              ? "bg-primary/10 border border-primary/20"
+                              : "hover:bg-gray-50 border border-transparent"
+                              }`}
+                            onClick={() => handleCompanyChange(company.name)}
+                          >
+                            <div className="w-8 h-8 rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                              {company.logo ? (
+                                <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
+                              ) : (
+                                <Building className="h-4 w-4 text-gray-400" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <span className={`text-sm truncate block ${selectedCompany === company.name ? "font-semibold text-primary" : "font-medium"}`}>
+                                {company.name}
+                              </span>
+                            </div>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${selectedCompany === company.name
+                              ? "bg-primary text-white"
+                              : "text-muted-foreground bg-gray-100"
+                              }`}>
+                              {company.count}
                             </span>
                           </div>
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${selectedCompany === company.name
-                            ? "bg-primary text-white"
-                            : "text-muted-foreground bg-gray-100"
-                            }`}>
-                            {company.count}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <Separator />
 
                   {/* Work Type Filter */}
                   <div>
-                    <Label className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <Briefcase className="h-4 w-4" />
-                      Hình thức làm việc
-                    </Label>
-                    <div className="space-y-1">
-                      {Object.entries(typeLabels).map(([value, label]) => (
-                        <div
-                          key={value}
-                          className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedType === value
-                            ? "bg-primary/10 border border-primary/20"
-                            : "hover:bg-gray-50 border border-transparent"
-                            }`}
-                          onClick={() => handleTypeChange(value)}
-                        >
-                          <span className={`text-sm block flex-1 ${selectedType === value ? "font-semibold text-primary" : "font-medium"}`}>
-                            {label}
-                          </span>
-                          {selectedType === value && <div className="w-2 h-2 rounded-full bg-primary" />}
-                        </div>
-                      ))}
+                    <div className="flex items-center justify-between cursor-pointer mb-3" onClick={() => toggleSection('type')}>
+                      <Label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                        <Briefcase className="h-4 w-4" />
+                        Hình thức làm việc
+                      </Label>
+                      <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${expandedSections.type ? "rotate-180" : ""}`} />
                     </div>
+                    {expandedSections.type && (
+                      <div className="space-y-1 animate-in slide-in-from-top-2 duration-200">
+                        {Object.entries(typeLabels).map(([value, label]) => (
+                          <div
+                            key={value}
+                            className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedType === value
+                              ? "bg-primary/10 border border-primary/20"
+                              : "hover:bg-gray-50 border border-transparent"
+                              }`}
+                            onClick={() => handleTypeChange(value)}
+                          >
+                            <span className={`text-sm block flex-1 ${selectedType === value ? "font-semibold text-primary" : "font-medium"}`}>
+                              {label}
+                            </span>
+                            {selectedType === value && <div className="w-2 h-2 rounded-full bg-primary" />}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <Separator />
 
                   {/* Salary Filter */}
                   <div>
-                    <Label className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      Mức lương
-                    </Label>
-                    <div className="space-y-1">
-                      {salaryRanges.map((range) => (
-                        <div
-                          key={range.id}
-                          className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedSalary === range.id
-                            ? "bg-primary/10 border border-primary/20"
-                            : "hover:bg-gray-50 border border-transparent"
-                            }`}
-                          onClick={() => handleSalaryChange(range.id)}
-                        >
-                          <span className={`text-sm block flex-1 ${selectedSalary === range.id ? "font-semibold text-primary" : "font-medium"}`}>
-                            {range.label}
-                          </span>
-                          {selectedSalary === range.id && <div className="w-2 h-2 rounded-full bg-primary" />}
-                        </div>
-                      ))}
+                    <div className="flex items-center justify-between cursor-pointer mb-3" onClick={() => toggleSection('salary')}>
+                      <Label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                        <DollarSign className="h-4 w-4" />
+                        Mức lương
+                      </Label>
+                      <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${expandedSections.salary ? "rotate-180" : ""}`} />
                     </div>
+                    {expandedSections.salary && (
+                      <div className="space-y-1 animate-in slide-in-from-top-2 duration-200">
+                        {salaryRanges.map((range) => (
+                          <div
+                            key={range.id}
+                            className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedSalary === range.id
+                              ? "bg-primary/10 border border-primary/20"
+                              : "hover:bg-gray-50 border border-transparent"
+                              }`}
+                            onClick={() => handleSalaryChange(range.id)}
+                          >
+                            <span className={`text-sm block flex-1 ${selectedSalary === range.id ? "font-semibold text-primary" : "font-medium"}`}>
+                              {range.label}
+                            </span>
+                            {selectedSalary === range.id && <div className="w-2 h-2 rounded-full bg-primary" />}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
