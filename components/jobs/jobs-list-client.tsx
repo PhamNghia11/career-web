@@ -676,11 +676,11 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const hasAdvancedFilters = selectedIndustry || selectedExperience || selectedEducation || selectedPostedDate || selectedLocation
   const advancedFilterCount = [selectedIndustry, selectedExperience, selectedEducation, selectedPostedDate, selectedLocation].filter(Boolean).length
 
-  // State for collapsible sidebar sections
+  // State for collapsible sidebar sections - default to collapsed as requested
   const [expandedSections, setExpandedSections] = useState({
-    company: true,
-    type: true,
-    salary: true
+    company: false,
+    type: false,
+    salary: false
   })
 
   const toggleSection = (section: keyof typeof expandedSections) => {
