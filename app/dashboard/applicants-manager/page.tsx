@@ -206,8 +206,18 @@ export default function ManageApplicationsPage() {
                 <main className="flex-1 container mx-auto px-4 py-8">
                     <Card className="p-12 text-center">
                         <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                        <h2 className="text-xl font-bold">Truy cập bị từ chối</h2>
-                        <p className="text-gray-500 mt-2">Bạn không có quyền truy cập trang này.</p>
+                        <h2 className="text-xl font-bold">Khu vực dành cho Nhà tuyển dụng</h2>
+                        <p className="text-gray-500 mt-2">
+                            Tài khoản hiện tại của bạn là <strong>Sinh viên</strong> ({user.email}).<br />
+                            Vui lòng đăng xuất và đăng nhập bằng tài khoản <strong>Nhà tuyển dụng</strong> để xem hồ sơ ứng tuyển.
+                        </p>
+                        <Button
+                            className="mt-6"
+                            variant="outline"
+                            onClick={() => router.push('/login')}
+                        >
+                            Đăng nhập tài khoản khác
+                        </Button>
                     </Card>
                 </main>
             </div>

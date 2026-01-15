@@ -233,10 +233,6 @@ export async function POST(request: Request) {
               Xem hồ sơ chi tiết
             </a>
           </div>
-          <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
-            Nếu nút trên không hoạt động, vui lòng copy đường dẫn sau:<br>
-            <a href="${applicationLink}" style="color: #1e3a5f;">${applicationLink}</a>
-          </p>
         </div>
         <div style="padding: 15px; text-align: center; color: #666; font-size: 12px;">
           <p>Email này được gửi tự động từ GDU Career Portal</p>
