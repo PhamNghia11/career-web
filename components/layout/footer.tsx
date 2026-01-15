@@ -27,20 +27,7 @@ export function Footer() {
               Cổng thông tin việc làm chính thức dành cho sinh viên Đại học Gia Định.
               Kết nối nhân tài trẻ với cộng đồng doanh nghiệp uy tín, kiến tạo tương lai vững chắc.
             </p>
-            <div className="flex items-center gap-4 pt-2">
-              <SocialButton
-                href="https://www.facebook.com/GDUStudentCenter"
-                icon={<Facebook className="h-5 w-5" />}
-                label="Facebook"
-                color="hover:bg-[#1877F2]"
-              />
-              <SocialButton
-                href="https://zalo.me/0796079423"
-                icon={<span className="font-bold text-xs">Zalo</span>}
-                label="Zalo"
-                color="hover:bg-[#0068FF]"
-              />
-            </div>
+
           </div>
 
           {/* Spacer */}
