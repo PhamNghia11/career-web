@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Menu, X, Home, Briefcase, User, Settings, Bell, LogOut, FileText, Users, Building, BarChart3, Star, Eye, MessageSquare, ChevronLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth-context"
@@ -12,6 +12,8 @@ export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
   const { user, logout } = useAuth()
+
+  const router = useRouter()
 
   const studentNav = [
     { name: "Tổng quan", href: "/dashboard", icon: Home },
@@ -51,16 +53,23 @@ export function MobileNav() {
 
   return (
     <div className="lg:hidden">
-      <div className="flex items-center justify-between px-4 py-3 bg-sidebar text-sidebar-foreground">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="bg-sidebar-primary text-sidebar-primary-foreground font-bold px-2 py-1 rounded">GDU</div>
-          <span className="font-bold">Gia Dinh University</span>
-        </Link>
+      <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 text-gray-900">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="text-gray-900 hover:bg-gray-100 -ml-2"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+          <span className="font-bold text-lg">Gia Dinh University</span>
+        </div>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsOpen(!isOpen)}
-          className="text-sidebar-foreground hover:bg-sidebar-accent"
+          className="text-gray-900 hover:bg-gray-100"
         >
           {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
