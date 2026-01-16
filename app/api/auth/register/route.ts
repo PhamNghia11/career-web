@@ -126,6 +126,7 @@ export async function POST(request: Request) {
       password: hashedPassword,
       role: role,
       email,
+      phone: phone || "",
       emailVerified: false,
       avatar: `/placeholder.svg?height=100&width=100&query=${encodeURIComponent(name)}`,
       createdAt: new Date(),
