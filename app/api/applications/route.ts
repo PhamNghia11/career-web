@@ -203,8 +203,11 @@ export async function POST(request: Request) {
     }
 
     // 3. Send Email Notifications
-    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://career-web-three.vercel.app').replace(/\/$/, '')
-    const applicationLink = `${baseUrl}/api/cv/${applicationId}`
+    const host = request.headers.get('host')
+    const protocol = host?.includes('localhost') ? 'http' : 'https'
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (host ? `${protocol}://${host}` : 'https://career-web-three.vercel.app')
+    const cleanBaseUrl = baseUrl.replace(/\/$/, '')
+    const applicationLink = `${cleanBaseUrl}/api/cv/${applicationId}`
 
     const emailSubject = `[GDU Career] Hồ sơ ứng tuyển mới: ${jobTitle}`
     const emailHtml = `

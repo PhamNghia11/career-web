@@ -205,10 +205,11 @@ const companies = [
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const company = companies.find((c) => c.id === params.id)
+        const { id } = await params
+        const company = companies.find((c) => c.id === id)
 
         if (!company) {
             return NextResponse.json(

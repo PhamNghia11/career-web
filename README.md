@@ -35,6 +35,23 @@ Hệ thống hoạt động theo mô hình Serverless trên Vercel:
 3. **Notifications:** Sử dụng Nodemailer để gửi OTP và thông báo tuyển dụng qua Email.
 4. **CI/CD:** Tự động triển khai phiên bản mới mỗi khi có thay đổi trên GitHub.
 
+##  Kiến trúc hệ thống
+
+### 1. Frontend (Giao diện)
+- **Framework:** Next.js 15 (App Router) - Tối ưu hóa render phía Server (SSR) và Client (CSR).
+- **UI Library:** Tailwind CSS kết hợp Shadcn/UI giúp giao diện đồng nhất, hiện đại và phản hồi nhanh (Responsive).
+- **Trạng thái:** Quản lý thông qua React Hooks và Context API (như `AuthContext` để quản lý đăng nhập).
+
+### 2. Backend (Xử lý máy chủ)
+- **API Routes:** Tích hợp sẵn trong thư mục `/app/api`. Xử lý mọi logic từ đăng ký, đăng tin đến ứng tuyển.
+- **Middleware/Utilities:** Các hàm dùng chung nằm trong thư mục `/lib` (kết nối DB, gửi Mail, xử lý định dạng dữ liệu).
+- **Xác thực:** Hệ thống phân quyền dựa trên Role (Admin, Employer, Student) được kiểm tra tại mỗi yêu cầu API.
+
+### 3. Dữ liệu (Data)
+- **Database:** MongoDB Atlas - Lưu trữ các collection chính: `users`, `jobs`, `applications`, `reviews`, `notifications`.
+- **File Static:** Ảnh đại diện, Logo công ty được quản lý và lưu trữ trực tiếp hoặc qua các dịch vụ lưu trữ đám mây.
+- **Import/Export:** Hỗ trợ công cụ import dữ liệu từ file JSON (`/data`) vào MongoDB để khởi tạo hệ thống nhanh chóng.
+
 ## I. Yêu cầu hệ thống
 
 ### 1. Server (Máy chủ)

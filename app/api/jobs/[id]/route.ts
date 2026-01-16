@@ -5,10 +5,10 @@ import { ObjectId } from "mongodb"
 // DELETE /api/jobs/[id]
 export async function DELETE(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params
+        const { id } = await params
 
         if (!ObjectId.isValid(id)) {
             return NextResponse.json({ error: "Invalid job ID" }, { status: 400 })
@@ -38,10 +38,10 @@ export async function DELETE(
 // PATCH /api/jobs/[id] - Update Job Details
 export async function PATCH(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params
+        const { id } = await params
         const body = await req.json()
 
         if (!ObjectId.isValid(id)) {
@@ -122,10 +122,10 @@ export async function PATCH(
 // GET /api/jobs/[id] - Get Single Job Details for Edit
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params
+        const { id } = await params
 
         if (!ObjectId.isValid(id)) {
             return NextResponse.json({ error: "Invalid job ID" }, { status: 400 })
