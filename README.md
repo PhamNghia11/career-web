@@ -2,6 +2,39 @@
 
 Kết nối sinh viên GDU với hàng ngàn cơ hội việc làm từ các doanh nghiệp uy tín.
 
+##  Tính năng chính
+
+###  Dành cho Sinh viên
+- **Tìm kiếm thông minh:** Lọc việc làm theo ngành học, mức lương và loại hình công việc.
+- **Ứng tuyển trực tuyến:** Nộp CV và theo dõi trạng thái hồ sơ ngay trên hệ thống.
+- **Quản lý hồ sơ:** Lưu trữ các công việc yêu thích và cập nhật thông tin cá nhân.
+- **Đánh giá & Phản hồi:** Tham khảo đánh giá thực tế từ cộng đồng sinh viên.
+
+###  Dành cho Nhà tuyển dụng
+- **Đăng tin tuyển dụng:** Công cụ tạo tin đăng chuyên nghiệp và thu hút.
+- **Quản lý ứng viên:** Tiếp nhận, duyệt hồ sơ và tương tác trực tiếp với ứng viên.
+- **Quảng bá thương hiệu:** Xây dựng trang thông tin doanh nghiệp uy tín.
+
+###  Dành cho Quản trị viên
+- **Kiểm duyệt nội dung:** Quản lý tin đăng và báo cáo vi phạm.
+- **Quản trị người dùng:** Cấp quyền và hỗ trợ kỹ thuật cho các nhóm đối tượng.
+- **Số liệu thống kê:** Theo dõi lượt truy cập và hiệu quả kết nối việc làm.
+
+##  Công nghệ sử dụng
+- **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
+- **Database:** [MongoDB](https://www.mongodb.com/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **UI Components:** [Shadcn/UI](https://ui.shadcn.com/)
+- **Authentication:** Custom Auth Context & MongoDB
+- **Deployment:** [Vercel](https://vercel.com/)
+
+##  Quy trình vận hành
+Hệ thống hoạt động theo mô hình Serverless trên Vercel:
+1. **Frontend/Backend:** Next.js xử lý cả giao diện người dùng và API xử lý logic.
+2. **Data Flow:** Dữ liệu tương tác được lưu trữ và truy xuất từ MongoDB Atlas.
+3. **Notifications:** Sử dụng Nodemailer để gửi OTP và thông báo tuyển dụng qua Email.
+4. **CI/CD:** Tự động triển khai phiên bản mới mỗi khi có thay đổi trên GitHub.
+
 ## I. Yêu cầu hệ thống
 
 ### 1. Server (Máy chủ)
