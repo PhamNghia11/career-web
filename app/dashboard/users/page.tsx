@@ -224,6 +224,7 @@ export default function UsersManagementPage() {
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-medium">Người dùng</th>
                   <th className="text-left py-3 px-4 font-medium">Vai trò</th>
+                  <th className="text-left py-3 px-4 font-medium text-center">Trạng thái</th>
                   <th className="text-left py-3 px-4 font-medium">Ngày tạo</th>
                   <th className="text-right py-3 px-4 font-medium">Hành động</th>
                 </tr>
@@ -231,11 +232,11 @@ export default function UsersManagementPage() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={4} className="text-center py-8 text-gray-500">Đang tải dữ liệu...</td>
+                    <td colSpan={5} className="text-center py-8 text-gray-500">Đang tải dữ liệu...</td>
                   </tr>
                 ) : filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="text-center py-8 text-gray-500">Không tìm thấy người dùng nào</td>
+                    <td colSpan={5} className="text-center py-8 text-gray-500">Không tìm thấy người dùng nào</td>
                   </tr>
                 ) : (
                   filteredUsers.map((u) => (
@@ -259,6 +260,13 @@ export default function UsersManagementPage() {
                         <Badge className={roleColors[u.role as keyof typeof roleColors] || "bg-gray-100 text-gray-800"}>
                           {roleLabels[u.role as keyof typeof roleLabels] || u.role}
                         </Badge>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        {u.emailVerified ? (
+                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Đã xác minh</Badge>
+                        ) : (
+                          <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">Chưa xác minh</Badge>
+                        )}
                       </td>
                       <td className="py-3 px-4 text-muted-foreground">
                         {new Date(u.createdAt).toLocaleDateString("vi-VN")}

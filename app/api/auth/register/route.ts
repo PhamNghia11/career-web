@@ -17,7 +17,8 @@ function hashOTP(otp: string): string {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, email, password, phone, role, studentId, major } = body
+    const { name, email, password, phone, role: requestedRole, studentId, major } = body
+    const role = requestedRole === "admin" ? "student" : (requestedRole || "student")
 
     // Validate required fields
     if (!name || !email || !password) {
@@ -30,40 +31,59 @@ export async function POST(request: Request) {
     }
 
     const collection = await getCollection(COLLECTIONS.USERS)
+    const pendingCollection = await getCollection(COLLECTIONS.PENDING_USERS)
 
-    // Check if email already exists
-    const existingUser = await collection.findOne({ email })
-    if (existingUser) {
-      // If user exists but not verified, allow re-sending OTP
-      if (!existingUser.emailVerified) {
-        // Generate new OTP
-        const otp = generateOTP()
-        const hashedOTP = hashOTP(otp)
-        const expiresAt = new Date(Date.now() + 5 * 60 * 1000)
+    // 1. Check if email exists in main USERS collection (Verified accounts)
+    const existingVerifiedUser = await collection.findOne({ email, emailVerified: true })
+    if (existingVerifiedUser) {
+      return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 })
+    }
 
-        await collection.updateOne(
-          { email },
-          {
-            $set: {
-              emailOtp: hashedOTP,
-              emailOtpExpires: expiresAt,
-            },
-          }
-        )
+    // 2. Check if user exists in PENDING_USERS or is unverified in USERS (Legacy case)
+    let pendingUser = await pendingCollection.findOne({ email })
+    if (!pendingUser) {
+      // Check for legacy unverified user in main collection
+      pendingUser = await collection.findOne({ email, emailVerified: false })
+    }
 
-        // Send OTP email
-        try {
-          await sendEmail({
-            to: email,
-            subject: "Mã xác minh tài khoản GDU Career",
-            html: `
+    if (pendingUser) {
+      // Generate new OTP
+      const otp = generateOTP()
+      const hashedOTP = hashOTP(otp)
+      const expiresAt = new Date(Date.now() + 5 * 60 * 1000)
+
+      // Update the relevant collection
+      const targetCollection = pendingUser.emailVerified === false ? collection : pendingCollection
+      await targetCollection.updateOne(
+        { email },
+        {
+          $set: {
+            name, // Update name/data in case they changed it
+            password: await bcrypt.hash(password, 10),
+            phone,
+            role,
+            studentId,
+            major,
+            emailOtp: hashedOTP,
+            emailOtpExpires: expiresAt,
+            updatedAt: new Date()
+          },
+        }
+      )
+
+      // Send OTP email
+      try {
+        await sendEmail({
+          to: email,
+          subject: "Mã xác minh tài khoản GDU Career",
+          html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                   <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8a 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
                     <h1 style="margin: 0; font-size: 24px;">GDU Career Portal</h1>
                     <p style="margin: 10px 0 0; opacity: 0.9;">Xác minh tài khoản</p>
                   </div>
                   <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-                    <h2 style="color: #1e3a5f; margin-top: 0;">Xin chào ${existingUser.name}!</h2>
+                    <h2 style="color: #1e3a5f; margin-top: 0;">Xin chào ${name}!</h2>
                     <p style="color: #666;">Đây là mã xác minh mới của bạn:</p>
                     <div style="background: #1e3a5f; color: white; font-size: 32px; font-weight: bold; text-align: center; padding: 20px; border-radius: 8px; letter-spacing: 8px; margin: 20px 0;">
                       ${otp}
@@ -72,19 +92,17 @@ export async function POST(request: Request) {
                   </div>
                 </div>
               `,
-          })
-        } catch (emailError) {
-          console.error("Failed to send OTP email:", emailError)
-        }
-
-        return NextResponse.json({
-          success: true,
-          needsVerification: true,
-          email: email,
-          message: "Tài khoản đã tồn tại nhưng chưa xác minh. Mã OTP mới đã được gửi.",
         })
+      } catch (emailError) {
+        console.error("Failed to send OTP email:", emailError)
       }
-      return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 })
+
+      return NextResponse.json({
+        success: true,
+        needsVerification: true,
+        email: email,
+        message: "Tài khoản đang chờ xác minh. Mã OTP mới đã được gửi.",
+      })
     }
 
     // Check if studentId already exists (only for students)
@@ -102,53 +120,28 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // DEFENSIVE CLEANUP: Ensure no leftover data for this email exists from previous deleted accounts
-    try {
-      const applicationsCollection = await getCollection(COLLECTIONS.APPLICATIONS)
-
-      // Find old apps to see if we can extract an old applicantId for more cleanup
-      const oldApps = await applicationsCollection.find({ email: email }).toArray()
-      const oldUserIds = Array.from(new Set(oldApps.map(a => a.applicantId).filter(Boolean)))
-
-      // Clean applications by email
-      await applicationsCollection.deleteMany({ email: email })
-
-      const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
-      const savedJobsCollection = await getCollection(COLLECTIONS.SAVED_JOBS)
-
-      // If we found old user IDs, clean them too
-      if (oldUserIds.length > 0) {
-        await notificationsCollection.deleteMany({ userId: { $in: oldUserIds } })
-        await savedJobsCollection.deleteMany({ userId: { $in: oldUserIds } })
-      }
-    } catch (cleanupErr) {
-      console.error("[Register] Defensive cleanup error:", cleanupErr)
-    }
-
-    // Prepare new user object
+    // Prepare new user object in PENDING collection
     const newUser: any = {
       name,
       password: hashedPassword,
-      role: role || "student",
+      role: role,
       email,
       emailVerified: false,
       avatar: `/placeholder.svg?height=100&width=100&query=${encodeURIComponent(name)}`,
       createdAt: new Date(),
     }
 
-    // Add student specific fields
     if (role === "student") {
       newUser.studentId = studentId || ""
       newUser.major = major || ""
     }
 
-    // Prepare email verification
     const otp = generateOTP()
     newUser.emailOtp = hashOTP(otp)
     newUser.emailOtpExpires = new Date(Date.now() + 5 * 60 * 1000)
 
-    // Insert user
-    await collection.insertOne(newUser)
+    // Insert into PENDING collection
+    await pendingCollection.insertOne(newUser)
 
     // Send Email OTP
     try {
@@ -172,20 +165,13 @@ export async function POST(request: Request) {
                       <p style="color: #999; font-size: 14px; text-align: center;">
                         Mã này sẽ hết hạn sau <strong>5 phút</strong>
                       </p>
-                      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-                      <p style="color: #999; font-size: 12px; text-align: center;">
-                        Nếu bạn không yêu cầu tạo tài khoản này, vui lòng bỏ qua email này.
-                      </p>
                     </div>
                   </div>
                 `,
       })
-      console.log("[register] Sent OTP email to:", email)
     } catch (emailError) {
       console.error("Failed to send OTP email:", emailError)
     }
-
-
 
     return NextResponse.json({
       success: true,
