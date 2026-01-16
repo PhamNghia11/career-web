@@ -151,7 +151,7 @@ export async function POST(request: Request) {
         message: `${fullname} vừa ứng tuyển vị trí ${jobTitle} tại ${companyName}`,
         read: false,
         createdAt: new Date(),
-        link: `/dashboard/applicants-manager`,
+        link: `/dashboard/applicants-manager?id=${applicationId}`,
         applicationId: applicationId
       })
       console.log("[Applications API] Created admin notification")
@@ -170,7 +170,7 @@ export async function POST(request: Request) {
           message: `${fullname} vừa ứng tuyển vị trí ${jobTitle}`,
           read: false,
           createdAt: new Date(),
-          link: `/dashboard/applicants-manager`,
+          link: `/dashboard/applicants-manager?id=${applicationId}`,
           applicationId: applicationId
         })
         console.log("[Applications API] Created employer notification for:", employerId)
@@ -207,7 +207,7 @@ export async function POST(request: Request) {
     const protocol = host?.includes('localhost') ? 'http' : 'https'
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (host ? `${protocol}://${host}` : 'https://career-web-three.vercel.app')
     const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-    const applicationLink = `${cleanBaseUrl}/api/cv/${applicationId}`
+    const applicationLink = `${cleanBaseUrl}/dashboard/applicants-manager?id=${applicationId}`
 
     const emailSubject = `[GDU Career] Hồ sơ ứng tuyển mới: ${jobTitle}`
     const emailHtml = `
