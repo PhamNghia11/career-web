@@ -42,10 +42,13 @@ export async function GET(
         const buffer = Buffer.from(base64Data, 'base64')
 
         // Use 'inline' to try to open in browser (e.g. PDF), 'attachment' to force download
+        const filename = application.cvOriginalName || 'cv.pdf'
+        const encodedFilename = encodeURIComponent(filename)
+
         return new Response(buffer, {
             headers: {
                 "Content-Type": contentType,
-                "Content-Disposition": `inline; filename="${application.cvOriginalName || 'cv.pdf'}"`,
+                "Content-Disposition": `inline; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`,
                 "Content-Length": buffer.length.toString(),
             },
         })
