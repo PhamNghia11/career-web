@@ -66,17 +66,12 @@ export function ReviewsClient() {
   // Visitor ID for anonymous likes
   const [visitorId, setVisitorId] = useState<string>("")
 
-  // Visitor ID handled by AuthContext or fallback to user id
-
   // Check sessionStorage on mount to restore dataProcessed state
   useEffect(() => {
     const storedDataProcessed = sessionStorage.getItem("dataProcessed")
     if (storedDataProcessed === "true") {
       setDataProcessed(true)
     }
-
-    // Load liked reviews from localStorage NOT NEEDED ANYMORE as we use API
-    // Load comments from localStorage NOT NEEDED ANYMORE as we use API
   }, [])
 
   // Only fetch reviews when category changes, data has been processed, or user/visitorId changes

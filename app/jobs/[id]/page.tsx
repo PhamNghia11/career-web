@@ -44,7 +44,7 @@ export default async function JobPage(props: JobPageProps) {
                 // Ignore invalid ID
             }
         } catch (error) {
-            console.error("Error fetching job from DB:", error)
+            // Error fetching from DB
         }
     }
 
