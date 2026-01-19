@@ -224,22 +224,29 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   }, [mergedJobs])
 
   const checkSalaryMatch = (jobSalary: string, filterSalary: string) => {
-    // Parse job salary (e.g., "5-8 triệu", "10-15 triệu")
-    const numbers = jobSalary.match(/\d+/g)?.map(Number)
-    if (!numbers || numbers.length === 0) return false
+    if (filterSalary === "negotiate") {
+      return jobSalary.toLowerCase().includes("thỏa thuận")
+    }
 
-    const minJob = numbers[0]
-    const maxJob = numbers.length > 1 ? numbers[1] : minJob
+    // Use higher-precision parsers already defined
+    const minJob = parseMinSalary(jobSalary) / 1000000
+    const maxJob = parseMaxSalary(jobSalary) / 1000000
+
+    if (minJob === 0 && maxJob === 0 && !jobSalary.toLowerCase().includes("thỏa thuận")) return false
 
     switch (filterSalary) {
       case "under-5":
         return minJob < 5
       case "5-10":
-        return Math.max(minJob, 5) <= Math.min(maxJob, 10)
-      case "10-20":
-        return Math.max(minJob, 10) <= Math.min(maxJob, 20)
-      case "above-20":
-        return maxJob >= 20
+        return (minJob >= 5 && minJob < 10) || (maxJob > 5 && maxJob <= 10) || (minJob < 5 && maxJob > 10)
+      case "10-15":
+        return (minJob >= 10 && minJob < 15) || (maxJob > 10 && maxJob <= 15) || (minJob < 10 && maxJob > 15)
+      case "15-20":
+        return (minJob >= 15 && minJob < 20) || (maxJob > 15 && maxJob <= 20) || (minJob < 15 && maxJob > 20)
+      case "20-30":
+        return (minJob >= 20 && minJob < 30) || (maxJob > 20 && maxJob <= 30) || (minJob < 20 && maxJob > 30)
+      case "above-30":
+        return maxJob >= 30
       default:
         return true
     }
@@ -842,9 +849,9 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
 
   return (
     <div className="space-y-6">
-      {/* Advanced Filter Bar */}
-      <div ref={dropdownRef} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-        <div className="flex flex-wrap items-center gap-3">
+      {/* Horizontal Filter Bar - STICKY */}
+      <div ref={dropdownRef} className="bg-white/90 backdrop-blur-md sticky top-[112px] lg:top-[128px] z-40 border-b border-gray-100 py-4 mb-8">
+        <div className="container mx-auto px-4 flex flex-wrap items-center gap-3">
           <FilterDropdown
             label="Ngành nghề"
             options={industryOptions}
@@ -922,153 +929,155 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar Filters */}
-        <div className="lg:col-span-1 space-y-6">
-          <Card className="sticky top-24 border-none shadow-sm bg-white max-h-[calc(100vh-8rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            <CardContent className="p-6 space-y-6">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <Filter className="h-5 w-5" />
-                    Bộ lọc tìm kiếm
-                  </h3>
-                  {hasActiveFilters && (
-                    <button
-                      onClick={clearFilters}
-                      className="text-xs text-primary hover:underline font-medium"
-                    >
-                      Xóa bộ lọc
-                    </button>
-                  )}
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-sm font-medium mb-2 block">Từ khóa</Label>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Chức danh, kỹ năng..."
-                        className="w-full pl-9 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 border-input"
-                      />
-                    </div>
+        <div className="lg:col-span-1">
+          <div className="hidden lg:block sticky top-[200px] space-y-6">
+            <Card className="border-none shadow-sm bg-white max-h-[calc(100vh-8rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <CardContent className="p-6 space-y-6">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-lg flex items-center gap-2">
+                      <Filter className="h-5 w-5" />
+                      Bộ lọc tìm kiếm
+                    </h3>
+                    {hasActiveFilters && (
+                      <button
+                        onClick={clearFilters}
+                        className="text-xs text-primary hover:underline font-medium"
+                      >
+                        Xóa bộ lọc
+                      </button>
+                    )}
                   </div>
 
-                  <Separator />
-
-                  {/* Company Filter */}
-                  <div>
-                    <div className="flex items-center justify-between cursor-pointer mb-3" onClick={() => toggleSection('company')}>
-                      <Label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
-                        <Building2 className="h-4 w-4" />
-                        Công ty
-                      </Label>
-                      <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${expandedSections.company ? "rotate-180" : ""}`} />
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium mb-2 block">Từ khóa</Label>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <input
+                          type="text"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          placeholder="Chức danh, kỹ năng..."
+                          className="w-full pl-9 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 border-input"
+                        />
+                      </div>
                     </div>
-                    {expandedSections.company && (
-                      <div className="space-y-1 max-h-[220px] overflow-y-auto pr-1 animate-in slide-in-from-top-2 duration-200">
-                        {companies.map((company) => (
-                          <div
-                            key={company.name}
-                            className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedCompany === company.name
-                              ? "bg-primary/10 border border-primary/20"
-                              : "hover:bg-gray-50 border border-transparent"
-                              }`}
-                            onClick={() => handleCompanyChange(company.name)}
-                          >
-                            <div className="w-8 h-8 rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                              {company.logo ? (
-                                <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
-                              ) : (
-                                <Building className="h-4 w-4 text-gray-400" />
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <span className={`text-sm truncate block ${selectedCompany === company.name ? "font-semibold text-primary" : "font-medium"}`}>
-                                {company.name}
+
+                    <Separator />
+
+                    {/* Company Filter */}
+                    <div>
+                      <div className="flex items-center justify-between cursor-pointer mb-3" onClick={() => toggleSection('company')}>
+                        <Label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                          <Building2 className="h-4 w-4" />
+                          Công ty
+                        </Label>
+                        <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${expandedSections.company ? "rotate-180" : ""}`} />
+                      </div>
+                      {expandedSections.company && (
+                        <div className="space-y-1 max-h-[220px] overflow-y-auto pr-1 animate-in slide-in-from-top-2 duration-200">
+                          {companies.map((company) => (
+                            <div
+                              key={company.name}
+                              className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedCompany === company.name
+                                ? "bg-primary/10 border border-primary/20"
+                                : "hover:bg-gray-50 border border-transparent"
+                                }`}
+                              onClick={() => handleCompanyChange(company.name)}
+                            >
+                              <div className="w-8 h-8 rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                {company.logo ? (
+                                  <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
+                                ) : (
+                                  <Building className="h-4 w-4 text-gray-400" />
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <span className={`text-sm truncate block ${selectedCompany === company.name ? "font-semibold text-primary" : "font-medium"}`}>
+                                  {company.name}
+                                </span>
+                              </div>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${selectedCompany === company.name
+                                ? "bg-primary text-white"
+                                : "text-muted-foreground bg-gray-100"
+                                }`}>
+                                {company.count}
                               </span>
                             </div>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${selectedCompany === company.name
-                              ? "bg-primary text-white"
-                              : "text-muted-foreground bg-gray-100"
-                              }`}>
-                              {company.count}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <Separator />
-
-                  {/* Work Type Filter */}
-                  <div>
-                    <div className="flex items-center justify-between cursor-pointer mb-3" onClick={() => toggleSection('type')}>
-                      <Label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
-                        <Briefcase className="h-4 w-4" />
-                        Hình thức làm việc
-                      </Label>
-                      <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${expandedSections.type ? "rotate-180" : ""}`} />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    {expandedSections.type && (
-                      <div className="space-y-1 animate-in slide-in-from-top-2 duration-200">
-                        {Object.entries(typeLabels).map(([value, label]) => (
-                          <div
-                            key={value}
-                            className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedType === value
-                              ? "bg-primary/10 border border-primary/20"
-                              : "hover:bg-gray-50 border border-transparent"
-                              }`}
-                            onClick={() => handleTypeChange(value)}
-                          >
-                            <span className={`text-sm block flex-1 ${selectedType === value ? "font-semibold text-primary" : "font-medium"}`}>
-                              {label}
-                            </span>
-                            {selectedType === value && <div className="w-2 h-2 rounded-full bg-primary" />}
-                          </div>
-                        ))}
+
+                    <Separator />
+
+                    {/* Work Type Filter */}
+                    <div>
+                      <div className="flex items-center justify-between cursor-pointer mb-3" onClick={() => toggleSection('type')}>
+                        <Label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                          <Briefcase className="h-4 w-4" />
+                          Hình thức làm việc
+                        </Label>
+                        <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${expandedSections.type ? "rotate-180" : ""}`} />
                       </div>
-                    )}
-                  </div>
-
-                  <Separator />
-
-                  {/* Salary Filter */}
-                  <div>
-                    <div className="flex items-center justify-between cursor-pointer mb-3" onClick={() => toggleSection('salary')}>
-                      <Label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
-                        <DollarSign className="h-4 w-4" />
-                        Mức lương
-                      </Label>
-                      <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${expandedSections.salary ? "rotate-180" : ""}`} />
+                      {expandedSections.type && (
+                        <div className="space-y-1 animate-in slide-in-from-top-2 duration-200">
+                          {Object.entries(typeLabels).map(([value, label]) => (
+                            <div
+                              key={value}
+                              className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedType === value
+                                ? "bg-primary/10 border border-primary/20"
+                                : "hover:bg-gray-50 border border-transparent"
+                                }`}
+                              onClick={() => handleTypeChange(value)}
+                            >
+                              <span className={`text-sm block flex-1 ${selectedType === value ? "font-semibold text-primary" : "font-medium"}`}>
+                                {label}
+                              </span>
+                              {selectedType === value && <div className="w-2 h-2 rounded-full bg-primary" />}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    {expandedSections.salary && (
-                      <div className="space-y-1 animate-in slide-in-from-top-2 duration-200">
-                        {salaryRanges.map((range) => (
-                          <div
-                            key={range.id}
-                            className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedSalary === range.id
-                              ? "bg-primary/10 border border-primary/20"
-                              : "hover:bg-gray-50 border border-transparent"
-                              }`}
-                            onClick={() => handleSalaryChange(range.id)}
-                          >
-                            <span className={`text-sm block flex-1 ${selectedSalary === range.id ? "font-semibold text-primary" : "font-medium"}`}>
-                              {range.label}
-                            </span>
-                            {selectedSalary === range.id && <div className="w-2 h-2 rounded-full bg-primary" />}
-                          </div>
-                        ))}
+
+                    <Separator />
+
+                    {/* Salary Filter */}
+                    <div>
+                      <div className="flex items-center justify-between cursor-pointer mb-3" onClick={() => toggleSection('salary')}>
+                        <Label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                          <DollarSign className="h-4 w-4" />
+                          Mức lương
+                        </Label>
+                        <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${expandedSections.salary ? "rotate-180" : ""}`} />
                       </div>
-                    )}
+                      {expandedSections.salary && (
+                        <div className="space-y-1 animate-in slide-in-from-top-2 duration-200">
+                          {salaryRanges.map((range) => (
+                            <div
+                              key={range.id}
+                              className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedSalary === range.id
+                                ? "bg-primary/10 border border-primary/20"
+                                : "hover:bg-gray-50 border border-transparent"
+                                }`}
+                              onClick={() => handleSalaryChange(range.id)}
+                            >
+                              <span className={`text-sm block flex-1 ${selectedSalary === range.id ? "font-semibold text-primary" : "font-medium"}`}>
+                                {range.label}
+                              </span>
+                              {selectedSalary === range.id && <div className="w-2 h-2 rounded-full bg-primary" />}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Main Content */}
