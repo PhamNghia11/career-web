@@ -197,9 +197,9 @@ export default function AdminJobsPage() {
                                         <TableCell>{job.salary}</TableCell>
                                         <TableCell>{getStatusBadge(job.status)}</TableCell>
                                         <TableCell className="text-right">
-                                            <div className="inline-flex justify-end items-center gap-2">
-                                                {/* Eye icon in a fixed-width container to ensure alignment */}
-                                                <div className="w-10 flex justify-center">
+                                            <div className="inline-flex justify-end items-center">
+                                                {/* Eye icon in a fixed-width container, adjusted with padding to align under "Hành động" */}
+                                                <div className="w-16 flex justify-center pr-3">
                                                     <Button
                                                         size="sm"
                                                         variant="ghost"
@@ -211,8 +211,8 @@ export default function AdminJobsPage() {
                                                     </Button>
                                                 </div>
 
-                                                {/* Other actions container - using a min-width to prevent shifting the Eye icon */}
-                                                <div className="flex items-center gap-2 min-w-[140px]">
+                                                {/* Other actions container */}
+                                                <div className="flex items-center gap-2 min-w-[140px] justify-start">
                                                     {job.status === 'pending' && (
                                                         <div className="flex items-center gap-1.5">
                                                             <Button
