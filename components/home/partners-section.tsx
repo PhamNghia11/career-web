@@ -3,33 +3,40 @@
 import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
 
-const partners = [
-  { name: "Techcombank", logo: "/logos/techcombank.png" },
-  { name: "FPT Software", logo: "/logos/fpt.png" },
-  { name: "ITP - ĐHQG-HCM", logo: "/logos/itp.png" },
-  { name: "IPS Independent", logo: "/logos/ips.png" },
-  { name: "TekNix Corporation", logo: "/logos/teknix.png" },
-  { name: "Cohota", logo: "/logos/cohota.png" },
-  { name: "ALTA Group", logo: "/logos/alta.png" },
-  { name: "Gia Nguyễn", logo: "/logos/gianguyen.png" },
-  { name: "Kênh Tài Trợ", logo: "/logos/kenhtaitro.png" },
-  { name: "MIA Solutions", logo: "/logos/miasolution.png" },
-  { name: "Nhân Kiệt", logo: "/logos/nhankiet.png" },
-  { name: "Quốc Law", logo: "/logos/quoclaw.png" },
-  { name: "TV Media", logo: "/logos/tvmedia.png" },
-]
+const partnersPlaceholder = [] // Removed hardcoded array in favor of dynamic fetch
 
 export function PartnersSection() {
+  const [partners, setPartners] = useState<any[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  // Fetch partners from API
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const response = await fetch('/api/companies')
+        const data = await response.json()
+        if (data.companies) {
+          setPartners(data.companies)
+        }
+      } catch (error) {
+        console.error("Failed to fetch partners:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPartners()
+  }, [])
 
   // Tự động chuyển slide liên tục mỗi 3 giây
   useEffect(() => {
+    if (partners.length === 0) return
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % partners.length)
     }, 3000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [partners.length])
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % partners.length)

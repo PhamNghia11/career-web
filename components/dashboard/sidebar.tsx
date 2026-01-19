@@ -56,6 +56,7 @@ const adminNav = [
   { name: "Báo cáo vi phạm", href: "/dashboard/admin/reports", icon: Flag },
   { name: "Thống kê", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Liên hệ", href: "/dashboard/messages", icon: MessageSquare },
+  { name: "Quản lý đối tác", href: "/dashboard/admin/partners", icon: Building },
   { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },
 ]
 
