@@ -698,7 +698,8 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     value,
     onChange,
     icon: Icon,
-    dropdownId
+    dropdownId,
+    searchable = false
   }: {
     label: string
     options: { id: string; label: string }[]
@@ -706,9 +707,26 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     onChange: (value: string | null) => void
     icon?: React.ComponentType<{ className?: string }>
     dropdownId: string
+    searchable?: boolean
   }) => {
+    const [localSearch, setLocalSearch] = useState("")
     const isOpen = activeDropdown === dropdownId
+
+    // Filter options based on local search query
+    const filteredOptions = useMemo(() => {
+      if (!searchable || !localSearch) return options
+      const query = localSearch.toLowerCase().trim()
+      return options.filter(opt => opt.label.toLowerCase().includes(query))
+    }, [options, searchable, localSearch])
+
     const selectedOption = options.find(opt => opt.id === value)
+
+    // Reset local search when dropdown closes
+    useEffect(() => {
+      if (!isOpen) {
+        setLocalSearch("")
+      }
+    }, [isOpen])
 
     return (
       <div className="relative">
@@ -726,41 +744,76 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
 
         {isOpen && (
           <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
-            <div className="px-3 py-2 border-b border-gray-100">
+            <div className="px-3 py-2 border-b border-gray-100 flex items-center justify-between">
               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{label}</span>
-            </div>
-            <div className="max-h-64 overflow-y-auto py-1">
-              {options.map((option) => (
+              {value && (
                 <button
-                  key={option.id}
-                  onClick={() => {
-                    onChange(option.id)
-                    setActiveDropdown(null)
-                  }}
-                  className={`w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors ${value === option.id ? "bg-primary/5 text-primary font-medium" : "text-gray-700"
-                    }`}
-                >
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${value === option.id ? "border-primary bg-primary" : "border-gray-300"}`}>
-                    {value === option.id && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                  </div>
-                  {option.label}
-                </button>
-              ))}
-            </div>
-            {value && (
-              <div className="border-t border-gray-100 pt-1.5 mt-1">
-                <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation()
                     onChange(null)
-                    setActiveDropdown(null)
                   }}
-                  className="w-full px-3 py-2 text-left text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                  className="text-[10px] text-blue-600 hover:underline font-medium"
                 >
-                  <X className="h-3.5 w-3.5" />
-                  Bỏ chọn
+                  Xóa
                 </button>
+              )}
+            </div>
+
+            {searchable && (
+              <div className="px-3 py-2 border-b border-gray-100">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={localSearch}
+                    onChange={(e) => setLocalSearch(e.target.value)}
+                    placeholder="Tìm kiếm..."
+                    className="w-full pl-8 pr-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30"
+                    autoFocus
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
               </div>
             )}
+
+            <div className="max-h-64 overflow-y-auto py-1">
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => {
+                      onChange(option.id)
+                      setActiveDropdown(null)
+                    }}
+                    className={`w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors ${value === option.id ? "bg-primary/5 text-primary font-medium" : "text-gray-700"
+                      }`}
+                  >
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${value === option.id ? "border-primary bg-primary" : "border-gray-300"}`}>
+                      {value === option.id && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    </div>
+                    {option.label}
+                  </button>
+                ))
+              ) : localSearch.trim() ? (
+                <button
+                  onClick={() => {
+                    onChange(localSearch.trim())
+                    setActiveDropdown(null)
+                  }}
+                  className="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors text-primary font-medium"
+                >
+                  <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                  </div>
+                  Sử dụng: "{localSearch.trim()}"
+                </button>
+              ) : (
+                <div className="px-3 py-4 text-center text-sm text-gray-500 italic">
+                  Không tìm thấy kết quả
+                </div>
+              )}
+            </div>
+            {/* Removed old clear button as it's now in the header */}
           </div>
         )}
       </div>
@@ -834,6 +887,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
             onChange={setSelectedLocation}
             icon={MapPin}
             dropdownId="location"
+            searchable={true}
           />
 
           {(hasAdvancedFilters || selectedSalary || selectedType) && (
