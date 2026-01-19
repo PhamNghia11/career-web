@@ -87,7 +87,7 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
     try {
         const body = await req.json()
-        const { reportId, status, adminResponse } = body
+        const { reportId, status, adminResponse, jobAction } = body
 
         if (!reportId || !status || !adminResponse) {
             return NextResponse.json(
@@ -106,6 +106,9 @@ export async function PATCH(req: Request) {
             )
         }
 
+        const jobsCollection = await getCollection(COLLECTIONS.JOBS)
+        const job = await jobsCollection.findOne({ _id: new ObjectId(report.jobId) })
+
         // Update report status and response
         await reportsCollection.updateOne(
             { _id: new ObjectId(reportId) },
@@ -113,23 +116,70 @@ export async function PATCH(req: Request) {
                 $set: {
                     status,
                     adminResponse,
+                    jobAction: jobAction || 'none',
                     resolvedAt: new Date().toISOString()
                 }
             }
         )
 
+        // Handle Job Actions
+        if (job) {
+            if (jobAction === 'hide') {
+                await jobsCollection.updateOne(
+                    { _id: new ObjectId(report.jobId) },
+                    { $set: { status: 'rejected', updatedAt: new Date().toISOString() } }
+                )
+                // Notify job creator
+                if (job.creatorId) {
+                    try {
+                        const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+                        await notifCollection.insertOne({
+                            userId: job.creatorId,
+                            type: 'system',
+                            title: 'Tin tuyển dụng đã bị gỡ',
+                            message: `Tin tuyển dụng "${job.title}" của bạn đã bị gỡ sau khi có báo cáo vi phạm được xác thực. Phản hồi của admin: ${adminResponse}`,
+                            read: false,
+                            createdAt: new Date(),
+                            link: '/dashboard/my-jobs'
+                        })
+                    } catch (e) { console.error('Notify creator hide failed', e) }
+                }
+            } else if (jobAction === 'delete') {
+                await jobsCollection.deleteOne({ _id: new ObjectId(report.jobId) })
+                // Notify job creator
+                if (job.creatorId) {
+                    try {
+                        const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+                        await notifCollection.insertOne({
+                            userId: job.creatorId,
+                            type: 'system',
+                            title: 'Tin tuyển dụng đã bị xóa',
+                            message: `Tin tuyển dụng "${job.title}" của bạn đã bị xóa vĩnh viễn sau khi có báo cáo vi phạm nghiêm trọng.`,
+                            read: false,
+                            createdAt: new Date(),
+                            link: '/dashboard/my-jobs'
+                        })
+                    } catch (e) { console.error('Notify creator delete failed', e) }
+                }
+            }
+        }
+
         // Notify reporter if userId exists
         if (report.reporterUserId) {
             try {
                 const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+                let message = `Admin đã xử lý báo cáo của bạn về tin "${report.jobTitle}": ${adminResponse}`
+                if (jobAction === 'hide') message += " (Tin đã bị gỡ bỏ)."
+                if (jobAction === 'delete') message += " (Tin đã được xóa vĩnh viễn)."
+
                 await notifCollection.insertOne({
                     userId: report.reporterUserId,
                     type: 'system',
                     title: status === 'resolved' ? 'Kết quả xử lý báo cáo' : 'Phản hồi báo cáo vi phạm',
-                    message: `Admin đã xử lý báo cáo của bạn về tin "${report.jobTitle}": ${adminResponse}`,
+                    message,
                     read: false,
                     createdAt: new Date(),
-                    link: `/jobs/${report.jobId}`
+                    link: jobAction === 'delete' ? undefined : `/jobs/${report.jobId}`
                 })
             } catch (err) {
                 console.error('Failed to notify reporter:', err)

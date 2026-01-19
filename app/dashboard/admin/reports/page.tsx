@@ -5,7 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth-context"
-import { Flag, ExternalLink, Mail, Phone, Clock, CheckCircle, XCircle, AlertTriangle, MessageSquare, Send, Loader2 } from "lucide-react"
+import {
+    Flag, ExternalLink, Mail, Phone, Clock, CheckCircle, XCircle,
+    AlertTriangle, MessageSquare, Send, Loader2, User, Building2,
+    ShieldAlert, Trash2, EyeOff, BarChart3, Info
+} from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 import {
@@ -19,6 +23,8 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Separator } from "@/components/ui/separator"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface Report {
     _id: string
@@ -32,6 +38,7 @@ interface Report {
     content: string
     status: 'pending' | 'resolved' | 'dismissed'
     adminResponse?: string
+    jobAction?: 'none' | 'hide' | 'delete'
     createdAt: string
     resolvedAt?: string
 }
@@ -47,7 +54,8 @@ export default function AdminReportsPage() {
     const [selectedReport, setSelectedReport] = useState<Report | null>(null)
     const [resolutionData, setResolutionData] = useState({
         status: 'resolved' as 'resolved' | 'dismissed',
-        adminResponse: ""
+        adminResponse: "",
+        jobAction: 'none' as 'none' | 'hide' | 'delete'
     })
     const [processingId, setProcessingId] = useState<string | null>(null)
 
@@ -83,7 +91,8 @@ export default function AdminReportsPage() {
         setSelectedReport(report)
         setResolutionData({
             status: report.status === 'pending' ? 'resolved' : report.status as any,
-            adminResponse: report.adminResponse || ""
+            adminResponse: report.adminResponse || "",
+            jobAction: report.jobAction || 'none'
         })
         setResolutionOpen(true)
     }
@@ -114,7 +123,7 @@ export default function AdminReportsPage() {
             if (data.success) {
                 toast({
                     title: "Thành công",
-                    description: "Đã cập nhật trạng thái báo cáo.",
+                    description: "Đã cập nhật trạng thái báo cáo và xử lý tin tuyển dụng.",
                 })
                 setResolutionOpen(false)
                 fetchReports()
@@ -132,14 +141,22 @@ export default function AdminReportsPage() {
         }
     }
 
+    const stats = {
+        total: reports.length,
+        pending: reports.filter(r => r.status === 'pending').length,
+        handled: reports.filter(r => r.status !== 'pending').length
+    }
+
     if (user?.role !== 'admin') {
         return (
             <div className="flex items-center justify-center h-[50vh]">
-                <Card className="max-w-md">
-                    <CardContent className="p-6 text-center">
-                        <AlertTriangle className="h-12 w-12 mx-auto text-yellow-500 mb-4" />
-                        <h2 className="text-xl font-bold mb-2">Truy cập bị từ chối</h2>
-                        <p className="text-muted-foreground">Bạn cần quyền quản trị viên để xem trang này.</p>
+                <Card className="max-w-md border-none shadow-2xl bg-white/80 backdrop-blur-md">
+                    <CardContent className="p-8 text-center">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <ShieldAlert className="h-8 w-8 text-red-600" />
+                        </div>
+                        <h2 className="text-2xl font-bold mb-2 text-gray-900">Truy cập bị từ chối</h2>
+                        <p className="text-gray-500">Bạn cần quyền quản trị viên để xem trang này.</p>
                     </CardContent>
                 </Card>
             </div>
@@ -147,195 +164,379 @@ export default function AdminReportsPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-3">
-                    <Flag className="h-8 w-8 text-destructive" />
-                    Báo cáo vi phạm
-                </h1>
-                <p className="text-muted-foreground mt-1">Quản lý các phản ánh về tin tuyển dụng không chính xác.</p>
+        <div className="space-y-8 pb-10">
+            {/* Header section with Stats */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1e3a5f] to-[#2d5a88] p-8 text-white shadow-xl">
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <h1 className="text-3xl font-extrabold flex items-center gap-3">
+                            <Flag className="h-9 w-9 text-red-400" />
+                            Quản lý Báo cáo Vi phạm
+                        </h1>
+                        <p className="text-blue-100/80 mt-2 text-lg">Hệ thống giám sát và xử lý phản ánh tin tuyển dụng không chính xác.</p>
+                    </div>
+
+                    <div className="flex gap-4">
+                        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 min-w-[120px]">
+                            <p className="text-blue-100/60 text-xs font-semibold uppercase tracking-wider">Tổng cộng</p>
+                            <p className="text-3xl font-bold mt-1">{stats.total}</p>
+                        </div>
+                        <div className="bg-red-500/20 backdrop-blur-md border border-red-500/30 rounded-2xl p-4 min-w-[120px]">
+                            <p className="text-red-100/60 text-xs font-semibold uppercase tracking-wider">Chờ xử lý</p>
+                            <p className="text-3xl font-bold mt-1 text-red-200">{stats.pending}</p>
+                        </div>
+                        <div className="bg-green-500/20 backdrop-blur-md border border-green-500/30 rounded-2xl p-4 min-w-[120px]">
+                            <p className="text-green-100/60 text-xs font-semibold uppercase tracking-wider">Đã xong</p>
+                            <p className="text-3xl font-bold mt-1 text-green-200">{stats.handled}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div className="grid gap-4">
-                {loading ? (
-                    <p className="text-center text-muted-foreground py-10">Đang tải dữ liệu...</p>
-                ) : reports.length === 0 ? (
-                    <Card>
-                        <CardContent className="p-10 text-center text-muted-foreground">
-                            <CheckCircle className="h-12 w-12 mx-auto text-green-500 mb-4" />
-                            <p>Không có báo cáo nào. Hệ thống đang hoạt động tốt!</p>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    reports.map((report) => (
-                        <Card key={report._id} className="overflow-hidden border-l-4 border-l-destructive/50 data-[status=resolved]:border-l-green-500 data-[status=dismissed]:border-l-gray-300" data-status={report.status}>
-                            <CardHeader className="bg-muted/30 pb-3">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                    <div className="space-y-1">
-                                        <CardTitle className="text-lg flex items-center gap-2">
-                                            <span className="text-destructive">Báo cáo:</span>
-                                            <Link href={`/jobs/${report.jobId}`} target="_blank" className="hover:underline flex items-center gap-1">
-                                                {report.jobTitle}
-                                                <ExternalLink className="h-3 w-3" />
-                                            </Link>
-                                        </CardTitle>
-                                        <p className="text-sm text-muted-foreground">
-                                            Tại công ty: <span className="font-medium text-foreground">{report.companyName}</span>
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Badge variant={
-                                            report.status === 'pending' ? 'destructive' :
-                                                report.status === 'resolved' ? 'default' : 'secondary'
-                                        }>
-                                            {report.status === 'pending' ? 'Chờ xử lý' :
-                                                report.status === 'resolved' ? 'Đã xử lý' : 'Đã bỏ qua'}
-                                        </Badge>
-                                        <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                            <Clock className="h-3 w-3" />
-                                            {new Date(report.createdAt).toLocaleString('vi-VN')}
-                                        </div>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="p-6">
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Người báo cáo</label>
-                                            <div className="mt-1 space-y-1">
-                                                <div className="flex items-center gap-2">
-                                                    <p className="font-medium">{report.reporterName}</p>
-                                                    {report.reporterUserId && (
-                                                        <Badge variant="outline" className="text-[10px] h-4 px-1 bg-blue-50 text-blue-700 border-blue-200">Thành viên</Badge>
-                                                    )}
+            {/* Reports List */}
+            <div className="space-y-6">
+                <AnimatePresence mode="popLayout">
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-4">
+                            <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+                            <p className="text-gray-500 font-medium">Đang đồng bộ hóa dữ liệu báo cáo...</p>
+                        </div>
+                    ) : reports.length === 0 ? (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-white rounded-3xl p-16 text-center border-2 border-dashed border-gray-100"
+                        >
+                            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <CheckCircle className="h-10 w-10 text-green-500" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2">Hệ thống đang sạch!</h3>
+                            <p className="text-gray-500 max-w-md mx-auto text-lg leading-relaxed">
+                                Hiện tại không có báo cáo vi phạm nào cần xử lý. Hãy duy trì môi trường tuyển dụng chất lượng!
+                            </p>
+                        </motion.div>
+                    ) : (
+                        reports.map((report, index) => (
+                            <motion.div
+                                key={report._id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                            >
+                                <Card className="overflow-hidden border-none shadow-lg hover:shadow-xl transition-all duration-300 relative group bg-white ring-1 ring-gray-100">
+                                    {/* Status vertical bar */}
+                                    <div className={`absolute left-0 top-0 bottom-0 w-2 ${report.status === 'pending' ? 'bg-red-500' :
+                                            report.status === 'resolved' ? 'bg-green-500' : 'bg-gray-300'
+                                        }`} />
+
+                                    <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-4 px-6 md:px-8">
+                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${report.status === 'pending' ? 'bg-red-100 text-red-600' :
+                                                        report.status === 'resolved' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                                                    }`}>
+                                                    <Flag className="h-6 w-6" />
                                                 </div>
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Phone className="h-3 w-3" />
-                                                    {report.reporterPhone}
-                                                </div>
-                                                {report.reporterEmail && (
-                                                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                        <Mail className="h-3 w-3" />
-                                                        {report.reporterEmail}
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-0.5">
+                                                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Tin bị báo cáo</span>
+                                                        <Badge variant={report.status === 'pending' ? 'destructive' : report.status === 'resolved' ? 'default' : 'secondary'} className="px-2 py-0 h-5 text-[10px] uppercase font-bold tracking-tight">
+                                                            {report.status === 'pending' ? 'Chờ xử lý' : report.status === 'resolved' ? 'Vi phạm' : 'Hợp lệ'}
+                                                        </Badge>
                                                     </div>
+                                                    <Link href={`/jobs/${report.jobId}`} target="_blank" className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-2 flex-wrap">
+                                                        {report.jobTitle}
+                                                        <ExternalLink className="h-4 w-4" />
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center md:flex-col md:items-end gap-3 md:gap-1">
+                                                <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-500 bg-white px-3 py-1 rounded-full border border-gray-100">
+                                                    <Clock className="h-4 w-4 text-orange-400" />
+                                                    {new Date(report.createdAt).toLocaleString('vi-VN', {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                        day: '2-digit',
+                                                        month: '2-digit'
+                                                    })}
+                                                </div>
+                                                {report.jobAction && report.jobAction !== 'none' && (
+                                                    <Badge className="bg-red-50 text-red-600 border-red-100 text-[10px] py-0 px-2 h-5">
+                                                        {report.jobAction === 'delete' ? 'Đã xóa tin' : 'Đã gỡ tin'}
+                                                    </Badge>
                                                 )}
                                             </div>
                                         </div>
-                                    </div>
+                                    </CardHeader>
 
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Nội dung phản ánh</label>
-                                            <div className="bg-red-50 p-3 rounded-md border border-red-100 text-red-900 text-sm leading-relaxed mt-1">
-                                                {report.content}
-                                            </div>
-                                        </div>
+                                    <CardContent className="p-0">
+                                        <div className="grid lg:grid-cols-12">
+                                            {/* Left side: Reporter & Metadata */}
+                                            <div className="lg:col-span-4 bg-gray-50/30 p-6 md:p-8 border-r border-gray-100 space-y-6">
+                                                <div>
+                                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 block">Người báo cáo</label>
+                                                    <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-start gap-4">
+                                                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                                            <User className="h-5 w-5" />
+                                                        </div>
+                                                        <div className="overflow-hidden">
+                                                            <p className="font-bold text-gray-900 truncate">{report.reporterName}</p>
+                                                            <div className="flex flex-col gap-1 mt-1 text-sm text-gray-500">
+                                                                <span className="flex items-center gap-1.5">
+                                                                    <Phone className="h-3 w-3" />
+                                                                    {report.reporterPhone}
+                                                                </span>
+                                                                {report.reporterEmail && (
+                                                                    <span className="flex items-center gap-1.5 truncate">
+                                                                        <Mail className="h-3 w-3" />
+                                                                        {report.reporterEmail}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            {report.reporterUserId && (
+                                                                <Badge variant="outline" className="mt-2 text-[10px] py-0 px-1.5 h-4 bg-blue-50 text-blue-700 border-blue-200">
+                                                                    Thành viên hệ thống
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                        {report.adminResponse && (
-                                            <div>
-                                                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Phản hồi từ Admin</label>
-                                                <div className="bg-blue-50 p-3 rounded-md border border-blue-100 text-blue-900 text-sm leading-relaxed mt-1 flex gap-2">
-                                                    <MessageSquare className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
-                                                    <div>
-                                                        {report.adminResponse}
-                                                        {report.resolvedAt && (
-                                                            <p className="text-[10px] text-blue-400 mt-1 italic">
-                                                                Xử lý lúc: {new Date(report.resolvedAt).toLocaleString('vi-VN')}
-                                                            </p>
-                                                        )}
+                                                <div>
+                                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 block">Đơn vị bị báo cáo</label>
+                                                    <div className="flex items-center gap-3 text-gray-700">
+                                                        <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+                                                            <Building2 className="h-4 w-4" />
+                                                        </div>
+                                                        <span className="font-medium">{report.companyName}</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                        )}
 
-                                        <div className="pt-2 flex justify-end">
-                                            <Button
-                                                size="sm"
-                                                variant={report.status === 'pending' ? 'default' : 'outline'}
-                                                className={report.status === 'pending' ? "bg-blue-600 hover:bg-blue-700" : ""}
-                                                onClick={() => openResolution(report)}
-                                            >
-                                                {report.status === 'pending' ? 'Xử lý báo cáo' : 'Sửa phản hồi'}
-                                            </Button>
+                                            {/* Right side: Content & Action */}
+                                            <div className="lg:col-span-8 p-6 md:p-8 flex flex-col justify-between gap-8">
+                                                <div className="space-y-6">
+                                                    <div>
+                                                        <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3 block">Nội dung phản ánh</label>
+                                                        <div className="bg-red-50/50 p-5 rounded-2xl border border-red-100 text-red-900/80 leading-relaxed text-base italic relative">
+                                                            <span className="text-3xl font-serif text-red-100 absolute -top-1 -left-1">"</span>
+                                                            {report.content}
+                                                            <span className="text-3xl font-serif text-red-100 absolute -bottom-4 right-1">"</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {report.adminResponse && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, scale: 0.95 }}
+                                                            animate={{ opacity: 1, scale: 1 }}
+                                                            className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 relative"
+                                                        >
+                                                            <label className="text-[11px] font-bold text-blue-400 uppercase tracking-widest mb-2 block">Phản hồi của QT Viên</label>
+                                                            <div className="flex gap-3 text-blue-900">
+                                                                <MessageSquare className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+                                                                <div>
+                                                                    <p className="text-base leading-relaxed">{report.adminResponse}</p>
+                                                                    {report.resolvedAt && (
+                                                                        <p className="text-[10px] text-blue-400 mt-2 font-medium flex items-center gap-1">
+                                                                            <Clock className="h-3 w-3" />
+                                                                            Đã xử lý: {new Date(report.resolvedAt).toLocaleString('vi-VN')}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </motion.div>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex justify-end pt-4">
+                                                    <Button
+                                                        size="lg"
+                                                        onClick={() => openResolution(report)}
+                                                        className={`rounded-2xl px-8 shadow-lg transition-all duration-300 ${report.status === 'pending'
+                                                                ? "bg-blue-600 hover:bg-blue-700 hover:scale-105"
+                                                                : "bg-white text-blue-600 border-2 border-blue-50 hover:bg-blue-50 shadow-none"
+                                                            }`}
+                                                    >
+                                                        {report.status === 'pending' ? (
+                                                            <>
+                                                                <MessageSquare className="h-5 w-5 mr-2" />
+                                                                Thực hiện xử lý
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Info className="h-5 w-5 mr-2" />
+                                                                Chỉnh sửa xử lý
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))
-                )}
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        ))
+                    )}
+                </AnimatePresence>
             </div>
 
-            {/* Resolution Dialog */}
+            {/* Resolution Dialog - Redesigned */}
             <Dialog open={resolutionOpen} onOpenChange={setResolutionOpen}>
-                <DialogContent className="sm:max-w-[500px]">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <MessageSquare className="h-5 w-5 text-blue-600" />
-                            Xử lý báo cáo vi phạm
-                        </DialogTitle>
-                        <DialogDescription>
-                            Phản hồi này sẽ được gửi thông báo đến người báo cáo (nếu là thành viên).
-                        </DialogDescription>
-                    </DialogHeader>
+                <DialogContent className="sm:max-w-[600px] rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl">
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-8 text-white relative">
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl font-extrabold flex items-center gap-3">
+                                <ShieldAlert className="h-7 w-7 text-blue-200" />
+                                Quyết định xử lý
+                            </DialogTitle>
+                            <DialogDescription className="text-blue-100/70 text-base">
+                                Xác thực phản ánh và đưa ra quyết định cuối cùng cho tin tuyển dụng này.
+                            </DialogDescription>
+                        </DialogHeader>
+                    </div>
 
-                    {selectedReport && (
-                        <div className="space-y-4 py-4">
-                            <div className="space-y-2">
-                                <Label>Tin bị báo cáo</Label>
-                                <p className="text-sm font-medium p-2 bg-muted rounded-md">{selectedReport.jobTitle}</p>
+                    <div className="px-8 py-8 space-y-8 max-h-[70vh] overflow-y-auto">
+                        {/* Summary info box */}
+                        {selectedReport && (
+                            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex items-center gap-4">
+                                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                                    <Building2 className="h-6 w-6 text-blue-600" />
+                                </div>
+                                <div className="overflow-hidden">
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Tin tuyển dụng</p>
+                                    <p className="font-bold text-gray-800 truncate">{selectedReport.jobTitle}</p>
+                                </div>
                             </div>
+                        )}
 
-                            <div className="space-y-3">
-                                <Label>Hướng xử lý</Label>
+                        <div className="grid gap-8">
+                            {/* Step 1: Status */}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">1</div>
+                                    <Label className="text-base font-bold">Kết luận báo cáo</Label>
+                                </div>
                                 <RadioGroup
                                     value={resolutionData.status}
                                     onValueChange={(val: any) => setResolutionData({ ...resolutionData, status: val })}
-                                    className="flex gap-4"
+                                    className="grid grid-cols-2 gap-4"
                                 >
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="resolved" id="resolved" />
-                                        <Label htmlFor="resolved" className="cursor-pointer">Xác nhận vi phạm</Label>
+                                    <div className={`transition-all duration-300 rounded-2xl border-2 p-4 cursor-pointer flex flex-col gap-2 ${resolutionData.status === 'resolved' ? "border-red-500 bg-red-50/50" : "border-gray-100 bg-white hover:border-blue-200"
+                                        }`}>
+                                        <RadioGroupItem value="resolved" id="resolved" className="sr-only" />
+                                        <Label htmlFor="resolved" className="cursor-pointer font-bold flex items-center gap-2 text-red-700">
+                                            <AlertTriangle className="h-4 w-4" /> Xác nhận vi phạm
+                                        </Label>
+                                        <p className="text-xs text-red-600/70 leading-relaxed">Tin không chính xác, lừa đảo hoặc vi phạm điều khoản.</p>
                                     </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="dismissed" id="dismissed" />
-                                        <Label htmlFor="dismissed" className="cursor-pointer">Bỏ qua / Không vi phạm</Label>
+                                    <div className={`transition-all duration-300 rounded-2xl border-2 p-4 cursor-pointer flex flex-col gap-2 ${resolutionData.status === 'dismissed' ? "border-green-500 bg-green-50/50" : "border-gray-100 bg-white hover:border-blue-200"
+                                        }`}>
+                                        <RadioGroupItem value="dismissed" id="dismissed" className="sr-only" />
+                                        <Label htmlFor="dismissed" className="cursor-pointer font-bold flex items-center gap-2 text-green-700">
+                                            <CheckCircle className="h-4 w-4" /> Bỏ qua báo cáo
+                                        </Label>
+                                        <p className="text-xs text-green-600/70 leading-relaxed">Báo cáo không đúng thực tế, tin tuyển dụng vẫn hợp lệ.</p>
                                     </div>
                                 </RadioGroup>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="response">Nội dung phản hồi <span className="text-destructive">*</span></Label>
+                            {/* Step 2: Job Action (Only if confirmed violation) */}
+                            {resolutionData.status === 'resolved' && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">2</div>
+                                        <Label className="text-base font-bold">Hành động trực tiếp với tin</Label>
+                                    </div>
+                                    <RadioGroup
+                                        value={resolutionData.jobAction}
+                                        onValueChange={(val: any) => setResolutionData({ ...resolutionData, jobAction: val })}
+                                        className="space-y-3"
+                                    >
+                                        <div className="flex items-center space-x-3 bg-white p-4 rounded-2xl border border-gray-100 hover:border-blue-200 transition-all">
+                                            <RadioGroupItem value="none" id="act-none" />
+                                            <Label htmlFor="act-none" className="cursor-pointer flex items-center gap-2 font-medium">
+                                                Duy trì trạng thái hiện tại
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center space-x-3 bg-white p-4 rounded-2xl border border-gray-100 hover:border-orange-200 transition-all group">
+                                            <RadioGroupItem value="hide" id="act-hide" />
+                                            <Label htmlFor="act-hide" className="cursor-pointer flex flex-1 items-center justify-between font-medium group-hover:text-orange-600">
+                                                <span className="flex items-center gap-2">
+                                                    <EyeOff className="h-4 w-4" /> Gỡ tin ngay lập tức
+                                                </span>
+                                                <Badge className="bg-orange-100 text-orange-600 border-none text-[10px]">Đề xuất</Badge>
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center space-x-3 bg-white p-4 rounded-2xl border border-gray-100 hover:border-red-200 transition-all group">
+                                            <RadioGroupItem value="delete" id="act-delete" />
+                                            <Label htmlFor="act-delete" className="cursor-pointer flex flex-1 items-center justify-between font-medium group-hover:text-red-600 text-gray-500">
+                                                <span className="flex items-center gap-2 font-bold">
+                                                    <Trash2 className="h-4 w-4" /> Xóa vĩnh viễn khỏi hệ thống
+                                                </span>
+                                            </Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
+                            )}
+
+                            {/* Step 3: Response */}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                                        {resolutionData.status === 'resolved' ? 3 : 2}
+                                    </div>
+                                    <Label className="text-base font-bold">Nội dung phản hồi cho người báo cáo</Label>
+                                </div>
                                 <Textarea
                                     id="response"
-                                    placeholder="Ví dụ: Cảm ơn bạn, chúng tôi đã gỡ tin này / Tin này vẫn hoàn toàn hợp lệ..."
+                                    placeholder="Vui lòng nhập lời giải thích hoặc cảm ơn người báo cáo..."
                                     rows={4}
+                                    className="rounded-2xl border-gray-200 focus:ring-blue-500 focus:border-blue-500 p-4"
                                     value={resolutionData.adminResponse}
                                     onChange={(e) => setResolutionData({ ...resolutionData, adminResponse: e.target.value })}
                                 />
-                                {selectedReport.reporterUserId && (
-                                    <p className="text-[11px] text-blue-600 italic">
-                                        * Một thông báo sẽ được gửi tự động đến tài khoản của {selectedReport.reporterName}.
-                                    </p>
+                                {selectedReport?.reporterUserId && (
+                                    <div className="flex items-start gap-2 bg-blue-50 p-4 rounded-2xl border border-blue-100 text-blue-800 text-xs">
+                                        <Info className="h-4 w-4 shrink-0 mt-0.5 text-blue-500" />
+                                        <p className="leading-relaxed">
+                                            Bạn đang trả lời báo cáo từ thành viên <b>{selectedReport.reporterName}</b>. Hệ thống sẽ tự động gửi thông báo trực tiếp đến họ.
+                                        </p>
+                                    </div>
                                 )}
                             </div>
                         </div>
-                    )}
+                    </div>
 
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setResolutionOpen(false)}>Hủy</Button>
+                    <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 flex gap-4 justify-end">
                         <Button
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            variant="outline"
+                            onClick={() => setResolutionOpen(false)}
+                            className="rounded-xl px-6 h-12"
+                        >
+                            Hủy bỏ
+                        </Button>
+                        <Button
+                            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-10 h-12 font-bold shadow-lg shadow-blue-200 transition-all hover:scale-105 active:scale-95 disabled:opacity-70"
                             onClick={handleResolve}
                             disabled={!!processingId}
                         >
-                            {processingId ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
-                            Xác nhận xử lý
+                            {processingId ? (
+                                <>
+                                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                    Đang đồng bộ...
+                                </>
+                            ) : (
+                                <>
+                                    <Send className="h-5 w-5 mr-2" />
+                                    Xác nhận & Hoàn tất
+                                </>
+                            )}
                         </Button>
-                    </DialogFooter>
+                    </div>
                 </DialogContent>
             </Dialog>
         </div>
     )
 }
+
