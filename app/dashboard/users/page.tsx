@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, MoreHorizontal, UserPlus, Shield, Trash2, Edit, Eye } from "lucide-react"
+import { Search, MoreHorizontal, UserPlus, Shield, Trash2, Edit, Eye, Users, GraduationCap, Building2, ShieldCheck } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -190,6 +190,82 @@ export default function UsersManagementPage() {
           <UserPlus className="h-4 w-4 mr-2" />
           Thêm người dùng
         </Button>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between space-y-0">
+              <div className="h-10 w-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                <Users size={20} />
+              </div>
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                Tổng cộng
+              </Badge>
+            </div>
+            <div className="mt-4">
+              <div className="text-2xl font-bold">{users.length}</div>
+              <p className="text-xs text-muted-foreground mt-1">Tổng số tài khoản</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between space-y-0">
+              <div className="h-10 w-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                <GraduationCap size={20} />
+              </div>
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                {roleLabels.student}
+              </Badge>
+            </div>
+            <div className="mt-4">
+              <div className="text-2xl font-bold">
+                {users.filter(u => u.role === 'student').length}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Tài khoản sinh viên</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between space-y-0">
+              <div className="h-10 w-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">
+                <Building2 size={20} />
+              </div>
+              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                {roleLabels.employer}
+              </Badge>
+            </div>
+            <div className="mt-4">
+              <div className="text-2xl font-bold">
+                {users.filter(u => u.role === 'employer').length}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Tài khoản nhà tuyển dụng</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between space-y-0">
+              <div className="h-10 w-10 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">
+                <ShieldCheck size={20} />
+              </div>
+              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                {roleLabels.admin}
+              </Badge>
+            </div>
+            <div className="mt-4">
+              <div className="text-2xl font-bold">
+                {users.filter(u => u.role === 'admin').length}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Quản trị viên</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>
