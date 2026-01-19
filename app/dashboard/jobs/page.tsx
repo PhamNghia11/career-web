@@ -197,45 +197,46 @@ export default function AdminJobsPage() {
                                         <TableCell>{job.salary}</TableCell>
                                         <TableCell>{getStatusBadge(job.status)}</TableCell>
                                         <TableCell className="text-right">
-                                            <div className="flex justify-end items-center gap-2">
-                                                {/* Action Container with fixed width for buttons to keep Eye icon stable */}
-                                                <div className="flex items-center gap-2">
-                                                    {job.status === 'pending' && (
-                                                        <div className="flex items-center gap-1.5">
+                                            <div className="flex justify-end items-center gap-1">
+                                                {/* Consistent Action Area */}
+                                                <div className="flex items-center justify-end gap-2">
+                                                    {/* Primary Actions (Duyệt/Gỡ) - Set a minimum width area */}
+                                                    <div className="flex items-center gap-2 min-w-[100px] justify-end">
+                                                        {job.status === 'pending' && (
+                                                            <div className="flex items-center gap-1.5">
+                                                                <Button
+                                                                    size="sm"
+                                                                    className="bg-green-600 hover:bg-green-700 h-9 px-3"
+                                                                    onClick={() => handleStatusUpdate(job._id, "active")}
+                                                                    title="Duyệt bài"
+                                                                >
+                                                                    <Check className="h-4 w-4 mr-1" /> Duyệt
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="destructive"
+                                                                    className="h-9 px-3"
+                                                                    onClick={() => openRejectDialog(job._id)}
+                                                                    title="Từ chối"
+                                                                >
+                                                                    <X className="h-4 w-4 mr-1" /> Từ chối
+                                                                </Button>
+                                                            </div>
+                                                        )}
+
+                                                        {job.status === 'active' && (
                                                             <Button
                                                                 size="sm"
-                                                                className="bg-green-600 hover:bg-green-700 h-9 px-3"
-                                                                onClick={() => handleStatusUpdate(job._id, "active")}
-                                                                title="Duyệt bài"
-                                                            >
-                                                                <Check className="h-4 w-4 mr-1" /> Duyệt
-                                                            </Button>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="destructive"
-                                                                className="h-9 px-3"
+                                                                variant="outline"
+                                                                className="h-9 px-4 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300 min-w-[100px]"
                                                                 onClick={() => openRejectDialog(job._id)}
-                                                                title="Từ chối"
                                                             >
-                                                                <X className="h-4 w-4 mr-1" /> Từ chối
+                                                                Gỡ bài
                                                             </Button>
-                                                        </div>
-                                                    )}
+                                                        )}
+                                                    </div>
 
-                                                    {job.status === 'active' && (
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                            className="h-9 px-4 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300 min-w-[100px]"
-                                                            onClick={() => openRejectDialog(job._id)}
-                                                        >
-                                                            Gỡ bài
-                                                        </Button>
-                                                    )}
-                                                </div>
-
-                                                {/* Fixed position for Eye and Trash icons */}
-                                                <div className="flex items-center gap-1 border-l pl-2 ml-1">
+                                                    {/* Eye Icon Area - Fixed position */}
                                                     <Button
                                                         size="sm"
                                                         variant="ghost"
@@ -246,19 +247,20 @@ export default function AdminJobsPage() {
                                                         <Eye className="h-4.5 w-4.5" />
                                                     </Button>
 
-                                                    {(job.status === 'rejected' || job.status === 'closed' || job.status === 'request_changes') ? (
-                                                        <Button
-                                                            size="sm"
-                                                            variant="ghost"
-                                                            className="h-9 w-9 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
-                                                            onClick={() => handleDelete(job._id)}
-                                                            title="Xóa vĩnh viễn"
-                                                        >
-                                                            <Trash2 className="h-4.5 w-4.5" />
-                                                        </Button>
-                                                    ) : (
-                                                        <div className="w-9" /> /* Spacer to keep Eye icon aligned when Trash is hidden */
-                                                    )}
+                                                    {/* Delete/Trash Icon Area - Fixed position */}
+                                                    <div className="w-9 flex justify-center">
+                                                        {(job.status === 'rejected' || job.status === 'closed' || job.status === 'request_changes') && (
+                                                            <Button
+                                                                size="sm"
+                                                                variant="ghost"
+                                                                className="h-9 w-9 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                                                                onClick={() => handleDelete(job._id)}
+                                                                title="Xóa vĩnh viễn"
+                                                            >
+                                                                <Trash2 className="h-4.5 w-4.5" />
+                                                            </Button>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </TableCell>
