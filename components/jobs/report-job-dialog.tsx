@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useAuth } from "@/lib/auth-context"
 import {
     Dialog,
     DialogContent,
@@ -25,6 +26,7 @@ interface ReportJobDialogProps {
 
 export function ReportJobDialog({ jobId, jobTitle, companyName }: ReportJobDialogProps) {
     const { toast } = useToast()
+    const { user } = useAuth()
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
@@ -55,6 +57,7 @@ export function ReportJobDialog({ jobId, jobTitle, companyName }: ReportJobDialo
                     jobId,
                     jobTitle,
                     companyName,
+                    userId: user?._id || user?.id, // Capture userId if logged in
                     ...formData
                 })
             })

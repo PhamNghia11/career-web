@@ -40,6 +40,7 @@ export async function POST(req: Request) {
         }
 
         const collection = await getCollection(COLLECTIONS.REPORTS)
+        const reporterUserId = body.userId // Capture userId from body
 
         const report = {
             jobId: new ObjectId(jobId),
@@ -48,6 +49,7 @@ export async function POST(req: Request) {
             reporterName,
             reporterPhone,
             reporterEmail,
+            reporterUserId: reporterUserId ? (typeof reporterUserId === 'string' ? reporterUserId : reporterUserId.toString()) : null,
             content,
             status: 'pending', // pending, resolved, dismissed
             createdAt: new Date().toISOString()
@@ -62,14 +64,13 @@ export async function POST(req: Request) {
                 targetRole: 'admin',
                 type: 'system',
                 title: 'Báo cáo tin tuyển dụng mới',
-                message: `Tin tuyển dụng ${jobTitle} của ${companyName} vừa bị báo cáo bởi ${reporterName}.`,
+                message: `Tin tuyển dụng "${jobTitle}" của ${companyName} vừa bị báo cáo bởi ${reporterName}.`,
                 read: false,
                 createdAt: new Date(),
-                link: '/dashboard/admin/reports' // Assuming there will be a page to view reports
+                link: '/dashboard/admin/reports'
             })
         } catch (err) {
             console.error('Failed to create admin notification for report:', err)
-            // Continue success response even if notification fails
         }
 
         return NextResponse.json({ success: true, message: 'Gửi báo cáo thành công' })
@@ -78,6 +79,69 @@ export async function POST(req: Request) {
         console.error('Error submitting report:', error)
         return NextResponse.json(
             { success: false, error: 'Đã xảy ra lỗi khi gửi báo cáo' },
+            { status: 500 }
+        )
+    }
+}
+
+export async function PATCH(req: Request) {
+    try {
+        const body = await req.json()
+        const { reportId, status, adminResponse } = body
+
+        if (!reportId || !status || !adminResponse) {
+            return NextResponse.json(
+                { success: false, error: 'Thiếu thông tin bắt buộc' },
+                { status: 400 }
+            )
+        }
+
+        const reportsCollection = await getCollection(COLLECTIONS.REPORTS)
+        const report = await reportsCollection.findOne({ _id: new ObjectId(reportId) })
+
+        if (!report) {
+            return NextResponse.json(
+                { success: false, error: 'Không tìm thấy báo cáo' },
+                { status: 404 }
+            )
+        }
+
+        // Update report status and response
+        await reportsCollection.updateOne(
+            { _id: new ObjectId(reportId) },
+            {
+                $set: {
+                    status,
+                    adminResponse,
+                    resolvedAt: new Date().toISOString()
+                }
+            }
+        )
+
+        // Notify reporter if userId exists
+        if (report.reporterUserId) {
+            try {
+                const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+                await notifCollection.insertOne({
+                    userId: report.reporterUserId,
+                    type: 'system',
+                    title: status === 'resolved' ? 'Kết quả xử lý báo cáo' : 'Phản hồi báo cáo vi phạm',
+                    message: `Admin đã xử lý báo cáo của bạn về tin "${report.jobTitle}": ${adminResponse}`,
+                    read: false,
+                    createdAt: new Date(),
+                    link: `/jobs/${report.jobId}`
+                })
+            } catch (err) {
+                console.error('Failed to notify reporter:', err)
+            }
+        }
+
+        return NextResponse.json({ success: true, message: 'Xử lý báo cáo thành công' })
+
+    } catch (error) {
+        console.error('Error updating report:', error)
+        return NextResponse.json(
+            { success: false, error: 'Đã xảy ra lỗi khi xử lý báo cáo' },
             { status: 500 }
         )
     }
