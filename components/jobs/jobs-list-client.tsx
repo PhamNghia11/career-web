@@ -767,6 +767,18 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                     type="text"
                     value={localSearch}
                     onChange={(e) => setLocalSearch(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        if (filteredOptions.length > 0) {
+                          onChange(filteredOptions[0].id)
+                          setActiveDropdown(null)
+                        } else if (localSearch.trim()) {
+                          onChange(localSearch.trim())
+                          setActiveDropdown(null)
+                        }
+                      }
+                    }}
                     placeholder="Tìm kiếm..."
                     className="w-full pl-8 pr-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30"
                     autoFocus
