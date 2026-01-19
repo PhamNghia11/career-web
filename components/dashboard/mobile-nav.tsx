@@ -37,11 +37,11 @@ export function MobileNav() {
 
   const adminNav = [
     { name: "Tổng quan", href: "/dashboard", icon: Home },
-    { name: "Quản lý đối tác", href: "/dashboard/admin/partners", icon: Building },
     { name: "Thống kê", href: "/dashboard/analytics", icon: BarChart3 },
     { name: "Quản lý người dùng", href: "/dashboard/users", icon: Users },
     { name: "Quản lý việc làm", href: "/dashboard/jobs", icon: FileText },
     { name: "Quản lý ứng tuyển", href: "/dashboard/applicants-manager", icon: Users },
+    { name: "Quản lý đối tác", href: "/dashboard/admin/partners", icon: Building },
     { name: "Đơn ứng tuyển", href: "/dashboard/applications", icon: FileText },
     { name: "Đăng tin tuyển dụng", href: "/dashboard/jobs/new", icon: Briefcase },
     { name: "Khách truy cập", href: "/dashboard/visitors", icon: Eye },
