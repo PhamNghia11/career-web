@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Menu, X, Home, Briefcase, User, Settings, Bell, LogOut, FileText, Users, Building, BarChart3, Star, Eye, MessageSquare, ChevronLeft } from "lucide-react"
+import { Menu, X, Home, Briefcase, User, Settings, Bell, LogOut, FileText, Users, Building, BarChart3, Star, Eye, MessageSquare, ChevronLeft, Flag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth-context"
 import { cn } from "@/lib/utils"
@@ -37,15 +37,17 @@ export function MobileNav() {
 
   const adminNav = [
     { name: "Tổng quan", href: "/dashboard", icon: Home },
+    { name: "Thống kê", href: "/dashboard/analytics", icon: BarChart3 },
     { name: "Quản lý người dùng", href: "/dashboard/users", icon: Users },
-    { name: "Đăng tin tuyển dụng", href: "/dashboard/jobs/new", icon: Briefcase },
+    { name: "Quản lý đối tác", href: "/dashboard/admin/partners", icon: Building },
     { name: "Quản lý việc làm", href: "/dashboard/jobs", icon: FileText },
     { name: "Quản lý ứng tuyển", href: "/dashboard/applicants-manager", icon: Users },
     { name: "Đơn ứng tuyển", href: "/dashboard/applications", icon: FileText },
-    { name: "Đánh giá Google", href: "/dashboard/reviews", icon: Star },
+    { name: "Đăng tin tuyển dụng", href: "/dashboard/jobs/new", icon: Briefcase },
     { name: "Khách truy cập", href: "/dashboard/visitors", icon: Eye },
-    { name: "Thống kê", href: "/dashboard/analytics", icon: BarChart3 },
+    { name: "Đánh giá Google", href: "/dashboard/reviews", icon: Star },
     { name: "Liên hệ", href: "/dashboard/messages", icon: MessageSquare },
+    { name: "Báo cáo vi phạm", href: "/dashboard/admin/reports", icon: Flag },
     { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },
   ]
 
