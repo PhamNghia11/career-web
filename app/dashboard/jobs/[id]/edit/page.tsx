@@ -23,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Loader2, Briefcase, MapPin, DollarSign, Building, ArrowLeft, ImagePlus, X, ChevronDown, Eye } from "lucide-react"
+import { Loader2, Briefcase, MapPin, DollarSign, Building, ArrowLeft, ImagePlus, X, ChevronDown, Eye, Paperclip, FileText } from "lucide-react"
 import { JobPreview } from "@/components/jobs/job-preview"
 import { DatePicker } from "@/components/ui/date-picker"
 
@@ -72,6 +72,8 @@ const formSchema = z.object({
     unlimitedQuantity: z.boolean().default(false),
     contactEmail: z.string().email("Vui lòng nhập đúng định dạng email").optional().or(z.literal("")),
     contactPhone: z.string().optional(),
+    documentUrl: z.string().optional(),
+    documentName: z.string().optional(),
 }).refine((data) => {
     if (!data.unlimitedQuantity && (!data.quantity || data.quantity < 1)) {
         return false
@@ -115,6 +117,8 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             unlimitedQuantity: false,
             contactEmail: "",
             contactPhone: "",
+            documentUrl: "",
+            documentName: "",
         },
     })
 
@@ -188,6 +192,8 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                         deadline: job.deadline ? new Date(job.deadline.split('/').reverse().join('-')) : undefined, // Parse DD/MM/YYYY to Date
                         contactEmail: job.contactEmail || "",
                         contactPhone: job.contactPhone || "",
+                        documentUrl: job.documentUrl || "",
+                        documentName: job.documentName || "",
                     })
 
                     // Load existing logo
@@ -446,358 +452,429 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                                     </FormItem>
                                 )}
                             />
+                        </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="contactEmail"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Email nhận hồ sơ / liên hệ</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="tuyendung@congty.com" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="contactPhone"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Số điện thoại liên hệ</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="0901 234 567" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                        {/* Document Attachment Section */}
+                        <div className="space-y-4 pt-4 border-t border-gray-100">
+                            <div className="flex flex-col gap-1">
+                                <FormLabel className="flex items-center gap-2 text-base font-semibold">
+                                    <Paperclip className="w-5 h-5 text-blue-600" /> Tài liệu đính kèm doanh nghiệp
+                                </FormLabel>
+                                <p className="text-sm text-gray-500 ml-7">Đính kèm giấy phép kinh doanh hoặc mô tả công việc chi tiết để Admin dễ dàng duyệt tin.</p>
                             </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="deadline"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel>Hạn nộp hồ sơ</FormLabel>
-                                            <DatePicker
-                                                date={field.value}
-                                                setDate={field.onChange}
-                                                placeholder="dd/mm/yyyy"
-                                            />
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="quantity"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <div className="flex items-center justify-between">
-                                                <FormLabel>Số lượng tuyển</FormLabel>
-                                                <FormField
-                                                    control={form.control}
-                                                    name="unlimitedQuantity"
-                                                    render={({ field: checkField }) => (
-                                                        <div className="flex items-center space-x-2">
-                                                            <Checkbox
-                                                                id="unlimited-edit"
-                                                                checked={checkField.value}
-                                                                onCheckedChange={(checked) => {
-                                                                    checkField.onChange(checked);
-                                                                    if (checked) {
-                                                                        form.setValue("quantity", 1);
-                                                                        form.clearErrors("quantity");
-                                                                    }
-                                                                }}
-                                                            />
-                                                            <label
-                                                                htmlFor="unlimited-edit"
-                                                                className="text-sm font-normal text-gray-500 cursor-pointer select-none"
-                                                            >
-                                                                Không giới hạn
-                                                            </label>
-                                                        </div>
-                                                    )}
-                                                />
-                                            </div>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    min="1"
-                                                    {...field}
-                                                    disabled={form.watch("unlimitedQuantity")}
-                                                    className={form.watch("unlimitedQuantity") ? "bg-gray-50 text-gray-400" : ""}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="type"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Hình thức làm việc</FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Chọn hình thức" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {JOB_TYPES.map(type => (
-                                                        <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="field"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Lĩnh vực / Ngành nghề <span className="text-red-500">*</span></FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Chọn lĩnh vực" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {Object.keys(FIELDS_AND_MAJORS).map((key) => (
-                                                        <SelectItem key={key} value={key}>
-                                                            {key}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <FormLabel className="text-base font-semibold">Ngành học liên quan</FormLabel>
-                                <FormField
-                                    control={form.control}
-                                    name="relatedMajors"
-                                    render={({ field }) => {
-                                        const selectedMajors = field.value || []
-
-                                        return (
-                                            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 border rounded-md p-3">
-                                                {Object.entries(FIELDS_AND_MAJORS).map(([fieldName, majors]) => (
-                                                    <div key={fieldName}>
-                                                        <h4 className="text-sm font-semibold text-gray-700 mb-2 sticky top-0 bg-white py-1 z-10">{fieldName}</h4>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {majors.map((major) => {
-                                                                const isSelected = selectedMajors.includes(major)
-                                                                return (
-                                                                    <div
-                                                                        key={major}
-                                                                        className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all border select-none ${isSelected
-                                                                            ? "bg-blue-600 text-white border-blue-600 shadow-sm hover:bg-blue-700"
-                                                                            : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
-                                                                            }`}
-                                                                        onClick={() => {
-                                                                            if (isSelected) {
-                                                                                field.onChange(selectedMajors.filter((m) => m !== major))
-                                                                            } else {
-                                                                                field.onChange([...selectedMajors, major])
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        {major}
-                                                                    </div>
-                                                                )
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )
-                                    }}
-                                />
-                                <FormMessage>{form.formState.errors.relatedMajors?.message}</FormMessage>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Salary & Benefits */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><DollarSign className="w-5 h-5 text-green-600" /> Lương & Phúc lợi</CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid gap-6">
-                            <div className="flex flex-col gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="isNegotiable"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                            <FormControl>
-                                                <Checkbox
-                                                    checked={field.value}
-                                                    onCheckedChange={field.onChange}
-                                                />
-                                            </FormControl>
-                                            <div className="space-y-1 leading-none">
-                                                <FormLabel>
-                                                    Mức lương Thoả thuận
-                                                </FormLabel>
-                                            </div>
-                                        </FormItem>
-                                    )}
-                                />
-
-                                {!isNegotiable && (
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <FormField
-                                            control={form.control}
-                                            name="salaryMin"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Tối thiểu ({jobType === "part-time" ? "VNĐ/giờ" : "VNĐ/tháng"})</FormLabel>
-                                                    <FormControl>
-                                                        <MoneyInput placeholder="0" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="salaryMax"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Tối đa ({jobType === "part-time" ? "VNĐ/giờ" : "VNĐ/tháng"})</FormLabel>
-                                                    <FormControl>
-                                                        <MoneyInput placeholder="0" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="space-y-3">
-                                <FormLabel>Phúc lợi</FormLabel>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                    {COMMON_BENEFITS.map((benefit) => (
-                                        <FormField
-                                            key={benefit}
-                                            control={form.control}
-                                            name="benefits"
-                                            render={({ field }) => {
-                                                const current = field.value || []
-                                                return (
-                                                    <FormItem
-                                                        key={benefit}
-                                                        className="flex flex-row items-start space-x-3 space-y-0"
-                                                    >
-                                                        <FormControl>
-                                                            <Checkbox
-                                                                checked={current.includes(benefit)}
-                                                                onCheckedChange={(checked) => {
-                                                                    return checked
-                                                                        ? field.onChange([...current, benefit])
-                                                                        : field.onChange(
-                                                                            current.filter(
-                                                                                (value) => value !== benefit
-                                                                            )
-                                                                        )
-                                                                }}
-                                                            />
-                                                        </FormControl>
-                                                        <FormLabel className="font-normal text-sm cursor-pointer">
-                                                            {benefit}
-                                                        </FormLabel>
-                                                    </FormItem>
-                                                )
+                            <div className="flex items-center gap-4 ml-7">
+                                {form.watch("documentUrl") ? (
+                                    <div className="flex items-center gap-4 p-4 border rounded-xl bg-blue-50/50 flex-1 border-blue-100">
+                                        <div className="p-3 bg-white rounded-lg border shadow-sm">
+                                            <FileText className="w-8 h-8 text-blue-600" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold text-gray-900 truncate">{form.watch("documentName")}</p>
+                                            <p className="text-xs text-blue-600 font-medium">Đã tải lên thành công</p>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                                form.setValue("documentUrl", "")
+                                                form.setValue("documentName", "")
                                             }}
+                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 h-10 w-10 p-0 rounded-full"
+                                        >
+                                            <X className="w-5 h-5" />
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <label className="flex flex-col items-center justify-center gap-2 px-6 py-8 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all flex-1 group">
+                                        <div className="p-3 bg-gray-50 rounded-full group-hover:bg-blue-100 transition-colors">
+                                            <Paperclip className="w-6 h-6 text-gray-400 group-hover:text-blue-600" />
+                                        </div>
+                                        <div className="text-center">
+                                            <span className="text-sm font-medium text-gray-700">Nhấn để chọn file hoặc kéo thả vào đây</span>
+                                            <p className="text-xs text-gray-500 mt-1">Hỗ trợ PDF, Word, Hình ảnh (Tối đa 5MB)</p>
+                                        </div>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0]
+                                                if (!file) return
+
+                                                if (file.size > 5 * 1024 * 1024) {
+                                                    toast({
+                                                        title: "File quá lớn",
+                                                        description: "Dung lượng tối đa 5MB",
+                                                        variant: "destructive",
+                                                    })
+                                                    return
+                                                }
+
+                                                const reader = new FileReader()
+                                                reader.onloadend = () => {
+                                                    form.setValue("documentUrl", reader.result as string)
+                                                    form.setValue("documentName", file.name)
+                                                }
+                                                reader.readAsDataURL(file)
+                                            }}
+                                            className="hidden"
                                         />
-                                    ))}
-                                </div>
+                                    </label>
+                                )}
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
 
-                    {/* Detailed Description */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><Building className="w-5 h-5 text-orange-600" /> Mô tả chi tiết</CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
-                                name="description"
+                                name="contactEmail"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Mô tả công việc <span className="text-red-500">*</span></FormLabel>
+                                        <FormLabel>Email nhận hồ sơ / liên hệ</FormLabel>
                                         <FormControl>
-                                            <Textarea className="h-32" {...field} />
+                                            <Input placeholder="tuyendung@congty.com" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
-
                             <FormField
                                 control={form.control}
-                                name="requirements"
+                                name="contactPhone"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Yêu cầu công việc <span className="text-red-500">*</span></FormLabel>
+                                        <FormLabel>Số điện thoại liên hệ</FormLabel>
                                         <FormControl>
-                                            <Textarea className="h-32" {...field} />
+                                            <Input placeholder="0901 234 567" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
+                        </div>
 
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField
                                 control={form.control}
-                                name="detailedBenefits"
+                                name="deadline"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col">
+                                        <FormLabel>Hạn nộp hồ sơ</FormLabel>
+                                        <DatePicker
+                                            date={field.value}
+                                            setDate={field.onChange}
+                                            placeholder="dd/mm/yyyy"
+                                        />
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="quantity"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Phúc lợi chi tiết</FormLabel>
+                                        <div className="flex items-center justify-between">
+                                            <FormLabel>Số lượng tuyển</FormLabel>
+                                            <FormField
+                                                control={form.control}
+                                                name="unlimitedQuantity"
+                                                render={({ field: checkField }) => (
+                                                    <div className="flex items-center space-x-2">
+                                                        <Checkbox
+                                                            id="unlimited-edit"
+                                                            checked={checkField.value}
+                                                            onCheckedChange={(checked) => {
+                                                                checkField.onChange(checked);
+                                                                if (checked) {
+                                                                    form.setValue("quantity", 1);
+                                                                    form.clearErrors("quantity");
+                                                                }
+                                                            }}
+                                                        />
+                                                        <label
+                                                            htmlFor="unlimited-edit"
+                                                            className="text-sm font-normal text-gray-500 cursor-pointer select-none"
+                                                        >
+                                                            Không giới hạn
+                                                        </label>
+                                                    </div>
+                                                )}
+                                            />
+                                        </div>
                                         <FormControl>
-                                            <Textarea className="h-24" {...field} />
+                                            <Input
+                                                type="number"
+                                                min="1"
+                                                {...field}
+                                                disabled={form.watch("unlimitedQuantity")}
+                                                className={form.watch("unlimitedQuantity") ? "bg-gray-50 text-gray-400" : ""}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
-                        </CardContent>
-                    </Card>
+                        </div>
 
-                    <div className="flex justify-end gap-4">
-                        <Button type="button" variant="outline" onClick={() => router.back()}>Hủy bỏ</Button>
-                        <Button type="button" variant="secondary" onClick={handlePreview} className="gap-2">
-                            <Eye className="w-4 h-4" /> Xem trước
-                        </Button>
-                        <Button type="submit" disabled={isLoading} className="bg-blue-600 hover:bg-blue-700">
-                            {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang lưu...</> : "Lưu thay đổi"}
-                        </Button>
-                    </div>
-                </form>
-            </Form>
-        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="type"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Hình thức làm việc</FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Chọn hình thức" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {JOB_TYPES.map(type => (
+                                                    <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="field"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Lĩnh vực / Ngành nghề <span className="text-red-500">*</span></FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Chọn lĩnh vực" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {Object.keys(FIELDS_AND_MAJORS).map((key) => (
+                                                    <SelectItem key={key} value={key}>
+                                                        {key}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <div className="space-y-4">
+                            <FormLabel className="text-base font-semibold">Ngành học liên quan</FormLabel>
+                            <FormField
+                                control={form.control}
+                                name="relatedMajors"
+                                render={({ field }) => {
+                                    const selectedMajors = field.value || []
+
+                                    return (
+                                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 border rounded-md p-3">
+                                            {Object.entries(FIELDS_AND_MAJORS).map(([fieldName, majors]) => (
+                                                <div key={fieldName}>
+                                                    <h4 className="text-sm font-semibold text-gray-700 mb-2 sticky top-0 bg-white py-1 z-10">{fieldName}</h4>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {majors.map((major) => {
+                                                            const isSelected = selectedMajors.includes(major)
+                                                            return (
+                                                                <div
+                                                                    key={major}
+                                                                    className={`px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all border select-none ${isSelected
+                                                                        ? "bg-blue-600 text-white border-blue-600 shadow-sm hover:bg-blue-700"
+                                                                        : "bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                                                                        }`}
+                                                                    onClick={() => {
+                                                                        if (isSelected) {
+                                                                            field.onChange(selectedMajors.filter((m) => m !== major))
+                                                                        } else {
+                                                                            field.onChange([...selectedMajors, major])
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {major}
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )
+                                }}
+                            />
+                            <FormMessage>{form.formState.errors.relatedMajors?.message}</FormMessage>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Salary & Benefits */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><DollarSign className="w-5 h-5 text-green-600" /> Lương & Phúc lợi</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid gap-6">
+                        <div className="flex flex-col gap-4">
+                            <FormField
+                                control={form.control}
+                                name="isNegotiable"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel>
+                                                Mức lương Thoả thuận
+                                            </FormLabel>
+                                        </div>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {!isNegotiable && (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="salaryMin"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Tối thiểu ({jobType === "part-time" ? "VNĐ/giờ" : "VNĐ/tháng"})</FormLabel>
+                                                <FormControl>
+                                                    <MoneyInput placeholder="0" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="salaryMax"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Tối đa ({jobType === "part-time" ? "VNĐ/giờ" : "VNĐ/tháng"})</FormLabel>
+                                                <FormControl>
+                                                    <MoneyInput placeholder="0" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-3">
+                            <FormLabel>Phúc lợi</FormLabel>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                {COMMON_BENEFITS.map((benefit) => (
+                                    <FormField
+                                        key={benefit}
+                                        control={form.control}
+                                        name="benefits"
+                                        render={({ field }) => {
+                                            const current = field.value || []
+                                            return (
+                                                <FormItem
+                                                    key={benefit}
+                                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                                >
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={current.includes(benefit)}
+                                                            onCheckedChange={(checked) => {
+                                                                return checked
+                                                                    ? field.onChange([...current, benefit])
+                                                                    : field.onChange(
+                                                                        current.filter(
+                                                                            (value) => value !== benefit
+                                                                        )
+                                                                    )
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal text-sm cursor-pointer">
+                                                        {benefit}
+                                                    </FormLabel>
+                                                </FormItem>
+                                            )
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Detailed Description */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Building className="w-5 h-5 text-orange-600" /> Mô tả chi tiết</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid gap-6">
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Mô tả công việc <span className="text-red-500">*</span></FormLabel>
+                                    <FormControl>
+                                        <Textarea className="h-32" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="requirements"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Yêu cầu công việc <span className="text-red-500">*</span></FormLabel>
+                                    <FormControl>
+                                        <Textarea className="h-32" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="detailedBenefits"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Phúc lợi chi tiết</FormLabel>
+                                    <FormControl>
+                                        <Textarea className="h-24" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </CardContent>
+                </Card>
+
+                <div className="flex justify-end gap-4">
+                    <Button type="button" variant="outline" onClick={() => router.back()}>Hủy bỏ</Button>
+                    <Button type="button" variant="secondary" onClick={handlePreview} className="gap-2">
+                        <Eye className="w-4 h-4" /> Xem trước
+                    </Button>
+                    <Button type="submit" disabled={isLoading} className="bg-blue-600 hover:bg-blue-700">
+                        {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang lưu...</> : "Lưu thay đổi"}
+                    </Button>
+                </div>
+            </form>
+        </Form>
+        </div >
     )
 }

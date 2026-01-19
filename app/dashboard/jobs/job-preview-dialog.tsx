@@ -6,7 +6,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Building2, MapPin, Clock, DollarSign, Calendar } from "lucide-react"
+import { Building2, MapPin, Clock, DollarSign, Calendar, FileText, Download } from "lucide-react"
 import Image from "next/image"
 
 // Define a robust Job type that covers all potential fields
@@ -24,6 +24,8 @@ export type Job = {
     requirements?: string[]
     benefits?: string[]
     deadline?: string
+    documentUrl?: string
+    documentName?: string
 }
 
 interface JobPreviewDialogProps {
@@ -142,6 +144,29 @@ export function JobPreviewDialog({ job, open, onOpenChange }: JobPreviewDialogPr
                                         <li key={i}>{benefit}</li>
                                     ))}
                                 </ul>
+                            </div>
+                        )}
+
+                        {job.documentUrl && (
+                            <div className="pt-4 border-t">
+                                <h3 className="text-lg font-semibold mb-3">Tài liệu đính kèm</h3>
+                                <div className="flex items-center gap-4 p-4 border rounded-lg bg-blue-50/50 group">
+                                    <div className="p-3 bg-white rounded-lg border shadow-sm">
+                                        <FileText className="h-8 w-8 text-blue-600" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-medium text-gray-900 truncate">{job.documentName || "Tai-lieu-dinh-kem"}</p>
+                                        <p className="text-sm text-gray-500">Người đăng đã đính kèm tài liệu này</p>
+                                    </div>
+                                    <a
+                                        href={job.documentUrl}
+                                        download={job.documentName || "tai-lieu"}
+                                        className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors shadow-sm"
+                                    >
+                                        <Download className="h-4 w-4" />
+                                        Tải xuống
+                                    </a>
+                                </div>
                             </div>
                         )}
                     </div>

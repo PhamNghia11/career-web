@@ -23,7 +23,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Loader2, Briefcase, MapPin, DollarSign, Building, ImagePlus, X, ChevronDown, Eye } from "lucide-react"
+import { Loader2, Briefcase, MapPin, DollarSign, Building, ImagePlus, X, ChevronDown, Eye, Paperclip, FileText } from "lucide-react"
 import { JobPreview } from "@/components/jobs/job-preview"
 import { DatePicker } from "@/components/ui/date-picker"
 
@@ -72,6 +72,8 @@ const formSchema = z.object({
     unlimitedQuantity: z.boolean().default(false),
     contactEmail: z.string().email("Vui lòng nhập đúng định dạng email").optional().or(z.literal("")),
     contactPhone: z.string().optional(),
+    documentUrl: z.string().optional(),
+    documentName: z.string().optional(),
 }).refine((data) => {
     if (!data.unlimitedQuantity && (!data.quantity || data.quantity < 1)) {
         return false
@@ -114,6 +116,8 @@ export default function PostJobPage() {
             unlimitedQuantity: false,
             contactEmail: "",
             contactPhone: "",
+            documentUrl: "",
+            documentName: "",
         },
     })
 
@@ -413,6 +417,76 @@ export default function PostJobPage() {
                                     </FormItem>
                                 )}
                             />
+
+                            {/* Document Attachment Section */}
+                            <div className="space-y-4 pt-4 border-t border-gray-100">
+                                <div className="flex flex-col gap-1">
+                                    <FormLabel className="flex items-center gap-2 text-base font-semibold">
+                                        <Paperclip className="w-5 h-5 text-blue-600" /> Tài liệu đính kèm doanh nghiệp
+                                    </FormLabel>
+                                    <p className="text-sm text-gray-500 ml-7">Đính kèm giấy phép kinh doanh hoặc mô tả công việc chi tiết để Admin dễ dàng duyệt tin.</p>
+                                </div>
+                                <div className="flex items-center gap-4 ml-7">
+                                    {form.watch("documentUrl") ? (
+                                        <div className="flex items-center gap-4 p-4 border rounded-xl bg-blue-50/50 flex-1 border-blue-100">
+                                            <div className="p-3 bg-white rounded-lg border shadow-sm">
+                                                <FileText className="w-8 h-8 text-blue-600" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-semibold text-gray-900 truncate">{form.watch("documentName")}</p>
+                                                <p className="text-xs text-blue-600 font-medium">Đã tải lên thành công</p>
+                                            </div>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => {
+                                                    form.setValue("documentUrl", "")
+                                                    form.setValue("documentName", "")
+                                                }}
+                                                className="text-red-500 hover:text-red-700 hover:bg-red-50 h-10 w-10 p-0 rounded-full"
+                                            >
+                                                <X className="w-5 h-5" />
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <label className="flex flex-col items-center justify-center gap-2 px-6 py-8 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all flex-1 group">
+                                            <div className="p-3 bg-gray-50 rounded-full group-hover:bg-blue-100 transition-colors">
+                                                <Paperclip className="w-6 h-6 text-gray-400 group-hover:text-blue-600" />
+                                            </div>
+                                            <div className="text-center">
+                                                <span className="text-sm font-medium text-gray-700">Nhấn để chọn file hoặc kéo thả vào đây</span>
+                                                <p className="text-xs text-gray-500 mt-1">Hỗ trợ PDF, Word, Hình ảnh (Tối đa 5MB)</p>
+                                            </div>
+                                            <input
+                                                type="file"
+                                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0]
+                                                    if (!file) return
+
+                                                    if (file.size > 5 * 1024 * 1024) {
+                                                        toast({
+                                                            title: "File quá lớn",
+                                                            description: "Dung lượng tối đa 5MB",
+                                                            variant: "destructive",
+                                                        })
+                                                        return
+                                                    }
+
+                                                    const reader = new FileReader()
+                                                    reader.onloadend = () => {
+                                                        form.setValue("documentUrl", reader.result as string)
+                                                        form.setValue("documentName", file.name)
+                                                    }
+                                                    reader.readAsDataURL(file)
+                                                }}
+                                                className="hidden"
+                                            />
+                                        </label>
+                                    )}
+                                </div>
+                            </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
@@ -767,6 +841,6 @@ export default function PostJobPage() {
                     </div>
                 </form>
             </Form>
-        </div>
+        </div >
     )
 }

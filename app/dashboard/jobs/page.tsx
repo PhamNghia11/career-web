@@ -175,43 +175,44 @@ export default function AdminJobsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Ngày đăng</TableHead>
-                                <TableHead>Vị trí</TableHead>
-                                <TableHead>Công ty</TableHead>
-                                <TableHead>Mức lương</TableHead>
-                                <TableHead>Trạng thái</TableHead>
-                                <TableHead className="text-right">Hành động</TableHead>
+                                <TableHead className="w-[120px]">Ngày đăng</TableHead>
+                                <TableHead className="min-w-[200px]">Vị trí</TableHead>
+                                <TableHead className="min-w-[150px]">Công ty</TableHead>
+                                <TableHead className="w-[150px]">Mức lương</TableHead>
+                                <TableHead className="w-[130px]">Trạng thái</TableHead>
+                                <TableHead className="text-right w-[180px]">Hành động</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {jobs.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-8">Chưa có tin tuyển dụng nào.</TableCell>
+                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Chưa có tin tuyển dụng nào.</TableCell>
                                 </TableRow>
                             ) : (
                                 jobs.map((job) => (
                                     <TableRow key={job._id}>
-                                        <TableCell>{new Date(job.postedAt).toLocaleDateString("vi-VN")}</TableCell>
+                                        <TableCell className="whitespace-nowrap">{new Date(job.postedAt).toLocaleDateString("vi-VN")}</TableCell>
                                         <TableCell className="font-medium">{job.title}</TableCell>
                                         <TableCell>{job.company}</TableCell>
                                         <TableCell>{job.salary}</TableCell>
                                         <TableCell>{getStatusBadge(job.status)}</TableCell>
                                         <TableCell className="text-right">
-                                            <div className="flex justify-end gap-2">
+                                            <div className="flex justify-end items-center gap-1.5">
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    className="h-8 w-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                                                    className="h-9 w-9 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                                                     onClick={() => setPreviewJob(job)}
                                                     title="Xem chi tiết"
                                                 >
-                                                    <Eye className="h-4 w-4" />
+                                                    <Eye className="h-4.5 w-4.5" />
                                                 </Button>
+
                                                 {job.status === 'pending' && (
-                                                    <>
+                                                    <div className="flex items-center gap-1.5">
                                                         <Button
                                                             size="sm"
-                                                            className="bg-green-600 hover:bg-green-700 h-8"
+                                                            className="bg-green-600 hover:bg-green-700 h-9 px-3"
                                                             onClick={() => handleStatusUpdate(job._id, "active")}
                                                             title="Duyệt bài"
                                                         >
@@ -220,20 +221,20 @@ export default function AdminJobsPage() {
                                                         <Button
                                                             size="sm"
                                                             variant="destructive"
-                                                            className="h-8"
+                                                            className="h-9 px-3"
                                                             onClick={() => openRejectDialog(job._id)}
                                                             title="Từ chối"
                                                         >
                                                             <X className="h-4 w-4 mr-1" /> Từ chối
                                                         </Button>
-                                                    </>
+                                                    </div>
                                                 )}
 
                                                 {job.status === 'active' && (
                                                     <Button
                                                         size="sm"
                                                         variant="outline"
-                                                        className="h-8 text-red-600 border-red-200 hover:bg-red-50"
+                                                        className="h-9 px-3 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
                                                         onClick={() => openRejectDialog(job._id)}
                                                     >
                                                         Gỡ bài
@@ -244,11 +245,11 @@ export default function AdminJobsPage() {
                                                     <Button
                                                         size="sm"
                                                         variant="ghost"
-                                                        className="h-8 w-8 text-gray-500 hover:text-red-600 hover:bg-red-50"
+                                                        className="h-9 w-9 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
                                                         onClick={() => handleDelete(job._id)}
                                                         title="Xóa vĩnh viễn"
                                                     >
-                                                        <Trash2 className="h-4 w-4" />
+                                                        <Trash2 className="h-4.5 w-4.5" />
                                                     </Button>
                                                 )}
                                             </div>
