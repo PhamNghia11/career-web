@@ -55,6 +55,14 @@ export async function POST(request: Request) {
         }
 
         const collection = await getCollection(COLLECTIONS.VISITORS)
+
+        // Ensure index for performance on first write
+        try {
+            await collection.createIndex({ visitedAt: -1 })
+        } catch (e) {
+            // Index might already exist or background creation is fine
+        }
+
         await collection.insertOne(visitor)
 
         return NextResponse.json({ success: true })
@@ -71,6 +79,7 @@ export async function GET(request: Request) {
         const page = parseInt(searchParams.get("page") || "1")
         const limit = parseInt(searchParams.get("limit") || "50")
         const days = parseInt(searchParams.get("days") || "7")
+        const download = searchParams.get("download") === "true"
 
         const collection = await getCollection(COLLECTIONS.VISITORS)
 
@@ -83,13 +92,14 @@ export async function GET(request: Request) {
         // Get total count
         const totalCount = await collection.countDocuments(filter)
 
-        // Get visitors with pagination
-        const visitors = await collection
-            .find(filter)
-            .sort({ visitedAt: -1 })
-            .skip((page - 1) * limit)
-            .limit(limit)
-            .toArray()
+        // Get visitors with pagination or full list for download
+        let visitorsQuery = collection.find(filter).sort({ visitedAt: -1 })
+
+        if (!download) {
+            visitorsQuery = visitorsQuery.skip((page - 1) * limit).limit(limit)
+        }
+
+        const visitors = await visitorsQuery.toArray()
 
         // Calculate stats
         const today = new Date()
@@ -133,5 +143,32 @@ export async function GET(request: Request) {
     } catch (error) {
         console.error("Error fetching visitors:", error)
         return NextResponse.json({ success: false, error: "Failed to fetch visitors" }, { status: 500 })
+    }
+}
+
+// DELETE - Admin dọn dẹp dữ liệu cũ
+export async function DELETE(request: Request) {
+    try {
+        const { searchParams } = new URL(request.url)
+        const days = parseInt(searchParams.get("days") || "30")
+
+        const collection = await getCollection(COLLECTIONS.VISITORS)
+
+        // Delete records older than 'days'
+        const beforeDate = new Date()
+        beforeDate.setDate(beforeDate.getDate() - days)
+
+        const result = await collection.deleteMany({
+            visitedAt: { $lt: beforeDate }
+        })
+
+        return NextResponse.json({
+            success: true,
+            deletedCount: result.deletedCount,
+            message: `Đã xóa ${result.deletedCount} bản ghi cũ hơn ${days} ngày.`
+        })
+    } catch (error) {
+        console.error("Error cleaning visitors:", error)
+        return NextResponse.json({ success: false, error: "Failed to clean visitors" }, { status: 500 })
     }
 }

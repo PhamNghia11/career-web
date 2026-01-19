@@ -20,8 +20,21 @@ import {
     Monitor,
     Smartphone,
     RefreshCw,
-    Calendar
+    Calendar,
+    Download,
+    Trash2,
+    AlertTriangle
 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface Visitor {
     _id: string
@@ -50,6 +63,11 @@ export default function VisitorsPage() {
     const [days, setDays] = useState(7)
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
+    const { toast } = useToast()
+    const [exporting, setExporting] = useState(false)
+    const [cleaning, setCleaning] = useState(false)
+    const [cleanupDays, setCleanupDays] = useState(90)
+    const [cleanupDialogOpen, setCleanupDialogOpen] = useState(false)
 
     const fetchVisitors = async () => {
         try {
@@ -72,6 +90,82 @@ export default function VisitorsPage() {
     useEffect(() => {
         fetchVisitors()
     }, [days, page])
+
+    const handleExport = async () => {
+        try {
+            setExporting(true)
+            const response = await fetch(`/api/visitors?days=${days}&download=true`)
+            const data = await response.json()
+
+            if (data.success && data.data) {
+                const headers = ["ID", "IP", "Trang", "Thiết bị", "Người dùng", "Thời gian"]
+                const rows = data.data.map((v: Visitor) => [
+                    v._id,
+                    v.ip,
+                    v.page,
+                    v.device || "Unknown",
+                    v.userName || "Khách",
+                    new Date(v.visitedAt).toLocaleString("vi-VN")
+                ])
+
+                const csvContent = [
+                    headers.join(","),
+                    ...rows.map((r: any[]) => r.map(cell => `"${cell}"`).join(","))
+                ].join("\n")
+
+                const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" })
+                const url = URL.createObjectURL(blob)
+                const link = document.createElement("a")
+                link.setAttribute("href", url)
+                link.setAttribute("download", `visitors_data_${days}days_${new Date().toLocaleDateString()}.csv`)
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+
+                toast({
+                    title: "Xuất dữ liệu thành công",
+                    description: `Đã tải xuống dữ liệu của ${days} ngày qua.`
+                })
+            }
+        } catch (error) {
+            console.error("Export error:", error)
+            toast({
+                title: "Lỗi",
+                description: "Không thể xuất dữ liệu.",
+                variant: "destructive"
+            })
+        } finally {
+            setExporting(false)
+        }
+    }
+
+    const handleCleanup = async () => {
+        try {
+            setCleaning(true)
+            const response = await fetch(`/api/visitors?days=${cleanupDays}`, {
+                method: 'DELETE'
+            })
+            const data = await response.json()
+
+            if (data.success) {
+                toast({
+                    title: "Dọn dẹp thành công",
+                    description: data.message
+                })
+                fetchVisitors()
+                setCleanupDialogOpen(false)
+            }
+        } catch (error) {
+            console.error("Cleanup error:", error)
+            toast({
+                title: "Lỗi",
+                description: "Không thể dọn dẹp dữ liệu.",
+                variant: "destructive"
+            })
+        } finally {
+            setCleaning(false)
+        }
+    }
 
     const formatTime = (dateString: string) => {
         const date = new Date(dateString)
@@ -102,7 +196,10 @@ export default function VisitorsPage() {
                 <div className="flex gap-2">
                     <select
                         value={days}
-                        onChange={(e) => setDays(Number(e.target.value))}
+                        onChange={(e) => {
+                            setDays(Number(e.target.value))
+                            setPage(1)
+                        }}
                         className="px-3 py-2 border rounded-md text-sm"
                     >
                         <option value={1}>Hôm nay</option>
@@ -110,6 +207,51 @@ export default function VisitorsPage() {
                         <option value={30}>30 ngày</option>
                         <option value={90}>90 ngày</option>
                     </select>
+                    <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting || loading}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Xuất CSV
+                    </Button>
+                    <Dialog open={cleanupDialogOpen} onOpenChange={setCleanupDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10">
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Dọn dẹp
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Dọn dẹp dữ liệu cũ</DialogTitle>
+                                <DialogDescription>
+                                    Hành động này sẽ xóa các bản ghi lịch sử truy cập để giải phóng dung lượng.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="py-4 space-y-4">
+                                <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-800 text-sm">
+                                    <AlertTriangle className="h-5 w-5 shrink-0" />
+                                    <span>Nên xuất dữ liệu CSV trước khi xóa để lưu trữ.</span>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Giữ lại dữ liệu trong vòng:</label>
+                                    <select
+                                        value={cleanupDays}
+                                        onChange={(e) => setCleanupDays(Number(e.target.value))}
+                                        className="w-full px-3 py-2 border rounded-md"
+                                    >
+                                        <option value={30}>30 ngày gần đây</option>
+                                        <option value={60}>60 ngày gần đây</option>
+                                        <option value={90}>90 ngày gần đây</option>
+                                    </select>
+                                    <p className="text-xs text-muted-foreground">Các bản ghi cũ hơn mốc này sẽ bị xóa vĩnh viễn.</p>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button variant="outline" onClick={() => setCleanupDialogOpen(false)}>Hủy</Button>
+                                <Button variant="destructive" onClick={handleCleanup} disabled={cleaning}>
+                                    {cleaning ? "Đang xóa..." : "Xác nhận xóa"}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                     <Button variant="outline" size="icon" onClick={fetchVisitors} disabled={loading}>
                         <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                     </Button>
