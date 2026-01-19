@@ -180,7 +180,7 @@ export default function AdminJobsPage() {
                                 <TableHead className="min-w-[150px]">Công ty</TableHead>
                                 <TableHead className="w-[150px]">Mức lương</TableHead>
                                 <TableHead className="w-[130px]">Trạng thái</TableHead>
-                                <TableHead className="text-right w-[180px]">Hành động</TableHead>
+                                <TableHead className="text-center w-[180px]">Hành động</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -196,9 +196,9 @@ export default function AdminJobsPage() {
                                         <TableCell>{job.company}</TableCell>
                                         <TableCell>{job.salary}</TableCell>
                                         <TableCell>{getStatusBadge(job.status)}</TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="inline-flex justify-end items-center">
-                                                {/* Eye icon in a fixed-width container, moved right by reducing the container to its right */}
+                                        <TableCell className="text-center">
+                                            <div className="flex justify-center items-center">
+                                                {/* Slot 1: Eye icon (fixed width for vertical alignment) */}
                                                 <div className="w-10 flex justify-center">
                                                     <Button
                                                         size="sm"
@@ -211,26 +211,26 @@ export default function AdminJobsPage() {
                                                     </Button>
                                                 </div>
 
-                                                {/* Actions container - reduced width to pull the Eye icon closer to the right edge */}
-                                                <div className="flex items-center gap-2 min-w-[110px] justify-start ml-1">
+                                                {/* Slot 2: Action buttons (fixed width to keep Eye icon in place) */}
+                                                <div className="w-[100px] flex justify-center">
                                                     {job.status === 'pending' && (
-                                                        <div className="flex items-center gap-1.5">
+                                                        <div className="flex items-center gap-1">
                                                             <Button
                                                                 size="sm"
-                                                                className="bg-green-600 hover:bg-green-700 h-9 px-3"
+                                                                className="bg-green-600 hover:bg-green-700 h-8 w-8 p-0"
                                                                 onClick={() => handleStatusUpdate(job._id, "active")}
                                                                 title="Duyệt bài"
                                                             >
-                                                                <Check className="h-4 w-4 mr-1" /> Duyệt
+                                                                <Check className="h-4 w-4" />
                                                             </Button>
                                                             <Button
                                                                 size="sm"
                                                                 variant="destructive"
-                                                                className="h-9 px-3"
+                                                                className="h-8 w-8 p-0"
                                                                 onClick={() => openRejectDialog(job._id)}
                                                                 title="Từ chối"
                                                             >
-                                                                <X className="h-4 w-4 mr-1" /> Từ chối
+                                                                <X className="h-4 w-4" />
                                                             </Button>
                                                         </div>
                                                     )}
@@ -239,7 +239,7 @@ export default function AdminJobsPage() {
                                                         <Button
                                                             size="sm"
                                                             variant="outline"
-                                                            className="h-9 px-4 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+                                                            className="h-8 px-3 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300 text-xs"
                                                             onClick={() => openRejectDialog(job._id)}
                                                         >
                                                             Gỡ bài
