@@ -21,6 +21,7 @@ interface ApplyJobDialogProps {
     companyEmail?: string
     companyPhone?: string
     companyWebsite?: string
+    jobType?: string
 }
 
 export function ApplyJobDialog({
@@ -32,7 +33,8 @@ export function ApplyJobDialog({
     employerId,
     companyEmail,
     companyPhone,
-    companyWebsite
+    companyWebsite,
+    jobType
 }: ApplyJobDialogProps) {
     const { toast } = useToast()
     const { user } = useAuth()
@@ -96,11 +98,13 @@ export function ApplyJobDialog({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Optional CV check removed
-        // if (!selectedFile) {
-        //     setError("Vui lòng đính kèm CV của bạn")
-        //     return
-        // }
+        // Conditional CV check
+        const isFullTime = jobType?.toLowerCase() === "full-time" || jobType?.toLowerCase() === "toàn thời gian"
+        if (isFullTime && !selectedFile) {
+            setError("Vui lòng đính kèm CV của bạn (bắt buộc đối với công việc toàn thời gian)")
+            setIsSubmitting(false)
+            return
+        }
 
         setIsSubmitting(true)
 
@@ -377,7 +381,11 @@ export function ApplyJobDialog({
                             <div className="grid gap-2">
                                 <Label htmlFor="cv" className="flex justify-between items-center">
                                     <span>CV / Hồ sơ đính kèm</span>
-                                    <span className="text-xs font-normal text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full">Không bắt buộc</span>
+                                    {jobType?.toLowerCase() === "full-time" || jobType?.toLowerCase() === "toàn thời gian" ? (
+                                        <span className="text-xs font-normal text-white bg-red-500 px-2 py-0.5 rounded-full animate-pulse">Bắt buộc</span>
+                                    ) : (
+                                        <span className="text-xs font-normal text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full">Không bắt buộc</span>
+                                    )}
                                 </Label>
                                 <div
                                     className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center transition-colors cursor-pointer group 

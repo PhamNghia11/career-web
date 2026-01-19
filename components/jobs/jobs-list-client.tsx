@@ -130,7 +130,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const [selectedSalary, setSelectedSalary] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<string>("newest")
   const [savedJobs, setSavedJobs] = useState<string[]>([])
-  const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string } | null>(null)
+  const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string; jobType?: string } | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
   const [hoveredJob, setHoveredJob] = useState<Job | null>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -572,7 +572,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     setSelectedCompany(prev => prev === company ? null : company)
   }
 
-  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string) => {
+  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string) => {
     setSelectedJob({
       title: jobTitle,
       company: company,
@@ -580,7 +580,8 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
       creatorId: creatorId,
       companyEmail: email,
       companyPhone: phone,
-      companyWebsite: website
+      companyWebsite: website,
+      jobType: jobType
     })
     setIsApplyDialogOpen(true)
   }
@@ -1069,7 +1070,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                               <div className="absolute top-full left-0 z-50 mt-2 w-[450px] md:w-[600px] shadow-2xl rounded-xl border border-gray-200 bg-white animate-in fade-in zoom-in-95 duration-200">
                                 <JobPreviewPanel
                                   job={job}
-                                  onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website)}
+                                  onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)}
                                   onSave={(job) => handleSave(job._id, job.title)}
                                   isSaved={savedJobs.includes(job._id)}
                                 />
@@ -1131,7 +1132,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                         <Button
                           onClick={(e) => {
                             e.stopPropagation()
-                            handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website)
+                            handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)
                           }}
                           className="bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white shadow-sm px-6"
                         >
@@ -1167,6 +1168,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
         companyEmail={selectedJob?.companyEmail}
         companyPhone={selectedJob?.companyPhone}
         companyWebsite={selectedJob?.companyWebsite}
+        jobType={selectedJob?.jobType}
       />
     </div>
   )

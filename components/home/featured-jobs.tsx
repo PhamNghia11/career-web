@@ -25,7 +25,7 @@ const typeLabels = {
 }
 
 export function FeaturedJobs() {
-  const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string } | null>(null)
+  const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string; jobType?: string } | null>(null)
   const [hoveredJob, setHoveredJob] = useState<Job | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
   const [featuredJobs, setFeaturedJobs] = useState<Job[]>(getFeaturedJobs(4))
@@ -66,7 +66,7 @@ export function FeaturedJobs() {
     fetchDbJobs()
   }, [])
 
-  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string) => {
+  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string) => {
     setSelectedJob({
       title: jobTitle,
       company: company,
@@ -74,7 +74,8 @@ export function FeaturedJobs() {
       creatorId: creatorId,
       companyEmail: email,
       companyPhone: phone,
-      companyWebsite: website
+      companyWebsite: website,
+      jobType: jobType
     })
     setIsApplyDialogOpen(true)
   }
@@ -137,7 +138,7 @@ export function FeaturedJobs() {
                     <div className="absolute top-full left-0 z-50 mt-2 w-[350px] shadow-xl rounded-lg border border-gray-200 bg-white animate-in fade-in zoom-in-95 duration-200">
                       <JobPreviewPanel
                         job={hoveredJob}
-                        onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website)}
+                        onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)}
                         onSave={() => { }}
                         isSaved={false}
                       />
@@ -167,7 +168,7 @@ export function FeaturedJobs() {
               <CardFooter className="p-6 pt-0">
                 <Button
                   className="w-full bg-primary hover:bg-primary/90"
-                  onClick={() => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website)}
+                  onClick={() => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)}
                 >
                   Ứng tuyển ngay
                 </Button>
@@ -194,6 +195,7 @@ export function FeaturedJobs() {
         companyEmail={selectedJob?.companyEmail}
         companyPhone={selectedJob?.companyPhone}
         companyWebsite={selectedJob?.companyWebsite}
+        jobType={selectedJob?.jobType}
       />
     </section>
   )

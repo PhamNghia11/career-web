@@ -76,10 +76,19 @@ export default function InternshipsPage() {
     const [internshipJobs, setInternshipJobs] = useState<Job[]>([])
     const [loading, setLoading] = useState(true)
     const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
-    const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string } | null>(null)
+    const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string; jobType?: string } | null>(null)
 
-    const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string) => {
-        setSelectedJob({ title: jobTitle, company: company, jobId: jobId, creatorId: creatorId })
+    const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string) => {
+        setSelectedJob({
+            title: jobTitle,
+            company: company,
+            jobId: jobId,
+            creatorId: creatorId,
+            companyEmail: email,
+            companyPhone: phone,
+            companyWebsite: website,
+            jobType: jobType
+        })
         setIsApplyDialogOpen(true)
     }
 
@@ -368,7 +377,7 @@ export default function InternshipsPage() {
                                                         <Button
                                                             onClick={(e) => {
                                                                 e.stopPropagation()
-                                                                handleApply(job._id, job.title, job.company, job.creatorId)
+                                                                handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)
                                                             }}
                                                             className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white shadow-sm h-9 px-4 text-sm"
                                                         >
@@ -389,6 +398,10 @@ export default function InternshipsPage() {
                                 companyName={selectedJob?.company || ""}
                                 jobId={selectedJob?.jobId}
                                 employerId={selectedJob?.creatorId}
+                                companyEmail={selectedJob?.companyEmail}
+                                companyPhone={selectedJob?.companyPhone}
+                                companyWebsite={selectedJob?.companyWebsite}
+                                jobType={selectedJob?.jobType}
                             />
                         </>
                     ) : (

@@ -246,6 +246,7 @@ export default async function JobPage(props: JobPageProps) {
                                             companyEmail={job.contactEmail}
                                             companyPhone={job.contactPhone}
                                             companyWebsite={job.website}
+                                            jobType={job.type}
                                         />
 
                                         <p className="text-center text-xs text-gray-400 mt-3">

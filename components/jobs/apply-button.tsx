@@ -14,6 +14,7 @@ interface ApplyButtonProps {
     companyEmail?: string
     companyPhone?: string
     companyWebsite?: string
+    jobType?: string
 }
 
 export function ApplyButton({
@@ -23,7 +24,8 @@ export function ApplyButton({
     employerId,
     companyEmail,
     companyPhone,
-    companyWebsite
+    companyWebsite,
+    jobType
 }: ApplyButtonProps) {
     const { user } = useAuth()
     const router = useRouter()
@@ -56,6 +58,7 @@ export function ApplyButton({
                 companyEmail={companyEmail}
                 companyPhone={companyPhone}
                 companyWebsite={companyWebsite}
+                jobType={jobType}
             />
         </>
     )
