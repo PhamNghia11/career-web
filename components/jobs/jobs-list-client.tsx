@@ -461,6 +461,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const checkLocationMatch = (job: Job, location: string | null): boolean => {
     if (!location) return true
     const jobLocation = job.location.toLowerCase()
+    const filterValue = location.toLowerCase()
 
     switch (location) {
       case "hcm":
@@ -481,7 +482,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
         return !["hồ chí minh", "hcm", "tp.hcm", "sài gòn", "hà nội", "hanoi", "đà nẵng", "da nang", "bình dương", "đồng nai", "cần thơ", "hải phòng"]
           .some(city => jobLocation.includes(city))
       default:
-        return true
+        return jobLocation.includes(filterValue)
     }
   }
 
