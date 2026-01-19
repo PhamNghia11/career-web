@@ -29,7 +29,11 @@ export async function GET(
 
         return NextResponse.json({
             success: true,
-            company: { ...company, _id: company._id.toString() },
+            company: {
+                ...company,
+                _id: company._id.toString(),
+                id: company._id.toString()
+            },
         })
     } catch (error) {
         console.error("Error fetching company:", error)

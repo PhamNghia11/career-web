@@ -34,7 +34,11 @@ export async function GET(request: Request) {
       .toArray()
 
     return NextResponse.json({
-      companies: companies.map(c => ({ ...c, _id: c._id.toString() })),
+      companies: companies.map(c => ({
+        ...c,
+        _id: c._id.toString(),
+        id: c._id.toString() // Map _id to id for frontend compatibility
+      })),
       total: companies.length
     })
   } catch (error) {
