@@ -198,8 +198,8 @@ export default function AdminJobsPage() {
                                         <TableCell>{getStatusBadge(job.status)}</TableCell>
                                         <TableCell className="text-right">
                                             <div className="inline-flex justify-end items-center">
-                                                {/* Eye icon in a fixed-width container, adjusted with padding to align under "Hành động" */}
-                                                <div className="w-16 flex justify-center pr-3">
+                                                {/* Eye icon in a fixed-width container, moved right by reducing the container to its right */}
+                                                <div className="w-10 flex justify-center">
                                                     <Button
                                                         size="sm"
                                                         variant="ghost"
@@ -211,8 +211,8 @@ export default function AdminJobsPage() {
                                                     </Button>
                                                 </div>
 
-                                                {/* Other actions container */}
-                                                <div className="flex items-center gap-2 min-w-[140px] justify-start">
+                                                {/* Actions container - reduced width to pull the Eye icon closer to the right edge */}
+                                                <div className="flex items-center gap-2 min-w-[110px] justify-start ml-1">
                                                     {job.status === 'pending' && (
                                                         <div className="flex items-center gap-1.5">
                                                             <Button
