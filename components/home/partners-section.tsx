@@ -9,6 +9,19 @@ export function PartnersSection() {
   const [partners, setPartners] = useState<any[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [spacing, setSpacing] = useState(180)
+
+  // Cập nhật khoảng cách logo dựa trên kích thước màn hình
+  useEffect(() => {
+    const updateSpacing = () => {
+      if (window.innerWidth < 640) setSpacing(110)
+      else if (window.innerWidth < 1024) setSpacing(160)
+      else setSpacing(220)
+    }
+    updateSpacing()
+    window.addEventListener('resize', updateSpacing)
+    return () => window.removeEventListener('resize', updateSpacing)
+  }, [])
 
   // Fetch partners from API
   useEffect(() => {
@@ -71,7 +84,7 @@ export function PartnersSection() {
           </button>
 
           {/* Logo Carousel */}
-          <div className="relative h-40 md:h-48 flex items-center justify-center overflow-hidden mx-16">
+          <div className="relative h-40 md:h-48 flex items-center justify-center overflow-hidden mx-4 md:mx-16">
             {partners.map((partner, index) => {
               let position = index - currentIndex
               if (position > partners.length / 2) position -= partners.length
@@ -82,9 +95,10 @@ export function PartnersSection() {
               const isCenter = position === 0
               const isNear = Math.abs(position) === 1
 
-              const translateX = position * 180
-              const scale = isCenter ? 1.2 : isNear ? 0.9 : 0.7
-              const opacity = isCenter ? 1 : isNear ? 0.7 : 0.4
+              const translateX = position * spacing
+              const scale = isCenter ? 1.2 : isNear ? 0.85 : 0.6
+              const opacity = isCenter ? 1 : isNear ? 0.5 : 0.2
+              const blur = isCenter ? 0 : 3
               const zIndex = isCenter ? 10 : isNear ? 5 : 1
 
               return (
@@ -95,6 +109,7 @@ export function PartnersSection() {
                     transform: `translateX(${translateX}px) scale(${scale})`,
                     opacity,
                     zIndex,
+                    filter: `blur(${blur}px)`,
                   }}
                 >
                   <img
