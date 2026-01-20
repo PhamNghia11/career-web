@@ -75,8 +75,8 @@ export function Header() {
                   key={item.name}
                   href={item.href}
                   className={`px-5 py-3 transition-colors font-semibold text-lg border-b-2 ${isActive
-                      ? "border-primary text-primary bg-primary/5"
-                      : "border-transparent text-gray-800 hover:text-primary hover:bg-primary/10"
+                    ? "border-primary text-primary bg-primary/5"
+                    : "border-transparent text-gray-800 hover:text-primary hover:bg-primary/10"
                     }`}
                 >
                   {item.name}
@@ -127,17 +127,17 @@ export function Header() {
                 </DropdownMenu>
               </>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <Link href="/login">
                   <Button
                     variant="ghost"
-                    className="text-primary hover:bg-primary/10 hidden sm:flex font-semibold text-base"
+                    className="text-primary hover:bg-primary/10 px-2 sm:px-4 font-semibold text-sm sm:text-base h-9 sm:h-10"
                   >
                     Đăng nhập
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button className="bg-primary hover:bg-primary/90 text-white font-semibold text-base px-6">Đăng ký</Button>
+                  <Button className="bg-primary hover:bg-primary/90 text-white font-semibold text-sm sm:text-base px-3 sm:px-6 h-9 sm:h-10">Đăng ký</Button>
                 </Link>
               </div>
             )}
@@ -179,18 +179,54 @@ export function Header() {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-gray-200 bg-white">
-          <nav className="container mx-auto px-4 py-4 space-y-2">
+        <div className="lg:hidden border-t border-gray-200 bg-white shadow-xl animate-in slide-in-from-top duration-200 overflow-hidden">
+          <nav className="container mx-auto px-4 py-6 space-y-1">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="block px-4 py-3 rounded-md hover:bg-primary/10 transition-colors font-semibold text-gray-800 hover:text-primary"
+                className="block px-4 py-3 rounded-xl hover:bg-primary/10 transition-colors font-bold text-gray-800 hover:text-primary active:scale-[0.98]"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}
               </Link>
             ))}
+
+            {!user && (
+              <div className="grid grid-cols-2 gap-3 pt-6 mt-6 border-t border-gray-100">
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full border-primary text-primary font-bold py-6 rounded-xl">
+                    Đăng nhập
+                  </Button>
+                </Link>
+                <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-6 rounded-xl">
+                    Đăng ký
+                  </Button>
+                </Link>
+              </div>
+            )}
+
+            {user && (
+              <div className="pt-6 mt-6 border-t border-gray-100 space-y-3">
+                <Link
+                  href="/dashboard"
+                  className="block px-4 py-3 rounded-xl bg-primary/5 font-bold text-primary"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Vào Dashboard
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout()
+                    setMobileMenuOpen(false)
+                  }}
+                  className="w-full text-left px-4 py-3 rounded-xl text-red-500 font-bold hover:bg-red-50"
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            )}
           </nav>
         </div>
       )}
