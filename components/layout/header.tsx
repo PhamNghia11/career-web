@@ -214,7 +214,7 @@ export function Header() {
                   className="block px-4 py-3 rounded-xl bg-primary/5 font-bold text-primary"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Vào Dashboard
+                  Dashboard
                 </Link>
                 <button
                   onClick={() => {
