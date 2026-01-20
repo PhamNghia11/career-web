@@ -110,7 +110,7 @@ export default function RegisterPage() {
 
             <form onSubmit={handleEmailRegister} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="role" className="text-gray-700 font-medium">Bạn là</Label>
+                <Label htmlFor="role" className="text-gray-700 font-medium">Bạn là <span className="text-red-500">*</span></Label>
                 <Select
                   value={formData.role}
                   onValueChange={(value) => setFormData({ ...formData, role: value as "student" | "employer" })}
@@ -126,7 +126,7 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-gray-700 font-medium">Họ và tên</Label>
+                <Label htmlFor="name" className="text-gray-700 font-medium">Họ và tên <span className="text-red-500">*</span></Label>
                 <div className="relative group">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                   <input
@@ -143,7 +143,7 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
+                <Label htmlFor="email" className="text-gray-700 font-medium">Email <span className="text-red-500">*</span></Label>
                 <div className="relative group">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                   <input
@@ -221,7 +221,7 @@ export default function RegisterPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-700 font-medium">Mật khẩu</Label>
+                <Label htmlFor="password" className="text-gray-700 font-medium">Mật khẩu <span className="text-red-500">*</span></Label>
                 <div className="relative group">
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                   <input
@@ -245,7 +245,7 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">Xác nhận mật khẩu</Label>
+                <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">Xác nhận mật khẩu <span className="text-red-500">*</span></Label>
                 <div className="relative group">
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                   <input
