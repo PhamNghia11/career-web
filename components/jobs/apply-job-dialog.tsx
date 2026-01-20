@@ -45,7 +45,37 @@ export function ApplyJobDialog({
     const [dragActive, setDragActive] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [faculty, setFaculty] = useState("")
+    const [major, setMajor] = useState("")
     const [cohort, setCohort] = useState("")
+
+    // Mapping of Majors to their corresponding Faculties
+    const MAJOR_FACULTY_MAP: Record<string, string> = {
+        "Công nghệ thông tin": "Khoa Công nghệ thông tin",
+        "Kỹ thuật phần mềm": "Khoa Công nghệ thông tin",
+        "Mạng máy tính và truyền thông dữ liệu": "Khoa Công nghệ thông tin",
+        "An toàn thông tin": "Khoa Công nghệ thông tin",
+        "Quản trị kinh doanh": "Khoa Kinh tế - Quản trị",
+        "Marketing": "Khoa Kinh tế - Quản trị",
+        "Kế toán": "Khoa Kinh tế - Quản trị",
+        "Tài chính ngân hàng": "Khoa Kinh tế - Quản trị",
+        "Logistics và Quản lý chuỗi cung ứng": "Khoa Kinh tế - Quản trị",
+        "Ngôn ngữ Anh": "Khoa Khoa học xã hội - Ngôn ngữ",
+        "Ngôn ngữ Trung Quốc": "Khoa Khoa học xã hội - Ngôn ngữ",
+        "Quản trị dịch vụ du lịch và lữ hành": "Khoa Khoa học xã hội - Ngôn ngữ",
+        "Đông phương học": "Khoa Khoa học xã hội - Ngôn ngữ",
+        "Việt Nam học": "Khoa Khoa học xã hội - Ngôn ngữ",
+        "Quản trị kinh doanh (Quốc tế)": "Viện Đào tạo Quốc tế",
+        "Marketing (Quốc tế)": "Viện Đào tạo Quốc tế",
+        "Kỹ thuật phần mềm (Quốc tế)": "Viện Đào tạo Quốc tế",
+    }
+
+    const handleMajorChange = (value: string) => {
+        setMajor(value)
+        const matchedFaculty = MAJOR_FACULTY_MAP[value]
+        if (matchedFaculty) {
+            setFaculty(matchedFaculty)
+        }
+    }
     const inputRef = useRef<HTMLInputElement>(null)
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,7 +162,7 @@ export function ApplyJobDialog({
             formData.append("email", email)
             formData.append("phone", phone)
             formData.append("mssv", (form.elements.namedItem("mssv") as HTMLInputElement).value.trim())
-            formData.append("major", (form.elements.namedItem("major") as HTMLInputElement).value.trim())
+            formData.append("major", major.trim())
             formData.append("faculty", faculty.trim())
             formData.append("cohort", cohort.trim())
 
@@ -293,13 +323,37 @@ export function ApplyJobDialog({
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="major">Ngành học <span className="text-red-500">*</span></Label>
-                                    <Input id="major" placeholder="Công nghệ thông tin, Marketing..." required />
+                                    <Select name="major" value={major} onValueChange={handleMajorChange} required>
+                                        <SelectTrigger id="major">
+                                            <SelectValue placeholder="Chọn Ngành học" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Công nghệ thông tin">Công nghệ thông tin</SelectItem>
+                                            <SelectItem value="Kỹ thuật phần mềm">Kỹ thuật phần mềm</SelectItem>
+                                            <SelectItem value="An toàn thông tin">An toàn thông tin</SelectItem>
+                                            <SelectItem value="Mạng máy tính và truyền thông dữ liệu">Mạng máy tính</SelectItem>
+                                            <SelectItem value="Quản trị kinh doanh">Quản trị kinh doanh</SelectItem>
+                                            <SelectItem value="Marketing">Marketing</SelectItem>
+                                            <SelectItem value="Kế toán">Kế toán</SelectItem>
+                                            <SelectItem value="Tài chính ngân hàng">Tài chính ngân hàng</SelectItem>
+                                            <SelectItem value="Logistics và Quản lý chuỗi cung ứng">Logistics</SelectItem>
+                                            <SelectItem value="Ngôn ngữ Anh">Ngôn ngữ Anh</SelectItem>
+                                            <SelectItem value="Ngôn ngữ Trung Quốc">Ngôn ngữ Trung Quốc</SelectItem>
+                                            <SelectItem value="Quản trị dịch vụ du lịch và lữ hành">Du lịch</SelectItem>
+                                            <SelectItem value="Đông phương học">Đông phương học</SelectItem>
+                                            <SelectItem value="Việt Nam học">Việt Nam học</SelectItem>
+                                            <SelectItem value="Quản trị kinh doanh (Quốc tế)">QTKD (Quốc tế)</SelectItem>
+                                            <SelectItem value="Marketing (Quốc tế)">Marketing (Quốc tế)</SelectItem>
+                                            <SelectItem value="Kỹ thuật phần mềm (Quốc tế)">Kỹ thuật phần mềm (Quốc tế)</SelectItem>
+                                            <SelectItem value="Khác">Khác</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
                                         <Label htmlFor="faculty">Khoa / Viện <span className="text-gray-400 font-normal">(Tùy chọn)</span></Label>
-                                        <Select name="faculty" value={faculty} onValueChange={setFaculty}>
+                                        <Select name="faculty" value={faculty} onValueChange={setFaculty} disabled={major !== "Khác" && major !== ""}>
                                             <SelectTrigger id="faculty">
                                                 <SelectValue placeholder="Chọn Khoa / Viện" />
                                             </SelectTrigger>
