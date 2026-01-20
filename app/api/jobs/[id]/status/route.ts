@@ -14,7 +14,14 @@ export async function PATCH(
 
         if (!status || !["active", "rejected", "request_changes"].includes(status)) {
             return NextResponse.json(
-                { error: "Invalid status provided" },
+                { error: "Trạng thái không hợp lệ" },
+                { status: 400 }
+            )
+        }
+
+        if ((status === "rejected" || status === "request_changes") && (!feedback || feedback.trim() === "")) {
+            return NextResponse.json(
+                { error: "Lý do từ chối là bắt buộc" },
                 { status: 400 }
             )
         }

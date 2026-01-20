@@ -273,20 +273,33 @@ export default function AdminJobsPage() {
                     <DialogHeader>
                         <DialogTitle>Từ chối / Gỡ bài tuyển dụng</DialogTitle>
                         <DialogDescription>
-                            Vui lòng nhập lý do từ chối để nhà tuyển dụng biết và chỉnh sửa (nếu cần).
+                            Vui lòng nhập lý do từ chối <span className="text-red-500 font-bold">*</span> để nhà tuyển dụng biết và chỉnh sửa.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="py-4">
                         <Textarea
-                            placeholder="Nhập lý do tại đây..."
+                            placeholder="Nhập lý do tại đây (ví dụ: nội dung chưa rõ ràng, hình ảnh không phù hợp...)"
                             value={feedback}
                             onChange={(e) => setFeedback(e.target.value)}
                             rows={4}
+                            className={!feedback.trim() ? "border-red-200 focus-visible:ring-red-500" : ""}
                         />
+                        {!feedback.trim() && (
+                            <p className="text-xs text-red-500 mt-2 italic">* Bạn không thể từ chối nếu không có lý do cụ thể.</p>
+                        )}
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setRejectDialogOpen(false)}>Hủy</Button>
-                        <Button variant="destructive" onClick={confirmReject}>Xác nhận từ chối</Button>
+                        <Button variant="outline" onClick={() => {
+                            setRejectDialogOpen(false)
+                            setFeedback("")
+                        }}>Hủy</Button>
+                        <Button
+                            variant="destructive"
+                            onClick={confirmReject}
+                            disabled={!feedback.trim()}
+                        >
+                            Xác nhận từ chối
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
