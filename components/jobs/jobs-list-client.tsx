@@ -11,6 +11,13 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { Separator } from "@/components/ui/separator"
 import { useAuth } from "@/lib/auth-context"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 import { JobPreviewPanel } from "./job-preview-panel"
 import { allJobs, Job } from "@/lib/jobs-data"
@@ -738,104 +745,160 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
 
     return (
       <div className="relative">
-        <button
-          onClick={() => setActiveDropdown(isOpen ? null : dropdownId)}
-          className={`flex items-center gap-2 px-3 py-2.5 text-sm rounded-full border transition-all shadow-sm ${value
-            ? "bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30 text-primary font-medium"
-            : "bg-white border-gray-200 text-gray-600 hover:border-primary/30 hover:bg-gray-50/80 hover:shadow-md"
-            }`}
-        >
-          {Icon && <Icon className={`h-4 w-4 ${value ? "text-primary" : "text-gray-400"}`} />}
-          <span className="whitespace-nowrap">{selectedOption ? selectedOption.label : label}</span>
-          <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} ${value ? "text-primary" : "text-gray-400"}`} />
-        </button>
+        {/* Desktop View: Absolute Dropdown */}
+        <div className="hidden lg:block">
+          <button
+            onClick={() => setActiveDropdown(isOpen ? null : dropdownId)}
+            className={`flex items-center gap-2 px-3 py-2.5 text-sm rounded-full border transition-all shadow-sm ${value
+              ? "bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30 text-primary font-medium"
+              : "bg-white border-gray-200 text-gray-600 hover:border-primary/30 hover:bg-gray-50/80 hover:shadow-md"
+              }`}
+          >
+            {Icon && <Icon className={`h-4 w-4 ${value ? "text-primary" : "text-gray-400"}`} />}
+            <span className="whitespace-nowrap">{selectedOption ? selectedOption.label : label}</span>
+            <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} ${value ? "text-primary" : "text-gray-400"}`} />
+          </button>
 
-        {isOpen && (
-          <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
-            <div className="px-3 py-2 border-b border-gray-100 flex items-center justify-between">
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{label}</span>
-              {value && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onChange(null)
-                  }}
-                  className="text-[10px] text-blue-600 hover:underline font-medium"
-                >
-                  Xóa
-                </button>
-              )}
-            </div>
-
-            {searchable && (
-              <div className="px-3 py-2 border-b border-gray-100">
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={localSearch}
-                    onChange={(e) => setLocalSearch(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        if (filteredOptions.length > 0) {
-                          onChange(filteredOptions[0].id)
-                          setActiveDropdown(null)
-                        } else if (localSearch.trim()) {
-                          onChange(localSearch.trim())
-                          setActiveDropdown(null)
-                        }
-                      }
-                    }}
-                    placeholder="Tìm kiếm..."
-                    className="w-full pl-8 pr-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30"
-                    autoFocus
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="max-h-64 overflow-y-auto py-1">
-              {filteredOptions.length > 0 ? (
-                filteredOptions.map((option) => (
+          {isOpen && (
+            <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
+              <div className="px-3 py-2 border-b border-gray-100 flex items-center justify-between">
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{label}</span>
+                {value && (
                   <button
-                    key={option.id}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onChange(null)
+                    }}
+                    className="text-[10px] text-blue-600 hover:underline font-medium"
+                  >
+                    Xóa
+                  </button>
+                )}
+              </div>
+
+              {searchable && (
+                <div className="px-3 py-2 border-b border-gray-100">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                    <input
+                      type="text"
+                      value={localSearch}
+                      onChange={(e) => setLocalSearch(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          if (filteredOptions.length > 0) {
+                            onChange(filteredOptions[0].id)
+                            setActiveDropdown(null)
+                          } else if (localSearch.trim()) {
+                            onChange(localSearch.trim())
+                            setActiveDropdown(null)
+                          }
+                        }
+                      }}
+                      placeholder="Tìm kiếm..."
+                      className="w-full pl-8 pr-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30"
+                      autoFocus
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="max-h-64 overflow-y-auto py-1">
+                {filteredOptions.length > 0 ? (
+                  filteredOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => {
+                        onChange(option.id)
+                        setActiveDropdown(null)
+                      }}
+                      className={`w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors ${value === option.id ? "bg-primary/5 text-primary font-medium" : "text-gray-700"
+                        }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${value === option.id ? "border-primary bg-primary" : "border-gray-300"}`}>
+                        {value === option.id && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </div>
+                      {option.label}
+                    </button>
+                  ))
+                ) : localSearch.trim() ? (
+                  <button
                     onClick={() => {
-                      onChange(option.id)
+                      onChange(localSearch.trim())
                       setActiveDropdown(null)
                     }}
-                    className={`w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors ${value === option.id ? "bg-primary/5 text-primary font-medium" : "text-gray-700"
-                      }`}
+                    className="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors text-primary font-medium"
                   >
-                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${value === option.id ? "border-primary bg-primary" : "border-gray-300"}`}>
-                      {value === option.id && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
                     </div>
-                    {option.label}
+                    Sử dụng: "{localSearch.trim()}"
                   </button>
-                ))
-              ) : localSearch.trim() ? (
-                <button
-                  onClick={() => {
-                    onChange(localSearch.trim())
-                    setActiveDropdown(null)
-                  }}
-                  className="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors text-primary font-medium"
-                >
-                  <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                ) : (
+                  <div className="px-3 py-4 text-center text-sm text-gray-500 italic">
+                    Không tìm thấy kết quả
                   </div>
-                  Sử dụng: "{localSearch.trim()}"
-                </button>
-              ) : (
-                <div className="px-3 py-4 text-center text-sm text-gray-500 italic">
-                  Không tìm thấy kết quả
-                </div>
-              )}
+                )}
+              </div>
             </div>
-            {/* Removed old clear button as it's now in the header */}
-          </div>
-        )}
+          )}
+        </div>
+
+        {/* Mobile View: Bottom Sheet */}
+        <div className="lg:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <button
+                className={`flex items-center gap-2 px-3 py-1.5 text-[13px] rounded-full border transition-all shadow-sm ${value
+                  ? "bg-primary text-white border-primary"
+                  : "bg-white border-gray-200 text-gray-600"
+                  }`}
+              >
+                {Icon && <Icon className={`h-3.5 w-3.5 ${value ? "text-white" : "text-gray-400"}`} />}
+                <span className="whitespace-nowrap">{selectedOption ? selectedOption.label : label}</span>
+                <ChevronDown className={`h-3 w-3 transition-transform ${value ? "text-white" : "text-gray-400"}`} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-2xl px-0 pb-10">
+              <SheetHeader className="px-6 mb-4">
+                <div className="flex items-center justify-between">
+                  <SheetTitle className="text-lg font-bold">{label}</SheetTitle>
+                  {value && (
+                    <button
+                      onClick={() => onChange(null)}
+                      className="text-sm text-red-500 font-medium"
+                    >
+                      Xóa chọn
+                    </button>
+                  )}
+                </div>
+              </SheetHeader>
+              <div className="max-h-[60vh] overflow-y-auto px-2">
+                <div className="grid grid-cols-1 gap-1">
+                  {options.map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => onChange(option.id)}
+                      className={`w-full px-4 py-4 text-left rounded-xl flex items-center justify-between transition-colors ${value === option.id
+                        ? "bg-primary/5 text-primary font-bold border border-primary/20"
+                        : "text-gray-700 hover:bg-gray-50"
+                        }`}
+                    >
+                      <span>{option.label}</span>
+                      {value === option.id && (
+                        <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                          <div className="w-2 h-2 rounded-full bg-white" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     )
   }
@@ -850,23 +913,23 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   return (
     <div className="space-y-6">
       {/* Horizontal Filter Bar - STICKY */}
-      <div ref={dropdownRef} className="bg-white/95 backdrop-blur-md sticky top-[112px] lg:top-[128px] z-40 border-b border-gray-100 py-3 mb-6 shadow-sm">
-        <div className="container mx-auto px-4 flex items-center gap-3">
-          {/* Mobile Search - Visible only on LG hidden */}
-          <div className="lg:hidden flex-shrink-0 w-48">
+      <div ref={dropdownRef} className="bg-white/95 backdrop-blur-md sticky top-[112px] lg:top-[128px] z-40 border-b border-gray-100 py-2.5 lg:py-4 mb-6 shadow-sm">
+        <div className="container mx-auto px-4 space-y-3">
+          {/* Row 1: Mobile Search - Visible only on LG hidden */}
+          <div className="lg:hidden w-full">
             <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-primary transition-colors" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm kiếm..."
-                className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50/50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                placeholder="Tìm kiếm chức danh, công ty..."
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all font-medium"
               />
             </div>
           </div>
 
-          {/* Filters Row - Scrollable on mobile */}
+          {/* Row 2: Filters Row - Scrollable on mobile */}
           <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 overflow-x-auto pb-1 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <FilterDropdown
               label="Ngành nghề"
@@ -926,7 +989,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
               searchable={true}
             />
 
-            {(hasAdvancedFilters || selectedSalary || selectedType || (searchQuery && !activeDropdown)) && (
+            {(hasAdvancedFilters || selectedSalary || selectedType || searchQuery) && (
               <button
                 onClick={() => {
                   clearAdvancedFilters()
@@ -934,13 +997,10 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                   setSelectedType(null)
                   setSearchQuery("")
                 }}
-                className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-all border border-transparent hover:border-red-100"
+                className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-full transition-all border border-red-100"
               >
                 <X className="h-3.5 w-3.5" />
                 <span>Xóa hết</span>
-                <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-red-100 text-red-600 rounded-full">
-                  {advancedFilterCount + (selectedSalary ? 1 : 0) + (selectedType ? 1 : 0) + (searchQuery ? 1 : 0)}
-                </span>
               </button>
             )}
           </div>
