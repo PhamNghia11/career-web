@@ -58,11 +58,11 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-28 lg:h-32">
           {/* Logo */}
-          <Link href="/" className="flex items-center mr-4">
+          <Link href="/" className="flex items-center mr-4 flex-shrink-0">
             <img
               src="/gdu-logo.png"
               alt="Gia Dinh University"
-              className="h-20 lg:h-24 w-auto object-contain"
+              className="h-16 lg:h-24 w-auto object-contain"
             />
           </Link>
 
@@ -127,7 +127,7 @@ export function Header() {
                 </DropdownMenu>
               </>
             ) : (
-              <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <Link href="/login">
                   <Button
                     variant="ghost"
@@ -136,7 +136,7 @@ export function Header() {
                     Đăng nhập
                   </Button>
                 </Link>
-                <Link href="/register">
+                <Link href="/register" className="hidden sm:block">
                   <Button className="bg-primary hover:bg-primary/90 text-white font-semibold text-sm sm:text-base px-3 sm:px-6 h-9 sm:h-10">Đăng ký</Button>
                 </Link>
               </div>
