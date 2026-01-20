@@ -48,25 +48,43 @@ export function ApplyJobDialog({
     const [major, setMajor] = useState("")
     const [cohort, setCohort] = useState("")
 
-    // Mapping of Majors to their corresponding Faculties
+    // Mapping of Majors to their corresponding Faculties (Official GDU List)
     const MAJOR_FACULTY_MAP: Record<string, string> = {
-        "Công nghệ thông tin": "Khoa Công nghệ thông tin",
-        "Kỹ thuật phần mềm": "Khoa Công nghệ thông tin",
-        "Mạng máy tính và truyền thông dữ liệu": "Khoa Công nghệ thông tin",
-        "An toàn thông tin": "Khoa Công nghệ thông tin",
-        "Quản trị kinh doanh": "Khoa Kinh tế - Quản trị",
-        "Marketing": "Khoa Kinh tế - Quản trị",
-        "Kế toán": "Khoa Kinh tế - Quản trị",
-        "Tài chính ngân hàng": "Khoa Kinh tế - Quản trị",
-        "Logistics và Quản lý chuỗi cung ứng": "Khoa Kinh tế - Quản trị",
-        "Ngôn ngữ Anh": "Khoa Khoa học xã hội - Ngôn ngữ",
-        "Ngôn ngữ Trung Quốc": "Khoa Khoa học xã hội - Ngôn ngữ",
-        "Quản trị dịch vụ du lịch và lữ hành": "Khoa Khoa học xã hội - Ngôn ngữ",
-        "Đông phương học": "Khoa Khoa học xã hội - Ngôn ngữ",
-        "Việt Nam học": "Khoa Khoa học xã hội - Ngôn ngữ",
-        "Quản trị kinh doanh (Quốc tế)": "Viện Đào tạo Quốc tế",
-        "Marketing (Quốc tế)": "Viện Đào tạo Quốc tế",
-        "Kỹ thuật phần mềm (Quốc tế)": "Viện Đào tạo Quốc tế",
+        // Sức khỏe
+        "Răng Hàm Mặt": "Sức khỏe",
+        "Kỹ thuật phục hồi chức năng": "Sức khỏe",
+        "Điều dưỡng": "Sức khỏe",
+        // Công nghệ thông tin
+        "Công nghệ thông tin": "Công nghệ thông tin",
+        "Kỹ thuật phần mềm": "Công nghệ thông tin",
+        "Mạng máy tính & Truyền thông dữ liệu": "Công nghệ thông tin",
+        "Trí tuệ nhân tạo": "Công nghệ thông tin",
+        // Truyền thông
+        "Truyền thông đa phương tiện": "Truyền thông",
+        "Công nghệ truyền thông": "Truyền thông",
+        "Quan hệ công chúng": "Truyền thông",
+        // Kinh doanh
+        "Kinh doanh quốc tế": "Kinh doanh",
+        "Kinh doanh thương mại": "Kinh doanh",
+        "Thương mại điện tử": "Kinh doanh",
+        // Quản trị - Quản lý
+        "Quản trị kinh doanh": "Quản trị - Quản lý",
+        "Marketing": "Quản trị - Quản lý",
+        "Quản trị khách sạn": "Quản trị - Quản lý",
+        "Quản trị dịch vụ du lịch & lữ hành": "Quản trị - Quản lý",
+        "Logistics & Quản lý chuỗi cung ứng": "Quản trị - Quản lý",
+        // Luật
+        "Luật": "Luật",
+        "Luật kinh tế": "Luật",
+        // Khoa học xã hội & Ngôn ngữ quốc tế
+        "Ngôn ngữ Anh": "Khoa học xã hội & Ngôn ngữ quốc tế",
+        "Đông phương học": "Khoa học xã hội & Ngôn ngữ quốc tế",
+        "Tâm lý học": "Khoa học xã hội & Ngôn ngữ quốc tế",
+        "Ngôn ngữ Trung Quốc": "Khoa học xã hội & Ngôn ngữ quốc tế",
+        // Tài chính ngân hàng
+        "Tài chính - Ngân hàng": "Tài chính ngân hàng",
+        "Công nghệ tài chính": "Tài chính ngân hàng",
+        "Kế toán": "Tài chính ngân hàng",
     }
 
     const handleMajorChange = (value: string) => {
@@ -328,23 +346,33 @@ export function ApplyJobDialog({
                                             <SelectValue placeholder="Chọn Ngành học" />
                                         </SelectTrigger>
                                         <SelectContent>
+                                            <SelectItem value="Răng Hàm Mặt">Răng Hàm Mặt</SelectItem>
+                                            <SelectItem value="Kỹ thuật phục hồi chức năng">Kỹ thuật phục hồi chức năng</SelectItem>
+                                            <SelectItem value="Điều dưỡng">Điều dưỡng</SelectItem>
                                             <SelectItem value="Công nghệ thông tin">Công nghệ thông tin</SelectItem>
                                             <SelectItem value="Kỹ thuật phần mềm">Kỹ thuật phần mềm</SelectItem>
-                                            <SelectItem value="An toàn thông tin">An toàn thông tin</SelectItem>
-                                            <SelectItem value="Mạng máy tính và truyền thông dữ liệu">Mạng máy tính</SelectItem>
+                                            <SelectItem value="Mạng máy tính & Truyền thông dữ liệu">Mạng máy tính</SelectItem>
+                                            <SelectItem value="Trí tuệ nhân tạo">Trí tuệ nhân tạo</SelectItem>
+                                            <SelectItem value="Truyền thông đa phương tiện">Truyền thông đa phương tiện</SelectItem>
+                                            <SelectItem value="Công nghệ truyền thông">Công nghệ truyền thông</SelectItem>
+                                            <SelectItem value="Quan hệ công chúng">Quan hệ công chúng</SelectItem>
+                                            <SelectItem value="Kinh doanh quốc tế">Kinh doanh quốc tế</SelectItem>
+                                            <SelectItem value="Kinh doanh thương mại">Kinh doanh thương mại</SelectItem>
+                                            <SelectItem value="Thương mại điện tử">Thương mại điện tử</SelectItem>
                                             <SelectItem value="Quản trị kinh doanh">Quản trị kinh doanh</SelectItem>
                                             <SelectItem value="Marketing">Marketing</SelectItem>
-                                            <SelectItem value="Kế toán">Kế toán</SelectItem>
-                                            <SelectItem value="Tài chính ngân hàng">Tài chính ngân hàng</SelectItem>
-                                            <SelectItem value="Logistics và Quản lý chuỗi cung ứng">Logistics</SelectItem>
+                                            <SelectItem value="Quản trị khách sạn">Quản trị khách sạn</SelectItem>
+                                            <SelectItem value="Quản trị dịch vụ du lịch & lữ hành">Du lịch</SelectItem>
+                                            <SelectItem value="Logistics & Quản lý chuỗi cung ứng">Logistics</SelectItem>
+                                            <SelectItem value="Luật">Luật</SelectItem>
+                                            <SelectItem value="Luật kinh tế">Luật kinh tế</SelectItem>
                                             <SelectItem value="Ngôn ngữ Anh">Ngôn ngữ Anh</SelectItem>
-                                            <SelectItem value="Ngôn ngữ Trung Quốc">Ngôn ngữ Trung Quốc</SelectItem>
-                                            <SelectItem value="Quản trị dịch vụ du lịch và lữ hành">Du lịch</SelectItem>
                                             <SelectItem value="Đông phương học">Đông phương học</SelectItem>
-                                            <SelectItem value="Việt Nam học">Việt Nam học</SelectItem>
-                                            <SelectItem value="Quản trị kinh doanh (Quốc tế)">QTKD (Quốc tế)</SelectItem>
-                                            <SelectItem value="Marketing (Quốc tế)">Marketing (Quốc tế)</SelectItem>
-                                            <SelectItem value="Kỹ thuật phần mềm (Quốc tế)">Kỹ thuật phần mềm (Quốc tế)</SelectItem>
+                                            <SelectItem value="Tâm lý học">Tâm lý học</SelectItem>
+                                            <SelectItem value="Ngôn ngữ Trung Quốc">Ngôn ngữ Trung Quốc</SelectItem>
+                                            <SelectItem value="Tài chính - Ngân hàng">Tài chính - Ngân hàng</SelectItem>
+                                            <SelectItem value="Công nghệ tài chính">Công nghệ tài chính</SelectItem>
+                                            <SelectItem value="Kế toán">Kế toán</SelectItem>
                                             <SelectItem value="Khác">Khác</SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -358,10 +386,14 @@ export function ApplyJobDialog({
                                                 <SelectValue placeholder="Chọn Khoa / Viện" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="Khoa Công nghệ thông tin">Khoa Công nghệ thông tin</SelectItem>
-                                                <SelectItem value="Khoa Kinh tế - Quản trị">Khoa Kinh tế - Quản trị</SelectItem>
-                                                <SelectItem value="Khoa Khoa học xã hội - Ngôn ngữ">Khoa Khoa học xã hội - Ngôn ngữ</SelectItem>
-                                                <SelectItem value="Viện Đào tạo Quốc tế">Viện Đào tạo Quốc tế</SelectItem>
+                                                <SelectItem value="Sức khỏe">Sức khỏe</SelectItem>
+                                                <SelectItem value="Công nghệ thông tin">Công nghệ thông tin</SelectItem>
+                                                <SelectItem value="Truyền thông">Truyền thông</SelectItem>
+                                                <SelectItem value="Kinh doanh">Kinh doanh</SelectItem>
+                                                <SelectItem value="Quản trị - Quản lý">Quản trị - Quản lý</SelectItem>
+                                                <SelectItem value="Luật">Luật</SelectItem>
+                                                <SelectItem value="Khoa học xã hội & Ngôn ngữ quốc tế">KHXH & Ngôn ngữ quốc tế</SelectItem>
+                                                <SelectItem value="Tài chính ngân hàng">Tài chính ngân hàng</SelectItem>
                                                 <SelectItem value="Khác">Khác</SelectItem>
                                             </SelectContent>
                                         </Select>
