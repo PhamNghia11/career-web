@@ -831,7 +831,7 @@ export default function PostJobPage() {
                     </Card>
 
                     <div className="flex justify-end gap-4">
-                        <Button type="button" variant="outline" onClick={() => router.back()}>Hủy bỏ</Button>
+                        <Button type="button" variant="outline" onClick={() => router.push("/dashboard/jobs")}>Hủy bỏ</Button>
                         <Button type="button" variant="secondary" onClick={handlePreview} className="gap-2">
                             <Eye className="w-4 h-4" /> Xem trước
                         </Button>

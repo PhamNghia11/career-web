@@ -53,6 +53,14 @@ export function MobileNav() {
 
   const navigation = user?.role === "admin" ? adminNav : user?.role === "employer" ? employerNav : studentNav
 
+  const handleBack = () => {
+    if (pathname === "/dashboard") {
+      router.push("/")
+    } else {
+      router.push("/dashboard")
+    }
+  }
+
   return (
     <div className="lg:hidden">
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 text-gray-900">
@@ -60,7 +68,7 @@ export function MobileNav() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.back()}
+            onClick={handleBack}
             className="text-gray-900 hover:bg-gray-100 -ml-2"
           >
             <ChevronLeft className="h-6 w-6" />

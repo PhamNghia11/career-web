@@ -40,7 +40,7 @@ export default function LoginPage() {
 
       if (data.success && data.user) {
         localStorage.setItem("gdu_user", JSON.stringify(data.user))
-        window.location.href = "/dashboard"
+        window.location.href = "/"
       } else if (data.needsVerification) {
         router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
       } else {

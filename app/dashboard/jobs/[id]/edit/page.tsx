@@ -338,7 +338,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
     return (
         <div className="container mx-auto py-6 max-w-4xl">
             <div className="mb-6 flex items-center gap-4">
-                <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard/my-jobs")}>
                     <ArrowLeft className="w-5 h-5" />
                 </Button>
                 <div>
@@ -864,7 +864,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                     </Card>
 
                     <div className="flex justify-end gap-4">
-                        <Button type="button" variant="outline" onClick={() => router.back()}>Hủy bỏ</Button>
+                        <Button type="button" variant="outline" onClick={() => router.push("/dashboard/my-jobs")}>Hủy bỏ</Button>
                         <Button type="button" variant="secondary" onClick={handlePreview} className="gap-2">
                             <Eye className="w-4 h-4" /> Xem trước
                         </Button>

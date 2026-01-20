@@ -3,8 +3,7 @@
 import type React from "react"
 
 import { useState, useRef } from "react"
-import { User, Mail, Phone, GraduationCap, Briefcase, Save, Upload, Loader2, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { User, Mail, Phone, GraduationCap, Briefcase, Save, Upload, Loader2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -83,14 +82,9 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center gap-4">
-        <Link href="/" className="p-2 rounded-full hover:bg-accent transition-colors">
-          <ArrowLeft className="h-6 w-6 text-foreground" />
-        </Link>
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Hồ sơ cá nhân</h1>
-          <p className="text-muted-foreground mt-1">Quản lý thông tin cá nhân của bạn</p>
-        </div>
+      <div>
+        <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Hồ sơ cá nhân</h1>
+        <p className="text-muted-foreground mt-1">Quản lý thông tin cá nhân của bạn</p>
       </div>
 
       {/* Avatar Section */}
