@@ -130,8 +130,8 @@ export function Header() {
               <div className="flex items-center gap-1 sm:gap-2">
                 <Link href="/login">
                   <Button
-                    variant="ghost"
-                    className="text-primary hover:bg-primary/10 px-2 sm:px-4 font-semibold text-sm sm:text-base h-9 sm:h-10"
+                    variant="secondary"
+                    className="bg-gray-100 hover:bg-gray-200 text-primary px-2 sm:px-4 font-semibold text-sm sm:text-base h-9 sm:h-10 border border-gray-200/50"
                   >
                     Đăng nhập
                   </Button>
