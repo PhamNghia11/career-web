@@ -171,100 +171,188 @@ export default function AdminJobsPage() {
                 <CardHeader>
                     <CardTitle>Danh sách bài đăng</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-[120px]">Ngày đăng</TableHead>
-                                <TableHead className="min-w-[200px]">Vị trí</TableHead>
-                                <TableHead className="min-w-[150px]">Công ty</TableHead>
-                                <TableHead className="w-[150px]">Mức lương</TableHead>
-                                <TableHead className="w-[130px]">Trạng thái</TableHead>
-                                <TableHead className="text-center w-[180px]">Hành động</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {jobs.length === 0 ? (
+                <CardContent className="p-0 sm:p-6">
+                    <div className="overflow-x-auto">
+                        <Table className="hidden md:table">
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Chưa có tin tuyển dụng nào.</TableCell>
+                                    <TableHead className="w-[120px]">Ngày đăng</TableHead>
+                                    <TableHead className="min-w-[200px]">Vị trí</TableHead>
+                                    <TableHead className="min-w-[150px]">Công ty</TableHead>
+                                    <TableHead className="w-[150px]">Mức lương</TableHead>
+                                    <TableHead className="w-[130px]">Trạng thái</TableHead>
+                                    <TableHead className="text-center w-[180px]">Hành động</TableHead>
                                 </TableRow>
-                            ) : (
-                                jobs.map((job) => (
-                                    <TableRow key={job._id}>
-                                        <TableCell className="whitespace-nowrap">{new Date(job.postedAt).toLocaleDateString("vi-VN")}</TableCell>
-                                        <TableCell className="font-medium">{job.title}</TableCell>
-                                        <TableCell>{job.company}</TableCell>
-                                        <TableCell>{job.salary}</TableCell>
-                                        <TableCell>{getStatusBadge(job.status)}</TableCell>
-                                        <TableCell className="text-center">
-                                            <div className="flex justify-center items-center">
-                                                {/* Slot 1: Eye icon (fixed width for vertical alignment) */}
-                                                <div className="w-10 flex justify-center">
-                                                    <Button
-                                                        size="sm"
-                                                        variant="ghost"
-                                                        className="h-9 w-9 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                                                        onClick={() => setPreviewJob(job)}
-                                                        title="Xem chi tiết"
-                                                    >
-                                                        <Eye className="h-4.5 w-4.5" />
-                                                    </Button>
-                                                </div>
-
-                                                {/* Slot 2: Action buttons (fixed width to keep Eye icon in place) */}
-                                                <div className="w-[100px] flex justify-center">
-                                                    {job.status === 'pending' && (
-                                                        <div className="flex items-center gap-1">
-                                                            <Button
-                                                                size="sm"
-                                                                className="bg-green-600 hover:bg-green-700 h-8 w-8 p-0"
-                                                                onClick={() => handleStatusUpdate(job._id, "active")}
-                                                                title="Duyệt bài"
-                                                            >
-                                                                <Check className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="destructive"
-                                                                className="h-8 w-8 p-0"
-                                                                onClick={() => openRejectDialog(job._id)}
-                                                                title="Từ chối"
-                                                            >
-                                                                <X className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    )}
-
-                                                    {job.status === 'active' && (
-                                                        <Button
-                                                            size="sm"
-                                                            variant="outline"
-                                                            className="h-8 px-3 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300 text-xs"
-                                                            onClick={() => openRejectDialog(job._id)}
-                                                        >
-                                                            Gỡ bài
-                                                        </Button>
-                                                    )}
-
-                                                    {(job.status === 'rejected' || job.status === 'closed' || job.status === 'request_changes') && (
+                            </TableHeader>
+                            <TableBody>
+                                {jobs.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Chưa có tin tuyển dụng nào.</TableCell>
+                                    </TableRow>
+                                ) : (
+                                    jobs.map((job) => (
+                                        <TableRow key={job._id}>
+                                            <TableCell className="whitespace-nowrap">{new Date(job.postedAt).toLocaleDateString("vi-VN")}</TableCell>
+                                            <TableCell className="font-medium">{job.title}</TableCell>
+                                            <TableCell>{job.company}</TableCell>
+                                            <TableCell>{job.salary}</TableCell>
+                                            <TableCell>{getStatusBadge(job.status)}</TableCell>
+                                            <TableCell className="text-center">
+                                                <div className="flex justify-center items-center">
+                                                    {/* Slot 1: Eye icon */}
+                                                    <div className="w-10 flex justify-center">
                                                         <Button
                                                             size="sm"
                                                             variant="ghost"
-                                                            className="h-9 w-9 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
-                                                            onClick={() => handleDelete(job._id)}
-                                                            title="Xóa vĩnh viễn"
+                                                            className="h-9 w-9 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                                                            onClick={() => setPreviewJob(job)}
+                                                            title="Xem chi tiết"
                                                         >
-                                                            <Trash2 className="h-4.5 w-4.5" />
+                                                            <Eye className="h-4.5 w-4.5" />
                                                         </Button>
-                                                    )}
+                                                    </div>
+
+                                                    {/* Slot 2: Action buttons */}
+                                                    <div className="w-[100px] flex justify-center">
+                                                        {job.status === 'pending' && (
+                                                            <div className="flex items-center gap-1">
+                                                                <Button
+                                                                    size="sm"
+                                                                    className="bg-green-600 hover:bg-green-700 h-8 w-8 p-0"
+                                                                    onClick={() => handleStatusUpdate(job._id, "active")}
+                                                                    title="Duyệt bài"
+                                                                >
+                                                                    <Check className="h-4 w-4" />
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="destructive"
+                                                                    className="h-8 w-8 p-0"
+                                                                    onClick={() => openRejectDialog(job._id)}
+                                                                    title="Từ chối"
+                                                                >
+                                                                    <X className="h-4 w-4" />
+                                                                </Button>
+                                                            </div>
+                                                        )}
+
+                                                        {job.status === 'active' && (
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="h-8 px-3 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 hover:border-red-300 text-xs"
+                                                                onClick={() => openRejectDialog(job._id)}
+                                                            >
+                                                                Gỡ bài
+                                                            </Button>
+                                                        )}
+
+                                                        {(job.status === 'rejected' || job.status === 'closed' || job.status === 'request_changes') && (
+                                                            <Button
+                                                                size="sm"
+                                                                variant="ghost"
+                                                                className="h-9 w-9 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                                                                onClick={() => handleDelete(job._id)}
+                                                                title="Xóa vĩnh viễn"
+                                                            >
+                                                                <Trash2 className="h-4.5 w-4.5" />
+                                                            </Button>
+                                                        )}
+                                                    </div>
                                                 </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+
+                        {/* Mobile Card Layout */}
+                        <div className="md:hidden grid grid-cols-1 divide-y">
+                            {jobs.length === 0 ? (
+                                <div className="p-8 text-center text-muted-foreground">Chưa có tin tuyển dụng nào.</div>
+                            ) : (
+                                jobs.map((job) => (
+                                    <div key={job._id} className="p-4 space-y-4">
+                                        <div className="flex justify-between items-start">
+                                            <div className="space-y-1">
+                                                <h3 className="font-bold text-gray-900 leading-tight">{job.title}</h3>
+                                                <p className="text-sm text-blue-600 font-medium">{job.company}</p>
                                             </div>
-                                        </TableCell>
-                                    </TableRow>
+                                            {getStatusBadge(job.status)}
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4 text-xs py-3 border-y border-gray-50 bg-gray-50/30 px-2 rounded-lg">
+                                            <div>
+                                                <p className="text-gray-400 font-bold uppercase mb-0.5">Ngày đăng</p>
+                                                <p className="font-medium">{new Date(job.postedAt).toLocaleDateString("vi-VN")}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-gray-400 font-bold uppercase mb-0.5">Mức lương</p>
+                                                <p className="font-medium">{job.salary}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center justify-between pt-1">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="h-9 px-4 text-blue-600 font-bold"
+                                                onClick={() => setPreviewJob(job)}
+                                            >
+                                                <Eye className="h-4 w-4 mr-2" />
+                                                Chi tiết
+                                            </Button>
+
+                                            <div className="flex items-center gap-2">
+                                                {job.status === 'pending' && (
+                                                    <>
+                                                        <Button
+                                                            size="sm"
+                                                            className="bg-green-600 hover:bg-green-700 h-9 px-4 font-bold"
+                                                            onClick={() => handleStatusUpdate(job._id, "active")}
+                                                        >
+                                                            <Check className="h-4 w-4 mr-1.5" /> Duyệt
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="destructive"
+                                                            className="h-9 w-9 p-0"
+                                                            onClick={() => openRejectDialog(job._id)}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </>
+                                                )}
+
+                                                {job.status === 'active' && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="h-9 px-4 text-red-600 border-red-200 font-bold"
+                                                        onClick={() => openRejectDialog(job._id)}
+                                                    >
+                                                        Gỡ bài
+                                                    </Button>
+                                                )}
+
+                                                {(job.status === 'rejected' || job.status === 'closed' || job.status === 'request_changes') && (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        className="h-9 px-4 text-red-500 font-medium"
+                                                        onClick={() => handleDelete(job._id)}
+                                                    >
+                                                        <Trash2 className="h-4 w-4 mr-1.5" /> Xóa
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
                                 ))
                             )}
-                        </TableBody>
-                    </Table>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
 

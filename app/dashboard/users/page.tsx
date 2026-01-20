@@ -192,77 +192,77 @@ export default function UsersManagementPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <Card className="shadow-sm">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between space-y-0">
-              <div className="h-10 w-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
-                <Users size={20} />
+              <div className="h-8 w-8 sm:h-10 sm:w-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                <Users size={18} className="sm:size-[20px]" />
               </div>
-              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              <Badge variant="outline" className="hidden sm:inline-flex bg-blue-50 text-blue-700 border-blue-200">
                 Tổng cộng
               </Badge>
             </div>
-            <div className="mt-4">
-              <div className="text-2xl font-bold">{users.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">Tổng số tài khoản</p>
+            <div className="mt-2 sm:mt-4">
+              <div className="text-xl sm:text-2xl font-bold">{users.length}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Tổng tài khoản</p>
             </div>
           </CardContent>
         </Card>
 
         <Card className="shadow-sm">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between space-y-0">
-              <div className="h-10 w-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
-                <GraduationCap size={20} />
+              <div className="h-8 w-8 sm:h-10 sm:w-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                <GraduationCap size={18} className="sm:size-[20px]" />
               </div>
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+              <Badge variant="outline" className="hidden sm:inline-flex bg-green-50 text-green-700 border-green-200">
                 {roleLabels.student}
               </Badge>
             </div>
-            <div className="mt-4">
-              <div className="text-2xl font-bold">
+            <div className="mt-2 sm:mt-4">
+              <div className="text-xl sm:text-2xl font-bold">
                 {users.filter(u => u.role === 'student').length}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Tài khoản sinh viên</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Sinh viên</p>
             </div>
           </CardContent>
         </Card>
 
         <Card className="shadow-sm">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between space-y-0">
-              <div className="h-10 w-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">
-                <Building2 size={20} />
+              <div className="h-8 w-8 sm:h-10 sm:w-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">
+                <Building2 size={18} className="sm:size-[20px]" />
               </div>
-              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+              <Badge variant="outline" className="hidden sm:inline-flex bg-purple-50 text-purple-700 border-purple-200">
                 {roleLabels.employer}
               </Badge>
             </div>
-            <div className="mt-4">
-              <div className="text-2xl font-bold">
+            <div className="mt-2 sm:mt-4">
+              <div className="text-xl sm:text-2xl font-bold">
                 {users.filter(u => u.role === 'employer').length}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Tài khoản nhà tuyển dụng</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Nhà tuyển dụng</p>
             </div>
           </CardContent>
         </Card>
 
         <Card className="shadow-sm">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between space-y-0">
-              <div className="h-10 w-10 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">
-                <ShieldCheck size={20} />
+              <div className="h-8 w-8 sm:h-10 sm:w-10 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">
+                <ShieldCheck size={18} className="sm:size-[20px]" />
               </div>
-              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+              <Badge variant="outline" className="hidden sm:inline-flex bg-red-50 text-red-700 border-red-200">
                 {roleLabels.admin}
               </Badge>
             </div>
-            <div className="mt-4">
-              <div className="text-2xl font-bold">
+            <div className="mt-2 sm:mt-4">
+              <div className="text-xl sm:text-2xl font-bold">
                 {users.filter(u => u.role === 'admin').length}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Quản trị viên</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Quản trị viên</p>
             </div>
           </CardContent>
         </Card>
@@ -293,9 +293,10 @@ export default function UsersManagementPage() {
             </select>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
+        <CardContent className="p-0 sm:p-6">
+          <div className="overflow-x-auto px-1 sm:px-0">
+            {/* Desktop Table View */}
+            <table className="w-full hidden md:table">
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-medium">Người dùng</th>
@@ -319,16 +320,16 @@ export default function UsersManagementPage() {
                     <tr key={u._id} className="border-b last:border-0 hover:bg-muted/50">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium overflow-hidden">
+                          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium overflow-hidden shrink-0">
                             {u.avatar ? (
                               <img src={u.avatar} alt={u.name} className="w-full h-full object-cover" />
                             ) : (
                               (u.name?.charAt(0) || "U").toUpperCase()
                             )}
                           </div>
-                          <div>
-                            <p className="font-medium">{u.name || "Chưa có tên"}</p>
-                            <p className="text-sm text-muted-foreground">{u.email}</p>
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{u.name || "Chưa có tên"}</p>
+                            <p className="text-sm text-muted-foreground truncate">{u.email}</p>
                           </div>
                         </div>
                       </td>
@@ -388,6 +389,84 @@ export default function UsersManagementPage() {
                   )))}
               </tbody>
             </table>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden divide-y divide-gray-50 px-1">
+              {loading ? (
+                <div className="py-12 text-center text-gray-500">Đang tải dữ liệu...</div>
+              ) : filteredUsers.length === 0 ? (
+                <div className="py-12 text-center text-gray-500">Không tìm thấy người dùng nào</div>
+              ) : (
+                filteredUsers.map((u) => (
+                  <div key={u._id} className="p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-sm shrink-0 overflow-hidden">
+                          {u.avatar ? (
+                            <img src={u.avatar} alt={u.name} className="w-full h-full object-cover" />
+                          ) : (
+                            (u.name?.charAt(0) || "U").toUpperCase()
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-bold text-gray-900 truncate leading-tight">{u.name || "Chưa có tên"}</h3>
+                          <p className="text-xs text-gray-500 truncate">{u.email}</p>
+                        </div>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" size="icon" className="h-8 w-8 rounded-full">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => {
+                            setEditingUser(u)
+                            setEditDialogOpen(true)
+                          }}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Chỉnh sửa
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {
+                            setEditingUser(u)
+                            setSelectedRole(u.role)
+                            setRoleDialogOpen(true)
+                          }}>
+                            <Shield className="h-4 w-4 mr-2" />
+                            Đổi vai trò
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => {
+                              setUserToDelete(u._id)
+                              setDeleteDialogOpen(true)
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Xóa
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <Badge className={`${roleColors[u.role as keyof typeof roleColors] || "bg-gray-100 text-gray-800"} px-2.5 py-0.5 text-[10px]`}>
+                        {roleLabels[u.role as keyof typeof roleLabels] || u.role}
+                      </Badge>
+                      {u.emailVerified ? (
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-100 text-[10px] px-2.5">Đã xác minh</Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-100 text-[10px] px-2.5">Chưa xác minh</Badge>
+                      )}
+                      <span className="text-[10px] text-gray-400 font-medium ml-auto self-center">
+                        {new Date(u.createdAt).toLocaleDateString("vi-VN")}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -432,7 +511,7 @@ export default function UsersManagementPage() {
 
       {/* Role Change Dialog */}
       <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-md w-[95vw] p-4 sm:p-6 rounded-2xl sm:rounded-xl">
           <DialogHeader>
             <DialogTitle>Thay đổi vai trò người dùng</DialogTitle>
             <DialogDescription>
@@ -441,7 +520,7 @@ export default function UsersManagementPage() {
           </DialogHeader>
           <div className="py-4">
             <Select value={selectedRole} onValueChange={setSelectedRole}>
-              <SelectTrigger>
+              <SelectTrigger className="h-11 rounded-xl">
                 <SelectValue placeholder="Chọn vai trò" />
               </SelectTrigger>
               <SelectContent>
@@ -451,9 +530,9 @@ export default function UsersManagementPage() {
               </SelectContent>
             </Select>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setRoleDialogOpen(false)}>Hủy</Button>
-            <Button onClick={handleRoleChange}>Cập nhật vai trò</Button>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setRoleDialogOpen(false)} className="rounded-xl h-11">Hủy</Button>
+            <Button onClick={handleRoleChange} className="rounded-xl h-11 bg-primary">Cập nhật vai trò</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

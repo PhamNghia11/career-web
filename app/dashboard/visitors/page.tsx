@@ -348,71 +348,110 @@ export default function VisitorsPage() {
                         </div>
                     ) : (
                         <>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Thời gian</TableHead>
-                                        <TableHead>Trang</TableHead>
-                                        <TableHead>Thiết bị</TableHead>
-                                        <TableHead>Người dùng</TableHead>
-                                        <TableHead>IP</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {visitors.map((visitor) => (
-                                        <TableRow key={visitor._id}>
-                                            <TableCell className="text-sm">
-                                                {formatTime(visitor.visitedAt)}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant="outline" className="font-mono text-xs">
-                                                    {visitor.page}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    {getDeviceIcon(visitor.device)}
-                                                    <span className="text-sm text-muted-foreground">
-                                                        {visitor.device || "Unknown"}
-                                                    </span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                {visitor.userName ? (
-                                                    <Badge variant="default" className="bg-green-100 text-green-800">
-                                                        {visitor.userName}
-                                                    </Badge>
-                                                ) : (
-                                                    <span className="text-muted-foreground text-sm">Khách</span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="font-mono text-xs text-muted-foreground">
-                                                {visitor.ip}
-                                            </TableCell>
+                            <div className="hidden md:block">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Thời gian</TableHead>
+                                            <TableHead>Trang</TableHead>
+                                            <TableHead>Thiết bị</TableHead>
+                                            <TableHead>Người dùng</TableHead>
+                                            <TableHead>IP</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {visitors.map((visitor) => (
+                                            <TableRow key={visitor._id}>
+                                                <TableCell className="text-sm">
+                                                    {formatTime(visitor.visitedAt)}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant="outline" className="font-mono text-xs">
+                                                        {visitor.page}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        {getDeviceIcon(visitor.device)}
+                                                        <span className="text-sm text-muted-foreground">
+                                                            {visitor.device || "Unknown"}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {visitor.userName ? (
+                                                        <Badge variant="default" className="bg-green-100 text-green-800">
+                                                            {visitor.userName}
+                                                        </Badge>
+                                                    ) : (
+                                                        <span className="text-muted-foreground text-sm">Khách</span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="font-mono text-xs text-muted-foreground">
+                                                    {visitor.ip}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+
+                            {/* Mobile Card View */}
+                            <div className="md:hidden space-y-4">
+                                {visitors.map((visitor) => (
+                                    <div key={visitor._id} className="p-4 rounded-xl border border-gray-100 bg-gray-50/50 space-y-3">
+                                        <div className="flex justify-between items-start">
+                                            <span className="text-xs text-gray-400 font-medium">
+                                                {formatTime(visitor.visitedAt)}
+                                            </span>
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                                {getDeviceIcon(visitor.device)}
+                                                <span>{visitor.device || "Unknown"}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center justify-between">
+                                            <Badge variant="outline" className="font-mono text-[10px] truncate max-w-[150px]">
+                                                {visitor.page}
+                                            </Badge>
+                                            {visitor.userName ? (
+                                                <Badge variant="default" className="bg-green-100 text-green-800 text-[10px]">
+                                                    {visitor.userName}
+                                                </Badge>
+                                            ) : (
+                                                <span className="text-muted-foreground text-xs font-medium">Khách</span>
+                                            )}
+                                        </div>
+
+                                        <div className="text-[10px] font-mono text-gray-400 flex items-center gap-1">
+                                            <Globe className="h-3 w-3" />
+                                            {visitor.ip}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
 
                             {/* Pagination */}
                             {totalPages > 1 && (
-                                <div className="flex justify-center gap-2 mt-4">
+                                <div className="flex justify-center gap-2 mt-6">
                                     <Button
                                         variant="outline"
                                         size="sm"
                                         onClick={() => setPage(p => Math.max(1, p - 1))}
                                         disabled={page === 1}
+                                        className="h-9"
                                     >
                                         Trước
                                     </Button>
-                                    <span className="px-3 py-2 text-sm">
-                                        Trang {page} / {totalPages}
+                                    <span className="px-3 py-2 text-sm font-medium">
+                                        {page} / {totalPages}
                                     </span>
                                     <Button
                                         variant="outline"
                                         size="sm"
                                         onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                         disabled={page === totalPages}
+                                        className="h-9"
                                     >
                                         Sau
                                     </Button>

@@ -199,7 +199,7 @@ export default function PartnerManagementPage() {
             </div>
 
             <Card>
-                <CardHeader>
+                <CardHeader className="p-4 sm:p-6 pb-2">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <input
@@ -207,13 +207,13 @@ export default function PartnerManagementPage() {
                             placeholder="Tìm kiếm doanh nghiệp..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="w-full pl-10 pr-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                         />
                     </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0 sm:p-6">
                     <div className="overflow-x-auto">
-                        <table className="w-full">
+                        <table className="w-full hidden md:table">
                             <thead>
                                 <tr className="border-b">
                                     <th className="text-left py-3 px-4 font-medium">Doanh nghiệp</th>
@@ -283,6 +283,65 @@ export default function PartnerManagementPage() {
                                     )))}
                             </tbody>
                         </table>
+
+                        {/* Mobile Card Layout */}
+                        <div className="md:hidden divide-y divide-gray-50">
+                            {loading ? (
+                                <div className="text-center py-12 text-gray-500 flex flex-col items-center gap-2">
+                                    <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+                                    <span>Đang tải...</span>
+                                </div>
+                            ) : filteredPartners.length === 0 ? (
+                                <div className="text-center py-12 text-gray-500">Không tìm thấy đối tác nào</div>
+                            ) : (
+                                filteredPartners.map((p) => (
+                                    <div key={p._id} className="p-4 space-y-4">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-xl border bg-white flex items-center justify-center p-1.5 overflow-hidden shrink-0 shadow-sm">
+                                                    {p.logo ? (
+                                                        <img src={p.logo} alt={p.name} className="w-full h-full object-contain" />
+                                                    ) : (
+                                                        <Building className="h-6 w-6 text-gray-400" />
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <h3 className="font-bold text-gray-900 truncate leading-tight">{p.name}</h3>
+                                                    <p className="text-xs text-blue-600 font-medium truncate">{p.industry}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 bg-blue-50" onClick={() => {
+                                                    setEditingPartner(p)
+                                                    setEditDialogOpen(true)
+                                                }}>
+                                                    <Edit className="h-4 w-4" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 bg-red-50" onClick={() => {
+                                                    setPartnerToDelete(p._id)
+                                                    setDeleteDialogOpen(true)
+                                                }}>
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2 text-[11px] text-gray-500">
+                                            <div className="flex items-center gap-1.5 truncate bg-gray-50 rounded-lg py-1.5 px-2.5">
+                                                <MapPin className="h-3 w-3 shrink-0" />
+                                                <span className="truncate">{p.location || "N/A"}</span>
+                                            </div>
+                                            {p.website && (
+                                                <a href={p.website} target="_blank" className="flex items-center gap-1.5 truncate bg-blue-50 text-blue-600 rounded-lg py-1.5 px-2.5 hover:bg-blue-100 transition-colors">
+                                                    <Globe className="h-3 w-3 shrink-0" />
+                                                    <span className="truncate">Website</span>
+                                                </a>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </CardContent>
             </Card>
@@ -305,12 +364,12 @@ export default function PartnerManagementPage() {
 
             {/* Edit/Add Partner Dialog */}
             <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-2xl w-[95vw] sm:w-full max-h-[92vh] overflow-y-auto p-4 sm:p-6 rounded-2xl sm:rounded-xl">
                     <DialogHeader>
                         <DialogTitle>{editingPartner?._id ? "Chỉnh sửa đối tác" : "Thêm đối tác mới"}</DialogTitle>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label>Tên doanh nghiệp <span className="text-destructive">*</span></Label>
                                 <Input
@@ -329,7 +388,7 @@ export default function PartnerManagementPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label>Logo URL</Label>
                                 <Input
@@ -348,7 +407,7 @@ export default function PartnerManagementPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label>Quy mô</Label>
                                 <Input

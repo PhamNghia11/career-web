@@ -39,15 +39,15 @@ export function JobPreviewDialog({ job, open, onOpenChange }: JobPreviewDialogPr
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle className="text-xl">Chi tiết tin tuyển dụng</DialogTitle>
+            <DialogContent className="max-w-3xl w-[95vw] sm:w-full max-h-[92vh] overflow-y-auto p-0 gap-0 border-none sm:border shadow-2xl rounded-2xl sm:rounded-xl">
+                <DialogHeader className="p-4 sm:p-6 border-b sticky top-0 bg-white z-10 flex flex-row items-center justify-between space-y-0">
+                    <DialogTitle className="text-lg sm:text-xl font-bold text-gray-900">Chi tiết tin tuyển dụng</DialogTitle>
                 </DialogHeader>
 
-                <div className="space-y-6">
+                <div className="p-4 sm:p-8 space-y-6">
                     {/* Header Section */}
-                    <div className="flex items-start gap-4">
-                        <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border bg-white">
+                    <div className="flex flex-col sm:flex-row items-start gap-4">
+                        <div className="relative h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0 overflow-hidden rounded-lg border bg-white shadow-sm">
                             <Image
                                 src={job.logo || "/placeholder.svg?height=100&width=100"}
                                 alt={job.company}
@@ -55,62 +55,61 @@ export function JobPreviewDialog({ job, open, onOpenChange }: JobPreviewDialogPr
                                 className="object-contain p-1"
                             />
                         </div>
-                        <div className="flex-1">
-                            <h2 className="text-2xl font-bold text-gray-900">{job.title}</h2>
-                            <div className="flex items-center gap-2 mt-1">
-                                <Building2 className="h-4 w-4 text-gray-500" />
-                                <span className="font-medium text-gray-700">{job.company}</span>
+                        <div className="flex-1 min-w-0">
+                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
+                                {job.title}
+                            </h2>
+                            <div className="flex items-center gap-2 mt-2">
+                                <Building2 className="h-4 w-4 text-gray-400 shrink-0" />
+                                <span className="font-semibold text-gray-700 text-sm sm:text-base truncate">{job.company}</span>
                             </div>
-                            <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-                                <Calendar className="h-4 w-4" />
+                            <div className="flex items-center gap-2 mt-1 text-xs sm:text-sm text-gray-500">
+                                <Calendar className="h-3.5 w-3.5 shrink-0" />
                                 <span>Đăng ngày: {new Date(job.postedAt).toLocaleDateString("vi-VN")}</span>
                             </div>
-                        </div>
-                        <div>
-                            {/* Status Badge can go here if needed */}
                         </div>
                     </div>
 
                     {/* Quick Info Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-white rounded-full border shadow-sm">
-                                <DollarSign className="h-5 w-5 text-green-600" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-xl border border-gray-100/50 shadow-inner">
+                        <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                            <div className="p-1.5 bg-green-50 rounded-full shrink-0">
+                                <DollarSign className="h-4 w-4 text-green-600" />
                             </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Mức lương</p>
-                                <p className="font-semibold">{job.salary}</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-white rounded-full border shadow-sm">
-                                <MapPin className="h-5 w-5 text-blue-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Địa điểm</p>
-                                <p className="font-semibold">{job.location || "Chưa cập nhật"}</p>
+                            <div className="min-w-0">
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Mức lương</p>
+                                <p className="font-bold text-sm text-gray-900 truncate">{job.salary}</p>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-white rounded-full border shadow-sm">
-                                <Clock className="h-5 w-5 text-orange-600" />
+                        <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                            <div className="p-1.5 bg-blue-50 rounded-full shrink-0">
+                                <MapPin className="h-4 w-4 text-blue-600" />
                             </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Loại hình</p>
-                                <p className="font-semibold capitalize">{job.type}</p>
+                            <div className="min-w-0">
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Địa điểm</p>
+                                <p className="font-bold text-sm text-gray-900 line-clamp-2 leading-tight">{job.location || "Chưa cập nhật"}</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                            <div className="p-1.5 bg-orange-50 rounded-full shrink-0">
+                                <Clock className="h-4 w-4 text-orange-600" />
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Loại hình</p>
+                                <p className="font-bold text-sm text-gray-900 capitalize">{job.type}</p>
                             </div>
                         </div>
 
                         {job.deadline && (
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-white rounded-full border shadow-sm">
-                                    <Calendar className="h-5 w-5 text-red-600" />
+                            <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                <div className="p-1.5 bg-red-50 rounded-full shrink-0">
+                                    <Calendar className="h-4 w-4 text-red-600" />
                                 </div>
-                                <div>
-                                    <p className="text-sm text-gray-500">Hạn nộp</p>
-                                    <p className="font-semibold">{new Date(job.deadline).toLocaleDateString("vi-VN")}</p>
+                                <div className="min-w-0">
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Hạn nộp</p>
+                                    <p className="font-bold text-sm text-gray-900">{new Date(job.deadline).toLocaleDateString("vi-VN")}</p>
                                 </div>
                             </div>
                         )}
@@ -161,10 +160,10 @@ export function JobPreviewDialog({ job, open, onOpenChange }: JobPreviewDialogPr
                                     <a
                                         href={job.documentUrl}
                                         download={job.documentName || "tai-lieu"}
-                                        className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-colors shadow-sm"
+                                        className="flex items-center justify-center gap-2 px-4 py-2 bg-white border rounded-lg text-sm font-bold text-blue-600 hover:bg-blue-50 transition-colors shadow-sm min-w-[120px]"
                                     >
                                         <Download className="h-4 w-4" />
-                                        Tải xuống
+                                        Tải ngay
                                     </a>
                                 </div>
                             </div>

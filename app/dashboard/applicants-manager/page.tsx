@@ -253,8 +253,9 @@ export default function ManageApplicationsPage() {
                                 <p className="text-gray-500">Chưa có ứng viên nào nộp hồ sơ vào các vị trí của bạn.</p>
                             </div>
                         ) : (
-                            <div className="overflow-x-auto">
-                                <Table>
+                            <div className="overflow-x-auto -mx-1 sm:mx-0">
+                                {/* Desktop Table View */}
+                                <Table className="hidden md:table">
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead>Vị trí</TableHead>
@@ -352,7 +353,7 @@ export default function ManageApplicationsPage() {
                                                     </Select>
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    <Button variant="ghost" size="icon">
+                                                    <Button variant="ghost" size="icon" onClick={() => handleViewCV(app)}>
                                                         <Eye className="h-4 w-4 text-gray-500" />
                                                     </Button>
                                                 </TableCell>
@@ -360,6 +361,71 @@ export default function ManageApplicationsPage() {
                                         ))}
                                     </TableBody>
                                 </Table>
+
+                                {/* Mobile Card View */}
+                                <div className="grid grid-cols-1 gap-4 md:hidden">
+                                    {applications.map((app) => (
+                                        <div key={app._id} className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm space-y-4">
+                                            <div className="flex justify-between items-start">
+                                                <div className="min-w-0 flex-1">
+                                                    <h3 className="font-bold text-blue-900 truncate pr-2">{app.jobTitle}</h3>
+                                                    <p className="text-xs text-gray-500 truncate">{app.companyName}</p>
+                                                </div>
+                                                {getStatusBadge(app.status)}
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-3 text-sm py-3 border-y border-gray-50">
+                                                <div className="space-y-1">
+                                                    <p className="text-[10px] text-gray-400 font-bold uppercase">Ứng viên</p>
+                                                    <p className="font-semibold text-gray-900 truncate">{app.fullname}</p>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <p className="text-[10px] text-gray-400 font-bold uppercase">Ngày nộp</p>
+                                                    <p className="font-medium text-gray-700">{new Date(app.createdAt).toLocaleDateString("vi-VN")}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                    <Mail className="h-3.5 w-3.5" />
+                                                    <span className="truncate">{app.email}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                    <Phone className="h-3.5 w-3.5" />
+                                                    <span>{app.phone}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex gap-2 pt-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="flex-1 font-bold text-blue-600 border-blue-100 bg-blue-50/50"
+                                                    onClick={() => handleViewCV(app)}
+                                                >
+                                                    <FileText className="h-4 w-4 mr-2" />
+                                                    Xem CV/Chi tiết
+                                                </Button>
+                                                <Select
+                                                    value={app.status}
+                                                    onValueChange={(value) => handleStatusChange(app._id, value)}
+                                                    disabled={user?.role === 'employer' && app.employerId !== user?.id}
+                                                >
+                                                    <SelectTrigger className="flex-1 h-9">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="new">Mới</SelectItem>
+                                                        <SelectItem value="reviewed">Đã xem</SelectItem>
+                                                        <SelectItem value="interviewed">Mời PV</SelectItem>
+                                                        <SelectItem value="hired">Đã tuyển</SelectItem>
+                                                        <SelectItem value="rejected">Từ chối</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </CardContent>
@@ -367,13 +433,16 @@ export default function ManageApplicationsPage() {
             </main>
 
             <Dialog open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
-                <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
+                <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[90vh] flex flex-col p-4 sm:p-6 rounded-2xl sm:rounded-xl">
                     <DialogHeader>
-                        <DialogTitle className="flex items-center justify-between">
-                            <span>CV: {selectedApp?.fullname} - {selectedApp?.jobTitle}</span>
-                            <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)}>
-                                Tải lại
-                            </Button>
+                        <DialogTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <span className="text-base sm:text-lg truncate">CV: {selectedApp?.fullname}</span>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <Badge variant="outline" className="hidden sm:inline-flex">{selectedApp?.jobTitle}</Badge>
+                                <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)} className="h-8">
+                                    Tải lại
+                                </Button>
+                            </div>
                         </DialogTitle>
                     </DialogHeader>
                     <div className="flex-1 bg-gray-100 rounded-md overflow-hidden relative">
