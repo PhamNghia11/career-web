@@ -135,10 +135,10 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Cài đặt</h1>
-        <p className="text-muted-foreground mt-1">Quản lý cài đặt tài khoản và hệ thống</p>
+    <div className="space-y-8 p-1 sm:p-2 lg:p-4 max-w-5xl">
+      <div className="space-y-1">
+        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 lg:text-5xl">Cài đặt</h1>
+        <p className="text-lg text-muted-foreground font-medium">Quản lý cài đặt tài khoản và hệ thống của bạn</p>
       </div>
 
       <UserProfileForm
@@ -146,70 +146,75 @@ export default function SettingsPage() {
         description="Cập nhật thông tin cá nhân của quản trị viên"
       />
 
-      {/* Security Settings - Moved to top */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5" />
+      {/* Security Settings */}
+      <Card className="border-none shadow-2xl shadow-gray-200/50 bg-white/80 backdrop-blur-xl rounded-3xl overflow-hidden">
+        <CardHeader className="pb-4 border-b border-gray-50">
+          <CardTitle className="flex items-center gap-3 text-2xl font-black text-gray-900 tracking-tight">
+            <div className="p-2 bg-blue-50 rounded-xl text-blue-600">
+              <Lock className="h-6 w-6" />
+            </div>
             Bảo mật
           </CardTitle>
-          <CardDescription>Quản lý mật khẩu và bảo mật tài khoản</CardDescription>
+          <CardDescription className="text-sm font-medium text-gray-500 mt-1 ml-11">Quản lý mật khẩu và bảo mật tài khoản</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Password Change Status */}
+        <CardContent className="space-y-6 pt-6 px-8">
           {passwordStatus !== "idle" && (
             <div
-              className={`p-4 rounded-lg flex items-center gap-3 ${passwordStatus === "loading"
-                ? "bg-blue-50 text-blue-700"
+              className={`p-5 rounded-2xl flex items-center gap-4 border transition-all duration-300 ${passwordStatus === "loading"
+                ? "bg-blue-50/50 text-blue-700 border-blue-100"
                 : passwordStatus === "success"
-                  ? "bg-green-50 text-green-700 border border-green-200"
-                  : "bg-red-50 text-red-700 border border-red-200"
+                  ? "bg-green-50 text-green-700 border-green-200"
+                  : "bg-red-50 text-red-700 border-red-200"
                 }`}
             >
-              {passwordStatus === "loading" && <RefreshCw className="h-5 w-5 animate-spin" />}
-              {/* Icon removed per user request */}
-              {passwordStatus === "error" && <AlertCircle className="h-5 w-5" />}
-              <span className="font-medium">{passwordStatus === "loading" ? "Đang xử lý..." : passwordMessage}</span>
+              <div className={`p-2 rounded-xl bg-white shadow-sm`}>
+                {passwordStatus === "loading" && <RefreshCw className="h-5 w-5 animate-spin" />}
+                {passwordStatus === "error" && <AlertCircle className="h-5 w-5" />}
+                {passwordStatus === "success" && <Check className="h-5 w-5" />}
+              </div>
+              <span className="font-bold">{passwordStatus === "loading" ? "Đang xử lý..." : passwordMessage}</span>
             </div>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="current-password">Mật khẩu hiện tại</Label>
-            <input
-              id="current-password"
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Nhập mật khẩu hiện tại"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="new-password">Mật khẩu mới</Label>
-            <input
-              id="new-password"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirm-password">Xác nhận mật khẩu mới</Label>
-            <input
-              id="confirm-password"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Nhập lại mật khẩu mới"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="current-password" title="Mật khẩu hiện tại" className="text-xs font-black text-gray-700 uppercase tracking-wider ml-1">Mật khẩu hiện tại</Label>
+              <input
+                id="current-password"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Nhập mật khẩu hiện tại"
+                className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:bg-white focus:border-primary/30 transition-all"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-password" title="Mật khẩu mới" className="text-xs font-black text-gray-700 uppercase tracking-wider ml-1">Mật khẩu mới</Label>
+              <input
+                id="new-password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Ít nhất 6 ký tự"
+                className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:bg-white focus:border-primary/30 transition-all"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="confirm-password" title="Xác nhận mật khẩu" className="text-xs font-black text-gray-700 uppercase tracking-wider ml-1">Xác nhận mật khẩu</Label>
+              <input
+                id="confirm-password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Nhập lại mật khẩu mới"
+                className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl font-bold text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:bg-white focus:border-primary/30 transition-all"
+              />
+            </div>
           </div>
           <Button
             onClick={handleChangePassword}
             disabled={passwordStatus === "loading"}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto h-12 px-8 rounded-2xl font-bold shadow-lg shadow-primary/20 transition-all"
           >
             {passwordStatus === "loading" ? (
               <>
@@ -217,218 +222,181 @@ export default function SettingsPage() {
                 Đang xử lý...
               </>
             ) : (
-              "Đổi mật khẩu"
+              "Lưu thay đổi mật khẩu"
             )}
           </Button>
         </CardContent>
       </Card>
 
       {/* Notification Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Thông báo</CardTitle>
-          <CardDescription>Quản lý cách bạn nhận thông báo</CardDescription>
+      <Card className="border-none shadow-2xl shadow-gray-200/50 bg-white/80 backdrop-blur-xl rounded-3xl overflow-hidden">
+        <CardHeader className="pb-4 border-b border-gray-50">
+          <CardTitle className="text-2xl font-black text-gray-900 tracking-tight ml-1">Thông báo</CardTitle>
+          <CardDescription className="text-sm font-medium text-gray-500 mt-1 ml-1">Tùy chỉnh cách thức nhận thông báo hệ thống</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Thông báo email</p>
-              <p className="text-sm text-muted-foreground">Nhận thông báo qua email</p>
+        <CardContent className="divide-y divide-gray-50 px-8">
+          {[
+            {
+              key: 'email',
+              label: 'Thông báo Email',
+              desc: 'Gửi cập nhật quan trọng qua hòm thư',
+              checked: user?.notificationSettings?.email ?? true
+            },
+            {
+              key: 'push',
+              label: 'Thông báo Push',
+              desc: 'Hiển thị trên trình duyệt ngay lập tức',
+              checked: user?.notificationSettings?.push ?? false
+            },
+            {
+              key: 'newJobs',
+              label: 'Việc làm mới',
+              desc: 'Cập nhật khi có công việc chuyển môn phù hợp',
+              checked: user?.notificationSettings?.newJobs ?? true
+            }
+          ].map((item, id) => (
+            <div key={id} className="flex items-center justify-between py-6 group">
+              <div className="space-y-1">
+                <p className="font-bold text-gray-800 group-hover:text-primary transition-colors">{item.label}</p>
+                <p className="text-sm font-medium text-gray-400">{item.desc}</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={item.checked}
+                  onChange={(e) => updateProfile({
+                    notificationSettings: {
+                      ...(user?.notificationSettings || { email: true, push: false, newJobs: true }),
+                      [item.key]: e.target.checked
+                    }
+                  })}
+                />
+                <div className="w-12 h-6.5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary shadow-inner"></div>
+              </label>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={user?.notificationSettings?.email ?? true}
-                onChange={(e) => updateProfile({
-                  notificationSettings: {
-                    ...(user?.notificationSettings || { email: true, push: false, newJobs: true }),
-                    email: e.target.checked
-                  }
-                })}
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Thông báo push</p>
-              <p className="text-sm text-muted-foreground">Nhận thông báo trên trình duyệt</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={user?.notificationSettings?.push ?? false}
-                onChange={(e) => updateProfile({
-                  notificationSettings: {
-                    ...(user?.notificationSettings || { email: true, push: false, newJobs: true }),
-                    push: e.target.checked
-                  }
-                })}
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Thông báo việc làm mới</p>
-              <p className="text-sm text-muted-foreground">Nhận thông báo khi có việc làm phù hợp</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={user?.notificationSettings?.newJobs ?? true}
-                onChange={(e) => updateProfile({
-                  notificationSettings: {
-                    ...(user?.notificationSettings || { email: true, push: false, newJobs: true }),
-                    newJobs: e.target.checked
-                  }
-                })}
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
+          ))}
         </CardContent>
       </Card>
 
       {/* Data Management - Admin Only */}
-      {
-        user?.role === "admin" && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Quản lý dữ liệu
-              </CardTitle>
-              <CardDescription>Import/Export dữ liệu CSV và quản lý MongoDB</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Import Status */}
-              {importStatus !== "idle" && (
-                <div
-                  className={`p-4 rounded-lg flex items-center gap-3 ${importStatus === "loading"
-                    ? "bg-blue-50 text-blue-700"
-                    : importStatus === "success"
-                      ? "bg-green-50 text-green-700"
-                      : "bg-red-50 text-red-700"
-                    }`}
-                >
+      {user?.role === "admin" && (
+        <Card className="border-none shadow-2xl shadow-gray-200/50 bg-white/80 backdrop-blur-xl rounded-3xl overflow-hidden">
+          <CardHeader className="pb-4 border-b border-gray-50">
+            <CardTitle className="flex items-center gap-3 text-2xl font-black text-gray-900 tracking-tight">
+              <div className="p-2 bg-purple-50 rounded-xl text-purple-600">
+                <Database className="h-6 w-6" />
+              </div>
+              Quản lý dữ liệu
+            </CardTitle>
+            <CardDescription className="text-sm font-medium text-gray-500 mt-1 ml-11">Xuất nhập liệu CSV và giám sát cơ sở dữ liệu</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-8 pt-6 px-8">
+            {importStatus !== "idle" && (
+              <div
+                className={`p-5 rounded-2xl flex items-center gap-4 border ${importStatus === "loading"
+                  ? "bg-blue-50/50 text-blue-700 border-blue-100"
+                  : importStatus === "success"
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : "bg-red-50 text-red-700 border-red-200"
+                  }`}
+              >
+                <div className="p-2 bg-white rounded-xl shadow-sm">
                   {importStatus === "loading" && <RefreshCw className="h-5 w-5 animate-spin" />}
                   {importStatus === "success" && <Check className="h-5 w-5" />}
                   {importStatus === "error" && <AlertCircle className="h-5 w-5" />}
-                  <span>{importStatus === "loading" ? "Đang xử lý..." : importMessage}</span>
                 </div>
-              )}
+                <span className="font-bold">{importStatus === "loading" ? "Đang xử lý..." : importMessage}</span>
+              </div>
+            )}
 
-              {/* Import Section */}
-              <div>
-                <Label className="text-base font-medium">Import dữ liệu CSV</Label>
-                <p className="text-sm text-muted-foreground mb-4">Upload file CSV để import dữ liệu vào hệ thống</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="import-jobs" className="text-sm">
-                      Import Việc làm
+            {/* Import Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-4 w-1 bg-primary rounded-full" />
+                <Label className="text-lg font-black text-gray-800">Nhập dữ liệu CSV</Label>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {[
+                  { key: 'jobs', label: 'Việc làm' },
+                  { key: 'reviews', label: 'Đánh giá' },
+                  { key: 'users', label: 'Người dùng' }
+                ].map((input) => (
+                  <div key={input.key} className="space-y-3">
+                    <Label htmlFor={`import-${input.key}`} className="text-xs font-black text-gray-500 uppercase tracking-widest ml-1">
+                      Download {input.label}
                     </Label>
-                    <div className="mt-2">
-                      <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
-                        <Upload className="h-5 w-5 text-muted-foreground" />
-                        <span className="text-sm">Chọn file CSV</span>
-                        <input
-                          id="import-jobs"
-                          type="file"
-                          accept=".csv"
-                          className="hidden"
-                          onChange={(e) => handleFileImport(e, "jobs")}
-                        />
-                      </label>
-                    </div>
+                    <label className="flex flex-col items-center justify-center gap-3 px-4 py-8 border-2 border-dashed border-gray-100 rounded-3xl cursor-pointer hover:bg-gray-50 hover:border-primary/30 transition-all group">
+                      <div className="p-3 bg-gray-50 group-hover:bg-primary/10 rounded-2xl transition-colors">
+                        <Upload className="h-6 w-6 text-gray-400 group-hover:text-primary" />
+                      </div>
+                      <span className="text-xs font-bold text-gray-400 group-hover:text-gray-600">Chọn file .CSV</span>
+                      <input
+                        id={`import-${input.key}`}
+                        type="file"
+                        accept=".csv"
+                        className="hidden"
+                        onChange={(e) => handleFileImport(e, input.key)}
+                      />
+                    </label>
                   </div>
+                ))}
+              </div>
+            </div>
 
-                  <div>
-                    <Label htmlFor="import-reviews" className="text-sm">
-                      Import Đánh giá
-                    </Label>
-                    <div className="mt-2">
-                      <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
-                        <Upload className="h-5 w-5 text-muted-foreground" />
-                        <span className="text-sm">Chon file CSV</span>
-                        <input
-                          id="import-reviews"
-                          type="file"
-                          accept=".csv"
-                          className="hidden"
-                          onChange={(e) => handleFileImport(e, "reviews")}
-                        />
-                      </label>
-                    </div>
-                  </div>
+            {/* Export Section */}
+            <div className="pt-6 border-t border-gray-50">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-4 w-1 bg-primary rounded-full" />
+                <Label className="text-lg font-black text-gray-800">Xuất dữ liệu hệ thống</Label>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { key: 'jobs', label: 'Việc làm' },
+                  { key: 'reviews', label: 'Đánh giá' },
+                  { key: 'users', label: 'Người dùng' }
+                ].map((exp) => (
+                  <Button
+                    key={exp.key}
+                    variant="outline"
+                    onClick={() => handleExport(exp.key)}
+                    className="h-11 px-6 rounded-2xl border-gray-200 font-bold hover:bg-gray-50 hover:border-gray-300 transition-all"
+                  >
+                    <Download className="h-4 w-4 mr-2 text-primary" />
+                    {exp.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
 
-                  <div>
-                    <Label htmlFor="import-users" className="text-sm">
-                      Import Người dùng
-                    </Label>
-                    <div className="mt-2">
-                      <label className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
-                        <Upload className="h-5 w-5 text-muted-foreground" />
-                        <span className="text-sm">Chon file CSV</span>
-                        <input
-                          id="import-users"
-                          type="file"
-                          accept=".csv"
-                          className="hidden"
-                          onChange={(e) => handleFileImport(e, "users")}
-                        />
-                      </label>
-                    </div>
+            {/* MongoDB Info */}
+            <div className="pt-6 border-t border-gray-50">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-4 w-1 bg-primary rounded-full" />
+                <Label className="text-lg font-black text-gray-800">Kết nối MongoDB</Label>
+              </div>
+              <div className="bg-gray-900 shadow-2xl shadow-gray-900/10 p-6 rounded-3xl space-y-3 font-mono text-sm relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500" />
+                <p className="flex items-center gap-3">
+                  <span className="text-gray-500 font-black min-w-[80px]">SERVER</span>
+                  <span className="text-blue-400 font-bold">mongodb://localhost:27017</span>
+                </p>
+                <p className="flex items-center gap-3">
+                  <span className="text-gray-500 font-black min-w-[80px]">DATABASE</span>
+                  <span className="text-purple-400 font-bold">gdu_career</span>
+                </p>
+                <div className="pt-2 flex items-center gap-3">
+                  <span className="text-gray-500 font-black min-w-[80px]">STATUS</span>
+                  <div className="flex items-center gap-2 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+                    <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+                    <span className="text-green-500 text-xs font-black uppercase tracking-widest">Connected</span>
                   </div>
                 </div>
               </div>
-
-              {/* Export Section */}
-              <div className="border-t pt-6">
-                <Label className="text-base font-medium">Export dữ liệu CSV</Label>
-                <p className="text-sm text-muted-foreground mb-4">Tải xuống dữ liệu dưới dạng file CSV</p>
-                <div className="flex flex-wrap gap-3">
-                  <Button variant="outline" onClick={() => handleExport("jobs")}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Export Việc làm
-                  </Button>
-                  <Button variant="outline" onClick={() => handleExport("reviews")}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Export Đánh giá
-                  </Button>
-                  <Button variant="outline" onClick={() => handleExport("users")}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Export Người dùng
-                  </Button>
-                </div>
-              </div>
-
-              {/* MongoDB Info */}
-              <div className="border-t pt-6">
-                <Label className="text-base font-medium">Kết nối MongoDB</Label>
-                <p className="text-sm text-muted-foreground mb-4">Thông tin kết nối cơ sở dữ liệu MongoDB</p>
-                <div className="bg-muted p-4 rounded-lg space-y-2 font-mono text-sm">
-                  <p>
-                    <span className="text-muted-foreground">URI:</span> mongodb://localhost:27017/gdu_career
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">Database:</span> gdu_career
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">Status:</span>{" "}
-                    <span className="text-green-600">Connected</span>
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )
-      }
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

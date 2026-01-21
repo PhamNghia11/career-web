@@ -173,7 +173,7 @@ export default function AdminJobsPage() {
                 </CardHeader>
                 <CardContent className="p-0 sm:p-6">
                     <div className="overflow-x-auto">
-                        <Table className="hidden md:table">
+                        <Table className="hidden lg:table">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[120px]">Ngày đăng</TableHead>
@@ -268,7 +268,7 @@ export default function AdminJobsPage() {
                         </Table>
 
                         {/* Mobile Card Layout */}
-                        <div className="md:hidden grid grid-cols-1 divide-y">
+                        <div className="lg:hidden grid grid-cols-1 divide-y">
                             {jobs.length === 0 ? (
                                 <div className="p-8 text-center text-muted-foreground">Chưa có tin tuyển dụng nào.</div>
                             ) : (

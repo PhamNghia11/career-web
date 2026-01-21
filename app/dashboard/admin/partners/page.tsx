@@ -170,14 +170,14 @@ export default function PartnerManagementPage() {
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Quản lý đối tác</h1>
-                    <p className="text-muted-foreground mt-1">Quản lý các doanh nghiệp liên kết với nhà trường</p>
+                <div className="min-w-0">
+                    <h1 className="text-2xl lg:text-3xl font-bold text-foreground truncate">Quản lý đối tác</h1>
+                    <p className="text-muted-foreground mt-1 text-sm sm:text-base">Quản lý các doanh nghiệp liên kết với nhà trường</p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" onClick={handleMigrate} disabled={isMigrating}>
-                        <RefreshCw className={`h-4 w-4 mr-2 ${isMigrating ? 'animate-spin' : ''}`} />
-                        Khôi phục mặc định
+                <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+                    <Button variant="outline" onClick={handleMigrate} disabled={isMigrating} className="w-full sm:w-auto text-xs sm:text-sm">
+                        <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2 ${isMigrating ? 'animate-spin' : ''}`} />
+                        Mặc định
                     </Button>
                     <Button onClick={() => {
                         setEditingPartner({
@@ -191,9 +191,9 @@ export default function PartnerManagementPage() {
                             benefits: []
                         })
                         setEditDialogOpen(true)
-                    }}>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Thêm đối tác
+                    }} className="w-full sm:w-auto text-xs sm:text-sm">
+                        <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        Thêm mới
                     </Button>
                 </div>
             </div>
@@ -212,80 +212,86 @@ export default function PartnerManagementPage() {
                     </div>
                 </CardHeader>
                 <CardContent className="p-0 sm:p-6">
-                    <div className="overflow-x-auto">
-                        <table className="w-full hidden md:table">
-                            <thead>
-                                <tr className="border-b">
-                                    <th className="text-left py-3 px-4 font-medium">Doanh nghiệp</th>
-                                    <th className="text-left py-3 px-4 font-medium">Ngành nghề</th>
-                                    <th className="text-left py-3 px-4 font-medium">Địa điểm</th>
-                                    <th className="text-right py-3 px-4 font-medium">Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
+                    <div className="rounded-md overflow-hidden">
+                        {/* Desktop Table View */}
+                        <div className="hidden lg:block overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-muted/50 border-b">
                                     <tr>
-                                        <td colSpan={4} className="text-center py-8 text-gray-500">Đang tải dữ liệu...</td>
+                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground text-sm">Doanh nghiệp</th>
+                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground text-sm">Ngành nghề</th>
+                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground text-sm">Địa điểm</th>
+                                        <th className="text-right py-3 px-4 font-medium text-muted-foreground text-sm">Hành động</th>
                                     </tr>
-                                ) : filteredPartners.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={4} className="text-center py-8 text-gray-500">Không tìm thấy đối tác nào</td>
-                                    </tr>
-                                ) : (
-                                    filteredPartners.map((p) => (
-                                        <tr key={p._id} className="border-b last:border-0 hover:bg-muted/50">
-                                            <td className="py-3 px-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded border bg-white flex items-center justify-center p-1 overflow-hidden shrink-0">
-                                                        {p.logo ? (
-                                                            <img src={p.logo} alt={p.name} className="w-full h-full object-contain" />
-                                                        ) : (
-                                                            <Building className="h-5 w-5 text-gray-400" />
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-medium">{p.name}</p>
-                                                        {p.website && (
-                                                            <a href={p.website} target="_blank" className="text-xs text-primary flex items-center gap-1 hover:underline">
-                                                                <Globe className="h-3 w-3" />
-                                                                Website
-                                                            </a>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                <Badge variant="secondary">{p.industry}</Badge>
-                                            </td>
-                                            <td className="py-3 px-4 text-sm text-muted-foreground">
-                                                <div className="flex items-center gap-1 max-w-[200px] truncate">
-                                                    <MapPin className="h-3 w-3 shrink-0" />
-                                                    {p.location}
-                                                </div>
-                                            </td>
-                                            <td className="py-3 px-4 text-right">
-                                                <div className="flex items-center justify-end gap-1">
-                                                    <Button variant="ghost" size="icon" onClick={() => {
-                                                        setEditingPartner(p)
-                                                        setEditDialogOpen(true)
-                                                    }}>
-                                                        <Edit className="h-4 w-4 text-blue-600" />
-                                                    </Button>
-                                                    <Button variant="ghost" size="icon" onClick={() => {
-                                                        setPartnerToDelete(p._id)
-                                                        setDeleteDialogOpen(true)
-                                                    }}>
-                                                        <Trash2 className="h-4 w-4 text-destructive" />
-                                                    </Button>
-                                                </div>
+                                </thead>
+                                <tbody>
+                                    {loading ? (
+                                        <tr>
+                                            <td colSpan={4} className="text-center py-12 text-gray-500">
+                                                <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2" />
+                                                Đang tải dữ liệu...
                                             </td>
                                         </tr>
-                                    )))}
-                            </tbody>
-                        </table>
+                                    ) : filteredPartners.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={4} className="text-center py-12 text-gray-500">Không tìm thấy đối tác nào</td>
+                                        </tr>
+                                    ) : (
+                                        filteredPartners.map((p) => (
+                                            <tr key={p._id} className="border-b last:border-0 hover:bg-muted/50 transition-colors">
+                                                <td className="py-4 px-4 text-sm">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-lg border bg-white flex items-center justify-center p-1 overflow-hidden shrink-0 shadow-sm">
+                                                            {p.logo ? (
+                                                                <img src={p.logo} alt={p.name} className="w-full h-full object-contain" />
+                                                            ) : (
+                                                                <Building className="h-5 w-5 text-gray-400" />
+                                                            )}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className="font-bold text-gray-900 truncate">{p.name}</p>
+                                                            {p.website && (
+                                                                <a href={p.website} target="_blank" className="text-xs text-primary flex items-center gap-1 hover:underline">
+                                                                    <Globe className="h-3 w-3" />
+                                                                    Website
+                                                                </a>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="py-4 px-4">
+                                                    <Badge variant="secondary" className="font-medium">{p.industry}</Badge>
+                                                </td>
+                                                <td className="py-4 px-4 text-sm text-gray-500">
+                                                    <div className="flex items-center gap-1.5 max-w-[200px] truncate">
+                                                        <MapPin className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                                                        <span className="truncate">{p.location}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="py-4 px-4 text-right">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <Button variant="ghost" size="icon" className="text-blue-600 hover:bg-blue-50" onClick={() => {
+                                                            setEditingPartner(p)
+                                                            setEditDialogOpen(true)
+                                                        }}>
+                                                            <Edit className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/5" onClick={() => {
+                                                            setPartnerToDelete(p._id)
+                                                            setDeleteDialogOpen(true)
+                                                        }}>
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )))}
+                                </tbody>
+                            </table>
+                        </div>
 
-                        {/* Mobile Card Layout */}
-                        <div className="md:hidden divide-y divide-gray-50">
+                        {/* Mobile & Tablet Card Layout */}
+                        <div className="lg:hidden divide-y divide-gray-100">
                             {loading ? (
                                 <div className="text-center py-12 text-gray-500 flex flex-col items-center gap-2">
                                     <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
@@ -297,7 +303,7 @@ export default function PartnerManagementPage() {
                                 filteredPartners.map((p) => (
                                     <div key={p._id} className="p-4 space-y-4">
                                         <div className="flex items-start justify-between">
-                                            <div className="flex items-center gap-3">
+                                            <div className="flex items-center gap-3 min-w-0">
                                                 <div className="w-12 h-12 rounded-xl border bg-white flex items-center justify-center p-1.5 overflow-hidden shrink-0 shadow-sm">
                                                     {p.logo ? (
                                                         <img src={p.logo} alt={p.name} className="w-full h-full object-contain" />
@@ -307,34 +313,34 @@ export default function PartnerManagementPage() {
                                                 </div>
                                                 <div className="min-w-0">
                                                     <h3 className="font-bold text-gray-900 truncate leading-tight">{p.name}</h3>
-                                                    <p className="text-xs text-blue-600 font-medium truncate">{p.industry}</p>
+                                                    <p className="text-xs text-blue-600 font-semibold truncate">{p.industry}</p>
                                                 </div>
                                             </div>
-                                            <div className="flex gap-1">
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 bg-blue-50" onClick={() => {
+                                            <div className="flex gap-1 shrink-0">
+                                                <Button variant="ghost" size="icon" className="h-9 w-9 text-blue-600 bg-blue-50/50 hover:bg-blue-50" onClick={() => {
                                                     setEditingPartner(p)
                                                     setEditDialogOpen(true)
                                                 }}>
-                                                    <Edit className="h-4 w-4" />
+                                                    <Edit className="h-4.5 w-4.5" />
                                                 </Button>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 bg-red-50" onClick={() => {
+                                                <Button variant="ghost" size="icon" className="h-9 w-9 text-red-600 bg-red-50/50 hover:bg-red-50" onClick={() => {
                                                     setPartnerToDelete(p._id)
                                                     setDeleteDialogOpen(true)
                                                 }}>
-                                                    <Trash2 className="h-4 w-4" />
+                                                    <Trash2 className="h-4.5 w-4.5" />
                                                 </Button>
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-2 text-[11px] text-gray-500">
-                                            <div className="flex items-center gap-1.5 truncate bg-gray-50 rounded-lg py-1.5 px-2.5">
-                                                <MapPin className="h-3 w-3 shrink-0" />
+                                        <div className="grid grid-cols-2 gap-2 text-[11px] text-gray-600">
+                                            <div className="flex items-center gap-1.5 truncate bg-gray-50 rounded-lg py-2 px-3">
+                                                <MapPin className="h-3.5 w-3.5 shrink-0 text-gray-400" />
                                                 <span className="truncate">{p.location || "N/A"}</span>
                                             </div>
                                             {p.website && (
-                                                <a href={p.website} target="_blank" className="flex items-center gap-1.5 truncate bg-blue-50 text-blue-600 rounded-lg py-1.5 px-2.5 hover:bg-blue-100 transition-colors">
-                                                    <Globe className="h-3 w-3 shrink-0" />
-                                                    <span className="truncate">Website</span>
+                                                <a href={p.website} target="_blank" className="flex items-center gap-1.5 truncate bg-blue-50 text-blue-600 rounded-lg py-2 px-3 hover:bg-blue-100 transition-colors">
+                                                    <Globe className="h-3.5 w-3.5 shrink-0" />
+                                                    <span className="truncate font-medium">Website</span>
                                                 </a>
                                             )}
                                         </div>

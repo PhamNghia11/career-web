@@ -164,7 +164,7 @@ export default function AdminReportsPage() {
     }
 
     return (
-        <div className="space-y-8 pb-10">
+        <div className="space-y-6 sm:space-y-8 pb-20">
             {/* Header section with Stats */}
             <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1e3a5f] to-[#2d5a88] p-6 sm:p-8 text-white shadow-xl">
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
@@ -238,16 +238,16 @@ export default function AdminReportsPage() {
                                                     }`}>
                                                     <Flag className="h-5 w-5 sm:h-6 sm:w-6" />
                                                 </div>
-                                                <div className="min-w-0">
-                                                    <div className="flex items-center gap-2 mb-0.5">
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center gap-2 mb-1 sm:mb-0.5">
                                                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hidden sm:inline">Tin bị báo cáo</span>
-                                                        <Badge variant={report.status === 'pending' ? 'destructive' : report.status === 'resolved' ? 'default' : 'secondary'} className="px-1.5 py-0 h-4 sm:h-5 text-[9px] sm:text-[10px] uppercase font-bold tracking-tight">
+                                                        <Badge variant={report.status === 'pending' ? 'destructive' : report.status === 'resolved' ? 'default' : 'secondary'} className="px-1.5 py-0 h-4 sm:h-5 text-[9px] sm:text-[10px] uppercase font-bold tracking-tight shrink-0">
                                                             {report.status === 'pending' ? 'Chờ xử lý' : report.status === 'resolved' ? 'Vi phạm' : 'Hợp lệ'}
                                                         </Badge>
                                                     </div>
-                                                    <Link href={`/jobs/${report.jobId}`} target="_blank" className="text-base sm:text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-1.5 flex-wrap leading-tight">
-                                                        {report.jobTitle}
-                                                        <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
+                                                    <Link href={`/jobs/${report.jobId}`} target="_blank" className="text-sm sm:text-base md:text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-1.5 leading-tight group-hover:underline">
+                                                        <span className="truncate">{report.jobTitle}</span>
+                                                        <ExternalLink className="h-3 w-3 sm:h-4 w-4 shrink-0" />
                                                     </Link>
                                                 </div>
                                             </div>
@@ -383,15 +383,15 @@ export default function AdminReportsPage() {
 
             {/* Resolution Dialog - Redesigned */}
             <Dialog open={resolutionOpen} onOpenChange={setResolutionOpen}>
-                <DialogContent className="sm:max-w-[600px] rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-8 text-white relative">
+                <DialogContent className="max-w-[600px] w-[95vw] sm:rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl rounded-3xl">
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 sm:p-8 text-white relative">
                         <DialogHeader>
-                            <DialogTitle className="text-2xl font-extrabold flex items-center gap-3">
-                                <ShieldAlert className="h-7 w-7 text-blue-200" />
-                                Quyết định xử lý
+                            <DialogTitle className="text-xl sm:text-2xl font-extrabold flex items-center gap-2 sm:gap-3 pr-8">
+                                <ShieldAlert className="h-6 w-6 sm:h-7 sm:w-7 text-blue-200 shrink-0" />
+                                <span className="truncate">Quyết định xử lý</span>
                             </DialogTitle>
-                            <DialogDescription className="text-blue-100/70 text-base">
-                                Xác thực phản ánh và đưa ra quyết định cuối cùng cho tin tuyển dụng này.
+                            <DialogDescription className="text-blue-100/70 text-xs sm:text-base mt-1">
+                                Xác thực phản ánh và đưa ra quyết định xử lý.
                             </DialogDescription>
                         </DialogHeader>
                     </div>

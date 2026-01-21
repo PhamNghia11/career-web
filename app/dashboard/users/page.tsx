@@ -182,11 +182,11 @@ export default function UsersManagementPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Quản lý người dùng</h1>
-          <p className="text-muted-foreground mt-1">Quản lý tài khoản và phân quyền người dùng</p>
+        <div className="min-w-0">
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground truncate">Quản lý người dùng</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">Quản lý tài khoản và phân quyền người dùng</p>
         </div>
-        <Button>
+        <Button className="w-full sm:w-auto">
           <UserPlus className="h-4 w-4 mr-2" />
           Thêm người dùng
         </Button>
@@ -296,7 +296,7 @@ export default function UsersManagementPage() {
         <CardContent className="p-0 sm:p-6">
           <div className="overflow-x-auto px-1 sm:px-0">
             {/* Desktop Table View */}
-            <table className="w-full hidden md:table">
+            <table className="w-full hidden lg:table">
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-3 px-4 font-medium">Người dùng</th>
@@ -391,7 +391,7 @@ export default function UsersManagementPage() {
             </table>
 
             {/* Mobile Card View */}
-            <div className="md:hidden divide-y divide-gray-50 px-1">
+            <div className="lg:hidden divide-y divide-gray-50 px-1">
               {loading ? (
                 <div className="py-12 text-center text-gray-500">Đang tải dữ liệu...</div>
               ) : filteredUsers.length === 0 ? (

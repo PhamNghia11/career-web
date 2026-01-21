@@ -129,16 +129,16 @@ export default function MyJobsPage() {
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl lg:text-3xl font-bold font-display tracking-tight text-foreground">
+                <div className="min-w-0">
+                    <h1 className="text-2xl lg:text-3xl font-bold font-display tracking-tight text-foreground truncate">
                         Quản lý tin đăng
                     </h1>
-                    <p className="text-muted-foreground mt-1">
+                    <p className="text-muted-foreground mt-1 text-sm sm:text-base">
                         Quản lý tất cả các vị trí bạn đã đăng tuyển
                     </p>
                 </div>
-                <Link href="/dashboard/jobs/new">
-                    <Button>
+                <Link href="/dashboard/jobs/new" className="w-full sm:w-auto">
+                    <Button className="w-full sm:w-auto">
                         <Plus className="mr-2 h-4 w-4" /> Đăng tin mới
                     </Button>
                 </Link>
@@ -173,28 +173,28 @@ export default function MyJobsPage() {
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <div className="rounded-md border">
-                        <table className="w-full text-sm">
-                            <thead className="hidden md:table-header-group">
-                                <tr className="border-b bg-muted/50 transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Vị trí tuyển dụng</th>
-                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Trạng thái</th>
-                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-1/4 whitespace-nowrap">Phản hồi</th>
-                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Ứng viên</th>
-                                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Ngày đăng</th>
-                                    <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground whitespace-nowrap">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Đang tải dữ liệu...</td></tr>
-                                ) : filteredJobs.length === 0 ? (
-                                    <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Không tìm thấy tin đăng nào.</td></tr>
-                                ) : (
-                                    filteredJobs.map((job) => (
-                                        <>
-                                            {/* Desktop Row */}
-                                            <tr key={`${job._id}-desktop`} className="hidden md:table-row border-b transition-colors hover:bg-muted/50">
+                    <div className="rounded-md border overflow-hidden">
+                        {/* Desktop Table View */}
+                        <div className="hidden lg:block overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead className="bg-muted/50">
+                                    <tr className="border-b transition-colors hover:bg-muted/50">
+                                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Vị trí tuyển dụng</th>
+                                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Trạng thái</th>
+                                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-1/4 whitespace-nowrap">Phản hồi</th>
+                                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Ứng viên</th>
+                                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Ngày đăng</th>
+                                        <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground whitespace-nowrap">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {loading ? (
+                                        <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Đang tải dữ liệu...</td></tr>
+                                    ) : filteredJobs.length === 0 ? (
+                                        <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Không tìm thấy tin đăng nào.</td></tr>
+                                    ) : (
+                                        filteredJobs.map((job) => (
+                                            <tr key={`${job._id}-desktop`} className="border-b transition-colors hover:bg-muted/50">
                                                 <td className="p-4 align-middle font-medium">
                                                     <div className="font-semibold line-clamp-1">{job.title}</div>
                                                     <div className="text-xs text-muted-foreground">{job.location} • {job.type}</div>
@@ -224,53 +224,62 @@ export default function MyJobsPage() {
                                                     <JobActions job={job} setJobToDelete={setJobToDelete} setDeleteDialogOpen={setDeleteDialogOpen} />
                                                 </td>
                                             </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
 
-                                            {/* Mobile Card Layout */}
-                                            <tr key={`${job._id}-mobile`} className="md:hidden border-b">
-                                                <td colSpan={6} className="p-4">
-                                                    <div className="space-y-4">
-                                                        <div className="flex items-start justify-between gap-4">
-                                                            <div className="flex-1 min-w-0">
-                                                                <h3 className="font-bold text-base text-gray-900 leading-tight mb-1">
-                                                                    {job.title}
-                                                                </h3>
-                                                                <div className="flex flex-wrap gap-2 items-center text-xs text-muted-foreground font-medium">
-                                                                    <span>{job.location}</span>
-                                                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                                                    <span>{job.type}</span>
-                                                                </div>
-                                                            </div>
-                                                            <div className="shrink-0">
-                                                                <JobActions job={job} setJobToDelete={setJobToDelete} setDeleteDialogOpen={setDeleteDialogOpen} />
-                                                            </div>
-                                                        </div>
+                        {/* Mobile & Tablet Card Layout */}
+                        <div className="lg:hidden divide-y">
+                            {loading ? (
+                                <div className="py-12 text-center text-muted-foreground">
+                                    <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2" />
+                                    Đang tải dữ liệu...
+                                </div>
+                            ) : filteredJobs.length === 0 ? (
+                                <div className="py-12 text-center text-muted-foreground">Không tìm thấy tin đăng nào.</div>
+                            ) : (
+                                filteredJobs.map((job) => (
+                                    <div key={`${job._id}-mobile`} className="p-4 space-y-4">
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-bold text-base text-gray-900 leading-tight mb-1">
+                                                    {job.title}
+                                                </h3>
+                                                <div className="flex flex-wrap gap-2 items-center text-xs text-muted-foreground font-medium">
+                                                    <span>{job.location}</span>
+                                                    <span className="w-1 h-1 rounded-full bg-gray-300" />
+                                                    <span>{job.type}</span>
+                                                </div>
+                                            </div>
+                                            <div className="shrink-0">
+                                                <JobActions job={job} setJobToDelete={setJobToDelete} setDeleteDialogOpen={setDeleteDialogOpen} />
+                                            </div>
+                                        </div>
 
-                                                        <div className="flex items-center justify-between gap-2 pt-2">
-                                                            <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : job.status === 'closed' ? 'outline' : 'destructive'} className="text-[10px] px-2 py-0.5">
-                                                                {job.status === 'active' ? 'Hoạt động' : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'closed' ? 'Đã đóng' : 'Từ chối'}
-                                                            </Badge>
-                                                            <div className="flex items-center gap-4 text-xs text-muted-foreground font-medium">
-                                                                <div className="flex items-center gap-1">
-                                                                    <Users className="h-3.5 w-3.5" />
-                                                                    <span>{job.applicants || 0} ứng viên</span>
-                                                                </div>
-                                                                <span>{new Date(job.postedAt).toLocaleDateString('vi-VN')}</span>
-                                                            </div>
-                                                        </div>
+                                        <div className="flex items-center justify-between gap-2 pt-1">
+                                            <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : job.status === 'closed' ? 'outline' : 'destructive'} className="text-[10px] px-2 py-0.5">
+                                                {job.status === 'active' ? 'Hoạt động' : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'closed' ? 'Đã đóng' : 'Từ chối'}
+                                            </Badge>
+                                            <div className="flex items-center gap-4 text-xs text-muted-foreground font-medium">
+                                                <div className="flex items-center gap-1">
+                                                    <Users className="h-3.5 w-3.5" />
+                                                    <span>{job.applicants || 0} ứng viên</span>
+                                                </div>
+                                                <span>{new Date(job.postedAt).toLocaleDateString('vi-VN')}</span>
+                                            </div>
+                                        </div>
 
-                                                        {(job.status === 'rejected' || job.status === 'request_changes') && job.adminFeedback && (
-                                                            <div className="mt-2 p-2 bg-destructive/5 rounded text-xs text-destructive font-medium border border-destructive/10">
-                                                                Phản hồi: {job.adminFeedback}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                                        {(job.status === 'rejected' || job.status === 'request_changes') && job.adminFeedback && (
+                                            <div className="mt-2 p-3 bg-destructive/5 rounded-lg text-xs text-destructive font-medium border border-destructive/10">
+                                                Phản hồi: {job.adminFeedback}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </CardContent>
             </Card>

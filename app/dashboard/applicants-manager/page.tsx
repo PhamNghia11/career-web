@@ -255,7 +255,7 @@ export default function ManageApplicationsPage() {
                         ) : (
                             <div className="overflow-x-auto -mx-1 sm:mx-0">
                                 {/* Desktop Table View */}
-                                <Table className="hidden md:table">
+                                <Table className="hidden lg:table">
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead>Vị trí</TableHead>
@@ -363,7 +363,7 @@ export default function ManageApplicationsPage() {
                                 </Table>
 
                                 {/* Mobile Card View */}
-                                <div className="grid grid-cols-1 gap-4 md:hidden">
+                                <div className="grid grid-cols-1 gap-4 lg:hidden">
                                     {applications.map((app) => (
                                         <div key={app._id} className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm space-y-4">
                                             <div className="flex justify-between items-start">
