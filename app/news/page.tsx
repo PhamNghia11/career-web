@@ -114,7 +114,7 @@ export default function NewsPage() {
                     <div className="container px-4 mx-auto py-8">
                         <div className="flex flex-col gap-10">
                             {/* Consolidated Topics - Full Width & Softened Style */}
-                            <div className="flex flex-nowrap items-center justify-between w-full overflow-x-hidden gap-x-6">
+                            <div className="flex flex-nowrap items-center justify-between w-full overflow-x-auto [&::-webkit-scrollbar]:hidden -ms-overflow-style:none [scrollbar-width:none] gap-x-6">
                                 {CATEGORIES.map(cat => (
                                     <button
                                         key={cat}
