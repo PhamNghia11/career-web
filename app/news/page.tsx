@@ -26,6 +26,9 @@ const CATEGORIES = [
     "Xu hướng công nghệ",
     "Cơ hội việc làm",
     "Kỹ năng mềm",
+    "Cẩm nang nghề nghiệp",
+    "Định hướng nghề nghiệp",
+    "Góc nhìn chuyên gia",
     "Thông báo GDU"
 ]
 
@@ -110,13 +113,13 @@ export default function NewsPage() {
                 <div className="bg-white border-b border-slate-100 sticky top-0 z-40 backdrop-blur-sm bg-white/80">
                     <div className="container px-4 mx-auto py-8">
                         <div className="flex flex-col gap-10">
-                            {/* Consolidated Topics - Full Width & Site Font */}
-                            <div className="flex flex-nowrap items-center justify-between w-full overflow-x-auto no-scrollbar pb-2 gap-x-4">
+                            {/* Consolidated Topics - Full Width & Softened Style */}
+                            <div className="flex flex-nowrap items-center justify-between w-full overflow-x-auto no-scrollbar pb-2 gap-x-6">
                                 {CATEGORIES.map(cat => (
                                     <button
                                         key={cat}
                                         onClick={() => setCategory(cat)}
-                                        className={`text-[13px] font-black transition-all duration-300 relative py-2 uppercase tracking-widest whitespace-nowrap ${category === cat
+                                        className={`text-[15px] font-bold transition-all duration-300 relative py-2 whitespace-nowrap ${category === cat
                                             ? "text-primary after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary"
                                             : "text-slate-400 hover:text-primary"}`}
                                     >
