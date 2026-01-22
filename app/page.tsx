@@ -5,6 +5,7 @@ import { FeaturedJobs } from "@/components/home/featured-jobs"
 import { MajorsSection } from "@/components/home/majors-section"
 import { StatsSection } from "@/components/home/stats-section"
 import { PartnersSection } from "@/components/home/partners-section"
+import { MarketTrends } from "@/components/home/market-trends"
 import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 
 export default function HomePage() {
@@ -16,6 +17,7 @@ export default function HomePage() {
         <div className="mt-12">
           <FeaturedJobs />
         </div>
+        <MarketTrends />
         <MajorsSection />
         <StatsSection />
         <PartnersSection />

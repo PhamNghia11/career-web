@@ -1,77 +1,114 @@
-# Hướng dẫn triển khai GDU Career Portal (Production)
+# Hướng dẫn Kỹ thuật Triển khai GDU Career Portal (Production)
 
-Tài liệu này hướng dẫn cách đưa toàn bộ mã nguồn và dữ liệu từ môi trường phát triển lên máy chủ của trường để vận hành thực tế.
+Tài liệu này cung cấp mô tả kỹ thuật chi tiết, hướng dẫn cài đặt và vận hành hệ thống GDU Career Portal trên máy chủ GDU Server để phục vụ đánh giá và chạy thử nghiệm.
 
-## 1. Yêu cầu hệ thống (Prerequisites)
-Để chạy dự án, máy chủ cần cài đặt:
-- **Hệ điều hành:** Linux (Ubuntu 20.04/22.04 LTS được khuyến nghị).
-- **Node.js:** Phiên bản 18.x hoặc 20.x.
-- **Cơ sở dữ liệu:** MongoDB (Phiên bản 6.0+). Có thể dùng MongoDB Atlas hoặc cài trực tiếp trên server.
-- **Process Manager:** PM2 (để giữ app luôn chạy).
-- **Web Server:** Nginx (để làm Reverse Proxy và cài SSL).
+---
 
-## 2. Các bước triển khai
+## 1. Kiến trúc Kỹ thuật (Technical Architecture)
 
-### Bước 1: Chuẩn bị mã nguồn
-1. Nén thư mục project (loại bỏ thư mục `node_modules` và `.next`).
-2. Upload lên server qua SCP/SFTP hoặc dùng `git clone` từ GitHub/GitLab.
+Hệ thống được xây dựng trên mô hình **Monolithic Modern** sử dụng framework Next.js:
 
-### Bước 2: Cài đặt dependencies
-Tại thư mục gốc của dự án trên server, chạy lệnh:
-```bash
-npm install
-npm run build
-```
+-   **Front-end:** React 19, Next.js 15 (App Router), Tailwind CSS cho giao diện, Framer Motion cho hiệu ứng.
+-   **Back-end (API Layer):** Next.js API Routes (Serverless Functions), chạy trong môi trường Node.js.
+-   **Database:** MongoDB 7.x - Cơ sở dữ liệu NoSQL lưu trữ thông tin người dùng, tin tuyển dụng, và ứng tuyển.
+-   **Authentication:** JWT (JSON Web Token) kết hợp với mã OTP gửi qua Email.
+-   **Storage:** 
+    -   **Local Storage (Server):** Lưu trữ tạm thời các file upload (CV, hình ảnh).
+    -   **Dữ liệu tĩnh:** Được quản lý trong thư mục `public/`.
 
-### Bước 3: Cấu hình biến môi trường
-Tạo file `.env` trên server với các thông tin thực tế:
+---
+
+## 2. Cấu trúc Thư mục (Folder Structure)
+
+| Thư mục | Chức năng |
+| :--- | :--- |
+| `/app` | Chứa toàn bộ logic các trang (Pages) và API (Back-end logic). |
+| `/components` | Các thành phần UI tái sử dụng (Button, Table, Modal, Dashboard components). |
+| `/lib` | Chứa các thư viện dùng chung, cấu hình kết nối MongoDB, các hàm tiện ích (utils). |
+| `/public` | Chứa các tài sản tĩnh (Ảnh logo, Icons, Files tải về công cộng). |
+| `/styles` | Cấu hình CSS toàn cục và các biến thiết kế. |
+| `/data` | Chứa các file dữ liệu mẫu hoặc cấu hình (ví dụ: `jobs.json`). |
+| `/scripts` | Các script hỗ trợ (Backup, Seeding dữ liệu). |
+| `/hooks` | Các React Custom Hooks xử lý logic state. |
+
+---
+
+## 3. Cấu hình Hệ thống Yêu cầu (System Requirements)
+
+### 3.1 Phần cứng (Khuyến nghị cho chạy thử)
+-   **CPU:** 2 Cores trở lên.
+-   **RAM:** Tối thiểu 4GB (Khuyến nghị 8GB để build Next.js mượt mà).
+-   **Storage:** 20GB SSD (Dành cho OS, Apps và lưu trữ CV).
+
+### 3.2 Phần mềm
+-   **OS:** Ubuntu 22.04 LTS hoặc Windows Server 2019+ (Khuyến nghị Linux).
+-   **Node.js:** Phiên bản 18.x hoặc 20.x (Bản LTS).
+-   **MongoDB:** Phiên bản 6.0 hoặc 7.0.
+-   **Process Manager:** PM2 (để quản lý tiến trình).
+-   **Reverse Proxy:** Nginx (để quản lý domain và SSL).
+
+---
+
+## 4. Hướng dẫn Cài đặt & Triển khai
+
+### Bước 1: Chuẩn bị Môi trường
+Cài đặt Node.js và MongoDB trên GDU Server. Đảm bảo MongoDB đang chạy và có thể truy cập nội bộ (localhost:27017).
+
+### Bước 2: Triển khai Mã nguồn
+1. Clone hoặc Upload mã nguồn vào thư mục `/var/www/gdu-career`.
+2. Chạy lệnh cài đặt thư viện:
+   ```bash
+   npm install --production=false
+   ```
+
+### Bước 3: Cấu hình Biến môi trường (`.env`)
+Tạo file `.env` tại thư mục gốc với các thông số:
 ```env
-MONGODB_URI=mongodb://username:password@localhost:27017/gdu_career
-# Các thông tin email để gửi OTP
-EMAIL_USER=your_email@gmail.com
+# Kết nối DB
+MONGODB_URI=mongodb://localhost:27017/gdu_career
+
+# Cấu hình Email (Gửi OTP)
+EMAIL_USER=your_system_email@giadinh.edu.vn
 EMAIL_PASS=your_app_password
-# Domain của web
+
+# Địa chỉ Domain
 NEXT_PUBLIC_APP_URL=https://career.giadinh.edu.vn
 ```
 
-### Bước 4: Di chuyển dữ liệu (Database Migration)
-Nếu bạn đang dùng dữ liệu thử nghiệm và muốn chuyển lên:
-1. **Xuất file (Dump) từ local:**
-   ```bash
-   mongodump --uri="mongodb://localhost:27017/gdu_career" --out=./backup
-   ```
-2. **Nhập vào (Restore) server:**
-   ```bash
-   mongorestore --uri="mongodb://localhost:27017/gdu_career" ./backup/gdu_career
-   ```
-
-### Bước 5: Khởi chạy dự án bằng PM2
-Chạy lệnh sau để app tự khởi động lại nếu server bị crash:
+### Bước 4: Xây dựng (Build) Ứng dụng
+Next.js cần được biên dịch trước khi chạy production:
 ```bash
-pm2 start npm --name "gdu-career" -- start
+npm run build
+```
+
+---
+
+## 5. Vận hành và Lưu trữ (Operation & Storage)
+
+### 5.1 Quản lý Tiến trình (PM2)
+Để ứng dụng chạy ngầm và tự khởi động lại:
+```bash
+pm2 start npm --name "gdu-portal" -- start
 pm2 save
-pm2 startup
 ```
 
-## 3. Cấu hình Nginx (Recommended)
-Để người dùng truy cập qua tên miền (ví dụ: `career.giadinh.edu.vn`), cấu hình Nginx trỏ về cổng `3000`:
-```nginx
-server {
-    listen 80;
-    server_name career.giadinh.edu.vn;
+### 5.2 Lưu trữ File (Storage)
+-   Các file CV ứng viên tải lên sẽ được lưu trữ trong hệ thống file của Server (hoặc cấu hình Cloud Storage nếu cần mở rộng).
+-   Cần đảm bảo quyền ghi (Write Permission) cho thư mục đích trên server.
 
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
+### 5.3 Cơ sở dữ liệu (DB)
+-   Sử dụng `mongodump` để backup định kỳ.
+-   File `backup.bat` (trên Windows) hoặc cronjob trên Linux có thể được sử dụng để tự động hóa.
 
-## 4. Kiểm tra bảo mật cuối cùng
-- [ ] Chặn cổng 27017 (MongoDB) ra bên ngoài (chỉ cho phép localhost).
-- [ ] Cài đặt SSL (Let's Encrypt) cho domain.
-- [ ] Thay đổi toàn bộ mật khẩu mặc định.
+### 5.4 Domain & SSL
+-   **Domain:** Cần trỏ bản ghi A về IP của GDU Server.
+-   **Nginx:** Cấu hình làm Reverse Proxy trỏ từ port 80/443 về port 3000 của ứng dụng.
+-   **SSL:** Khuyến nghị sử dụng Certbot (Let's Encrypt) để cài đặt SSL miễn phí.
+
+---
+
+## 6. Checklist trước khi đánh giá
+- [ ] MongoDB đã import dữ liệu ban đầu.
+- [ ] File `.env` đã đúng thông số của GDU.
+- [ ] Port 3000 đã được mở nội bộ và Nginx đã nhận kết nối.
+- [ ] Test thử chức năng Đăng ký/Gửi OTP thành công qua mail trường.

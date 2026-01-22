@@ -275,7 +275,7 @@ Nhấn đúp chuột vào file `backup.bat` trong thư mục dự án.
 
 ### Lỗi: "Port 3000 already in use"
 ```powershell
-# Tìm process đang dùng port 3000
+# Tìm process đang dùng port 3000![alt text](image.png)
 netstat -ano | findstr :3000
 
 # Kill process (thay PID bằng số tìm được)

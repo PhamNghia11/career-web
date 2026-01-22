@@ -30,6 +30,7 @@ export function Header() {
     { name: "Trang chủ", href: "/" },
     { name: "Việc làm", href: "/jobs" },
     { name: "Doanh nghiệp", href: "/companies" },
+    { name: "Tin tức", href: "/news" },
     { name: "Liên hệ", href: "/contact" },
   ]
 

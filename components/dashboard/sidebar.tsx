@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   Eye,
   Flag,
+  Newspaper,
 } from "lucide-react"
 import { useAuth } from "@/lib/auth-context"
 import { cn } from "@/lib/utils"
@@ -49,6 +50,7 @@ const adminNav = [
   { name: "Thống kê", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Quản lý người dùng", href: "/dashboard/users", icon: Users },
   { name: "Quản lý việc làm", href: "/dashboard/jobs", icon: FileText },
+  { name: "Quản lý tin tức", href: "/dashboard/admin/news", icon: Newspaper },
   { name: "Quản lý ứng tuyển", href: "/dashboard/applicants-manager", icon: Users },
   { name: "Quản lý đối tác", href: "/dashboard/admin/partners", icon: Building },
   { name: "Đơn ứng tuyển", href: "/dashboard/applications", icon: FileText },

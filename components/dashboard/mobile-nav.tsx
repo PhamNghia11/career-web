@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Menu, X, Home, Briefcase, User, Settings, Bell, LogOut, FileText, Users, Building, BarChart3, Star, Eye, MessageSquare, ChevronLeft, Flag } from "lucide-react"
+import { Menu, X, Home, Briefcase, User, Settings, Bell, LogOut, FileText, Users, Building, BarChart3, Star, Eye, MessageSquare, ChevronLeft, Flag, Newspaper } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth-context"
 import { cn } from "@/lib/utils"
@@ -40,6 +40,7 @@ export function MobileNav() {
     { name: "Thống kê", href: "/dashboard/analytics", icon: BarChart3 },
     { name: "Quản lý người dùng", href: "/dashboard/users", icon: Users },
     { name: "Quản lý việc làm", href: "/dashboard/jobs", icon: FileText },
+    { name: "Quản lý tin tức", href: "/dashboard/admin/news", icon: Newspaper },
     { name: "Quản lý ứng tuyển", href: "/dashboard/applicants-manager", icon: Users },
     { name: "Quản lý đối tác", href: "/dashboard/admin/partners", icon: Building },
     { name: "Đơn ứng tuyển", href: "/dashboard/applications", icon: FileText },

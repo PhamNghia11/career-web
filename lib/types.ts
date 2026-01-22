@@ -58,3 +58,19 @@ export interface DailyUpdate {
   createdAt: Date
   views: number
 }
+
+export interface News {
+  _id?: string
+  id?: string
+  title: string
+  slug: string
+  summary: string
+  content: string
+  imageUrl?: string
+  videoUrl?: string
+  sourceName: string
+  sourceUrl: string
+  category: string
+  publishedAt: string | Date
+  views: number
+}
