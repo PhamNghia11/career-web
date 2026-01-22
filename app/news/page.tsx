@@ -111,12 +111,12 @@ export default function NewsPage() {
                     <div className="container px-4 mx-auto py-8">
                         <div className="flex flex-col gap-10">
                             {/* Consolidated Topics - Minimalist Underline Style */}
-                            <div className="flex flex-nowrap items-center gap-x-12 overflow-x-auto no-scrollbar pb-2">
+                            <div className="flex flex-nowrap items-center gap-x-8 overflow-x-auto no-scrollbar pb-2">
                                 {CATEGORIES.map(cat => (
                                     <button
                                         key={cat}
                                         onClick={() => setCategory(cat)}
-                                        className={`text-[13px] font-black transition-all duration-300 relative py-2 uppercase tracking-[0.15em] whitespace-nowrap ${category === cat
+                                        className={`text-[12px] font-black transition-all duration-300 relative py-2 uppercase tracking-tighter whitespace-nowrap font-serif ${category === cat
                                             ? "text-primary after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary"
                                             : "text-slate-400 hover:text-primary"}`}
                                     >
