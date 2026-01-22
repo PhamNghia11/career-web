@@ -23,15 +23,9 @@ import Image from "next/image"
 const CATEGORIES = [
     "Tất cả",
     "Thị trường lao động",
-    "Phân tích dự báo",
-    "Kinh tế vĩ mô",
-    "Cẩm nang nghề nghiệp",
-    "Kỹ năng mềm",
     "Xu hướng công nghệ",
     "Cơ hội việc làm",
-    "Định hướng nghề nghiệp",
-    "Đào tạo & Chứng chỉ",
-    "Góc nhìn chuyên gia",
+    "Kỹ năng mềm",
     "Thông báo GDU"
 ]
 
@@ -117,12 +111,12 @@ export default function NewsPage() {
                     <div className="container px-4 mx-auto py-8">
                         <div className="flex flex-col gap-10">
                             {/* Consolidated Topics - Minimalist Underline Style */}
-                            <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+                            <div className="flex flex-nowrap items-center gap-x-12 overflow-x-auto no-scrollbar pb-2">
                                 {CATEGORIES.map(cat => (
                                     <button
                                         key={cat}
                                         onClick={() => setCategory(cat)}
-                                        className={`text-[13px] font-bold transition-all duration-300 relative py-2 uppercase tracking-wider ${category === cat
+                                        className={`text-[13px] font-black transition-all duration-300 relative py-2 uppercase tracking-[0.15em] whitespace-nowrap ${category === cat
                                             ? "text-primary after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary"
                                             : "text-slate-400 hover:text-primary"}`}
                                     >
