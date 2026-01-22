@@ -22,14 +22,14 @@ import Image from "next/image"
 
 const CATEGORIES = [
     "Tất cả",
-    "Thị trường lao động",
-    "Xu hướng công nghệ",
-    "Cơ hội việc làm",
-    "Kỹ năng mềm",
-    "Cẩm nang nghề nghiệp",
-    "Định hướng nghề nghiệp",
-    "Góc nhìn chuyên gia",
-    "Thông báo GDU"
+    "Thị trường",
+    "Công nghệ",
+    "Việc làm",
+    "Kỹ năng",
+    "Cẩm nang",
+    "Định hướng",
+    "Góc nhìn",
+    "Thông báo"
 ]
 
 const SOURCES = [
@@ -114,14 +114,14 @@ export default function NewsPage() {
                     <div className="container px-4 mx-auto py-8">
                         <div className="flex flex-col gap-10">
                             {/* Consolidated Topics - Full Width & Softened Style */}
-                            <div className="flex flex-nowrap items-center justify-between w-full overflow-x-auto no-scrollbar pb-2 gap-x-6">
+                            <div className="flex flex-nowrap items-center justify-between w-full overflow-x-hidden gap-x-6">
                                 {CATEGORIES.map(cat => (
                                     <button
                                         key={cat}
                                         onClick={() => setCategory(cat)}
-                                        className={`text-[15px] font-bold transition-all duration-300 relative py-2 whitespace-nowrap ${category === cat
+                                        className={`text-sm font-medium transition-all duration-300 relative py-2 whitespace-nowrap ${category === cat
                                             ? "text-primary after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary"
-                                            : "text-slate-400 hover:text-primary"}`}
+                                            : "text-slate-500 hover:text-primary"}`}
                                     >
                                         {cat}
                                     </button>
@@ -133,7 +133,7 @@ export default function NewsPage() {
                                     <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-primary transition-colors" />
                                     <input
                                         placeholder="Tìm kiếm nội dung bài viết..."
-                                        className="w-full pl-8 pr-4 py-3 bg-transparent border-b border-slate-100 focus:border-primary focus:outline-none text-[15px] transition-all placeholder:text-slate-300"
+                                        className="w-full pl-8 pr-4 py-3 bg-transparent border-b border-slate-100 focus:border-primary focus:outline-none text-sm transition-all placeholder:text-slate-300"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />

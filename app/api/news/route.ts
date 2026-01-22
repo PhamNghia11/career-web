@@ -20,8 +20,8 @@ export async function GET(req: Request) {
         }
 
         let query: any = {}
-        if (category && category !== "all") {
-            query.category = category
+        if (category && category !== "all" && category !== "Tất cả") {
+            query.category = { $regex: category, $options: 'i' }
         }
 
         const news = await collection
