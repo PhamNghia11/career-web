@@ -114,14 +114,14 @@ export default function NewsPage() {
                     <div className="container px-4 mx-auto py-8">
                         <div className="flex flex-col gap-10">
                             {/* Consolidated Topics - Full Width & Softened Style */}
-                            <div className="flex flex-nowrap items-center justify-between w-full overflow-x-auto [&::-webkit-scrollbar]:hidden -ms-overflow-style:none [scrollbar-width:none] gap-x-6">
+                            <div className="flex flex-nowrap items-center w-full overflow-x-auto [&::-webkit-scrollbar]:hidden -ms-overflow-style:none [scrollbar-width:none] gap-3 pb-2">
                                 {CATEGORIES.map(cat => (
                                     <button
                                         key={cat}
                                         onClick={() => setCategory(cat)}
-                                        className={`text-sm font-medium transition-all duration-300 relative py-2 whitespace-nowrap ${category === cat
-                                            ? "text-primary after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary"
-                                            : "text-slate-500 hover:text-primary"}`}
+                                        className={`px-6 py-3 rounded-full text-[15px] font-bold transition-all duration-300 whitespace-nowrap border ${category === cat
+                                            ? "bg-[#002855] text-white border-[#002855] shadow-lg shadow-[#002855]/20"
+                                            : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300"}`}
                                     >
                                         {cat}
                                     </button>
@@ -130,10 +130,10 @@ export default function NewsPage() {
 
                             <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 pb-2">
                                 <div className="relative group max-w-2xl flex-1">
-                                    <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-primary transition-colors" />
+                                    <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
                                     <input
                                         placeholder="Tìm kiếm nội dung bài viết..."
-                                        className="w-full pl-8 pr-4 py-3 bg-transparent border-b border-slate-100 focus:border-primary focus:outline-none text-sm transition-all placeholder:text-slate-300"
+                                        className="w-full pl-9 pr-4 py-3 bg-transparent border-b border-slate-200 focus:border-primary focus:outline-none text-sm transition-all placeholder:text-slate-500 font-medium"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
@@ -261,20 +261,18 @@ export default function NewsPage() {
                         </div>
 
                         {/* Clean & Premium CTA Section */}
-                        <div className="mt-28 max-w-5xl mx-auto p-12 md:p-16 rounded-[48px] bg-primary text-white relative overflow-hidden shadow-2xl shadow-primary/20 group">
-                            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 opacity-50 group-hover:opacity-60 transition-all duration-1000" />
-                            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12 justify-between">
-                                <div className="space-y-6 max-w-xl text-center lg:text-left">
-                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/5 text-white/40 font-bold text-[10px] uppercase tracking-widest">
-                                        Contributor Program
-                                    </div>
-                                    <h4 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1]">Cộng tác cùng <br /> đội ngũ chuyên gia</h4>
-                                    <p className="text-white/40 text-[15px] font-normal leading-relaxed">Gửi bài phân tích của bạn để chia sẻ kiến thức hữu ích tới cộng đồng 5,000+ sinh viên GDU hàng tuần.</p>
+                        <div className="mt-28 max-w-4xl mx-auto p-12 md:p-16 rounded-[48px] bg-primary text-white relative overflow-hidden shadow-2xl shadow-primary/20 text-center">
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-[120px] -translate-y-1/2 opacity-50 pointer-events-none" />
+                            <div className="relative z-10 flex flex-col items-center gap-6">
+                                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/5 text-white/60 font-bold text-[10px] uppercase tracking-widest">
+                                    Contributor Program
                                 </div>
-                                <Button className="h-14 px-10 rounded-2xl bg-white text-primary font-bold text-sm uppercase tracking-widest hover:bg-slate-50 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-black/10 md:min-w-[240px]">
-                                    Gửi bài phân tích
-                                    <ArrowUpRight className="ml-2 w-4 h-4" />
-                                </Button>
+                                <h4 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight">
+                                    Cộng tác cùng <br className="hidden md:block" /> đội ngũ chuyên gia
+                                </h4>
+                                <p className="text-white/60 text-lg font-light leading-relaxed max-w-2xl mx-auto">
+                                    Gửi bài phân tích của bạn để chia sẻ kiến thức hữu ích tới cộng đồng 5,000+ sinh viên GDU hàng tuần.
+                                </p>
                             </div>
                         </div>
                     </div>
