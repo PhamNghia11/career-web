@@ -172,10 +172,12 @@ export function ApplyJobDialog({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Conditional CV check
-        const isFullTime = jobType?.toLowerCase() === "full-time" || jobType?.toLowerCase() === "toàn thời gian"
-        if (isFullTime && !selectedFile) {
-            setError("Vui lòng đính kèm CV của bạn (bắt buộc đối với công việc toàn thời gian)")
+        // Conditional CV check (Mandatory for Full-time and Internship)
+        const type = jobType?.toLowerCase()
+        const isMandatory = type === "full-time" || type === "toàn thời gian" || type === "internship" || type === "thực tập"
+
+        if (isMandatory && !selectedFile) {
+            setError("Vui lòng đính kèm CV của bạn (bắt buộc đối với công việc toàn thời gian và thực tập)")
             setIsSubmitting(false)
             return
         }
@@ -501,9 +503,12 @@ export function ApplyJobDialog({
                             <div className="grid gap-2">
                                 <Label htmlFor="cv" className="flex items-center gap-1">
                                     <span>CV / Hồ sơ đính kèm</span>
-                                    {(jobType?.toLowerCase() === "full-time" || jobType?.toLowerCase() === "toàn thời gian") && (
-                                        <span className="text-red-500">*</span>
-                                    )}
+                                    {((type) => {
+                                        const t = type?.toLowerCase()
+                                        return t === "full-time" || t === "toàn thời gian" || t === "internship" || t === "thực tập"
+                                    })(jobType) && (
+                                            <span className="text-red-500">*</span>
+                                        )}
                                 </Label>
                                 <div
                                     className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center transition-colors cursor-pointer group 
