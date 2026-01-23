@@ -56,8 +56,12 @@ export function ApplyJobDialog({
     const [faculty, setFaculty] = useState(cleanValue(user?.faculty))
     const [major, setMajor] = useState(cleanValue(user?.major))
     const [cohort, setCohort] = useState(cleanValue(user?.cohort) || "")
+    const [phoneValue, setPhoneValue] = useState(user?.phone || "")
 
     useEffect(() => {
+        if (user?.phone && !phoneValue) {
+            setPhoneValue(user.phone)
+        }
         if (user?.major && !major) {
             setMajor(user.major)
         }
@@ -68,7 +72,7 @@ export function ApplyJobDialog({
         } else if (user?.faculty && !faculty) {
             setFaculty(user.faculty)
         }
-    }, [user, major, faculty])
+    }, [user, major, faculty, phoneValue])
 
     // Mapping of Majors to their corresponding Faculties (Official GDU List)
     const MAJOR_FACULTY_MAP: Record<string, string> = {
@@ -181,11 +185,14 @@ export function ApplyJobDialog({
         try {
             // Get form values
             const form = e.target as HTMLFormElement
-            const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim()
-            const phone = (form.elements.namedItem("phone") as HTMLInputElement).value.trim()
-
             if (!email.toLowerCase().endsWith("@gmail.com")) {
                 setError("Email phải là địa chỉ Gmail (@gmail.com)")
+                setIsSubmitting(false)
+                return
+            }
+
+            if (!phone.startsWith('0') || phone.length < 10 || phone.length > 11) {
+                setPhoneError("Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số")
                 setIsSubmitting(false)
                 return
             }
@@ -465,20 +472,24 @@ export function ApplyJobDialog({
                                             placeholder="0901234567"
                                             required
                                             defaultValue={user?.phone || ""}
+                                            value={phoneValue}
                                             onChange={(e) => {
                                                 const val = e.target.value
-                                                if (/\D/.test(val)) {
-                                                    setPhoneError("Số điện thoại chỉ được chứa các chữ số")
+                                                // Only allow digits
+                                                const numericVal = val.replace(/\D/g, '')
+                                                setPhoneValue(numericVal)
+
+                                                if (numericVal.length > 0) {
+                                                    if (!numericVal.startsWith('0')) {
+                                                        setPhoneError("Số điện thoại phải bắt đầu bằng số 0")
+                                                    } else if (numericVal.length < 10 || numericVal.length > 11) {
+                                                        setPhoneError("Số điện thoại phải có 10-11 số")
+                                                    } else {
+                                                        setPhoneError("")
+                                                    }
                                                 } else {
                                                     setPhoneError("")
                                                 }
-                                                const numericVal = val.replace(/\D/g, '')
-                                                if (numericVal.length > 0 && !numericVal.startsWith('0')) {
-                                                    setPhoneError("Số điện thoại phải bắt đầu bằng số 0")
-                                                    e.target.value = ''
-                                                    return
-                                                }
-                                                e.target.value = numericVal
                                             }}
                                         />
                                         {phoneError && (
