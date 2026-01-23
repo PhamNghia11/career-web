@@ -172,6 +172,15 @@ export function ApplyJobDialog({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        if (user?.role === "employer" || user?.role === "admin") {
+            toast({
+                title: "Không được phép",
+                description: "Tài khoản nhà tuyển dụng không thể ứng tuyển công việc.",
+                variant: "destructive"
+            })
+            return
+        }
+
         // Conditional CV check (Mandatory for Full-time and Internship)
         const type = jobType?.toLowerCase()
         const isMandatory = type === "full-time" || type === "toàn thời gian" || type === "internship" || type === "thực tập"
@@ -187,6 +196,8 @@ export function ApplyJobDialog({
         try {
             // Get form values
             const form = e.target as HTMLFormElement
+            const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim()
+            const phone = (form.elements.namedItem("phone") as HTMLInputElement).value.trim()
             if (!email.toLowerCase().endsWith("@gmail.com")) {
                 setError("Email phải là địa chỉ Gmail (@gmail.com)")
                 setIsSubmitting(false)

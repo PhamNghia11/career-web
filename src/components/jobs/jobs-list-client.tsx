@@ -1293,13 +1293,18 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                         <Button
                           onClick={(e) => {
                             e.stopPropagation()
+                            if (user?.role === "employer" || user?.role === "admin") return
                             handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)
                           }}
-                          disabled={!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()}
-                          className={`shadow-sm px-6 ${!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime() ? "bg-gray-100 text-gray-400 hover:bg-gray-100" : "bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white"}`}
+                          disabled={(user?.role === "employer" || user?.role === "admin") || (!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime())}
+                          className={`shadow-sm px-6 ${(user?.role === "employer" || user?.role === "admin" || (!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime())) ? "bg-gray-100 text-gray-400 hover:bg-gray-100" : "bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white"}`}
                         >
-                          {!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime() ? "Đã hết hạn" : "Ứng tuyển ngay"}
-                          {(!job.deadline || parseDateHelper(job.deadline) === 0 || parseDateHelper(job.deadline) >= new Date().getTime()) && <ChevronRight className="h-4 w-4 ml-1" />}
+                          {!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()
+                            ? "Đã hết hạn"
+                            : (user?.role === "employer" || user?.role === "admin")
+                              ? "Chỉ dành cho ứng viên"
+                              : "Ứng tuyển ngay"}
+                          {!(user?.role === "employer" || user?.role === "admin") && (!job.deadline || parseDateHelper(job.deadline) === 0 || parseDateHelper(job.deadline) >= new Date().getTime()) && <ChevronRight className="h-4 w-4 ml-1" />}
                         </Button>
                       </div>
                     </div>

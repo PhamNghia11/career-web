@@ -32,25 +32,26 @@ export function ApplyButton({
     const { user } = useAuth()
     const router = useRouter()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const isEmployer = user?.role === "employer" || user?.role === "admin"
+    const isExpired = deadline && new Date(deadline).getTime() > 0 && new Date(deadline).getTime() < new Date().getTime()
 
     const handleApplyClick = () => {
         if (!user) {
             router.push("/login?redirect=/jobs/" + jobId)
             return
         }
+        if (isEmployer) return
         setIsDialogOpen(true)
     }
-
-    const isExpired = deadline && new Date(deadline).getTime() > 0 && new Date(deadline).getTime() < new Date().getTime()
 
     return (
         <>
             <Button
                 onClick={handleApplyClick}
-                disabled={!!isExpired}
-                className={`w-full h-12 text-lg shadow-md transition-all hover:shadow-lg ${isExpired ? "bg-gray-100 text-gray-400 hover:bg-gray-100 cursor-not-allowed" : "bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white"}`}
+                disabled={!!isExpired || isEmployer}
+                className={`w-full h-12 text-lg shadow-md transition-all hover:shadow-lg ${isExpired || isEmployer ? "bg-gray-100 text-gray-400 hover:bg-gray-100 cursor-not-allowed" : "bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white"}`}
             >
-                {isExpired ? "Đã hết hạn" : "Ứng tuyển ngay"}
+                {isExpired ? "Đã hết hạn" : isEmployer ? "Chỉ dành cho ứng viên" : "Ứng tuyển ngay"}
             </Button>
 
             <ApplyJobDialog

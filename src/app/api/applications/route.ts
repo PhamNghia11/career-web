@@ -31,6 +31,9 @@ export async function POST(request: Request) {
       if (!userExists) {
         return NextResponse.json({ error: "Tài khoản của bạn không tồn tại hoặc đã bị xóa. Vui lòng đăng xuất và đăng ký lại." }, { status: 401 })
       }
+      if (userExists.role === "employer" || userExists.role === "admin") {
+        return NextResponse.json({ error: "Nhà tuyển dụng hoặc quản trị viên không thể ứng tuyển công việc." }, { status: 403 })
+      }
     }
 
     console.log("[Applications API] POST - jobId:", jobId, "employerId from form:", employerId, "applicantId:", applicantId)
