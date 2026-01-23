@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -38,15 +38,37 @@ export function ApplyJobDialog({
 }: ApplyJobDialogProps) {
     const { toast } = useToast()
     const { user } = useAuth()
+
+    // Helper to clean potential 'undefined' string values
+    const cleanValue = (val: string | undefined | null) => {
+        if (!val || val === 'undefined') return ''
+        return val
+    }
+
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [phoneError, setPhoneError] = useState("")
     const [isSuccess, setIsSuccess] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [dragActive, setDragActive] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [faculty, setFaculty] = useState("")
-    const [major, setMajor] = useState("")
-    const [cohort, setCohort] = useState("")
+
+    // Auto-fill from user profile
+    const [faculty, setFaculty] = useState(cleanValue(user?.faculty))
+    const [major, setMajor] = useState(cleanValue(user?.major))
+    const [cohort, setCohort] = useState(cleanValue(user?.cohort) || "")
+
+    useEffect(() => {
+        if (user?.major && !major) {
+            setMajor(user.major)
+        }
+        // If user has a major but no faculty in profile, try to map it
+        if (user?.major && !user.faculty && !faculty) {
+            const mapped = MAJOR_FACULTY_MAP[user.major] || ""
+            if (mapped) setFaculty(mapped)
+        } else if (user?.faculty && !faculty) {
+            setFaculty(user.faculty)
+        }
+    }, [user, major, faculty])
 
     // Mapping of Majors to their corresponding Faculties (Official GDU List)
     const MAJOR_FACULTY_MAP: Record<string, string> = {
@@ -335,7 +357,7 @@ export function ApplyJobDialog({
                                     </div>
                                     <div className="grid gap-2">
                                         <Label htmlFor="mssv">Mã số sinh viên <span className="text-red-500">*</span></Label>
-                                        <Input id="mssv" placeholder="21123456" required />
+                                        <Input id="mssv" placeholder="21123456" required defaultValue={user?.studentId || ""} />
                                     </div>
                                 </div>
 
@@ -442,6 +464,7 @@ export function ApplyJobDialog({
                                             type="tel"
                                             placeholder="0901234567"
                                             required
+                                            defaultValue={user?.phone || ""}
                                             onChange={(e) => {
                                                 const val = e.target.value
                                                 if (/\D/.test(val)) {
