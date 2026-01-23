@@ -938,8 +938,8 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
       {/* Horizontal Filter Bar - STICKY */}
       <div ref={dropdownRef} className="bg-white/95 backdrop-blur-md sticky top-[112px] lg:top-[128px] z-40 border-b border-gray-100 py-2.5 lg:py-4 mb-6 shadow-sm">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-            {/* Filters Row - Scrollable on mobile, wraps on desktop if needed */}
+          <div className="flex flex-col gap-6">
+            {/* Row 1: Filter Options */}
             <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex-1">
               <FilterDropdown
                 label="Ngành nghề"
@@ -999,32 +999,41 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                 searchable={true}
               />
 
-              {(hasAdvancedFilters || selectedSalary || selectedType || searchQuery) && (
+              {(hasAdvancedFilters || selectedSalary || selectedType) && (
                 <button
                   onClick={() => {
                     clearAdvancedFilters()
                     setSelectedSalary(null)
                     setSelectedType(null)
-                    setSearchQuery("")
                   }}
                   className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-full transition-all border border-red-100"
                 >
                   <X className="h-3.5 w-3.5" />
-                  <span>Xóa hết</span>
+                  <span>Xóa lọc</span>
                 </button>
               )}
             </div>
 
-            {/* Search Input - Desktop: Fixed width on right, Mobile: Full width */}
-            <div className="w-full lg:w-72 relative group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-primary transition-colors" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm kiếm chức danh, công ty..."
-                className="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all font-medium"
-              />
+            {/* Row 2: Search Bar - Dedicated Row */}
+            <div className="max-w-4xl mx-auto w-full">
+              <div className="relative group">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors font-bold" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Tìm kiếm chức danh công việc, kỹ năng hoặc tên công ty..."
+                  className="w-full pl-12 pr-4 py-4 text-sm lg:text-base bg-gray-50/50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30 focus:bg-white transition-all font-medium placeholder:text-gray-400 shadow-sm hover:shadow-md"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-100 text-gray-400 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
