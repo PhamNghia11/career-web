@@ -499,12 +499,10 @@ export function ApplyJobDialog({
                                 </div>
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="cv" className="flex justify-between items-center">
+                                <Label htmlFor="cv" className="flex items-center gap-1">
                                     <span>CV / Hồ sơ đính kèm</span>
-                                    {jobType?.toLowerCase() === "full-time" || jobType?.toLowerCase() === "toàn thời gian" ? (
-                                        <span className="text-xs font-normal text-white bg-red-500 px-2 py-0.5 rounded-full animate-pulse">Bắt buộc</span>
-                                    ) : (
-                                        <span className="text-xs font-normal text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full">Không bắt buộc</span>
+                                    {(jobType?.toLowerCase() === "full-time" || jobType?.toLowerCase() === "toàn thời gian") && (
+                                        <span className="text-red-500">*</span>
                                     )}
                                 </Label>
                                 <div
