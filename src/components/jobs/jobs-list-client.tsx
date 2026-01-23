@@ -760,26 +760,28 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
           </button>
 
           {isOpen && (
-            <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
-              <div className="px-3 py-2 border-b border-gray-100 flex items-center justify-between">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{label}</span>
+            <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 animate-in fade-in-0 zoom-in-95 duration-200 overflow-hidden">
+              {/* Header */}
+              <div className="px-4 py-3 bg-gray-50/80 border-b border-gray-200 flex items-center justify-between">
+                <span className="text-xs font-bold text-gray-600 uppercase tracking-wider">{label}</span>
                 {value && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
                       onChange(null)
                     }}
-                    className="text-[10px] text-blue-600 hover:underline font-medium"
+                    className="text-xs text-red-600 hover:text-red-700 hover:underline font-semibold"
                   >
                     Xóa
                   </button>
                 )}
               </div>
 
+              {/* Search Input - Separated */}
               {searchable && (
-                <div className="px-3 py-2 border-b border-gray-100">
+                <div className="px-4 py-3 bg-white border-b-2 border-gray-100">
                   <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <input
                       type="text"
                       value={localSearch}
@@ -797,7 +799,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                         }
                       }}
                       placeholder="Tìm kiếm..."
-                      className="w-full pl-8 pr-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-primary/20 focus:border-primary/30"
+                      className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 focus:bg-white transition-all"
                       autoFocus
                       onClick={(e) => e.stopPropagation()}
                     />
@@ -805,7 +807,8 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                 </div>
               )}
 
-              <div className="max-h-64 overflow-y-auto py-1">
+              {/* Options List - Increased Height */}
+              <div className="max-h-96 overflow-y-auto py-2">
                 {filteredOptions.length > 0 ? (
                   filteredOptions.map((option) => (
                     <button
@@ -814,13 +817,13 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                         onChange(option.id)
                         setActiveDropdown(null)
                       }}
-                      className={`w-full px-3 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors ${value === option.id ? "bg-primary/5 text-primary font-medium" : "text-gray-700"
+                      className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors ${value === option.id ? "bg-primary/5 text-primary font-semibold" : "text-gray-700"
                         }`}
                     >
                       <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${value === option.id ? "border-primary bg-primary" : "border-gray-300"}`}>
                         {value === option.id && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                       </div>
-                      {option.label}
+                      <span className="flex-1">{option.label}</span>
                     </button>
                   ))
                 ) : localSearch.trim() ? (
@@ -829,7 +832,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                       onChange(localSearch.trim())
                       setActiveDropdown(null)
                     }}
-                    className="w-full px-3 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors text-primary font-medium"
+                    className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors text-primary font-semibold"
                   >
                     <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary flex items-center justify-center">
                       <div className="w-1.5 h-1.5 rounded-full bg-white" />
@@ -837,7 +840,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                     Sử dụng: "{localSearch.trim()}"
                   </button>
                 ) : (
-                  <div className="px-3 py-4 text-center text-sm text-gray-500 italic">
+                  <div className="px-4 py-6 text-center text-sm text-gray-500 italic">
                     Không tìm thấy kết quả
                   </div>
                 )}
