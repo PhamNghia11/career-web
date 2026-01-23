@@ -6,12 +6,13 @@ import bcrypt from "bcryptjs"
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { userId, currentPassword, newPassword } = body
+        const { userId, currentPassword, newPassword, otp } = body
 
         console.log("[API] Change Password Request:", {
             userId,
             hasCurrentPass: !!currentPassword,
-            hasNewPass: !!newPassword
+            hasNewPass: !!newPassword,
+            hasOtp: !!otp
         })
 
         if (!userId || !currentPassword || !newPassword) {
@@ -51,16 +52,38 @@ export async function POST(request: Request) {
             )
         }
 
+        // For admin users, require OTP verification
+        if (user.role === "admin") {
+            if (!otp) {
+                return NextResponse.json(
+                    { error: "Vui lòng nhập mã OTP để xác thực", requiresOtp: true },
+                    { status: 400 }
+                )
+            }
+
+            // Verify OTP
+            if (user.passwordChangeOtp !== otp || !user.passwordChangeOtpExpires || new Date() > new Date(user.passwordChangeOtpExpires)) {
+                return NextResponse.json(
+                    { error: "Mã OTP không chính xác hoặc đã hết hạn" },
+                    { status: 400 }
+                )
+            }
+        }
+
         // Hash new password
         const hashedPassword = await bcrypt.hash(newPassword, 10)
 
-        // Update password in database
+        // Update password in database and clear OTP tokens
         await collection.updateOne(
             { _id: new ObjectId(userId) },
             {
                 $set: {
                     password: hashedPassword,
                     updatedAt: new Date()
+                },
+                $unset: {
+                    passwordChangeOtp: "",
+                    passwordChangeOtpExpires: ""
                 }
             }
         )

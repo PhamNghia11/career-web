@@ -3,15 +3,17 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Upload, Download, Database, RefreshCw, Check, AlertCircle, Lock } from "lucide-react"
+import { Upload, Download, Database, RefreshCw, Check, AlertCircle, Lock, ShieldCheck, Mail } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/lib/auth-context"
 import { UserProfileForm } from "@/components/dashboard/user-profile-form"
+import { useToast } from "@/hooks/use-toast"
 
 export default function SettingsPage() {
   const { user, updateProfile } = useAuth()
+  const { toast } = useToast()
   const [importStatus, setImportStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
   const [importMessage, setImportMessage] = useState("")
 
@@ -19,6 +21,9 @@ export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [otp, setOtp] = useState("")
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpLoading, setOtpLoading] = useState(false)
   const [passwordStatus, setPasswordStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
   const [passwordMessage, setPasswordMessage] = useState("")
 
@@ -72,6 +77,42 @@ export default function SettingsPage() {
     }
   }
 
+  // Request OTP for admin password change
+  const handleRequestOtp = async () => {
+    setOtpLoading(true)
+    try {
+      const response = await fetch("/api/user/request-password-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user?._id || user?.id }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setOtpSent(true)
+        toast({
+          title: "Mã OTP đã được gửi",
+          description: "Vui lòng kiểm tra email của bạn để lấy mã xác thực.",
+        })
+      } else {
+        toast({
+          title: "Lỗi",
+          description: result.error || "Không thể gửi mã OTP",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Lỗi kết nối",
+        description: "Vui lòng thử lại sau.",
+        variant: "destructive"
+      })
+    } finally {
+      setOtpLoading(false)
+    }
+  }
+
   const handleChangePassword = async () => {
     // Reset status
     setPasswordStatus("idle")
@@ -96,12 +137,20 @@ export default function SettingsPage() {
       return
     }
 
+    // Admin requires OTP
+    if (user?.role === "admin" && !otp) {
+      setPasswordStatus("error")
+      setPasswordMessage("Quản trị viên cần nhập mã OTP để xác thực")
+      return
+    }
+
     setPasswordStatus("loading")
 
     const payload = {
       userId: user?._id || user?.id,
       currentPassword,
       newPassword,
+      otp: user?.role === "admin" ? otp : undefined,
     }
 
     console.log("Sending change password request:", payload)
@@ -124,6 +173,8 @@ export default function SettingsPage() {
         setCurrentPassword("")
         setNewPassword("")
         setConfirmPassword("")
+        setOtp("")
+        setOtpSent(false)
       } else {
         setPasswordStatus("error")
         setPasswordMessage(result.error || "Đổi mật khẩu thất bại")
@@ -211,6 +262,55 @@ export default function SettingsPage() {
               />
             </div>
           </div>
+
+          {/* Admin 2FA OTP Section */}
+          {user?.role === "admin" && (
+            <div className="space-y-4 p-5 bg-blue-50/50 rounded-2xl border border-blue-100">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 rounded-xl text-blue-600">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">Xác thực 2 lớp (2FA)</p>
+                  <p className="text-sm text-gray-500">Quản trị viên cần xác thực OTP để đổi mật khẩu</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex-1 space-y-2">
+                  <Label htmlFor="otp" className="text-xs font-black text-gray-700 uppercase tracking-wider ml-1">Mã OTP</Label>
+                  <input
+                    id="otp"
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder={otpSent ? "Nhập 6 số OTP" : "Nhấn nút bên cạnh để nhận mã"}
+                    disabled={!otpSent}
+                    maxLength={6}
+                    className="w-full px-5 py-3.5 bg-white border border-blue-200 rounded-2xl font-bold text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all text-center text-lg tracking-[0.3em] disabled:bg-gray-100"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleRequestOtp}
+                    disabled={otpLoading || otpSent}
+                    className="h-[54px] px-6 rounded-2xl font-bold border-blue-200 text-blue-600 hover:bg-blue-50 whitespace-nowrap"
+                  >
+                    {otpLoading ? (
+                      <><RefreshCw className="h-4 w-4 mr-2 animate-spin" />Đang gửi...</>
+                    ) : otpSent ? (
+                      <><Check className="h-4 w-4 mr-2" />Đã gửi OTP</>
+                    ) : (
+                      <><Mail className="h-4 w-4 mr-2" />Gửi mã OTP</>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <Button
             onClick={handleChangePassword}
             disabled={passwordStatus === "loading"}
@@ -225,6 +325,7 @@ export default function SettingsPage() {
               "Lưu thay đổi mật khẩu"
             )}
           </Button>
+
         </CardContent>
       </Card>
 
