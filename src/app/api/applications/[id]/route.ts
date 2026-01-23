@@ -69,6 +69,41 @@ export async function PATCH(
             return NextResponse.json({ error: "Bạn không có quyền cập nhật trạng thái này" }, { status: 403 })
         }
 
+        // Logic check: Enforce hiring limit
+        if (status === "hired" && currentApplication.status !== "hired") {
+            try {
+                const jobsCollection = await getCollection(COLLECTIONS.JOBS)
+                const jobId = currentApplication.jobId
+
+                let job = null
+                if (ObjectId.isValid(jobId)) {
+                    job = await jobsCollection.findOne({ _id: new ObjectId(jobId) })
+                } else {
+                    job = await jobsCollection.findOne({ _id: jobId })
+                }
+
+                if (job) {
+                    // quantity -1 means unlimited
+                    if (job.quantity && job.quantity > 0) {
+                        const hiredCount = await collection.countDocuments({
+                            jobId: jobId,
+                            status: "hired"
+                        })
+
+                        console.log(`[Limit Check] Job: ${jobId}, Quantity: ${job.quantity}, Hired: ${hiredCount}`)
+
+                        if (hiredCount >= job.quantity) {
+                            return NextResponse.json({
+                                error: `Đã tuyển đủ số lượng (${job.quantity} người). Không thể tuyển thêm.`
+                            }, { status: 400 })
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Error checking hiring limit:", err)
+            }
+        }
+
         const updateData: Record<string, any> = {
             updatedAt: new Date()
         }
