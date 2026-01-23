@@ -760,92 +760,112 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
           </button>
 
           {isOpen && (
-            <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 animate-in fade-in-0 zoom-in-95 duration-200 overflow-hidden">
-              {/* Header */}
-              <div className="px-4 py-3 bg-gray-50/80 border-b border-gray-200 flex items-center justify-between">
-                <span className="text-xs font-bold text-gray-600 uppercase tracking-wider">{label}</span>
-                {value && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onChange(null)
-                    }}
-                    className="text-xs text-red-600 hover:text-red-700 hover:underline font-semibold"
-                  >
-                    Xóa
-                  </button>
-                )}
-              </div>
+            <>
+              {/* Dropdown Triangle Arrow */}
+              <div className="absolute top-full left-6 mt-1.5 w-3 h-3 bg-white border-l border-t border-gray-200 rotate-45 z-[51]" />
 
-              {/* Search Input - Separated */}
-              {searchable && (
-                <div className="px-4 py-3 bg-white border-b-2 border-gray-100">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="text"
-                      value={localSearch}
-                      onChange={(e) => setLocalSearch(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault()
-                          if (filteredOptions.length > 0) {
-                            onChange(filteredOptions[0].id)
-                            setActiveDropdown(null)
-                          } else if (localSearch.trim()) {
-                            onChange(localSearch.trim())
-                            setActiveDropdown(null)
-                          }
-                        }
-                      }}
-                      placeholder="Tìm kiếm..."
-                      className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 focus:bg-white transition-all"
-                      autoFocus
-                      onClick={(e) => e.stopPropagation()}
-                    />
+              <div className="absolute top-full left-0 mt-3 w-80 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-gray-200 z-50 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-300 overflow-hidden">
+                {/* Header Section */}
+                <div className="px-5 py-4 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Lọc theo</span>
+                    <span className="text-sm font-black text-gray-800 tracking-tight">{label}</span>
                   </div>
-                </div>
-              )}
-
-              {/* Options List - Increased Height */}
-              <div className="max-h-96 overflow-y-auto py-2">
-                {filteredOptions.length > 0 ? (
-                  filteredOptions.map((option) => (
+                  {value && (
                     <button
-                      key={option.id}
-                      onClick={() => {
-                        onChange(option.id)
-                        setActiveDropdown(null)
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onChange(null)
                       }}
-                      className={`w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors ${value === option.id ? "bg-primary/5 text-primary font-semibold" : "text-gray-700"
-                        }`}
+                      className="text-xs text-red-500 hover:text-red-600 font-bold bg-red-50 px-2 py-1 rounded-md transition-colors"
                     >
-                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${value === option.id ? "border-primary bg-primary" : "border-gray-300"}`}>
-                        {value === option.id && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                      </div>
-                      <span className="flex-1">{option.label}</span>
+                      Xóa lọc
                     </button>
-                  ))
-                ) : localSearch.trim() ? (
-                  <button
-                    onClick={() => {
-                      onChange(localSearch.trim())
-                      setActiveDropdown(null)
-                    }}
-                    className="w-full px-4 py-3 text-left text-sm hover:bg-gray-50 flex items-center gap-3 transition-colors text-primary font-semibold"
-                  >
-                    <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary flex items-center justify-center">
-                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                  )}
+                </div>
+
+                {/* Search Input Section - Isolated */}
+                {searchable && (
+                  <div className="px-4 py-4 bg-white">
+                    <div className="relative group">
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-primary transition-colors font-bold" />
+                      <input
+                        type="text"
+                        value={localSearch}
+                        onChange={(e) => setLocalSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            if (filteredOptions.length > 0) {
+                              onChange(filteredOptions[0].id)
+                              setActiveDropdown(null)
+                            } else if (localSearch.trim()) {
+                              onChange(localSearch.trim())
+                              setActiveDropdown(null)
+                            }
+                          }
+                        }}
+                        placeholder={`Tìm kiếm ${label.toLowerCase()}...`}
+                        className="w-full pl-10 pr-4 py-3 text-sm bg-gray-50/50 border border-gray-100 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30 focus:bg-white transition-all font-medium placeholder:text-gray-400"
+                        autoFocus
+                        onClick={(e) => e.stopPropagation()}
+                      />
                     </div>
-                    Sử dụng: "{localSearch.trim()}"
-                  </button>
-                ) : (
-                  <div className="px-4 py-6 text-center text-sm text-gray-500 italic">
-                    Không tìm thấy kết quả
                   </div>
                 )}
+
+                {/* Options List */}
+                <div className="max-h-[320px] overflow-y-auto py-2 custom-scrollbar">
+                  {filteredOptions.length > 0 ? (
+                    <div className="px-2 space-y-0.5">
+                      {filteredOptions.map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => {
+                            onChange(option.id)
+                            setActiveDropdown(null)
+                          }}
+                          className={`w-full px-3 py-3 text-left text-sm rounded-xl flex items-center gap-3 transition-all ${value === option.id
+                            ? "bg-primary/5 text-primary font-bold shadow-sm ring-1 ring-primary/10"
+                            : "text-gray-600 hover:bg-gray-50/80 hover:text-gray-900"
+                            }`}
+                        >
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${value === option.id
+                            ? "border-primary bg-primary scale-110 shadow-lg shadow-primary/20"
+                            : "border-gray-200 bg-white"
+                            }`}>
+                            {value === option.id && <div className="w-1.5 h-1.5 rounded-full bg-white animate-in zoom-in-0 duration-300" />}
+                          </div>
+                          <span className="flex-1 truncate">{option.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : localSearch.trim() ? (
+                    <div className="px-4 py-2">
+                      <button
+                        onClick={() => {
+                          onChange(localSearch.trim())
+                          setActiveDropdown(null)
+                        }}
+                        className="w-full px-4 py-3 text-left text-sm bg-primary/5 rounded-xl border border-dashed border-primary/30 flex items-center gap-3 transition-colors text-primary font-bold hover:bg-primary/10"
+                      >
+                        <div className="w-5 h-5 rounded-full border-2 border-primary bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                        </div>
+                        Dùng: "{localSearch.trim()}"
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="px-4 py-12 text-center">
+                      <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                        <Search className="h-6 w-6 text-gray-300" />
+                      </div>
+                      <p className="text-sm text-gray-400 font-medium">Không tìm thấy kết quả</p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
 
@@ -920,7 +940,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row lg:items-center gap-4">
             {/* Filters Row - Scrollable on mobile, wraps on desktop if needed */}
-            <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 overflow-x-auto pb-1 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex-1">
+            <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex-1">
               <FilterDropdown
                 label="Ngành nghề"
                 options={industryOptions}
