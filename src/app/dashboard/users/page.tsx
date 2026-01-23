@@ -57,6 +57,14 @@ export default function UsersManagementPage() {
   const [roleDialogOpen, setRoleDialogOpen] = useState(false)
   const [selectedRole, setSelectedRole] = useState("")
 
+  const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "student"
+  })
+
   useEffect(() => {
     fetchUsers()
   }, [user])
@@ -158,6 +166,36 @@ export default function UsersManagementPage() {
     }
   }
 
+  const handleAddUser = async () => {
+    if (!newUser.name || !newUser.email || !newUser.password) {
+      toast({ title: "Lỗi", description: "Vui lòng nhập đầy đủ thông tin.", variant: "destructive" })
+      return
+    }
+
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...newUser,
+          creatorEmail: user?.email // Pass current user email for root admin verification
+        })
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        toast({ title: "Thành công", description: "Tài khoản mới đã được tạo." })
+        fetchUsers() // Refresh list
+        setAddDialogOpen(false)
+        setNewUser({ name: "", email: "", password: "", role: "student" })
+      } else {
+        throw new Error(data.error)
+      }
+    } catch (error: any) {
+      toast({ title: "Lỗi", description: error.message || "Không thể tạo tài khoản.", variant: "destructive" })
+    }
+  }
+
   if (user?.role !== "admin") {
     // ... existing unauthorized view
     return (
@@ -188,7 +226,11 @@ export default function UsersManagementPage() {
           <h1 className="text-2xl lg:text-3xl font-bold text-foreground truncate">Quản lý người dùng</h1>
           <p className="text-muted-foreground mt-1 text-sm sm:text-base">Quản lý tài khoản và phân quyền người dùng</p>
         </div>
-        <Button className="w-full sm:w-auto">
+        <Button
+          className="w-full sm:w-auto"
+          onClick={() => setAddDialogOpen(true)}
+          disabled={user?.email !== adminEmail} // Only Root Admin can add users directly for now
+        >
           <UserPlus className="h-4 w-4 mr-2" />
           Thêm người dùng
         </Button>
@@ -553,6 +595,65 @@ export default function UsersManagementPage() {
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setRoleDialogOpen(false)} className="rounded-xl h-11">Hủy</Button>
             <Button onClick={handleRoleChange} className="rounded-xl h-11 bg-primary">Cập nhật vai trò</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Add User Dialog */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Thêm người dùng mới</DialogTitle>
+            <DialogDescription>
+              Tạo tài khoản mới trực tiếp (không cần xác minh OTP).
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Họ và tên</label>
+              <Input
+                placeholder="Nguyễn Văn A"
+                value={newUser.name}
+                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Email</label>
+              <Input
+                type="email"
+                placeholder="email@example.com"
+                value={newUser.email}
+                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Mật khẩu</label>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                value={newUser.password}
+                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">Vai trò</label>
+              <Select
+                value={newUser.role}
+                onValueChange={(value) => setNewUser({ ...newUser, role: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn vai trò" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Sinh viên</SelectItem>
+                  <SelectItem value="employer">Nhà tuyển dụng</SelectItem>
+                  <SelectItem value="admin">Quản trị viên</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddDialogOpen(false)}>Hủy</Button>
+            <Button onClick={handleAddUser}>Tạo tài khoản</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
