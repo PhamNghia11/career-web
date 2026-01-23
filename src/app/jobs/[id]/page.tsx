@@ -31,7 +31,7 @@ export default async function JobPage(props: JobPageProps) {
     // Fallback: Try to fetch from DB if not found in static
     if (!job) {
         try {
-            const { getCollection, COLLECTIONS } = await import("@/lib/mongodb")
+            const { getCollection, COLLECTIONS } = await import("@/database/connection")
             const { ObjectId } = await import("mongodb")
             const collection = await getCollection(COLLECTIONS.JOBS)
 

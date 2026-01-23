@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from "react"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { News } from "@/lib/types"
+import { News } from "@/types"
 import { Calendar, Eye, ArrowLeft, ExternalLink, Share2, MessageSquare, Bookmark, TrendingUp, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"

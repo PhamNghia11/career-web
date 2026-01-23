@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getCollection, COLLECTIONS } from "@/lib/mongodb"
+import { getCollection, COLLECTIONS } from "@/database/connection"
 import { ObjectId } from "mongodb"
 
 export async function POST(
