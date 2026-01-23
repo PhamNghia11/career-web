@@ -111,9 +111,9 @@ export function ApplyJobDialog({
             return
         }
 
-        // Check file size (5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            setError("Kích thước file không được vượt quá 5MB")
+        // Check file size (20MB)
+        if (file.size > 20 * 1024 * 1024) {
+            setError("Kích thước file không được vượt quá 20MB")
             return
         }
 
@@ -523,7 +523,7 @@ export function ApplyJobDialog({
                                                 {error && !selectedFile ? error : "Nhấn để tải lên CV"}
                                             </p>
                                             <p className="text-xs text-gray-500 mt-1">
-                                                {dragActive ? "Thả file vào đây" : "PDF, DOC, DOCX (Tối đa 5MB)"}
+                                                {dragActive ? "Thả file vào đây" : "PDF, DOC, DOCX (Tối đa 20MB)"}
                                             </p>
                                         </>
                                     )}

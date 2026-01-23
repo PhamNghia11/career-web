@@ -77,9 +77,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Loại file không hợp lệ" }, { status: 400 })
       }
 
-      // Validate file size (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        return NextResponse.json({ error: "File quá lớn (>5MB)" }, { status: 400 })
+      // Validate file size (20MB)
+      if (file.size > 20 * 1024 * 1024) {
+        return NextResponse.json({ error: "File quá lớn (>20MB)" }, { status: 400 })
       }
 
       // Convert CV to Base64
