@@ -127,6 +127,11 @@ export default function ManageApplicationsPage() {
         setCvUrl(null)
         setCvLoading(true)
 
+        // Auto-update status to "Reviewed" if currently "New"
+        if (app.status === "new") {
+            handleStatusChange(app._id, "reviewed")
+        }
+
         try {
             const res = await fetch(`/api/applications/${app._id}`)
             const data = await res.json()
@@ -150,6 +155,11 @@ export default function ManageApplicationsPage() {
     const handleViewDetails = (app: Application) => {
         setSelectedApp(app)
         setViewMode("details")
+
+        // Auto-update status to "Reviewed" if currently "New"
+        if (app.status === "new") {
+            handleStatusChange(app._id, "reviewed")
+        }
     }
 
     const getStatusBadge = (status: string) => {
