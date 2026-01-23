@@ -26,6 +26,10 @@ interface Application {
     status: "new" | "reviewed" | "interviewed" | "rejected" | "hired"
     createdAt: string
     employerId?: string
+    studentId?: string
+    major?: string
+    faculty?: string
+    cohort?: string
 }
 
 export default function ManageApplicationsPage() {
@@ -39,6 +43,7 @@ export default function ManageApplicationsPage() {
     const [selectedApp, setSelectedApp] = useState<Application | null>(null)
     const [cvLoading, setCvLoading] = useState(false)
     const [cvUrl, setCvUrl] = useState<string | null>(null)
+    const [viewMode, setViewMode] = useState<"cv" | "details">("details")
 
     // Filter states
     const [searchTerm, setSearchTerm] = useState("")
@@ -118,6 +123,7 @@ export default function ManageApplicationsPage() {
 
     const handleViewCV = async (app: Application) => {
         setSelectedApp(app)
+        setViewMode("cv")
         setCvUrl(null)
         setCvLoading(true)
 
@@ -136,14 +142,14 @@ export default function ManageApplicationsPage() {
             }
         } catch (error) {
             console.error("Error fetching CV:", error)
-            toast({
-                title: "Lỗi",
-                description: "Có lỗi xảy ra khi tải CV",
-                variant: "destructive"
-            })
         } finally {
             setCvLoading(false)
         }
+    }
+
+    const handleViewDetails = (app: Application) => {
+        setSelectedApp(app)
+        setViewMode("details")
     }
 
     const getStatusBadge = (status: string) => {
@@ -451,7 +457,7 @@ export default function ManageApplicationsPage() {
                                                     </Select>
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    <Button variant="ghost" size="icon" onClick={() => handleViewCV(app)}>
+                                                    <Button variant="ghost" size="icon" onClick={() => handleViewDetails(app)} title="Xem chi tiết">
                                                         <Eye className="h-4 w-4 text-gray-500" />
                                                     </Button>
                                                 </TableCell>
@@ -499,10 +505,10 @@ export default function ManageApplicationsPage() {
                                                     variant="outline"
                                                     size="sm"
                                                     className="flex-1 font-bold text-blue-600 border-blue-100 bg-blue-50/50"
-                                                    onClick={() => handleViewCV(app)}
+                                                    onClick={() => handleViewDetails(app)}
                                                 >
                                                     <FileText className="h-4 w-4 mr-2" />
-                                                    Xem CV/Chi tiết
+                                                    Xem chi tiết
                                                 </Button>
                                                 <Select
                                                     value={app.status}
@@ -531,35 +537,135 @@ export default function ManageApplicationsPage() {
             </main>
 
             <Dialog open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
-                <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[90vh] flex flex-col p-4 sm:p-6 rounded-2xl sm:rounded-xl">
+                <DialogContent className={`${viewMode === 'cv' ? 'max-w-4xl' : 'max-w-2xl'} w-[95vw] sm:w-full ${viewMode === 'cv' ? 'h-[90vh]' : 'max-h-[85vh]'} flex flex-col p-4 sm:p-6 rounded-2xl sm:rounded-xl overflow-y-auto`}>
                     <DialogHeader>
-                        <DialogTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <span className="text-base sm:text-lg truncate">CV: {selectedApp?.fullname}</span>
+                        <DialogTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4 mb-2">
+                            <span className="text-base sm:text-lg">
+                                {viewMode === 'cv' ? "Xem CV: " : "Chi tiết hồ sơ: "} {selectedApp?.fullname}
+                            </span>
                             <div className="flex items-center gap-2 shrink-0">
                                 <Badge variant="outline" className="hidden sm:inline-flex">{selectedApp?.jobTitle}</Badge>
-                                <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)} className="h-8">
-                                    Tải lại
-                                </Button>
+                                {viewMode === 'cv' ? (
+                                    <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)} className="h-8">
+                                        <RotateCcw className="h-3 w-3 mr-1" />
+                                        Tải lại
+                                    </Button>
+                                ) : (
+                                    <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)} className="h-8 border-blue-200 text-blue-600 hover:bg-blue-50">
+                                        <FileText className="h-3 w-3 mr-1" />
+                                        Xem CV
+                                    </Button>
+                                )}
                             </div>
                         </DialogTitle>
                     </DialogHeader>
-                    <div className="flex-1 bg-gray-100 rounded-md overflow-hidden relative">
-                        {cvLoading ? (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+
+                    {viewMode === 'cv' ? (
+                        <div className="flex-1 bg-gray-100 rounded-md overflow-hidden relative min-h-[500px]">
+                            {cvLoading ? (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                </div>
+                            ) : cvUrl ? (
+                                <iframe
+                                    src={cvUrl}
+                                    className="w-full h-full"
+                                    title="CV Preview"
+                                />
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-gray-500 flex-col gap-2">
+                                    <FileText className="h-10 w-10 text-gray-300" />
+                                    <span>Không thể hiển thị CV</span>
+                                    <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)}>
+                                        Thử lại
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="space-y-6 py-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Academic & Personal Section */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Thông tin sinh viên</h4>
+                                        <div className="bg-gray-50 p-4 rounded-xl space-y-3">
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-gray-500">MSSV:</span>
+                                                <span className="font-bold text-gray-900">{selectedApp?.studentId || "N/A"}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-gray-500">Khóa:</span>
+                                                <span className="font-semibold">{selectedApp?.cohort || "N/A"}</span>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] text-gray-400 uppercase font-bold">Ngành học</p>
+                                                <p className="text-sm font-medium leading-tight">{selectedApp?.major || "N/A"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] text-gray-400 uppercase font-bold">Khoa / Viện</p>
+                                                <p className="text-sm text-gray-600 leading-tight">{selectedApp?.faculty || "N/A"}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Liên hệ</h4>
+                                        <div className="bg-blue-50/50 p-4 rounded-xl space-y-3">
+                                            <div className="flex items-center gap-3 text-sm">
+                                                <Mail className="h-4 w-4 text-blue-500" />
+                                                <span className="font-medium">{selectedApp?.email}</span>
+                                            </div>
+                                            <div className="flex items-center gap-3 text-sm">
+                                                <Phone className="h-4 w-4 text-blue-500" />
+                                                <span className="font-medium">{selectedApp?.phone}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Application Status & Message Section */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Trạng thái hồ sơ</h4>
+                                        <div className="bg-gray-50 p-4 rounded-xl space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm text-gray-500">Hiện tại:</span>
+                                                {selectedApp && getStatusBadge(selectedApp.status)}
+                                            </div>
+                                            <Select
+                                                value={selectedApp?.status}
+                                                onValueChange={(value) => selectedApp && handleStatusChange(selectedApp._id, value)}
+                                            >
+                                                <SelectTrigger className="w-full bg-white">
+                                                    <SelectValue placeholder="Cập nhật trạng thái" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="new">Mới</SelectItem>
+                                                    <SelectItem value="reviewed">Đã xem</SelectItem>
+                                                    <SelectItem value="interviewed">Mời PV</SelectItem>
+                                                    <SelectItem value="hired">Đã tuyển</SelectItem>
+                                                    <SelectItem value="rejected">Từ chối</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <div className="pt-2 border-t border-gray-100 italic text-[10px] text-gray-400">
+                                                Ngày nộp: {selectedApp && new Date(selectedApp.createdAt).toLocaleString("vi-VN")}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Lời giới thiệu</h4>
+                                        <div className="bg-yellow-50/30 p-4 rounded-xl min-h-[140px]">
+                                            <p className="text-sm text-gray-700 whitespace-pre-wrap italic">
+                                                {selectedApp?.message ? `"${selectedApp.message}"` : "Không có lời nhắn."}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        ) : cvUrl ? (
-                            <iframe
-                                src={cvUrl}
-                                className="w-full h-full"
-                                title="CV Preview"
-                            />
-                        ) : (
-                            <div className="absolute inset-0 flex items-center justify-center text-gray-500">
-                                Không thể hiển thị CV
-                            </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>
