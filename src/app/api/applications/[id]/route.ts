@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/database/connection"
 import { ObjectId } from "mongodb"
+import { sendEmail } from "@/services/email.service"
 
 // GET - Get application details by ID (including CV)
 export async function GET(
@@ -157,6 +158,69 @@ export async function PATCH(
                         applicationId: id
                     })
                     console.log(`[Applications API] Created ${status} notification for student:`, currentApplication.applicantId)
+                }
+
+                // --- Send Email Notification to Candidate ---
+                if (status === "interviewed" || status === "rejected") {
+                    const candidateEmail = currentApplication.email
+                    const candidateName = currentApplication.fullname
+                    const jobTitle = currentApplication.jobTitle
+
+                    let emailSubject = ""
+                    let emailHtml = ""
+
+                    if (status === "interviewed") {
+                        emailSubject = `[GDU Career] Mời phỏng vấn vị trí: ${jobTitle}`
+                        emailHtml = `
+                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                                <div style="background-color: #1e3a8a; color: white; padding: 20px; text-align: center;">
+                                    <h1 style="margin: 0;">GDU Career Portal</h1>
+                                </div>
+                                <div style="padding: 24px; color: #333; line-height: 1.6;">
+                                    <p>Xin chào <strong>${candidateName}</strong>,</p>
+                                    <p>Chúc mừng! Chúng tôi vui mừng thông báo rằng hồ sơ của bạn cho vị trí <strong>${jobTitle}</strong> đã được nhà tuyển dụng lựa chọn để phỏng vấn.</p>
+                                    <div style="background-color: #f0f4ff; border-left: 4px solid #1e3a8a; padding: 16px; margin: 20px 0;">
+                                        <p style="margin: 0; font-weight: bold; color: #1e3a8a;">Hành động tiếp theo:</p>
+                                        <p style="margin: 8px 0 0;">Vui lòng kiểm tra điện thoại hoặc hộp thư đến trong Gmail thường xuyên. Nhà tuyển dụng sẽ trực tiếp liên hệ với bạn để sắp xếp lịch phỏng vấn chi tiết.</p>
+                                    </div>
+                                    <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi qua hệ thống portal.</p>
+                                    <p>Trân trọng,<br><strong>Đội ngũ GDU Career</strong></p>
+                                </div>
+                                <div style="background-color: #f9fafb; padding: 16px; text-align: center; border-top: 1px solid #e0e0e0; font-size: 12px; color: #6b7280;">
+                                    <p style="margin: 0;">Đây là email tự động, vui lòng không trả lời email này.</p>
+                                    <p style="margin: 4px 0 0;">&copy; 2026 Gia Dinh University Career Portal</p>
+                                </div>
+                            </div>
+                        `
+                    } else if (status === "rejected") {
+                        emailSubject = `[GDU Career] Kết quả ứng tuyển vị trí: ${jobTitle}`
+                        emailHtml = `
+                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                                <div style="background-color: #374151; color: white; padding: 20px; text-align: center;">
+                                    <h1 style="margin: 0;">GDU Career Portal</h1>
+                                </div>
+                                <div style="padding: 24px; color: #333; line-height: 1.6;">
+                                    <p>Xin chào <strong>${candidateName}</strong>,</p>
+                                    <p>Cảm ơn bạn đã quan tâm và nộp hồ sơ vào vị trí <strong>${jobTitle}</strong> thông qua GDU Career Portal.</p>
+                                    <p>Rất tiếc, sau khi xem xét kỹ lưỡng, chúng tôi nhận thấy hồ sơ của bạn chưa thực sự phù hợp với yêu cầu hiện tại cho vị trí này. Tuy nhiên, chúng tôi sẽ lưu trữ hồ sơ của bạn để xem xét cho các cơ hội phù hợp khác trong tương lai.</p>
+                                    <p>Chúc bạn sớm tìm được công việc ưng ý và gặt hái được nhiều thành công trên con đường sự nghiệp của mình.</p>
+                                    <p>Trân trọng,<br><strong>Đội ngũ GDU Career</strong></p>
+                                </div>
+                                <div style="background-color: #f9fafb; padding: 16px; text-align: center; border-top: 1px solid #e0e0e0; font-size: 12px; color: #6b7280;">
+                                    <p style="margin: 0;">Đây là email tự động, vui lòng không trả lời email này.</p>
+                                    <p style="margin: 4px 0 0;">&copy; 2026 Gia Dinh University Career Portal</p>
+                                </div>
+                            </div>
+                        `
+                    }
+
+                    if (emailSubject && candidateEmail) {
+                        sendEmail({
+                            to: candidateEmail,
+                            subject: emailSubject,
+                            html: emailHtml
+                        }).catch(err => console.error("Async email sending failed:", err))
+                    }
                 }
             } catch (notifError) {
                 console.error("Failed to create student status notification:", notifError)
