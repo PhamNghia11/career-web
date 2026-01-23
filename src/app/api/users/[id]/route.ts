@@ -125,10 +125,13 @@ export async function DELETE(
             // Continue with user deletion even if cleanup fails partially
         }
 
-        // 3. Prevent deleting Root Admin
+        // 3. Prevent deleting Admin accounts by non-root admins
         const adminEmail = process.env.ADMIN_EMAIL
-        if (userToDelete.email === adminEmail) {
-            return NextResponse.json({ error: "Không thể xóa tài khoản Quản trị viên gốc." }, { status: 403 })
+        const body = await req.json().catch(() => ({})) // Try to get body for requesterEmail
+        const requesterEmail = body.requesterEmail
+
+        if (userToDelete.role === "admin" && requesterEmail !== adminEmail) {
+            return NextResponse.json({ error: "Chỉ Quản trị viên gốc mới có quyền xóa tài khoản Quản trị viên." }, { status: 403 })
         }
 
         // 4. Finally delete the user record itself
@@ -170,10 +173,12 @@ export async function PATCH(
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
 
-        // Prevent updating Root Admin
+        // Root Admin and Admin management protection
         const adminEmail = process.env.ADMIN_EMAIL
-        if (currentUser.email === adminEmail) {
-            return NextResponse.json({ error: "Không thể chỉnh sửa tài khoản Quản trị viên gốc." }, { status: 403 })
+        const requesterEmail = body.requesterEmail
+
+        if (currentUser.role === "admin" && requesterEmail !== adminEmail) {
+            return NextResponse.json({ error: "Chỉ Quản trị viên gốc mới có quyền chỉnh sửa tài khoản Quản trị viên." }, { status: 403 })
         }
 
         // Prevent updating to invalid roles if role is present

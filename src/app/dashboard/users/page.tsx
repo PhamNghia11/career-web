@@ -90,12 +90,16 @@ export default function UsersManagementPage() {
     }
   }
 
+  const isRootAdmin = user?.email === adminEmail
+
   const handleDeleteUser = async () => {
     if (!userToDelete) return
 
     try {
       const response = await fetch(`/api/users/${userToDelete}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requesterEmail: user?.email })
       })
       const data = await response.json()
 
@@ -118,8 +122,9 @@ export default function UsersManagementPage() {
 
     try {
       const payload = {
-        name: editingUser.name, // Only update name and role for now as example
-        role: editingUser.role
+        name: editingUser.name,
+        role: editingUser.role,
+        requesterEmail: user?.email
       }
 
       const response = await fetch(`/api/users/${editingUser._id}`, {
@@ -150,7 +155,7 @@ export default function UsersManagementPage() {
       const response = await fetch(`/api/users/${editingUser._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: selectedRole })
+        body: JSON.stringify({ role: selectedRole, requesterEmail: user?.email })
       })
       const data = await response.json()
 
@@ -400,45 +405,43 @@ export default function UsersManagementPage() {
                         {new Date(u.createdAt).toLocaleDateString("vi-VN")}
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {u.email !== adminEmail && (
-                              <>
-                                <DropdownMenuItem onClick={() => {
-                                  setEditingUser(u)
-                                  setEditDialogOpen(true)
-                                }}>
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Chỉnh sửa
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => {
-                                  setEditingUser(u)
-                                  setSelectedRole(u.role)
-                                  setRoleDialogOpen(true)
-                                }}>
-                                  <Shield className="h-4 w-4 mr-2" />
-                                  Đổi vai trò
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                  className="text-destructive"
-                                  onClick={() => {
-                                    setUserToDelete(u._id)
-                                    setDeleteDialogOpen(true)
-                                  }}
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Xóa
-                                </DropdownMenuItem>
-                              </>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        {(u.email !== adminEmail && (u.role !== 'admin' || isRootAdmin)) ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => {
+                                setEditingUser(u)
+                                setEditDialogOpen(true)
+                              }}>
+                                <Edit className="h-4 w-4 mr-2" />
+                                Chỉnh sửa
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => {
+                                setEditingUser(u)
+                                setSelectedRole(u.role)
+                                setRoleDialogOpen(true)
+                              }}>
+                                <Shield className="h-4 w-4 mr-2" />
+                                Đổi vai trò
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={() => {
+                                  setUserToDelete(u._id)
+                                  setDeleteDialogOpen(true)
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Xóa
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : null}
                       </td>
                     </tr>
                   )))}
@@ -468,7 +471,7 @@ export default function UsersManagementPage() {
                           <p className="text-xs text-gray-500 truncate">{u.email}</p>
                         </div>
                       </div>
-                      {u.email !== adminEmail && (
+                      {u.email !== adminEmail && (u.role !== 'admin' || isRootAdmin) && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="icon" className="h-8 w-8 rounded-full">
