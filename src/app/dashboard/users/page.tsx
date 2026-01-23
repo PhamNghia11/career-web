@@ -61,6 +61,8 @@ export default function UsersManagementPage() {
     fetchUsers()
   }, [user])
 
+  const adminEmail = "phamlenghia113dx@gmail.com" // Hardcoded for matching UI, should ideally come from public env if possible
+
   const fetchUsers = async () => {
     try {
       if (user?.role !== 'admin') {
@@ -334,9 +336,16 @@ export default function UsersManagementPage() {
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <Badge className={roleColors[u.role as keyof typeof roleColors] || "bg-gray-100 text-gray-800"}>
-                          {roleLabels[u.role as keyof typeof roleLabels] || u.role}
-                        </Badge>
+                        <div className="flex flex-col gap-1">
+                          <Badge className={roleColors[u.role as keyof typeof roleColors] || "bg-gray-100 text-gray-800"}>
+                            {roleLabels[u.role as keyof typeof roleLabels] || u.role}
+                          </Badge>
+                          {u.email === adminEmail && (
+                            <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 text-[10px]">
+                              Quản trị viên gốc
+                            </Badge>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3 px-4 text-center">
                         {u.emailVerified ? (
@@ -352,6 +361,75 @@ export default function UsersManagementPage() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {u.email !== adminEmail && (
+                              <>
+                                <DropdownMenuItem onClick={() => {
+                                  setEditingUser(u)
+                                  setEditDialogOpen(true)
+                                }}>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Chỉnh sửa
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => {
+                                  setEditingUser(u)
+                                  setSelectedRole(u.role)
+                                  setRoleDialogOpen(true)
+                                }}>
+                                  <Shield className="h-4 w-4 mr-2" />
+                                  Đổi vai trò
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  className="text-destructive"
+                                  onClick={() => {
+                                    setUserToDelete(u._id)
+                                    setDeleteDialogOpen(true)
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Xóa
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  )))}
+              </tbody>
+            </table>
+
+            {/* Mobile Card View */}
+            <div className="lg:hidden divide-y divide-gray-50 px-1">
+              {loading ? (
+                <div className="py-12 text-center text-gray-500">Đang tải dữ liệu...</div>
+              ) : filteredUsers.length === 0 ? (
+                <div className="py-12 text-center text-gray-500">Không tìm thấy người dùng nào</div>
+              ) : (
+                filteredUsers.map((u) => (
+                  <div key={u._id} className="p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-sm shrink-0 overflow-hidden">
+                          {u.avatar ? (
+                            <img src={u.avatar} alt={u.name} className="w-full h-full object-cover" />
+                          ) : (
+                            (u.name?.charAt(0) || "U").toUpperCase()
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-bold text-gray-900 truncate leading-tight">{u.name || "Chưa có tên"}</h3>
+                          <p className="text-xs text-gray-500 truncate">{u.email}</p>
+                        </div>
+                      </div>
+                      {u.email !== adminEmail && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon" className="h-8 w-8 rounded-full">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -384,70 +462,7 @@ export default function UsersManagementPage() {
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      </td>
-                    </tr>
-                  )))}
-              </tbody>
-            </table>
-
-            {/* Mobile Card View */}
-            <div className="lg:hidden divide-y divide-gray-50 px-1">
-              {loading ? (
-                <div className="py-12 text-center text-gray-500">Đang tải dữ liệu...</div>
-              ) : filteredUsers.length === 0 ? (
-                <div className="py-12 text-center text-gray-500">Không tìm thấy người dùng nào</div>
-              ) : (
-                filteredUsers.map((u) => (
-                  <div key={u._id} className="p-4 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-sm shrink-0 overflow-hidden">
-                          {u.avatar ? (
-                            <img src={u.avatar} alt={u.name} className="w-full h-full object-cover" />
-                          ) : (
-                            (u.name?.charAt(0) || "U").toUpperCase()
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="font-bold text-gray-900 truncate leading-tight">{u.name || "Chưa có tên"}</h3>
-                          <p className="text-xs text-gray-500 truncate">{u.email}</p>
-                        </div>
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="icon" className="h-8 w-8 rounded-full">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => {
-                            setEditingUser(u)
-                            setEditDialogOpen(true)
-                          }}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Chỉnh sửa
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => {
-                            setEditingUser(u)
-                            setSelectedRole(u.role)
-                            setRoleDialogOpen(true)
-                          }}>
-                            <Shield className="h-4 w-4 mr-2" />
-                            Đổi vai trò
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => {
-                              setUserToDelete(u._id)
-                              setDeleteDialogOpen(true)
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Xóa
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      )}
                     </div>
 
                     <div className="flex flex-wrap gap-2">
@@ -524,11 +539,16 @@ export default function UsersManagementPage() {
                 <SelectValue placeholder="Chọn vai trò" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="student">Sinh viên</SelectItem>
-                <SelectItem value="employer">Nhà tuyển dụng</SelectItem>
-                <SelectItem value="admin">Quản trị viên</SelectItem>
+                {editingUser?.role === "student" && <SelectItem value="student">Sinh viên</SelectItem>}
+                {editingUser?.role === "employer" && <SelectItem value="employer">Nhà tuyển dụng</SelectItem>}
+                {editingUser?.role === "admin" && <SelectItem value="admin">Quản trị viên</SelectItem>}
               </SelectContent>
             </Select>
+            {editingUser?.role !== "admin" && (
+              <p className="text-xs text-muted-foreground mt-2">
+                * Hiện tại tài khoản này chỉ có 1 vai trò hợp lệ trong luồng sử dụng.
+              </p>
+            )}
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setRoleDialogOpen(false)} className="rounded-xl h-11">Hủy</Button>

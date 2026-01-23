@@ -125,7 +125,13 @@ export async function DELETE(
             // Continue with user deletion even if cleanup fails partially
         }
 
-        // 3. Finally delete the user record itself
+        // 3. Prevent deleting Root Admin
+        const adminEmail = process.env.ADMIN_EMAIL
+        if (userToDelete.email === adminEmail) {
+            return NextResponse.json({ error: "Không thể xóa tài khoản Quản trị viên gốc." }, { status: 403 })
+        }
+
+        // 4. Finally delete the user record itself
         const result = await usersCollection.deleteOne({ _id: new ObjectId(id) })
 
         if (result.deletedCount === 0) {
@@ -158,10 +164,46 @@ export async function PATCH(
         }
 
         const collection = await getCollection(COLLECTIONS.USERS)
+        const currentUser = await collection.findOne({ _id: new ObjectId(id) })
+
+        if (!currentUser) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 })
+        }
+
+        // Prevent updating Root Admin
+        const adminEmail = process.env.ADMIN_EMAIL
+        if (currentUser.email === adminEmail) {
+            return NextResponse.json({ error: "Không thể chỉnh sửa tài khoản Quản trị viên gốc." }, { status: 403 })
+        }
 
         // Prevent updating to invalid roles if role is present
         if (body.role && !["student", "employer", "admin"].includes(body.role)) {
             return NextResponse.json({ error: "Invalid role" }, { status: 400 })
+        }
+
+        // Role track restriction
+        if (body.role && body.role !== currentUser.role) {
+            // Simple mapping: each role is currently its own track
+            // student -> only student
+            // employer -> only employer
+            // admin -> only admin (unless there are sub-roles in future)
+
+            // For now, if current role is X, new role must be X (effectively disabling horizontal role change)
+            // If we want to allow future vertical roles, we'd check if they belong to the same category.
+            const tracks = {
+                student: ["student"],
+                employer: ["employer"],
+                admin: ["admin"]
+            }
+
+            const currentTrack = Object.entries(tracks).find(([_, roles]) => roles.includes(currentUser.role))?.[0]
+            const newRoleInSameTrack = currentTrack && tracks[currentTrack as keyof typeof tracks].includes(body.role)
+
+            if (!newRoleInSameTrack) {
+                return NextResponse.json({
+                    error: `Không thể đổi vai trò từ ${currentUser.role} sang ${body.role}. Đổi vai trò chỉ áp dụng cho tài khoản cùng luồng.`
+                }, { status: 400 })
+            }
         }
 
         // Validate phone number if present

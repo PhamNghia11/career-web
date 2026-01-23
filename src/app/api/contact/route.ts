@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/database/connection"
+import { sendEmail } from "@/services/email.service"
 
 export async function POST(request: Request) {
   try {
@@ -18,8 +19,6 @@ export async function POST(request: Request) {
     }
 
     const contactsCollection = await getCollection(COLLECTIONS.CONTACTS)
-
-
 
     const result = await contactsCollection.insertOne({
       name,
@@ -45,6 +44,51 @@ export async function POST(request: Request) {
       link: `/dashboard/messages`,
       contactId: contactId
     })
+
+    // Send Email to Admin
+    if (process.env.ADMIN_EMAIL) {
+      try {
+        const host = request.headers.get('host')
+        const protocol = host?.includes('localhost') ? 'http' : 'https'
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (host ? `${protocol}://${host}` : 'http://localhost:3000')
+        const messageLink = `${baseUrl.replace(/\/$/, '')}/dashboard/messages`
+
+        await sendEmail({
+          to: process.env.ADMIN_EMAIL,
+          subject: `[GDU Career] Liên hệ mới từ ${name}: ${subject}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+              <div style="background-color: #0F52BA; color: white; padding: 20px; text-align: center;">
+                <h2 style="margin: 0;">Liên hệ mới</h2>
+              </div>
+              <div style="padding: 20px; line-height: 1.6;">
+                <p>Bạn nhận được một tin nhắn liên hệ mới từ hệ thống:</p>
+                <div style="background-color: #f5f8ff; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                  <p style="margin: 5px 0;"><strong>Người gửi:</strong> ${name}</p>
+                  <p style="margin: 5px 0;"><strong>Email:</strong> ${email}</p>
+                  <p style="margin: 5px 0;"><strong>Số điện thoại:</strong> ${phone || "N/A"}</p>
+                  <p style="margin: 5px 0;"><strong>Chủ đề:</strong> ${subject}</p>
+                </div>
+                <div style="border-left: 4px solid #0F52BA; padding-left: 15px; font-style: italic; color: #555;">
+                  ${message.replace(/\n/g, '<br/>')}
+                </div>
+                <div style="text-align: center; margin-top: 30px;">
+                  <a href="${messageLink}" 
+                     style="background-color: #0F52BA; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                    Xem chi tiết trong Dashboard
+                  </a>
+                </div>
+              </div>
+              <div style="background-color: #f9f9f9; color: #888; padding: 15px; text-align: center; font-size: 12px;">
+                <p>Email này được gửi tự động từ GDU Career Portal.</p>
+              </div>
+            </div>
+          `
+        })
+      } catch (emailError) {
+        console.error("Failed to send contact email to admin:", emailError)
+      }
+    }
 
     return NextResponse.json(
       {
