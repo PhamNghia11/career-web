@@ -23,10 +23,61 @@ export default function ProfilePage() {
     phone: user?.phone || "",
     studentId: user?.studentId || "",
     major: user?.major || "",
+    faculty: user?.faculty || "",
+    cohort: user?.cohort || "",
   })
 
+  // Mapping of Majors to their corresponding Faculties (Official GDU List)
+  const MAJOR_FACULTY_MAP: Record<string, string> = {
+    // Sức khỏe
+    "Răng Hàm Mặt": "Sức khỏe",
+    "Kỹ thuật phục hồi chức năng": "Sức khỏe",
+    "Điều dưỡng": "Sức khỏe",
+    // Công nghệ thông tin
+    "Công nghệ thông tin": "Công nghệ thông tin",
+    "Kỹ thuật phần mềm": "Công nghệ thông tin",
+    "Mạng máy tính & Truyền thông dữ liệu": "Công nghệ thông tin",
+    "Trí tuệ nhân tạo": "Công nghệ thông tin",
+    // Truyền thông
+    "Truyền thông đa phương tiện": "Truyền thông",
+    "Công nghệ truyền thông": "Truyền thông",
+    "Quan hệ công chúng": "Truyền thông",
+    // Kinh doanh
+    "Kinh doanh quốc tế": "Kinh doanh",
+    "Kinh doanh thương mại": "Kinh doanh",
+    "Thương mại điện tử": "Kinh doanh",
+    // Quản trị - Quản lý
+    "Quản trị kinh doanh": "Quản trị - Quản lý",
+    "Marketing": "Quản trị - Quản lý",
+    "Quản trị khách sạn": "Quản trị - Quản lý",
+    "Quản trị dịch vụ du lịch & lữ hành": "Quản trị - Quản lý",
+    "Logistics & Quản lý chuỗi cung ứng": "Quản trị - Quản lý",
+    // Luật
+    "Luật": "Luật",
+    "Luật kinh tế": "Luật",
+    // Khoa học xã hội & Ngôn ngữ quốc tế
+    "Ngôn ngữ Anh": "Khoa học xã hội & Ngôn ngữ quốc tế",
+    "Đông phương học": "Khoa học xã hội & Ngôn ngữ quốc tế",
+    "Tâm lý học": "Khoa học xã hội & Ngôn ngữ quốc tế",
+    "Ngôn ngữ Trung Quốc": "Khoa học xã hội & Ngôn ngữ quốc tế",
+    // Tài chính ngân hàng
+    "Tài chính - Ngân hàng": "Tài chính ngân hàng",
+    "Công nghệ tài chính": "Tài chính ngân hàng",
+    "Kế toán": "Tài chính ngân hàng",
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    if (name === "major") {
+      const matchedFaculty = MAJOR_FACULTY_MAP[value]
+      setFormData({
+        ...formData,
+        [name]: value,
+        faculty: matchedFaculty || formData.faculty
+      })
+    } else {
+      setFormData({ ...formData, [name]: value })
+    }
   }
 
   const handleSave = async () => {
@@ -254,12 +305,97 @@ export default function ProfilePage() {
                       className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed bg-background"
                     >
                       <option value="">Chọn ngành học</option>
+                      <optgroup label="Sức khỏe">
+                        <option value="Răng Hàm Mặt">Răng Hàm Mặt</option>
+                        <option value="Kỹ thuật phục hồi chức năng">Kỹ thuật phục hồi chức năng</option>
+                        <option value="Điều dưỡng">Điều dưỡng</option>
+                      </optgroup>
+                      <optgroup label="Công nghệ thông tin">
+                        <option value="Công nghệ thông tin">Công nghệ thông tin</option>
+                        <option value="Kỹ thuật phần mềm">Kỹ thuật phần mềm</option>
+                        <option value="Mạng máy tính & Truyền thông dữ liệu">Mạng máy tính</option>
+                        <option value="Trí tuệ nhân tạo">Trí tuệ nhân tạo</option>
+                      </optgroup>
+                      <optgroup label="Truyền thông">
+                        <option value="Truyền thông đa phương tiện">Truyền thông đa phương tiện</option>
+                        <option value="Công nghệ truyền thông">Công nghệ truyền thông</option>
+                        <option value="Quan hệ công chúng">Quan hệ công chúng</option>
+                      </optgroup>
+                      <optgroup label="Kinh doanh">
+                        <option value="Kinh doanh quốc tế">Kinh doanh quốc tế</option>
+                        <option value="Kinh doanh thương mại">Kinh doanh thương mại</option>
+                        <option value="Thương mại điện tử">Thương mại điện tử</option>
+                      </optgroup>
+                      <optgroup label="Quản trị - Quản lý">
+                        <option value="Quản trị kinh doanh">Quản trị kinh doanh</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Quản trị khách sạn">Quản trị khách sạn</option>
+                        <option value="Quản trị dịch vụ du lịch & lữ hành">Du lịch</option>
+                        <option value="Logistics & Quản lý chuỗi cung ứng">Logistics</option>
+                      </optgroup>
+                      <optgroup label="Luật">
+                        <option value="Luật">Luật</option>
+                        <option value="Luật kinh tế">Luật kinh tế</option>
+                      </optgroup>
+                      <optgroup label="Khoa học xã hội & Ngôn ngữ quốc tế">
+                        <option value="Ngôn ngữ Anh">Ngôn ngữ Anh</option>
+                        <option value="Đông phương học">Đông phương học</option>
+                        <option value="Tâm lý học">Tâm lý học</option>
+                        <option value="Ngôn ngữ Trung Quốc">Ngôn ngữ Trung Quốc</option>
+                      </optgroup>
+                      <optgroup label="Tài chính ngân hàng">
+                        <option value="Tài chính - Ngân hàng">Tài chính - Ngân hàng</option>
+                        <option value="Công nghệ tài chính">Công nghệ tài chính</option>
+                        <option value="Kế toán">Kế toán</option>
+                      </optgroup>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="faculty">Khoa / Viện</Label>
+                  <div className="relative">
+                    <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <select
+                      id="faculty"
+                      name="faculty"
+                      value={formData.faculty}
+                      onChange={handleChange}
+                      disabled={!isEditing || (formData.major !== "" && MAJOR_FACULTY_MAP[formData.major] !== undefined)}
+                      className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed bg-background"
+                    >
+                      <option value="">Chọn khoa / viện</option>
+                      <option value="Sức khỏe">Sức khỏe</option>
                       <option value="Công nghệ thông tin">Công nghệ thông tin</option>
-                      <option value="Quản trị kinh doanh">Quản trị kinh doanh</option>
-                      <option value="Marketing">Marketing</option>
+                      <option value="Truyền thông">Truyền thông</option>
+                      <option value="Kinh doanh">Kinh doanh</option>
+                      <option value="Quản trị - Quản lý">Quản trị - Quản lý</option>
+                      <option value="Luật">Luật</option>
+                      <option value="Khoa học xã hội & Ngôn ngữ quốc tế">KHXH & Ngôn ngữ quốc tế</option>
                       <option value="Tài chính ngân hàng">Tài chính ngân hàng</option>
-                      <option value="Kế toán">Kế toán</option>
-                      <option value="Ngôn ngữ Anh">Ngôn ngữ Anh</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="cohort">Khóa</Label>
+                  <div className="relative">
+                    <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <select
+                      id="cohort"
+                      name="cohort"
+                      value={formData.cohort}
+                      onChange={handleChange}
+                      disabled={!isEditing}
+                      className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed bg-background"
+                    >
+                      <option value="">Chọn khóa</option>
+                      <option value="K14">K14</option>
+                      <option value="K15">K15</option>
+                      <option value="K16">K16</option>
+                      <option value="K17">K17</option>
+                      <option value="K18">K18</option>
+                      <option value="K19">K19</option>
                     </select>
                   </div>
                 </div>

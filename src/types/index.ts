@@ -8,6 +8,8 @@ export interface User {
   phone?: string
   studentId?: string
   major?: string
+  faculty?: string
+  cohort?: string
   createdAt: Date
   updatedAt: Date
   // Company fields
