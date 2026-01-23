@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAuth } from "@/lib/auth-context"
-import { FileText, Mail, Phone, Calendar, User, CheckCircle, XCircle, Clock, Eye } from "lucide-react"
+import { FileText, Mail, Phone, Calendar, User, CheckCircle, XCircle, Clock, Eye, Search, Filter, RotateCcw } from "lucide-react"
+import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
@@ -38,6 +39,30 @@ export default function ManageApplicationsPage() {
     const [selectedApp, setSelectedApp] = useState<Application | null>(null)
     const [cvLoading, setCvLoading] = useState(false)
     const [cvUrl, setCvUrl] = useState<string | null>(null)
+
+    // Filter states
+    const [searchTerm, setSearchTerm] = useState("")
+    const [statusFilter, setStatusFilter] = useState("all")
+    const [jobFilter, setJobFilter] = useState("all")
+    const [companyFilter, setCompanyFilter] = useState("all")
+
+    // Filtered data logic
+    const filteredApplications = applications.filter((app) => {
+        const matchesSearch =
+            app.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            app.email.toLowerCase().includes(searchTerm.toLowerCase())
+
+        const matchesStatus = statusFilter === "all" || app.status === statusFilter
+        const matchesJob = jobFilter === "all" || app.jobTitle === jobFilter
+        const matchesCompany = companyFilter === "all" || app.companyName === companyFilter
+
+        return matchesSearch && matchesStatus && matchesJob && matchesCompany
+    })
+
+    // Get unique jobs and companies for filters
+    const uniqueJobs = Array.from(new Set(applications.map(app => app.jobTitle)))
+    const uniqueCompanies = Array.from(new Set(applications.map(app => app.companyName)))
 
     useEffect(() => {
         if (!isLoading && user) {
@@ -236,15 +261,88 @@ export default function ManageApplicationsPage() {
                     </div>
                 </div>
 
+                {/* Filter Bar */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-6 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                    <div className="relative col-span-1 lg:col-span-2">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                            placeholder="Tìm tên ứng viên, vị trí, email..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-9 h-10"
+                        />
+                    </div>
+
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="h-10">
+                            <div className="flex items-center gap-2">
+                                <Filter className="h-4 w-4 text-gray-400" />
+                                <SelectValue placeholder="Trạng thái" />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                            <SelectItem value="new">Mới</SelectItem>
+                            <SelectItem value="reviewed">Đã xem</SelectItem>
+                            <SelectItem value="interviewed">Phỏng vấn</SelectItem>
+                            <SelectItem value="hired">Đã tuyển</SelectItem>
+                            <SelectItem value="rejected">Từ chối</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <Select value={jobFilter} onValueChange={setJobFilter}>
+                        <SelectTrigger className="h-10">
+                            <SelectValue placeholder="Vị trí tuyển dụng" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Tất cả vị trí</SelectItem>
+                            {uniqueJobs.map(job => (
+                                <SelectItem key={job} value={job}>{job}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    <div className="flex gap-2">
+                        <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                            <SelectTrigger className="h-10 flex-1">
+                                <SelectValue placeholder="Công ty" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Tất cả công ty</SelectItem>
+                                {uniqueCompanies.map(company => (
+                                    <SelectItem key={company} value={company}>{company}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        {(searchTerm || statusFilter !== "all" || jobFilter !== "all" || companyFilter !== "all") && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                    setSearchTerm("")
+                                    setStatusFilter("all")
+                                    setJobFilter("all")
+                                    setCompanyFilter("all")
+                                }}
+                                className="h-10 w-10 shrink-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                                title="Xóa bộ lọc"
+                            >
+                                <RotateCcw className="h-4 w-4" />
+                            </Button>
+                        )}
+                    </div>
+                </div>
+
                 <Card>
                     <CardHeader>
-                        <CardTitle>Danh sách hồ sơ ({applications.length})</CardTitle>
+                        <CardTitle>Danh sách hồ sơ ({filteredApplications.length})</CardTitle>
                         <CardDescription>
                             Danh sách ứng viên nộp hồ sơ vào các vị trí của bạn
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        {applications.length === 0 ? (
+                        {filteredApplications.length === 0 ? (
                             <div className="text-center py-12">
                                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <FileText className="h-8 w-8 text-gray-400" />
@@ -268,7 +366,7 @@ export default function ManageApplicationsPage() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {applications.map((app) => (
+                                        {filteredApplications.map((app) => (
                                             <TableRow key={app._id}>
                                                 <TableCell>
                                                     <div className="font-medium text-blue-900">{app.jobTitle}</div>
@@ -364,7 +462,7 @@ export default function ManageApplicationsPage() {
 
                                 {/* Mobile Card View */}
                                 <div className="grid grid-cols-1 gap-4 lg:hidden">
-                                    {applications.map((app) => (
+                                    {filteredApplications.map((app) => (
                                         <div key={app._id} className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm space-y-4">
                                             <div className="flex justify-between items-start">
                                                 <div className="min-w-0 flex-1">
