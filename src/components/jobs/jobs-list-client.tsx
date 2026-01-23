@@ -914,10 +914,86 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     <div className="space-y-6">
       {/* Horizontal Filter Bar - STICKY */}
       <div ref={dropdownRef} className="bg-white/95 backdrop-blur-md sticky top-[112px] lg:top-[128px] z-40 border-b border-gray-100 py-2.5 lg:py-4 mb-6 shadow-sm">
-        <div className="container mx-auto px-4 space-y-3">
-          {/* Row 1: Mobile Search - Visible only on LG hidden */}
-          <div className="lg:hidden w-full">
-            <div className="relative group">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+            {/* Filters Row - Scrollable on mobile, wraps on desktop if needed */}
+            <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 overflow-x-auto pb-1 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex-1">
+              <FilterDropdown
+                label="Ngành nghề"
+                options={industryOptions}
+                value={selectedIndustry}
+                onChange={setSelectedIndustry}
+                icon={Briefcase}
+                dropdownId="industry"
+              />
+              <FilterDropdown
+                label="Kinh nghiệm"
+                options={experienceOptions}
+                value={selectedExperience}
+                onChange={setSelectedExperience}
+                icon={Clock}
+                dropdownId="experience"
+              />
+              <FilterDropdown
+                label="Mức lương"
+                options={advancedSalaryRanges}
+                value={selectedSalary}
+                onChange={setSelectedSalary}
+                icon={DollarSign}
+                dropdownId="salary"
+              />
+              <FilterDropdown
+                label="Học vấn"
+                options={educationOptions}
+                value={selectedEducation}
+                onChange={setSelectedEducation}
+                icon={GraduationCap}
+                dropdownId="education"
+              />
+              <FilterDropdown
+                label="Loại việc"
+                options={Object.entries(typeLabels).map(([id, label]) => ({ id, label }))}
+                value={selectedType}
+                onChange={setSelectedType}
+                icon={Building}
+                dropdownId="type"
+              />
+              <FilterDropdown
+                label="Đăng trong"
+                options={postedDateOptions}
+                value={selectedPostedDate}
+                onChange={setSelectedPostedDate}
+                icon={Calendar}
+                dropdownId="posted"
+              />
+              <FilterDropdown
+                label="Địa điểm"
+                options={locationOptions}
+                value={selectedLocation}
+                onChange={setSelectedLocation}
+                icon={MapPin}
+                dropdownId="location"
+                searchable={true}
+              />
+
+              {(hasAdvancedFilters || selectedSalary || selectedType || searchQuery) && (
+                <button
+                  onClick={() => {
+                    clearAdvancedFilters()
+                    setSelectedSalary(null)
+                    setSelectedType(null)
+                    setSearchQuery("")
+                  }}
+                  className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-full transition-all border border-red-100"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  <span>Xóa hết</span>
+                </button>
+              )}
+            </div>
+
+            {/* Search Input - Desktop: Fixed width on right, Mobile: Full width */}
+            <div className="w-full lg:w-72 relative group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-primary transition-colors" />
               <input
                 type="text"
@@ -927,82 +1003,6 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                 className="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all font-medium"
               />
             </div>
-          </div>
-
-          {/* Row 2: Filters Row - Scrollable on mobile */}
-          <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 overflow-x-auto pb-1 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            <FilterDropdown
-              label="Ngành nghề"
-              options={industryOptions}
-              value={selectedIndustry}
-              onChange={setSelectedIndustry}
-              icon={Briefcase}
-              dropdownId="industry"
-            />
-            <FilterDropdown
-              label="Kinh nghiệm"
-              options={experienceOptions}
-              value={selectedExperience}
-              onChange={setSelectedExperience}
-              icon={Clock}
-              dropdownId="experience"
-            />
-            <FilterDropdown
-              label="Mức lương"
-              options={advancedSalaryRanges}
-              value={selectedSalary}
-              onChange={setSelectedSalary}
-              icon={DollarSign}
-              dropdownId="salary"
-            />
-            <FilterDropdown
-              label="Học vấn"
-              options={educationOptions}
-              value={selectedEducation}
-              onChange={setSelectedEducation}
-              icon={GraduationCap}
-              dropdownId="education"
-            />
-            <FilterDropdown
-              label="Loại việc"
-              options={Object.entries(typeLabels).map(([id, label]) => ({ id, label }))}
-              value={selectedType}
-              onChange={setSelectedType}
-              icon={Building}
-              dropdownId="type"
-            />
-            <FilterDropdown
-              label="Đăng trong"
-              options={postedDateOptions}
-              value={selectedPostedDate}
-              onChange={setSelectedPostedDate}
-              icon={Calendar}
-              dropdownId="posted"
-            />
-            <FilterDropdown
-              label="Địa điểm"
-              options={locationOptions}
-              value={selectedLocation}
-              onChange={setSelectedLocation}
-              icon={MapPin}
-              dropdownId="location"
-              searchable={true}
-            />
-
-            {(hasAdvancedFilters || selectedSalary || selectedType || searchQuery) && (
-              <button
-                onClick={() => {
-                  clearAdvancedFilters()
-                  setSelectedSalary(null)
-                  setSelectedType(null)
-                  setSearchQuery("")
-                }}
-                className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 rounded-full transition-all border border-red-100"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span>Xóa hết</span>
-              </button>
-            )}
           </div>
         </div>
       </div>
