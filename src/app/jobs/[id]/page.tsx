@@ -18,6 +18,8 @@ interface JobPageProps {
     }>
 }
 
+export const dynamic = "force-dynamic"
+
 export function generateStaticParams() {
     return allJobs.map((job) => ({
         id: job._id,
@@ -26,26 +28,27 @@ export function generateStaticParams() {
 
 export default async function JobPage(props: JobPageProps) {
     const params = await props.params;
-    let job = allJobs.find((j) => j._id === params.id)
+    let job: any = null
 
-    // Fallback: Try to fetch from DB if not found in static
-    if (!job) {
-        try {
-            const { getCollection, COLLECTIONS } = await import("@/database/connection")
-            const { ObjectId } = await import("mongodb")
-            const collection = await getCollection(COLLECTIONS.JOBS)
+    // 1. Try to fetch from DB first (Most up-to-date)
+    try {
+        const { getCollection, COLLECTIONS } = await import("@/database/connection")
+        const { ObjectId } = await import("mongodb")
+        const collection = await getCollection(COLLECTIONS.JOBS)
 
-            try {
-                const dbJob = await collection.findOne({ _id: new ObjectId(params.id) })
-                if (dbJob) {
-                    job = { ...dbJob, _id: dbJob._id.toString() } as any
-                }
-            } catch (e) {
-                // Ignore invalid ID
+        if (ObjectId.isValid(params.id)) {
+            const dbJob = await collection.findOne({ _id: new ObjectId(params.id) })
+            if (dbJob) {
+                job = { ...dbJob, _id: dbJob._id.toString() }
             }
-        } catch (error) {
-            // Error fetching from DB
         }
+    } catch (error) {
+        console.error("Error fetching job from DB:", error)
+    }
+
+    // 2. Fallback: Try static data if not found in DB
+    if (!job) {
+        job = allJobs.find((j) => j._id === params.id)
     }
 
     if (!job) {
@@ -134,7 +137,7 @@ export default async function JobPage(props: JobPageProps) {
                                             Yêu cầu ứng viên
                                         </h2>
                                         <ul className="grid gap-3">
-                                            {job.requirements.map((req, index) => (
+                                            {job.requirements.map((req: string, index: number) => (
                                                 <li key={index} className="flex items-start gap-4 text-gray-600 bg-gray-50/50 p-3 rounded-lg border border-gray-100/50">
                                                     <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                                                     <span className="text-base">{req}</span>
@@ -156,7 +159,7 @@ export default async function JobPage(props: JobPageProps) {
                                             Quyền lợi
                                         </h2>
                                         <div className="grid sm:grid-cols-2 gap-4">
-                                            {job.benefits.map((benefit, index) => (
+                                            {job.benefits.map((benefit: string, index: number) => (
                                                 <div key={index} className="flex items-center gap-3 text-gray-700 bg-blue-50/30 p-4 rounded-xl border border-blue-50">
                                                     <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
                                                     <span className="font-medium">{benefit}</span>

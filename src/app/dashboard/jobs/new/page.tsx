@@ -75,6 +75,14 @@ const formSchema = z.object({
     documentUrl: z.string().optional(),
     documentName: z.string().optional(),
 }).refine((data) => {
+    if (!data.isNegotiable && data.salaryMin && data.salaryMax && data.salaryMax < data.salaryMin) {
+        return false
+    }
+    return true
+}, {
+    message: "Lương tối đa không được nhỏ hơn lương tối thiểu",
+    path: ["salaryMax"],
+}).refine((data) => {
     if (!data.unlimitedQuantity && (!data.quantity || data.quantity < 1)) {
         return false
     }

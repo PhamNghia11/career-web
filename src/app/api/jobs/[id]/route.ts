@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/database/connection"
 import { ObjectId } from "mongodb"
+import { revalidatePath } from "next/cache"
 
 // DELETE /api/jobs/[id]
 export async function DELETE(
@@ -108,6 +109,11 @@ export async function PATCH(
         if (result.matchedCount === 0) {
             return NextResponse.json({ error: "Job not found" }, { status: 404 })
         }
+
+        // Revalidate paths to refresh cache
+        revalidatePath("/jobs/" + id)
+        revalidatePath("/")
+        revalidatePath("/dashboard/my-jobs")
 
         return NextResponse.json({ success: true, message: "Job updated successfully" })
     } catch (error) {
