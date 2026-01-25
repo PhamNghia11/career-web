@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
 
-const MONGODB_URI = "mongodb://localhost:27017/gdu_career"; // Cập nhật URI nếu cần
+const MONGODB_URI = "mongodb://localhost:27017/gdu_career";
 
 async function seed() {
     const client = new MongoClient(MONGODB_URI);
@@ -9,81 +9,79 @@ async function seed() {
         const db = client.db("gdu_career");
         const collection = db.collection("news");
 
+        // Dữ liệu mẫu cực xịn
         const sampleNews = [
+            // QUOTES (Danh mục: Quote)
             {
-                title: "GDU hợp tác cùng Techcombank: Mở rộng cơ hội thực tập cho sinh viên khối ngành Kinh tế",
-                summary: "Buổi ký kết hợp tác giữa Đại học Gia Định và Techcombank hứa hẹn mang lại hàng trăm vị trí thực tập và cơ hội việc làm chính thức cho sinh viên bản địa trong năm 2026.",
-                content: "<p>Đại học Gia Định (GDU) vừa chính thức ký kết thỏa thuận hợp tác chiến lược với Ngân hàng Techcombank...</p>",
+                title: "Phạm Phú Công (Mr.)",
+                summary: "Thường xuyên cập nhật CV và những thành tựu cá nhân, chủ động tìm kiếm tin qua mối quan hệ với các doanh nghiệp đối tác GDU... Chính là con đường dẫn bạn đến với những cơ hội giá trị.",
+                content: "Giám đốc Nguồn nhân lực - TECHCOMBANK (Alumni 2018)",
+                imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&q=80",
+                category: "Quote",
+                sourceName: "GDU Alumni",
+                sourceUrl: "#",
+                publishedAt: new Date().toISOString(),
+                views: 999,
+                slug: "quote-pham-phu-cong"
+            },
+
+            // VIDEOS (Danh mục: Video)
+            {
+                title: "CareerViet Phủ Sóng Công Nghệ AI Matching",
+                summary: "Khám phá cách AI thay đổi cuộc chơi tuyển dụng toàn cầu.",
+                videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // Ví dụ
+                imageUrl: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80",
+                category: "Video",
+                sourceName: "CareerViet",
+                sourceUrl: "#",
+                publishedAt: new Date().toISOString(),
+                views: 5400,
+                slug: "video-ai-matching"
+            },
+            {
+                title: "Bí mật quy trình tuyển dụng tại tập đoàn lớn",
+                summary: "Chuyên gia HR chia sẻ những điều ít người biết.",
+                videoUrl: "#",
+                imageUrl: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80",
+                category: "Video",
+                sourceName: "HR Insider",
+                sourceUrl: "#",
+                publishedAt: new Date().toISOString(),
+                views: 3200,
+                slug: "video-hr-secrets"
+            },
+            {
+                title: "Chìa khóa an toàn cho 'mẹ bỉm' quay lại đi làm",
+                summary: "Hành trình bứt phá của phụ nữ hiện đại.",
+                videoUrl: "#",
+                imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80",
+                category: "Video",
+                sourceName: "Women In Tech",
+                sourceUrl: "#",
+                publishedAt: new Date().toISOString(),
+                views: 2100,
+                slug: "video-women-career"
+            },
+
+            // TIN TỨC CHUYÊN SÂU (Đã có từ trước nhưng làm mới)
+            {
+                title: "GDU hợp tác cùng Techcombank: 500 vị trí thực tập chờ đón sinh viên",
+                summary: "Ký kết thỏa thuận hợp tác đào tạo và tuyển dụng lớn nhất quý 1/2026.",
                 imageUrl: "https://images.unsplash.com/photo-1577412647305-991150c7d163?w=800&q=80",
                 category: "Thị trường",
-                sourceName: "GDU News",
-                sourceUrl: "#",
-                publishedAt: new Date().toISOString(),
-                views: 1250,
-                slug: "gdu-hop-tac-techcombank-2026-v2"
-            },
-            {
-                title: "Thị trường lao động IT 2026: Ưu tiên nhân lực có kỹ năng về AI và Cloud Computing",
-                summary: "Báo cáo mới nhất từ đối tác VietnamWorks cho thấy nhu cầu tuyển dụng kỹ sư AI tăng vọt 150% so với cùng kỳ năm ngoái.",
-                imageUrl: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
-                category: "Thị trường",
-                sourceName: "VietnamWorks",
-                sourceUrl: "#",
-                publishedAt: new Date().toISOString(),
-                views: 3420,
-                slug: "thi-truong-lao-dong-it-2026-v2"
-            },
-            {
-                title: "5 bước để có một bộ CV 'bách phát bách trúng' trong mắt nhà tuyển dụng",
-                summary: "Hướng dẫn thực tế từ chuyên gia nhân sự giúp sinh viên GDU tối ưu hóa CV để vượt qua vòng hồ sơ của các tập đoàn lớn.",
-                imageUrl: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&q=80",
-                category: "Kỹ năng",
-                sourceName: "Career Hacks",
-                sourceUrl: "#",
-                publishedAt: new Date().toISOString(),
-                views: 2800,
-                slug: "5-buoc-toi-uu-cv-v2"
-            },
-            {
-                title: "Chuyện người trong nghề: Từ sinh viên GDU đến vị trí Lead Engineer tại tập đoàn đa quốc gia",
-                summary: "Anh Nguyễn Văn A - Cựu sinh viên K14 chia sẻ hành trình nỗ lực và những bí kíp giúp anh gặt hái thành công sớm.",
-                imageUrl: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&q=80",
-                category: "Kỹ năng",
-                sourceName: "Career Talk",
-                sourceUrl: "#",
-                publishedAt: new Date().toISOString(),
-                views: 4100,
-                slug: "career-talk-nguyen-van-a-v2"
-            },
-            {
-                title: "Thông báo tuyển dụng Thực tập sinh Tài năng GDU Nest - Mùa 5",
-                summary: "Chương trình thực tập trả lương tại GDU Nest đã chính thức mở đơn đăng ký. Đây là cơ hội vàng để sinh viên trải nghiệm môi trường làm việc thực chiến.",
-                imageUrl: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80",
-                category: "Thông báo",
                 sourceName: "GDU Center",
                 sourceUrl: "#",
                 publishedAt: new Date().toISOString(),
-                views: 5200,
-                slug: "tuyen-dung-thuc-tap-sinh-gdu-nest-m5-v2"
-            },
-            {
-                title: "Học bổng 'Vươn xa ước mơ 2026': Tổng giá trị lên tới 1 tỷ đồng dành cho sinh viên GDU",
-                summary: "Quỹ học bổng từ các doanh nghiệp đối tác dành riêng cho sinh viên GDU có thành tích học tập xuất sắc và vượt khó.",
-                imageUrl: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&q=80",
-                category: "Thông báo",
-                sourceName: "GDU Center",
-                sourceUrl: "#",
-                publishedAt: new Date().toISOString(),
-                views: 1800,
-                slug: "hoc-bong-vuon-xa-uo-mo-2026-v2"
+                views: 1560,
+                slug: "gdu-techcombank-partnership"
             }
         ];
 
-        console.log("Inserting 6 quality news items...");
+        console.log("Nạp dữ liệu mẫu mới (Video & Quote)...");
         await collection.insertMany(sampleNews);
-        console.log("Seed data created successfully in MongoDB!");
+        console.log("Hoàn tất nạp dữ liệu!");
     } catch (error) {
-        console.error("Error seeding data:", error);
+        console.error("Lỗi:", error);
     } finally {
         await client.close();
     }

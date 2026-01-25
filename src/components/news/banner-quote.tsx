@@ -1,9 +1,17 @@
+```typescript
 "use client"
 
 import Image from "next/image"
 import { Quote } from "lucide-react"
+import { News } from "@/types"
 
-export function BannerQuote() {
+interface BannerQuoteProps {
+    news?: News
+}
+
+export function BannerQuote({ news }: BannerQuoteProps) {
+    if (!news) return null;
+
     return (
         <section className="container px-4 mx-auto py-24">
             <div className="relative overflow-hidden rounded-[64px] bg-slate-50 border border-slate-100">
@@ -18,22 +26,24 @@ export function BannerQuote() {
 
                         <div className="space-y-6 border-l-4 border-primary pl-8 mt-12">
                             <p className="text-slate-500 text-lg md:text-xl font-medium italic leading-relaxed">
-                                "Thường xuyên cập nhật CV và những thành tựu cá nhân, chủ động tìm kiếm tin qua mối quan hệ với các doanh nghiệp đối tác GDU... Chính là con đường dẫn bạn đến với những cơ hội giá trị."
+                                "{news.summary}"
                             </p>
                             <div>
-                                <h4 className="text-lg font-black text-slate-900">Phạm Phú Công (Mr.)</h4>
-                                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">Giám đốc Nguồn nhân lực - TECHCOMBANK (Alumni 2018)</p>
+                                <h4 className="text-lg font-black text-slate-900">{news.title}</h4>
+                                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">{news.content.replace(/<[^>]*>?/gm, '')}</p>
                             </div>
                         </div>
                     </div>
 
                     <div className="relative aspect-[4/3] lg:aspect-square">
-                        <Image
-                            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&q=80"
-                            alt="Success Story"
-                            fill
-                            className="object-cover"
-                        />
+                        {news.imageUrl && (
+                            <Image
+                                src={news.imageUrl}
+                                alt={news.title}
+                                fill
+                                className="object-cover"
+                            />
+                        )}
                     </div>
                 </div>
 

@@ -1,15 +1,16 @@
 "use client"
 
-import { Play, ArrowRight } from "lucide-react"
+import { Play, ArrowRight, Newspaper } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { News } from "@/types"
 
-export function VideoSection() {
-    const videos = [
-        { id: 1, title: "CareerViet Phủ Sóng Công Nghệ AI Matching", thumbnail: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80" },
-        { id: 2, title: "Bí mật về quy trình tuyển dụng tại tập đoàn lớn", thumbnail: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&q=80" },
-        { id: 3, title: "Chìa khóa an toàn cho 'mẹ bỉm' quay lại đi làm", thumbnail: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80" }
-    ]
+interface VideoSectionProps {
+    news: News[]
+}
+
+export function VideoSection({ news }: VideoSectionProps) {
+    if (news.length === 0) return null;
 
     return (
         <section className="py-24 bg-slate-900 text-white overflow-hidden">
@@ -22,15 +23,21 @@ export function VideoSection() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {videos.map((v) => (
-                        <div key={v.id} className="group cursor-pointer">
+                    {news.map((v) => (
+                        <div key={v._id} className="group cursor-pointer">
                             <div className="relative aspect-video rounded-[32px] overflow-hidden mb-6 bg-slate-800">
-                                <Image
-                                    src={v.thumbnail}
-                                    alt={v.title}
-                                    fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
-                                />
+                                {v.imageUrl ? (
+                                    <Image
+                                        src={v.imageUrl}
+                                        alt={v.title}
+                                        fill
+                                        className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                                    />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Newspaper className="w-12 h-12 text-slate-700" />
+                                    </div>
+                                )}
                                 <div className="absolute inset-0 flex items-center justify-center">
                                     <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary transition-all duration-500">
                                         <Play className="w-8 h-8 text-white fill-white translate-x-1" />

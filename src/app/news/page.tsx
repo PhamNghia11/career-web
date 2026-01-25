@@ -58,6 +58,8 @@ export default function NewsPage() {
     const [partnerNews, setPartnerNews] = useState<News[]>([])
     const [careerHackNews, setCareerHackNews] = useState<News[]>([])
     const [opportunityNews, setOpportunityNews] = useState<News[]>([])
+    const [quoteNews, setQuoteNews] = useState<News | null>(null)
+    const [videoNews, setVideoNews] = useState<News[]>([])
 
     const fetchNews = async () => {
         setLoading(true)
@@ -109,6 +111,20 @@ export default function NewsPage() {
                 const oFallback = await fetch(`/api/news?limit=10`)
                 const ofData = await oFallback.json()
                 if (ofData.success) setOpportunityNews(ofData.data)
+            }
+
+            // Fetch Quote
+            const qRes = await fetch(`/api/news?limit=1&category=Quote`)
+            const qData = await qRes.json()
+            if (qData.success && qData.data.length > 0) {
+                setQuoteNews(qData.data[0])
+            }
+
+            // Fetch Videos
+            const vRes = await fetch(`/api/news?limit=3&category=Video`)
+            const vData = await vRes.json()
+            if (vData.success && vData.data.length > 0) {
+                setVideoNews(vData.data)
             }
         } catch (error) {
             console.error("Error fetching specialized news:", error)
@@ -169,6 +185,8 @@ export default function NewsPage() {
                     </div>
                 </div>
 
+                {/* Video Media Section */}
+                <VideoSection news={videoNews} />
                 {/* Modern Hero Grid Section */}
                 {news.length > 0 && (
                     <HeroGrid featuredNews={[...news].sort((a, b) => b.views - a.views).slice(0, 3)} />
@@ -290,7 +308,7 @@ export default function NewsPage() {
                 </div>
 
                 {/* Premium Banner Quote Section */}
-                <BannerQuote />
+                <BannerQuote news={quoteNews || undefined} />
 
                 {/* Professional Sections Replacement */}
                 <div className="space-y-0">
