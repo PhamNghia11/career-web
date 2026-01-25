@@ -19,6 +19,7 @@ import {
     DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
+import Link from "next/link"
 import { CategorySection } from "@/components/news/category-section"
 import { HeroGrid } from "@/components/news/hero-grid"
 import { NewsSidebar } from "@/components/news/news-sidebar"
