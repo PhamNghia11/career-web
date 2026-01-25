@@ -165,14 +165,6 @@ export default function NewsPage() {
 
                     <div className="container px-4 mx-auto relative z-10">
                         <div className="max-w-4xl">
-                            <Link
-                                href="/"
-                                className="inline-flex items-center gap-2 text-white/60 hover:text-white transition-colors text-xs font-black uppercase tracking-widest mb-8 group"
-                            >
-                                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                                Quay lại trang chủ
-                            </Link>
-
                             <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight tracking-tight">
                                 Tin tức & Phân tích <br />
                                 Thị trường Lao động
@@ -185,8 +177,6 @@ export default function NewsPage() {
                     </div>
                 </div>
 
-                {/* Video Media Section */}
-                <VideoSection news={videoNews} />
                 {/* Modern Hero Grid Section */}
                 {news.length > 0 && (
                     <HeroGrid featuredNews={[...news].sort((a, b) => b.views - a.views).slice(0, 3)} />
