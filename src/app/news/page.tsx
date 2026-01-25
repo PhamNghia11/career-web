@@ -236,7 +236,11 @@ export default function NewsPage() {
                                     </DropdownMenu>
 
                                     <button
-                                        onClick={fetchNews}
+                                        onClick={() => {
+                                            setCategory("Tất cả")
+                                            setSearchQuery("")
+                                            fetchNews()
+                                        }}
                                         className="h-12 w-12 flex items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-400 hover:text-[#002855] hover:bg-slate-100 transition-all"
                                     >
                                         <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -280,9 +284,12 @@ export default function NewsPage() {
                             )}
 
                             {/* Load More */}
-                            {filteredAndSortedNews.length >= 20 && !loading && (
+                            {filteredAndSortedNews.length >= 10 && (
                                 <div className="mt-16 text-center">
-                                    <button className="h-14 px-12 rounded-full border border-slate-200 text-[11px] font-black text-slate-500 hover:bg-primary hover:text-white transition-all uppercase tracking-[0.2em] bg-white">
+                                    <button
+                                        onClick={() => fetchNews()}
+                                        className="h-14 px-12 rounded-full border border-slate-200 text-[11px] font-black text-slate-500 hover:bg-primary hover:text-white transition-all uppercase tracking-[0.2em] bg-white"
+                                    >
                                         XEM THÊM BÀI VIẾT
                                         <ArrowRight className="inline-block ml-3 w-4 h-4" />
                                     </button>
@@ -292,7 +299,10 @@ export default function NewsPage() {
 
                         {/* Sidebar Area */}
                         <div className="lg:col-span-4">
-                            <NewsSidebar />
+                            <NewsSidebar onTagClick={(tag) => {
+                                setSearchQuery(tag)
+                                window.scrollTo({ top: 400, behavior: 'smooth' })
+                            }} />
                         </div>
                     </div>
                 </div>

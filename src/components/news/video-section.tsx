@@ -23,32 +23,34 @@ export function VideoSection({ news }: VideoSectionProps) {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {news.map((v) => (
-                        <div key={v._id} className="group cursor-pointer">
-                            <div className="relative aspect-video rounded-[32px] overflow-hidden mb-6 bg-slate-800">
-                                {v.imageUrl ? (
-                                    <Image
-                                        src={v.imageUrl}
-                                        alt={v.title}
-                                        fill
-                                        className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
-                                    />
-                                ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <Newspaper className="w-12 h-12 text-slate-700" />
-                                    </div>
-                                )}
+                    <div
+                        key={v._id}
+                        className="group cursor-pointer"
+                        onClick={() => v.videoUrl ? window.open(v.videoUrl, '_blank') : null}
+                    >
+                        <div className="relative aspect-video rounded-[32px] overflow-hidden mb-6 bg-slate-800">
+                            {v.imageUrl ? (
+                                <Image
+                                    src={v.imageUrl}
+                                    alt={v.title}
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                                />
+                            ) : (
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary transition-all duration-500">
-                                        <Play className="w-8 h-8 text-white fill-white translate-x-1" />
-                                    </div>
+                                    <Newspaper className="w-12 h-12 text-slate-700" />
+                                </div>
+                            )}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary transition-all duration-500">
+                                    <Play className="w-8 h-8 text-white fill-white translate-x-1" />
                                 </div>
                             </div>
-                            <h3 className="text-xl font-bold line-clamp-2 leading-snug group-hover:text-primary transition-colors">
-                                {v.title}
-                            </h3>
                         </div>
-                    ))}
+                        <h3 className="text-xl font-bold line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+                            {v.title}
+                        </h3>
+                    </div>
                 </div>
             </div>
         </section>
