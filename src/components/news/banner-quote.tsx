@@ -1,4 +1,3 @@
-```typescript
 "use client"
 
 import Image from "next/image"
@@ -30,7 +29,9 @@ export function BannerQuote({ news }: BannerQuoteProps) {
                             </p>
                             <div>
                                 <h4 className="text-lg font-black text-slate-900">{news.title}</h4>
-                                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">{news.content.replace(/<[^>]*>?/gm, '')}</p>
+                                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                    {news.content.replace(/<[^>]*>?/gm, '')}
+                                </p>
                             </div>
                         </div>
                     </div>
