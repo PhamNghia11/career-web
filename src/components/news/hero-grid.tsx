@@ -1,5 +1,4 @@
-"use client"
-
+import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { News } from "@/types"
@@ -10,8 +9,10 @@ interface HeroGridProps {
 }
 
 export function HeroGrid({ featuredNews }: HeroGridProps) {
-    if (featuredNews.length === 0) return null
+    const [mainImg, setMainImg] = useState(featuredNews[0]?.imageUrl || "")
+    const [secImgs, setSecImgs] = useState(featuredNews.slice(1, 3).map(n => n.imageUrl || ""))
 
+    if (featuredNews.length === 0) return null
     const mainNews = featuredNews[0]
     const secondaryNews = featuredNews.slice(1, 3)
 
@@ -20,12 +21,13 @@ export function HeroGrid({ featuredNews }: HeroGridProps) {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
                 {/* Main Featured News */}
                 <div className="lg:col-span-8 group relative overflow-hidden rounded-[32px] bg-slate-100 aspect-[16/9] lg:aspect-auto h-full min-h-[400px] md:min-h-[500px]">
-                    {mainNews.imageUrl && (
+                    {mainImg && (
                         <Image
-                            src={mainNews.imageUrl}
+                            src={mainImg}
                             alt={mainNews.title}
                             fill
                             className="object-cover transition-transform duration-700 group-hover:scale-105"
+                            onError={() => setMainImg("https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80")}
                         />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
@@ -59,14 +61,19 @@ export function HeroGrid({ featuredNews }: HeroGridProps) {
 
                 {/* Secondary News / Banners */}
                 <div className="lg:col-span-4 flex flex-col gap-6 md:gap-8">
-                    {secondaryNews.map((news) => (
+                    {secondaryNews.map((news, idx) => (
                         <div key={news._id} className="group relative flex-1 overflow-hidden rounded-[28px] bg-slate-100 aspect-[16/9] md:aspect-auto min-h-[220px]">
-                            {news.imageUrl && (
+                            {secImgs[idx] && (
                                 <Image
-                                    src={news.imageUrl}
+                                    src={secImgs[idx]}
                                     alt={news.title}
                                     fill
                                     className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                    onError={() => {
+                                        const newImgs = [...secImgs];
+                                        newImgs[idx] = "https://images.unsplash.com/photo-1454165833767-131438cf58ff?w=800&q=80";
+                                        setSecImgs(newImgs);
+                                    }}
                                 />
                             )}
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />

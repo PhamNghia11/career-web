@@ -1,5 +1,4 @@
-"use client"
-
+import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Calendar, Eye, ArrowUpRight, ExternalLink, TrendingUp, Newspaper } from "lucide-react"
@@ -17,15 +16,19 @@ export function NewsCard({ news }: NewsCardProps) {
     })
 
     return (
+    const [imgSrc, setImgSrc] = useState(news.imageUrl || "")
+
+    return (
         <div className="group relative bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-slate-100 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 flex flex-col h-full hover:-translate-y-1">
             {/* Image Section */}
             <div className="relative aspect-[16/10] w-full overflow-hidden">
-                {news.imageUrl ? (
+                {imgSrc ? (
                     <Image
-                        src={news.imageUrl}
+                        src={imgSrc}
                         alt={news.title}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        onError={() => setImgSrc("https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80")}
                     />
                 ) : (
                     <div className="w-full h-full bg-slate-50 flex items-center justify-center">
