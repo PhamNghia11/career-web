@@ -72,20 +72,39 @@ export default function NewsPage() {
 
     const fetchSpecializedNews = async () => {
         try {
-            // Fetch Partner News
-            const pRes = await fetch(`/api/news?limit=10&category=Đối tác`)
+            // Fetch Partner News (Market category)
+            const pRes = await fetch(`/api/news?limit=10&category=Thị trường`)
             const pData = await pRes.json()
-            if (pData.success) setPartnerNews(pData.data)
+            if (pData.success && pData.data.length > 0) {
+                setPartnerNews(pData.data)
+            } else {
+                // Fallback to latest news if empty
+                const pFallback = await fetch(`/api/news?limit=10`)
+                const pfData = await pFallback.json()
+                if (pfData.success) setPartnerNews(pfData.data)
+            }
 
-            // Fetch Career Hacks & Talk
+            // Fetch Career Hacks & Talk (Skills category)
             const cRes = await fetch(`/api/news?limit=10&category=Kỹ năng`)
             const cData = await cRes.json()
-            if (cData.success) setCareerHackNews(cData.data)
+            if (cData.success && cData.data.length > 0) {
+                setCareerHackNews(cData.data)
+            } else {
+                const cFallback = await fetch(`/api/news?limit=10`)
+                const cfData = await cFallback.json()
+                if (cfData.success) setCareerHackNews(cfData.data)
+            }
 
-            // Fetch Internships & Contests
+            // Fetch Internships & Contests (Notifications category)
             const oRes = await fetch(`/api/news?limit=10&category=Thông báo`)
             const oData = await oRes.json()
-            if (oData.success) setOpportunityNews(oData.data)
+            if (oData.success && oData.data.length > 0) {
+                setOpportunityNews(oData.data)
+            } else {
+                const oFallback = await fetch(`/api/news?limit=10`)
+                const ofData = await oFallback.json()
+                if (ofData.success) setOpportunityNews(ofData.data)
+            }
         } catch (error) {
             console.error("Error fetching specialized news:", error)
         }
