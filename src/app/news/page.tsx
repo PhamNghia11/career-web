@@ -19,6 +19,7 @@ import {
     DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
+import { CategorySection } from "@/components/news/category-section"
 
 const CATEGORIES = [
     "Tất cả",
@@ -48,6 +49,11 @@ export default function NewsPage() {
     const [category, setCategory] = useState("Tất cả")
     const [sortBy, setSortBy] = useState("newest")
 
+    // States for specialized categories
+    const [partnerNews, setPartnerNews] = useState<News[]>([])
+    const [careerHackNews, setCareerHackNews] = useState<News[]>([])
+    const [opportunityNews, setOpportunityNews] = useState<News[]>([])
+
     const fetchNews = async () => {
         setLoading(true)
         try {
@@ -64,8 +70,30 @@ export default function NewsPage() {
         }
     }
 
+    const fetchSpecializedNews = async () => {
+        try {
+            // Fetch Partner News
+            const pRes = await fetch(`/api/news?limit=10&category=Đối tác`)
+            const pData = await pRes.json()
+            if (pData.success) setPartnerNews(pData.data)
+
+            // Fetch Career Hacks & Talk
+            const cRes = await fetch(`/api/news?limit=10&category=Kỹ năng`)
+            const cData = await cRes.json()
+            if (cData.success) setCareerHackNews(cData.data)
+
+            // Fetch Internships & Contests
+            const oRes = await fetch(`/api/news?limit=10&category=Thông báo`)
+            const oData = await oRes.json()
+            if (oData.success) setOpportunityNews(oData.data)
+        } catch (error) {
+            console.error("Error fetching specialized news:", error)
+        }
+    }
+
     useEffect(() => {
         fetchNews()
+        fetchSpecializedNews()
     }, [category])
 
     const filteredAndSortedNews = news
@@ -231,51 +259,28 @@ export default function NewsPage() {
                     )}
                 </div>
 
-                {/* Professional Partners Section - Harmonious & Soft */}
-                <div className="bg-slate-50 py-24 md:py-28 overflow-hidden relative border-t border-slate-100">
-                    <div className="container px-4 mx-auto relative z-10">
-                        <div className="flex flex-col items-center gap-4 mb-20">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-primary/40 bg-primary/5 px-6 py-2 rounded-full">Global Partners</span>
-                            <h3 className="text-2xl md:text-3xl font-bold text-center tracking-tight text-primary">Đối tác chiến lược toàn cầu</h3>
-                        </div>
+                {/* Professional Sections Replacement */}
+                <div className="space-y-0">
+                    <CategorySection
+                        title="Góc Đối Tác"
+                        description="Tin tức, báo cáo và cơ hội từ các đối tác chiến lược của GDU."
+                        news={partnerNews}
+                        viewAllHref="/news?category=Thị trường"
+                    />
 
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                            {[
-                                { name: "VietnamWorks", desc: "Cổng thông tin tuyển dụng" },
-                                { name: "World Bank Group", desc: "Nghiên cứu kinh tế vĩ mô" },
-                                { name: "TopCV Vietnam", desc: "Nền tảng công nghệ nhân sự" },
-                                { name: "GDU Research", desc: "Đơn vị nghiên cứu chuyên sâu" },
-                                { name: "ITviec", desc: "Việc làm IT chuyên nghiệp" },
-                                { name: "LinkedIn Learning", desc: "Nâng cao kỹ năng sự nghiệp" },
-                                { name: "Navigos Search", desc: "Tuyển dụng cấp quản lý" },
-                                { name: "GDU Placement", desc: "Trung tâm hỗ trợ việc làm" }
-                            ].map((s) => (
-                                <div key={s.name} className="bg-white p-8 rounded-[32px] border border-slate-100 flex flex-col items-center justify-center text-center group hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-500">
-                                    <div className="mb-6 p-4 rounded-2xl bg-slate-50 group-hover:bg-primary/5 transition-colors">
-                                        <Newspaper className="w-5 h-5 text-primary/30 group-hover:text-primary transition-colors" />
-                                    </div>
-                                    <span className="text-md font-bold text-primary transition-colors">{s.name}</span>
-                                    <span className="text-[9px] uppercase font-bold text-slate-300 mt-2 tracking-widest">{s.desc}</span>
-                                </div>
-                            ))}
-                        </div>
+                    <CategorySection
+                        title="Cẩm Nang Bứt Phá"
+                        description="Bí kíp săn job, rèn luyện kỹ năng và câu chuyện từ những người đi trước."
+                        news={careerHackNews}
+                        viewAllHref="/news?category=Kỹ năng"
+                    />
 
-                        {/* Clean & Premium CTA Section */}
-                        <div className="mt-28 max-w-4xl mx-auto p-12 md:p-16 rounded-[48px] bg-primary text-white relative overflow-hidden shadow-2xl shadow-primary/20 text-center">
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-[120px] -translate-y-1/2 opacity-50 pointer-events-none" />
-                            <div className="relative z-10 flex flex-col items-center gap-6">
-                                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/5 text-white/60 font-bold text-[10px] uppercase tracking-widest">
-                                    Contributor Program
-                                </div>
-                                <h4 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight">
-                                    Cộng tác cùng <br className="hidden md:block" /> đội ngũ chuyên gia
-                                </h4>
-                                <p className="text-white/60 text-lg font-light leading-relaxed max-w-2xl mx-auto">
-                                    Gửi bài phân tích của bạn để chia sẻ kiến thức hữu ích tới cộng đồng 5,000+ sinh viên GDU hàng tuần.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <CategorySection
+                        title="Trạm Cơ Hội"
+                        description="Học bổng, cuộc thi và các chương trình thực tập hấp dẫn dành riêng cho sinh viên."
+                        news={opportunityNews}
+                        viewAllHref="/news?category=Thông báo"
+                    />
                 </div>
             </main>
 
