@@ -323,6 +323,9 @@ export default function NewsPage() {
                         viewAllHref="/news?category=Thông báo"
                     />
                 </div>
+
+                {/* Video Media Section fixed to bottom */}
+                <VideoSection news={videoNews} />
             </main>
 
             <Footer />
