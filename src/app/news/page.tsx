@@ -20,6 +20,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
 import { CategorySection } from "@/components/news/category-section"
+import { HeroGrid } from "@/components/news/hero-grid"
+import { NewsSidebar } from "@/components/news/news-sidebar"
+import { BannerQuote } from "@/components/news/banner-quote"
+import { VideoSection } from "@/components/news/video-section"
 
 const CATEGORIES = [
     "Tất cả",
@@ -132,29 +136,10 @@ export default function NewsPage() {
             <Header />
 
             <main className="flex-1">
-                {/* Professional & Harmonious Hero Section */}
-                <div className="relative py-16 md:py-24 lg:py-28 overflow-hidden">
-                    {/* Background Image */}
-                    <div
-                        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                        style={{ backgroundImage: "url('/hero-bg.png')" }}
-                    />
-                    {/* Dark Overlay */}
-                    <div className="absolute inset-0 bg-primary/95 lg:bg-primary/90" />
-
-                    <div className="container px-4 mx-auto relative z-10">
-                        <div className="max-w-4xl">
-                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight tracking-tight">
-                                Tin tức & Phân tích <br />
-                                Thị trường Lao động
-                            </h1>
-
-                            <p className="text-base md:text-lg text-white/60 leading-relaxed max-w-2xl font-light">
-                                Cập nhật xu hướng tuyển dụng, báo cáo thị trường và kiến thức phát triển sự nghiệp từ đội ngũ chuyên gia GDU.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                {/* Modern Hero Grid Section */}
+                {news.length > 0 && (
+                    <HeroGrid featuredNews={[...news].sort((a, b) => b.views - a.views).slice(0, 3)} />
+                )}
 
                 {/* Compact & Integrated Toolbar Section */}
                 <div className="bg-white border-b border-slate-100 sticky top-0 z-40 backdrop-blur-sm bg-white/80">
@@ -221,62 +206,58 @@ export default function NewsPage() {
                     </div>
                 </div>
 
-                {/* Results Section */}
                 <div className="container px-4 mx-auto pb-24">
-                    {loading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                            {[1, 2, 3, 4, 5, 6].map((i) => (
-                                <div key={i} className="animate-pulse flex flex-col gap-6">
-                                    <div className="aspect-[16/10] bg-muted rounded-[32px]" />
-                                    <div className="space-y-3 px-2">
-                                        <div className="h-4 w-1/4 bg-muted rounded-full" />
-                                        <div className="h-8 w-full bg-muted rounded-xl" />
-                                        <div className="h-4 w-full bg-muted rounded-full" />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : filteredAndSortedNews.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                            {filteredAndSortedNews.map((item) => (
-                                <NewsCard key={item._id} news={item} />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="py-32 text-center flex flex-col items-center gap-8 bg-muted/5 rounded-[48px] border-2 border-dashed border-border/40">
-                            <div className="w-32 h-32 rounded-full bg-muted/20 flex items-center justify-center relative">
-                                <Search className="w-12 h-12 text-muted-foreground/30" />
-                                <div className="absolute top-0 right-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold">0</div>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                        {/* Main Content Area */}
+                        <div className="lg:col-span-8">
+                            <div className="flex items-center justify-between mb-10 border-b border-slate-100 pb-4">
+                                <h2 className="text-2xl font-black uppercase tracking-tight text-slate-800">Bài viết mới nhất</h2>
                             </div>
-                            <div className="max-w-md">
-                                <h3 className="text-2xl font-bold mb-3 text-slate-900">Không tìm thấy kết quả</h3>
-                                <p className="text-slate-500 text-base">
-                                    Thử thay đổi từ khóa hoặc bộ lọc để tìm được nội dung mong muốn.
-                                </p>
-                            </div>
-                            <Button
-                                variant="secondary"
-                                className="h-14 px-8 rounded-2xl font-bold"
-                                onClick={() => {
-                                    setSearchQuery("")
-                                    setCategory("Tất cả")
-                                }}
-                            >
-                                Xóa tất cả bộ lọc
-                            </Button>
-                        </div>
-                    )}
 
-                    {/* Load More - Refined */}
-                    {filteredAndSortedNews.length >= 20 && !loading && (
-                        <div className="mt-20 text-center">
-                            <button className="h-14 px-12 rounded-full border border-slate-200 text-[12px] font-bold text-slate-500 hover:bg-primary hover:text-white hover:border-primary transition-all uppercase tracking-widest bg-white shadow-xl shadow-slate-200/50">
-                                XEM THÊM BÀI VIẾT
-                                <ArrowRight className="inline-block ml-3 w-4 h-4" />
-                            </button>
+                            {loading ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {[1, 2, 3, 4].map((i) => (
+                                        <div key={i} className="animate-pulse flex flex-col gap-6">
+                                            <div className="aspect-[16/10] bg-muted rounded-[32px]" />
+                                            <div className="space-y-3">
+                                                <div className="h-8 w-full bg-muted rounded-xl" />
+                                                <div className="h-4 w-1/2 bg-muted rounded-full" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : filteredAndSortedNews.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+                                    {filteredAndSortedNews.map((item) => (
+                                        <NewsCard key={item._id} news={item} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="py-24 text-center bg-slate-50 rounded-[48px] border-2 border-dashed border-slate-200">
+                                    <p className="text-slate-400 font-bold">Không tìm thấy bài viết nào.</p>
+                                </div>
+                            )}
+
+                            {/* Load More */}
+                            {filteredAndSortedNews.length >= 20 && !loading && (
+                                <div className="mt-16 text-center">
+                                    <button className="h-14 px-12 rounded-full border border-slate-200 text-[11px] font-black text-slate-500 hover:bg-primary hover:text-white transition-all uppercase tracking-[0.2em] bg-white">
+                                        XEM THÊM BÀI VIẾT
+                                        <ArrowRight className="inline-block ml-3 w-4 h-4" />
+                                    </button>
+                                </div>
+                            )}
                         </div>
-                    )}
+
+                        {/* Sidebar Area */}
+                        <div className="lg:col-span-4">
+                            <NewsSidebar />
+                        </div>
+                    </div>
                 </div>
+
+                {/* Premium Banner Quote Section */}
+                <BannerQuote />
 
                 {/* Professional Sections Replacement */}
                 <div className="space-y-0">
