@@ -1,5 +1,5 @@
 import { Mail, Calculator, ArrowRight, TrendingUp } from "lucide-react"
-import { toast } from "react-hot-toast"
+import { toast } from "sonner"
 
 interface NewsSidebarProps {
     onTagClick: (tag: string) => void
