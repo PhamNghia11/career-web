@@ -19,38 +19,6 @@ export function NewsSidebar() {
                 </button>
             </div>
 
-            {/* Salary Calculator Mockup Card */}
-            <div className="bg-white border border-slate-100 rounded-[32px] p-8 shadow-2xl shadow-slate-200/50">
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2.5 bg-emerald-50 rounded-xl">
-                        <Calculator className="w-5 h-5 text-emerald-500" />
-                    </div>
-                    <h3 className="text-[13px] font-black uppercase tracking-[0.15em] text-slate-800">Công cụ tính lương</h3>
-                </div>
-
-                <div className="space-y-4">
-                    <div className="space-y-1.5">
-                        <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest px-1">Lương Gross (VNĐ)</label>
-                        <input
-                            placeholder="Nhập mức lương..."
-                            className="w-full px-5 py-3.5 bg-slate-50 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 rounded-2xl outline-none transition-all text-sm font-bold"
-                        />
-                    </div>
-
-                    <div className="space-y-1.5">
-                        <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest px-1">Người phụ thuộc</label>
-                        <input
-                            placeholder="Số người..."
-                            className="w-full px-5 py-3.5 bg-slate-50 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 rounded-2xl outline-none transition-all text-sm font-bold"
-                        />
-                    </div>
-
-                    <button className="w-full py-4 bg-emerald-500 text-white font-black uppercase text-[11px] tracking-widest rounded-2xl hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20">
-                        Tính Lương NET
-                    </button>
-                </div>
-            </div>
-
             {/* Trending Tags Section */}
             <div className="p-8 bg-slate-50 rounded-[32px]">
                 <div className="flex items-center gap-3 mb-6">
