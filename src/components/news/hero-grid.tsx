@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
@@ -13,6 +15,7 @@ export function HeroGrid({ featuredNews }: HeroGridProps) {
     const [secImgs, setSecImgs] = useState(featuredNews.slice(1, 3).map(n => n.imageUrl || ""))
 
     if (featuredNews.length === 0) return null
+
     const mainNews = featuredNews[0]
     const secondaryNews = featuredNews.slice(1, 3)
 

@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
@@ -9,14 +11,13 @@ interface NewsCardProps {
 }
 
 export function NewsCard({ news }: NewsCardProps) {
+    const [imgSrc, setImgSrc] = useState(news.imageUrl || "")
+
     const publishedDate = new Date(news.publishedAt).toLocaleDateString("vi-VN", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric"
     })
-
-    return (
-    const [imgSrc, setImgSrc] = useState(news.imageUrl || "")
 
     return (
         <div className="group relative bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-slate-100 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 flex flex-col h-full hover:-translate-y-1">
