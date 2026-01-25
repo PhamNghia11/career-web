@@ -24,11 +24,10 @@ export function NewsCard({ news }: NewsCardProps) {
             {/* Image Section */}
             <div className="relative aspect-[16/10] w-full overflow-hidden">
                 {imgSrc ? (
-                    <Image
+                    <img
                         src={imgSrc}
                         alt={news.title}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         onError={() => setImgSrc("https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80")}
                     />
                 ) : (

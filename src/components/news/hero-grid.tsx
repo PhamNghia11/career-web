@@ -25,11 +25,10 @@ export function HeroGrid({ featuredNews }: HeroGridProps) {
                 {/* Main Featured News */}
                 <div className="lg:col-span-8 group relative overflow-hidden rounded-[32px] bg-slate-100 aspect-[16/9] lg:aspect-auto h-full min-h-[400px] md:min-h-[500px]">
                     {mainImg && (
-                        <Image
+                        <img
                             src={mainImg}
                             alt={mainNews.title}
-                            fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             onError={() => setMainImg("https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&q=80")}
                         />
                     )}
@@ -67,11 +66,10 @@ export function HeroGrid({ featuredNews }: HeroGridProps) {
                     {secondaryNews.map((news, idx) => (
                         <div key={news._id} className="group relative flex-1 overflow-hidden rounded-[28px] bg-slate-100 aspect-[16/9] md:aspect-auto min-h-[220px]">
                             {secImgs[idx] && (
-                                <Image
+                                <img
                                     src={secImgs[idx]}
                                     alt={news.title}
-                                    fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     onError={() => {
                                         const newImgs = [...secImgs];
                                         newImgs[idx] = "https://images.unsplash.com/photo-1454165833767-131438cf58ff?w=800&q=80";

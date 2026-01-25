@@ -31,11 +31,10 @@ export function VideoSection({ news }: VideoSectionProps) {
                         >
                             <div className="relative aspect-video rounded-[32px] overflow-hidden mb-6 bg-slate-800">
                                 {v.imageUrl ? (
-                                    <Image
+                                    <img
                                         src={v.imageUrl}
                                         alt={v.title}
-                                        fill
-                                        className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
                                     />
                                 ) : (
                                     <div className="absolute inset-0 flex items-center justify-center">
