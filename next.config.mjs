@@ -12,27 +12,23 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'img.youtube.com',
+        hostname: '**.unsplash.com',
       },
       {
         protocol: 'https',
-        hostname: 'i.ytimg.com',
+        hostname: '**.ytimg.com',
+      },
+      {
+        protocol: 'http',
+        hostname: '**.ytimg.com',
       },
       {
         protocol: 'https',
-        hostname: 'i1.ytimg.com',
+        hostname: '**.youtube.com',
       },
       {
-        protocol: 'https',
-        hostname: 'i2.ytimg.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'i3.ytimg.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'i4.ytimg.com',
+        protocol: 'http',
+        hostname: '**.youtube.com',
       },
     ],
   },
