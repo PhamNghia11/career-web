@@ -23,9 +23,11 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
 import { News } from "@/types"
 
-const CATEGORIES = ["Thị trường lao động", "Phân tích dự báo", "Kinh tế vĩ mô", "Cẩm nang nghề nghiệp", "Thông báo GDU"]
+const CATEGORIES = ["Thị trường", "Công nghệ", "Việc làm", "Kỹ năng", "Cẩm nang", "Định hướng", "Góc nhìn", "Thông báo", "Video", "Quote"]
 
 export default function AdminNewsPage() {
     const [news, setNews] = useState<News[]>([])
@@ -41,8 +43,37 @@ export default function AdminNewsPage() {
         sourceName: "GDU Research",
         sourceUrl: "#",
         imageUrl: "",
+        gallery: [],
+        videoUrls: [],
+        relatedLinks: [],
+        tags: [],
+        isFeatured: false,
     })
     const { toast } = useToast()
+
+    // Helper to add/remove items from arrays
+    const handleArrayChange = (field: keyof News, index: number, value: string) => {
+        const arr = [...(currentNews[field] as any[])]
+        arr[index] = value
+        setCurrentNews({ ...currentNews, [field]: arr })
+    }
+
+    const addItem = (field: keyof News, defaultValue: any = "") => {
+        const arr = [...(currentNews[field] as any[] || []), defaultValue]
+        setCurrentNews({ ...currentNews, [field]: arr })
+    }
+
+    const removeItem = (field: keyof News, index: number) => {
+        const arr = [...(currentNews[field] as any[])]
+        arr.splice(index, 1)
+        setCurrentNews({ ...currentNews, [field]: arr })
+    }
+
+    const handleLinkChange = (index: number, field: "title" | "url", value: string) => {
+        const links = [...(currentNews.relatedLinks || [])]
+        links[index] = { ...links[index], [field]: value }
+        setCurrentNews({ ...currentNews, relatedLinks: links })
+    }
 
     const fetchNews = async () => {
         setLoading(true)
@@ -133,6 +164,11 @@ export default function AdminNewsPage() {
                         sourceName: "GDU Research",
                         sourceUrl: "#",
                         imageUrl: "",
+                        gallery: [],
+                        videoUrls: [],
+                        relatedLinks: [],
+                        tags: [],
+                        isFeatured: false,
                     })
                     setIsDialogOpen(true)
                 }} className="h-14 px-8 rounded-2xl gap-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95">
@@ -322,6 +358,16 @@ export default function AdminNewsPage() {
                                         />
                                     </div>
                                 </div>
+                                <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl border border-primary/10 mt-4">
+                                    <div className="space-y-0.5">
+                                        <Label className="font-bold text-primary">Bài viết nổi bật (Featured)</Label>
+                                        <p className="text-xs text-muted-foreground font-medium">Hiển thị ở khu vực trang trọng nhất trên trang tin tức.</p>
+                                    </div>
+                                    <Switch
+                                        checked={currentNews.isFeatured}
+                                        onCheckedChange={(val) => setCurrentNews({ ...currentNews, isFeatured: val })}
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -346,15 +392,104 @@ export default function AdminNewsPage() {
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="imageUrl" className="font-bold text-zinc-700 flex items-center gap-2">
-                                        <TrendingUp className="w-4 h-4 text-muted-foreground" /> Link hình ảnh minh họa
+                                        <TrendingUp className="w-4 h-4 text-muted-foreground" /> Link hình ảnh đại diện (Thumbnail)
                                     </Label>
                                     <Input
                                         id="imageUrl"
                                         value={currentNews.imageUrl}
                                         onChange={(e) => setCurrentNews({ ...currentNews, imageUrl: e.target.value })}
-                                        placeholder="Gợi ý: Dùng Unsplash URL để có ảnh chất lượng cao..."
+                                        placeholder="Link ảnh chính..."
                                         className="h-14 rounded-xl border-border/60 focus:ring-primary/20 bg-white"
                                     />
+                                </div>
+
+                                <Separator className="my-2" />
+
+                                {/* Gallery Section */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <Label className="font-bold text-zinc-700">Bộ sưu tập ảnh (Gallery)</Label>
+                                        <Button type="button" variant="outline" size="sm" onClick={() => addItem('gallery')} className="h-8 gap-1">
+                                            <Plus className="w-3 h-3" /> Thêm ảnh
+                                        </Button>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {currentNews.gallery?.map((url, idx) => (
+                                            <div key={idx} className="flex gap-2">
+                                                <Input
+                                                    value={url}
+                                                    onChange={(e) => handleArrayChange('gallery', idx, e.target.value)}
+                                                    placeholder="Link ảnh bổ sung..."
+                                                    className="h-10 rounded-lg"
+                                                />
+                                                <Button size="icon" variant="ghost" onClick={() => removeItem('gallery', idx)} className="text-red-500 hover:bg-red-50">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <Separator className="my-2" />
+
+                                {/* Videos Section */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <Label className="font-bold text-zinc-700">Danh sách Videos (URL)</Label>
+                                        <Button type="button" variant="outline" size="sm" onClick={() => addItem('videoUrls')} className="h-8 gap-1">
+                                            <Plus className="w-3 h-3" /> Thêm video
+                                        </Button>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {currentNews.videoUrls?.map((url, idx) => (
+                                            <div key={idx} className="flex gap-2">
+                                                <Input
+                                                    value={url}
+                                                    onChange={(e) => handleArrayChange('videoUrls', idx, e.target.value)}
+                                                    placeholder="https://youtube.com/watch?v=..."
+                                                    className="h-10 rounded-lg"
+                                                />
+                                                <Button size="icon" variant="ghost" onClick={() => removeItem('videoUrls', idx)} className="text-red-500 hover:bg-red-50">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <Separator className="my-2" />
+
+                                {/* Related Links Section */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <Label className="font-bold text-zinc-700">Liên kết liên quan (Related Links)</Label>
+                                        <Button type="button" variant="outline" size="sm" onClick={() => addItem('relatedLinks', { title: "", url: "" })} className="h-8 gap-1">
+                                            <Plus className="w-3 h-3" /> Thêm link
+                                        </Button>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {currentNews.relatedLinks?.map((link, idx) => (
+                                            <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 bg-zinc-50 rounded-xl relative border border-border/20">
+                                                <Input
+                                                    value={link.title}
+                                                    onChange={(e) => handleLinkChange(idx, 'title', e.target.value)}
+                                                    placeholder="Tên liên kết (VD: Báo cáo chi tiết)"
+                                                    className="h-9 text-xs"
+                                                />
+                                                <div className="flex gap-2">
+                                                    <Input
+                                                        value={link.url}
+                                                        onChange={(e) => handleLinkChange(idx, 'url', e.target.value)}
+                                                        placeholder="URL liên kết"
+                                                        className="h-9 text-xs"
+                                                    />
+                                                    <Button size="icon" variant="ghost" onClick={() => removeItem('relatedLinks', idx)} className="h-9 w-9 text-red-500 hover:bg-red-50">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>

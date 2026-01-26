@@ -69,10 +69,15 @@ export interface News {
   summary: string
   content: string
   imageUrl?: string
+  gallery?: string[]
   videoUrl?: string
+  videoUrls?: string[]
+  relatedLinks?: { title: string; url: string }[]
   sourceName: string
   sourceUrl: string
   category: string
   publishedAt: string | Date
   views: number
+  isFeatured?: boolean
+  tags?: string[]
 }

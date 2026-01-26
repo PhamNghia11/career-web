@@ -4,7 +4,7 @@ import { useEffect, useState, use } from "react"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { News } from "@/types"
-import { Calendar, Eye, ArrowLeft, ExternalLink, Share2, MessageSquare, Bookmark, TrendingUp, Clock } from "lucide-react"
+import { Calendar, Eye, ArrowLeft, ExternalLink, Share2, MessageSquare, Bookmark, TrendingUp, Clock, Play, Link as LinkIcon, Image as ImageIcon, ArrowUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
@@ -126,9 +126,72 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
                                     </p>
                                 </div>
 
-                                <div className="whitespace-pre-line text-[17px] md:text-[19px] leading-[1.8] text-slate-600 space-y-10 font-normal">
+                                <div className="whitespace-pre-line text-[17px] md:text-[19px] leading-[1.8] text-slate-600 space-y-10 font-normal mb-16">
                                     {news.content}
                                 </div>
+
+                                {/* Rich Media: Gallery */}
+                                {news.gallery && news.gallery.length > 0 && (
+                                    <div className="space-y-6 mb-16">
+                                        <h3 className="text-xl font-bold flex items-center gap-2">
+                                            <ImageIcon className="w-5 h-5 text-primary" /> Bộ sưu tập hình ảnh
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {news.gallery.map((url, idx) => (
+                                                <div key={idx} className="relative aspect-[16/10] rounded-3xl overflow-hidden group">
+                                                    <Image
+                                                        src={url}
+                                                        alt={`${news.title} gallery ${idx}`}
+                                                        fill
+                                                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Rich Media: Videos */}
+                                {news.videoUrls && news.videoUrls.length > 0 && (
+                                    <div className="space-y-6 mb-16">
+                                        <h3 className="text-xl font-bold flex items-center gap-2">
+                                            <Play className="w-5 h-5 text-primary" /> Video liên quan
+                                        </h3>
+                                        <div className="grid grid-cols-1 gap-6">
+                                            {news.videoUrls.map((url, idx) => (
+                                                <div key={idx} className="aspect-video rounded-3xl overflow-hidden bg-slate-900 shadow-xl">
+                                                    <iframe
+                                                        src={url.replace("watch?v=", "embed/")}
+                                                        className="w-full h-full"
+                                                        allowFullScreen
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Related Links Section */}
+                                {news.relatedLinks && news.relatedLinks.length > 0 && (
+                                    <div className="p-8 md:p-10 bg-slate-50 rounded-[40px] border border-slate-100 flex flex-col gap-6">
+                                        <h3 className="text-xl font-bold flex items-center gap-2">
+                                            <LinkIcon className="w-5 h-5 text-primary" /> Liên kết tham khảo
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {news.relatedLinks.map((link, idx) => (
+                                                <a
+                                                    key={idx}
+                                                    href={link.url}
+                                                    target="_blank"
+                                                    className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-200 hover:border-primary/30 hover:shadow-md transition-all group"
+                                                >
+                                                    <span className="font-bold text-slate-700 group-hover:text-primary transition-colors line-clamp-1">{link.title}</span>
+                                                    <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-primary transition-colors" />
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Reorganized Action Area - Left Aligned and Tidy */}
@@ -149,7 +212,7 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
                                 <div className="space-y-4">
                                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 block pb-2">Chủ đề liên quan:</span>
                                     <div className="flex flex-wrap gap-3">
-                                        {["Thị trường", "Việc làm", "Xu hướng", "AI", "2025"].map(tag => (
+                                        {(news.tags && news.tags.length > 0 ? news.tags : ["Thị trường", "Việc làm", "GDU"]).map(tag => (
                                             <button
                                                 key={tag}
                                                 className="px-6 py-3 bg-slate-50 text-slate-500 text-xs font-bold rounded-2xl uppercase tracking-wider hover:bg-primary/5 hover:text-primary transition-all border border-slate-100 hover:border-primary/20"
