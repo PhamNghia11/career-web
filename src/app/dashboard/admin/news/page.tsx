@@ -26,10 +26,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { News } from "@/types"
+import { useAuth } from "@/lib/auth-context"
+import { useRouter } from "next/navigation"
 
 const CATEGORIES = ["Thị trường", "Công nghệ", "Việc làm", "Kỹ năng", "Cẩm nang", "Định hướng", "Góc nhìn", "Thông báo", "Video", "Quote"]
 
 export default function AdminNewsPage() {
+    const { user, isLoading: authLoading } = useAuth()
+    const router = useRouter()
     const [news, setNews] = useState<News[]>([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
@@ -48,6 +52,7 @@ export default function AdminNewsPage() {
         relatedLinks: [],
         tags: [],
         isFeatured: false,
+        readingTime: "5 phút",
     })
     const { toast } = useToast()
 
@@ -76,6 +81,7 @@ export default function AdminNewsPage() {
     }
 
     const fetchNews = async () => {
+        if (user?.role !== "admin") return // Unauthorized
         setLoading(true)
         try {
             const res = await fetch("/api/news?limit=100")
@@ -91,10 +97,18 @@ export default function AdminNewsPage() {
     }
 
     useEffect(() => {
+        if (!authLoading && user?.role !== "admin") {
+            router.push("/dashboard")
+            return
+        }
         fetchNews()
-    }, [])
+    }, [user, authLoading])
 
     const handleSave = async () => {
+        if (user?.role !== "admin") {
+            toast({ title: "Từ chối", description: "Bạn không có quyền đăng tin", variant: "destructive" })
+            return
+        }
         if (!currentNews.title || !currentNews.summary || !currentNews.content) {
             toast({ title: "Thiếu thông tin", description: "Vui lòng điền các trường bắt buộc", variant: "destructive" })
             return
@@ -121,6 +135,12 @@ export default function AdminNewsPage() {
                     sourceName: "GDU Research",
                     sourceUrl: "#",
                     imageUrl: "",
+                    gallery: [],
+                    videoUrls: [],
+                    relatedLinks: [],
+                    tags: [],
+                    isFeatured: false,
+                    readingTime: "5 phút",
                 })
             }
         } catch (error) {
@@ -129,6 +149,10 @@ export default function AdminNewsPage() {
     }
 
     const handleDelete = async (id: string) => {
+        if (user?.role !== "admin") {
+            toast({ title: "Từ chối", description: "Chỉ Admin mới có quyền xóa", variant: "destructive" })
+            return
+        }
         if (!confirm("Bạn có chắc chắn muốn xóa bài viết này?")) return
 
         try {
@@ -169,6 +193,7 @@ export default function AdminNewsPage() {
                         relatedLinks: [],
                         tags: [],
                         isFeatured: false,
+                        readingTime: "5 phút",
                     })
                     setIsDialogOpen(true)
                 }} className="h-14 px-8 rounded-2xl gap-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95">
@@ -299,7 +324,7 @@ export default function AdminNewsPage() {
 
             {/* Post/Edit Dialog - Professional Redesign */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-[32px] border-none shadow-2xl">
+                <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-[32px] border-none shadow-2xl">
                     <div className="bg-primary text-white p-8">
                         <DialogHeader>
                             <div className="flex items-center gap-4 mb-2">
@@ -357,6 +382,28 @@ export default function AdminNewsPage() {
                                             className="h-14 rounded-xl border-border/60 focus:ring-primary/20 bg-white"
                                         />
                                     </div>
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="readingTime" className="font-bold text-zinc-700">Thời gian đọc (phút)</Label>
+                                            <Input
+                                                id="readingTime"
+                                                value={currentNews.readingTime}
+                                                onChange={(e) => setCurrentNews({ ...currentNews, readingTime: e.target.value })}
+                                                placeholder="VD: 5 phút"
+                                                className="h-14 rounded-xl border-border/60 focus:ring-primary/20 bg-white"
+                                            />
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="tags" className="font-bold text-zinc-700">Từ khóa (Tags)</Label>
+                                            <Input
+                                                id="tags"
+                                                value={currentNews.tags?.join(", ")}
+                                                onChange={(e) => setCurrentNews({ ...currentNews, tags: e.target.value.split(",").map(t => t.trim()).filter(t => t !== "") })}
+                                                placeholder="VD: IT, Kỹ năng, GDU (cách nhau bằng dấu phẩy)"
+                                                className="h-14 rounded-xl border-border/60 focus:ring-primary/20 bg-white"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl border border-primary/10 mt-4">
                                     <div className="space-y-0.5">
@@ -405,55 +452,66 @@ export default function AdminNewsPage() {
 
                                 <Separator className="my-2" />
 
-                                {/* Gallery Section */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <Label className="font-bold text-zinc-700">Bộ sưu tập ảnh (Gallery)</Label>
-                                        <Button type="button" variant="outline" size="sm" onClick={() => addItem('gallery')} className="h-8 gap-1">
-                                            <Plus className="w-3 h-3" /> Thêm ảnh
-                                        </Button>
+                                {/* Media Gallery and Videos in 2 columns */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {/* Gallery Section */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <Label className="font-bold text-zinc-700">Bộ sưu tập ảnh (Gallery)</Label>
+                                            <Button type="button" variant="outline" size="sm" onClick={() => addItem('gallery')} className="h-8 gap-1">
+                                                <Plus className="w-3 h-3" /> Thêm ảnh
+                                            </Button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {currentNews.gallery?.map((url, idx) => (
+                                                <div key={idx} className="flex gap-2">
+                                                    <Input
+                                                        value={url}
+                                                        onChange={(e) => handleArrayChange('gallery', idx, e.target.value)}
+                                                        placeholder="Link ảnh bổ sung..."
+                                                        className="h-10 rounded-lg"
+                                                    />
+                                                    <Button size="icon" variant="ghost" onClick={() => removeItem('gallery', idx)} className="text-red-500 hover:bg-red-50">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                            {(!currentNews.gallery || currentNews.gallery.length === 0) && (
+                                                <div className="py-4 border border-dashed rounded-xl flex items-center justify-center text-xs text-muted-foreground">
+                                                    Chưa có ảnh trong bộ sưu tập
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        {currentNews.gallery?.map((url, idx) => (
-                                            <div key={idx} className="flex gap-2">
-                                                <Input
-                                                    value={url}
-                                                    onChange={(e) => handleArrayChange('gallery', idx, e.target.value)}
-                                                    placeholder="Link ảnh bổ sung..."
-                                                    className="h-10 rounded-lg"
-                                                />
-                                                <Button size="icon" variant="ghost" onClick={() => removeItem('gallery', idx)} className="text-red-500 hover:bg-red-50">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
 
-                                <Separator className="my-2" />
-
-                                {/* Videos Section */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <Label className="font-bold text-zinc-700">Danh sách Videos (URL)</Label>
-                                        <Button type="button" variant="outline" size="sm" onClick={() => addItem('videoUrls')} className="h-8 gap-1">
-                                            <Plus className="w-3 h-3" /> Thêm video
-                                        </Button>
-                                    </div>
-                                    <div className="space-y-2">
-                                        {currentNews.videoUrls?.map((url, idx) => (
-                                            <div key={idx} className="flex gap-2">
-                                                <Input
-                                                    value={url}
-                                                    onChange={(e) => handleArrayChange('videoUrls', idx, e.target.value)}
-                                                    placeholder="https://youtube.com/watch?v=..."
-                                                    className="h-10 rounded-lg"
-                                                />
-                                                <Button size="icon" variant="ghost" onClick={() => removeItem('videoUrls', idx)} className="text-red-500 hover:bg-red-50">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
-                                            </div>
-                                        ))}
+                                    {/* Videos Section */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <Label className="font-bold text-zinc-700">Danh sách Videos (URL)</Label>
+                                            <Button type="button" variant="outline" size="sm" onClick={() => addItem('videoUrls')} className="h-8 gap-1">
+                                                <Plus className="w-3 h-3" /> Thêm video
+                                            </Button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {currentNews.videoUrls?.map((url, idx) => (
+                                                <div key={idx} className="flex gap-2">
+                                                    <Input
+                                                        value={url}
+                                                        onChange={(e) => handleArrayChange('videoUrls', idx, e.target.value)}
+                                                        placeholder="https://youtube.com/watch?v=..."
+                                                        className="h-10 rounded-lg"
+                                                    />
+                                                    <Button size="icon" variant="ghost" onClick={() => removeItem('videoUrls', idx)} className="text-red-500 hover:bg-red-50">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                            {(!currentNews.videoUrls || currentNews.videoUrls.length === 0) && (
+                                                <div className="py-4 border border-dashed rounded-xl flex items-center justify-center text-xs text-muted-foreground">
+                                                    Chưa có video liên quan
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
