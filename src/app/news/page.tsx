@@ -179,7 +179,11 @@ export default function NewsPage() {
 
                 {/* Modern Hero Grid Section */}
                 {news.length > 0 && (
-                    <HeroGrid featuredNews={[...news].sort((a, b) => b.views - a.views).slice(0, 3)} />
+                    <HeroGrid featuredNews={[...news].sort((a, b) => {
+                        if (a.isFeatured && !b.isFeatured) return -1
+                        if (!a.isFeatured && b.isFeatured) return 1
+                        return b.views - a.views
+                    }).slice(0, 3)} />
                 )}
 
                 {/* Compact & Integrated Toolbar Section */}

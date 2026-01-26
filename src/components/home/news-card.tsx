@@ -75,9 +75,17 @@ export function NewsCard({ news }: NewsCardProps) {
                         <ArrowUpRight className="w-4 h-4 transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
                     </Link>
 
-                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-300 uppercase tracking-widest">
-                        <Eye className="w-3.5 h-3.5 opacity-50" />
-                        {news.views.toLocaleString()}
+                    <div className="flex items-center gap-4 text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+                        {news.readingTime && (
+                            <div className="flex items-center gap-1.5">
+                                <TrendingUp className="w-3.5 h-3.5 opacity-50" />
+                                {news.readingTime}
+                            </div>
+                        )}
+                        <div className="flex items-center gap-1.5">
+                            <Eye className="w-3.5 h-3.5 opacity-50" />
+                            {news.views.toLocaleString()}
+                        </div>
                     </div>
                 </div>
             </div>
