@@ -231,6 +231,56 @@ export async function PATCH(
             { $set: updateData }
         )
 
+        // NEW: Send Approval Email to Employer
+        if (
+            currentUser.role === 'employer' &&
+            currentUser.status === 'pending' &&
+            updateData.status === 'active'
+        ) {
+            try {
+                const { sendEmail } = await import("@/services/email.service")
+                await sendEmail({
+                    to: currentUser.email,
+                    subject: "Tài khoản Nhà tuyển dụng đã được phê duyệt - GDU Career",
+                    html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden;">
+                            <div style="background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%); color: white; padding: 40px 20px; text-align: center;">
+                                <h1 style="margin: 0; font-size: 28px;">Chúc mừng!</h1>
+                                <p style="margin: 10px 0 0; opacity: 0.9; font-size: 18px;">Tài khoản của bạn đã được phê duyệt</p>
+                            </div>
+                            <div style="padding: 30px; background-color: #ffffff;">
+                                <h2 style="color: #333; margin-top: 0;">Xin chào ${currentUser.contactPerson || currentUser.name},</h2>
+                                <p style="color: #666; font-size: 16px; line-height: 1.6;">
+                                    Chúng tôi rất vui mừng thông báo rằng hồ sơ doanh nghiệp của bạn tại <strong>GDU Career Portal</strong> đã được Admin phê duyệt thành công.
+                                </p>
+                                <div style="background-color: #f9f9f9; border-left: 4px solid #d32f2f; padding: 20px; margin: 25px 0;">
+                                    <p style="margin: 0; color: #333; font-weight: bold;">Bây giờ bạn có thể:</p>
+                                    <ul style="margin: 10px 0 0; color: #555; padding-left: 20px;">
+                                        <li>Đăng tin tuyển dụng không giới hạn</li>
+                                        <li>Quản lý hồ sơ ứng viên trực tuyến</li>
+                                        <li>Xây dựng thương hiệu nhà tuyển dụng tại GDU</li>
+                                    </ul>
+                                </div>
+                                <div style="text-align: center; margin-top: 35px;">
+                                    <a href="${process.env.NEXT_PUBLIC_APP_URL}/login" 
+                                       style="background-color: #d32f2f; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block; transition: background-color 0.3s;">
+                                        Đăng nhập ngay
+                                    </a>
+                                </div>
+                                <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+                                <p style="color: #999; font-size: 13px; text-align: center;">
+                                    Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ bộ phận hỗ trợ của chúng tôi tại <a href="mailto:support@gdu.edu.vn" style="color: #d32f2f;">support@gdu.edu.vn</a>
+                                </p>
+                            </div>
+                        </div>
+                    `
+                })
+                console.log(`[Users API] Approval email sent to: ${currentUser.email}`)
+            } catch (emailErr) {
+                console.error("[Users API] Failed to send approval email:", emailErr)
+            }
+        }
+
         if (result.matchedCount === 0) {
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
