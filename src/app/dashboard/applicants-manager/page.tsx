@@ -32,7 +32,11 @@ interface Application {
     cohort?: string
 }
 
-export default function ManageApplicationsPage() {
+import { Suspense } from "react"
+
+export const dynamic = "force-dynamic"
+
+function ManageApplicationsContent() {
     const router = useRouter()
     const { user, isLoading } = useAuth()
     const searchParams = useSearchParams()
@@ -679,5 +683,17 @@ export default function ManageApplicationsPage() {
                 </DialogContent>
             </Dialog>
         </div>
+    )
+}
+
+export default function ManageApplicationsPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+        }>
+            <ManageApplicationsContent />
+        </Suspense>
     )
 }

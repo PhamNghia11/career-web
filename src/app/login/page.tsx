@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 
+export const dynamic = "force-dynamic"
+
 function LoginContent() {
   const searchParams = useSearchParams()
   const isPending = searchParams.get("pending") === "true"

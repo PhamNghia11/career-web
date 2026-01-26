@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useRef, useEffect, Suspense } from "react"
+
+export const dynamic = "force-dynamic"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Mail, RefreshCw, CheckCircle2 } from "lucide-react"
