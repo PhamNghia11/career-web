@@ -418,7 +418,7 @@ export default function RegisterPage() {
                         className="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
                       />
                       <Label htmlFor="terms" className="font-normal cursor-pointer text-sm">
-                        Tôi đồng ý với <Link href="/terms" className="text-blue-600 hover:underline">Điều khoản sử dụng</Link> và <Link href="/privacy" className="text-blue-600 hover:underline">Chính sách bảo mật</Link> của Viecoi.vn
+                        Tôi đồng ý với <Link href="/terms" className="text-blue-600 hover:underline">Điều khoản sử dụng</Link> và <Link href="/privacy" className="text-blue-600 hover:underline">Chính sách bảo mật</Link> của GDU Career
                       </Label>
                     </div>
 
