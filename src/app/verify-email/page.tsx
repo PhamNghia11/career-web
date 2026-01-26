@@ -114,18 +114,33 @@ function VerifyEmailContent() {
             if (data.success) {
                 setIsSuccess(true)
 
-                // Store user data for auto-login
+                // Store user data for auto-login (Except for pending Employers)
                 if (data.data?.user) {
-                    setAuthUser(data.data.user)
+                    const user = data.data.user
+                    if (user.role === 'employer' && user.status === 'pending') {
+                        // Special case: Employer verified email but needs Admin approval
+                        setIsSuccess(true)
+                        toast({
+                            title: "Xác minh thành công!",
+                            description: "Email của bạn đã được xác minh. Vui lòng chờ Admin phê duyệt tài khoản.",
+                        })
+                        // We do NOT setAuthUser here to prevent logging in
+                    } else {
+                        setAuthUser(user)
+                        toast({
+                            title: "Xác minh thành công!",
+                            description: "Chào mừng bạn gia nhập GDU Career.",
+                        })
+                    }
                 }
 
-                toast({
-                    title: "Xác minh thành công!",
-                    description: "Chào mừng bạn gia nhập GDU Career.",
-                })
-
                 // Redirect after success
-                if (data.data?.needsPhoneVerification) {
+                if (data.data?.user?.role === 'employer' && data.data?.user?.status === 'pending') {
+                    // Redirect to login or a specialized "Pending" page after a short delay
+                    setTimeout(() => {
+                        router.push("/login?pending=true")
+                    }, 3000)
+                } else if (data.data?.needsPhoneVerification) {
                     router.push(`/verify-phone?email=${encodeURIComponent(email)}`)
                 } else {
                     // Redirect to home page as requested

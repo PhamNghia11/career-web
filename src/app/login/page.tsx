@@ -11,8 +11,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/lib/auth-context"
 import { useToast } from "@/hooks/use-toast"
+import { useSearchParams } from "next/navigation"
 
 export default function LoginPage() {
+  const searchParams = useSearchParams()
+  const isPending = searchParams.get("pending") === "true"
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [otp, setOtp] = useState("")
@@ -114,6 +118,16 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {isPending && (
+              <div className="bg-blue-50 border border-blue-100 text-blue-700 text-sm p-4 rounded-xl mb-6 flex flex-col gap-1 animate-in fade-in zoom-in-95">
+                <div className="font-bold flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
+                  Đang chờ phê duyệt
+                </div>
+                <p className="text-blue-600/80">Tài khoản của bạn đã được xác minh. Vui lòng chờ Admin kiểm tra và phê duyệt thông tin doanh nghiệp.</p>
+              </div>
+            )}
+
             {error && (
               <div className="bg-red-50 border border-red-100 text-red-600 text-sm p-4 rounded-xl mb-6 flex items-center gap-2 animate-in fade-in zoom-in-95">
                 <div className="w-1 h-1 rounded-full bg-red-600 shrink-0" />

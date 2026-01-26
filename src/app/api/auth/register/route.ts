@@ -186,6 +186,26 @@ export async function POST(request: Request) {
       console.error("Failed to send OTP email:", emailError)
     }
 
+    // NEW: Notify Admin immediately about new registration (especially Employers)
+    try {
+      const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+      const isEmployer = role === "employer"
+
+      await notificationsCollection.insertOne({
+        targetRole: "admin",
+        type: "system",
+        title: isEmployer ? "Yêu cầu đăng ký Nhà tuyển dụng mới" : "Người dùng mới đăng ký",
+        message: isEmployer
+          ? `${newUser.companyName || name} vừa đăng ký. Chờ xác minh email và phê duyệt.`
+          : `${name} vừa đăng ký tài khoản sinh viên.`,
+        read: false,
+        createdAt: new Date(),
+        link: isEmployer ? "/dashboard/users?role=employer" : "/dashboard/users"
+      })
+    } catch (notifError) {
+      console.error("Failed to create admin notification:", notifError)
+    }
+
     return NextResponse.json({
       success: true,
       needsVerification: true,
