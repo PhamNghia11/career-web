@@ -279,6 +279,23 @@ export async function PATCH(
             } catch (emailErr) {
                 console.error("[Users API] Failed to send approval email:", emailErr)
             }
+
+            // Create In-App Notification for Employer
+            try {
+                const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+                await notificationsCollection.insertOne({
+                    userId: id,
+                    type: "system",
+                    title: "Tài khoản đã được phê duyệt!",
+                    message: `Chào mừng ${currentUser.companyName || currentUser.name}! Tài khoản của bạn đã được kích hoạt. Bạn có thể bắt đầu đăng tuyển công việc ngay bây giờ.`,
+                    read: false,
+                    createdAt: new Date(),
+                    link: "/dashboard"
+                })
+                console.log(`[Users API] In-app notification created for: ${id}`)
+            } catch (notifErr) {
+                console.error("[Users API] Failed to create approval notification:", notifErr)
+            }
         }
 
         if (result.matchedCount === 0) {
