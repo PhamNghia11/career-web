@@ -281,7 +281,7 @@ export function ApplyJobDialog({
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogContent
-                className="sm:max-w-[900px] max-h-[95vh] flex flex-col p-0 overflow-hidden rounded-[32px] border-none shadow-2xl"
+                className="sm:max-w-[900px]"
                 onPointerDownOutside={(e) => {
                     if (isSuccess) e.preventDefault();
                 }}
@@ -290,339 +290,311 @@ export function ApplyJobDialog({
                 }}
             >
                 {isSuccess ? (
-                    <div className="flex flex-col items-center justify-center p-12 text-center space-y-6">
-                        <div className="h-24 w-24 bg-green-100 rounded-full flex items-center justify-center animate-in zoom-in duration-500">
-                            <CheckCircle2 className="h-14 w-14 text-green-600" />
+                    <div className="flex flex-col items-center justify-center py-6 text-center space-y-6">
+                        <div className="h-20 w-20 bg-green-100 rounded-full flex items-center justify-center animate-in zoom-in duration-300">
+                            <CheckCircle2 className="h-12 w-12 text-green-600" />
                         </div>
 
                         <div className="space-y-2">
-                            <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tight">Ứng tuyển thành công!</h2>
-                            <p className="text-gray-500 font-medium">
-                                Hồ sơ của bạn đã được gửi đến nhà tuyển dụng một cách an toàn.
+                            <h2 className="text-2xl font-bold text-gray-900">Ứng tuyển thành công!</h2>
+                            <p className="text-gray-500">
+                                Hồ sơ của bạn đã được gửi đến nhà tuyển dụng.
                             </p>
                         </div>
 
-                        <div className="w-full bg-slate-50 rounded-[32px] p-8 border border-slate-100 text-left space-y-6">
-                            <h3 className="font-bold text-slate-800 uppercase tracking-widest text-xs border-b border-slate-200 pb-3">Tóm tắt thông tin</h3>
+                        <div className="w-full bg-gray-50 rounded-lg p-5 border border-gray-100 text-left space-y-4">
+                            <h3 className="font-semibold text-gray-900 border-b border-gray-200 pb-2">Thông tin ứng tuyển</h3>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
+                            <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
-                                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mb-1">Vị trí</p>
-                                    <p className="font-bold text-slate-900 truncate" title={jobTitle}>{jobTitle}</p>
+                                    <p className="text-gray-500">Vị trí</p>
+                                    <p className="font-medium text-gray-900 truncate" title={jobTitle}>{jobTitle}</p>
                                 </div>
                                 <div>
-                                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mb-1">Công ty</p>
-                                    <p className="font-bold text-slate-900 truncate" title={companyName}>{companyName}</p>
+                                    <p className="text-gray-500">Công ty</p>
+                                    <p className="font-medium text-gray-900 truncate" title={companyName}>{companyName}</p>
                                 </div>
                                 <div>
-                                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mb-1">Trạng thái</p>
-                                    <p className="font-bold text-green-600 uppercase tracking-wider">Đã gửi</p>
+                                    <p className="text-gray-500">Trạng thái hồ sơ</p>
+                                    <p className="font-medium text-green-600">Đã gửi thành công</p>
                                 </div>
                                 <div>
-                                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mb-1">Thời gian</p>
-                                    <p className="font-bold text-slate-900">{new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {new Date().toLocaleDateString('vi-VN')}</p>
+                                    <p className="text-gray-500">Thời gian</p>
+                                    <p className="font-medium text-gray-900">{new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {new Date().toLocaleDateString('vi-VN')}</p>
                                 </div>
                             </div>
 
-                            <Separator className="bg-slate-200" />
-
-                            <h3 className="font-bold text-slate-800 uppercase tracking-widest text-xs border-b border-slate-200 pb-3">Thông tin liên hệ</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                                <div className="space-y-1">
-                                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest flex items-center gap-2">
-                                        <Globe className="h-3.5 w-3.5" /> Website
-                                    </p>
-                                    <a href={companyWebsite || "#"} target="_blank" rel="noopener noreferrer" className="font-bold text-blue-600 hover:underline truncate block">
+                            <h3 className="font-semibold text-gray-900 border-b border-gray-200 pb-2 pt-2">Thông tin liên hệ nhà tuyển dụng</h3>
+                            <div className="grid grid-cols-1 gap-3 text-sm">
+                                <div className="flex items-center gap-2">
+                                    <Globe className="h-4 w-4 text-gray-400" />
+                                    <p className="text-gray-500 w-20">Website:</p>
+                                    <a href={companyWebsite || "#"} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 hover:underline truncate">
                                         {companyWebsite || "N/A"}
                                     </a>
                                 </div>
-                                <div className="space-y-1">
-                                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest flex items-center gap-2">
-                                        <Mail className="h-3.5 w-3.5" /> Email
-                                    </p>
-                                    <p className="font-bold text-slate-900">{companyEmail || "N/A"}</p>
+                                <div className="flex items-center gap-2">
+                                    <Mail className="h-4 w-4 text-gray-400" />
+                                    <p className="text-gray-500 w-20">Email:</p>
+                                    <p className="font-medium text-gray-900">{companyEmail || "N/A"}</p>
                                 </div>
-                                <div className="space-y-1">
-                                    <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest flex items-center gap-2">
-                                        <Phone className="h-3.5 w-3.5" /> Điện thoại
-                                    </p>
-                                    <p className="font-bold text-slate-900">{companyPhone || "N/A"}</p>
+                                <div className="flex items-center gap-2">
+                                    <Phone className="h-4 w-4 text-gray-400" />
+                                    <p className="text-gray-500 w-20">Điện thoại:</p>
+                                    <p className="font-medium text-gray-900">{companyPhone || "N/A"}</p>
                                 </div>
+                            </div>
+
+                            <div className="pt-2 border-t border-gray-200 mt-2">
+                                <p className="text-xs text-gray-500 italic">
+                                    * Bạn có thể chủ động liên hệ với nhà tuyển dụng qua các kênh trên để được phản hồi nhanh hơn.
+                                </p>
                             </div>
                         </div>
 
-                        <div className="flex gap-4 w-full pt-4">
-                            <Button onClick={onClose} variant="outline" className="flex-1 h-14 rounded-2xl font-bold uppercase tracking-widest text-xs">
+                        <div className="flex gap-3 w-full">
+                            <Button onClick={onClose} variant="outline" className="flex-1">
                                 Đóng
                             </Button>
-                            <Button onClick={() => window.location.href = "/dashboard/applications"} className="flex-1 h-14 rounded-2xl bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white font-bold uppercase tracking-widest text-xs shadow-xl shadow-blue-900/10">
-                                Hồ sơ của tôi
+                            <Button onClick={() => window.location.href = "/dashboard/applications"} className="flex-1 bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white">
+                                Xem hồ sơ của tôi
                             </Button>
                         </div>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="flex flex-col h-full max-h-[95vh]">
-                        <div className="bg-[#1e3a5f] text-white p-8">
-                            <DialogHeader>
-                                <DialogTitle className="text-2xl font-black uppercase tracking-tight text-white underline decoration-blue-400 decoration-4 underline-offset-8">Ứng tuyển công việc</DialogTitle>
-                                <DialogDescription className="text-blue-100/80 font-medium pt-4">
-                                    Bạn đang ứng tuyển vị trí <span className="font-black text-white">{jobTitle}</span> <br className="hidden md:block" />
-                                    tại <span className="font-black text-white uppercase">{companyName}</span>
-                                </DialogDescription>
-                            </DialogHeader>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-white">
-                            <div className="grid gap-8">
-                                {/* Academic Information */}
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-blue-600">
-                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-[10px]">1</span>
-                                        Thông tin sinh viên
+                    <form onSubmit={handleSubmit}>
+                        <DialogHeader>
+                            <DialogTitle>Ứng tuyển công việc</DialogTitle>
+                            <DialogDescription>
+                                Ứng tuyển vị trí <span className="font-semibold text-foreground">{jobTitle}</span> tại {companyName}.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto px-1">
+                            <div className="grid gap-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="fullname">Họ và tên <span className="text-red-500">*</span></Label>
+                                        <Input id="fullname" placeholder="Nguyễn Văn A" required defaultValue={user?.name || ""} />
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="fullname" className="font-bold text-slate-700">Họ và tên <span className="text-red-500">*</span></Label>
-                                            <Input id="fullname" placeholder="Nguyễn Văn A" required defaultValue={user?.name || ""} className="h-12 rounded-xl" />
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="mssv" className="font-bold text-slate-700">Mã số sinh viên <span className="text-red-500">*</span></Label>
-                                            <Input id="mssv" placeholder="21123456" required defaultValue={user?.studentId || ""} className="h-12 rounded-xl" />
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="cohort" className="font-bold text-slate-700">Khóa <span className="text-slate-400 font-normal">(Tùy chọn)</span></Label>
-                                            <Select name="cohort" value={cohort} onValueChange={setCohort}>
-                                                <SelectTrigger id="cohort" className="h-12 rounded-xl">
-                                                    <SelectValue placeholder="Chọn Khóa" />
-                                                </SelectTrigger>
-                                                <SelectContent className="rounded-xl">
-                                                    <SelectItem value="K14">K14</SelectItem>
-                                                    <SelectItem value="K15">K15</SelectItem>
-                                                    <SelectItem value="K16">K16</SelectItem>
-                                                    <SelectItem value="K17">K17</SelectItem>
-                                                    <SelectItem value="K18">K18</SelectItem>
-                                                    <SelectItem value="K19">K19</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="major" className="font-bold text-slate-700">Ngành học <span className="text-red-500">*</span></Label>
-                                            <Select name="major" value={major} onValueChange={handleMajorChange} required>
-                                                <SelectTrigger id="major" className="h-12 rounded-xl">
-                                                    <SelectValue placeholder="Chọn Ngành học" />
-                                                </SelectTrigger>
-                                                <SelectContent className="rounded-xl">
-                                                    <SelectItem value="Răng Hàm Mặt">Răng Hàm Mặt</SelectItem>
-                                                    <SelectItem value="Kỹ thuật phục hồi chức năng">Kỹ thuật phục hồi chức năng</SelectItem>
-                                                    <SelectItem value="Điều dưỡng">Điều dưỡng</SelectItem>
-                                                    <Separator className="my-1" />
-                                                    <SelectItem value="Công nghệ thông tin">Công nghệ thông tin</SelectItem>
-                                                    <SelectItem value="Kỹ thuật phần mềm">Kỹ thuật phần mềm</SelectItem>
-                                                    <SelectItem value="Mạng máy tính & Truyền thông dữ liệu">Mạng máy tính</SelectItem>
-                                                    <SelectItem value="Trí tuệ nhân tạo">Trí tuệ nhân tạo</SelectItem>
-                                                    <Separator className="my-1" />
-                                                    <SelectItem value="Truyền thông đa phương tiện">Truyền thông đa phương tiện</SelectItem>
-                                                    <SelectItem value="Công nghệ truyền thông">Công nghệ truyền thông</SelectItem>
-                                                    <SelectItem value="Quan hệ công chúng">Quan hệ công chúng</SelectItem>
-                                                    <Separator className="my-1" />
-                                                    <SelectItem value="Kinh doanh quốc tế">Kinh doanh quốc tế</SelectItem>
-                                                    <SelectItem value="Kinh doanh thương mại">Kinh doanh thương mại</SelectItem>
-                                                    <SelectItem value="Thương mại điện tử">Thương mại điện tử</SelectItem>
-                                                    <SelectItem value="Quản trị kinh doanh">Quản trị kinh doanh</SelectItem>
-                                                    <SelectItem value="Marketing">Marketing</SelectItem>
-                                                    <SelectItem value="Quản trị khách sạn">Quản trị khách sạn</SelectItem>
-                                                    <SelectItem value="Quản trị dịch vụ du lịch & lữ hành">Du lịch</SelectItem>
-                                                    <SelectItem value="Logistics & Quản lý chuỗi cung ứng">Logistics</SelectItem>
-                                                    <Separator className="my-1" />
-                                                    <SelectItem value="Luật">Luật</SelectItem>
-                                                    <SelectItem value="Luật kinh tế">Luật kinh tế</SelectItem>
-                                                    <Separator className="my-1" />
-                                                    <SelectItem value="Ngôn ngữ Anh">Ngôn ngữ Anh</SelectItem>
-                                                    <SelectItem value="Đông phương học">Đông phương học</SelectItem>
-                                                    <SelectItem value="Tâm lý học">Tâm lý học</SelectItem>
-                                                    <SelectItem value="Ngôn ngữ Trung Quốc">Ngôn ngữ Trung Quốc</SelectItem>
-                                                    <Separator className="my-1" />
-                                                    <SelectItem value="Tài chính - Ngân hàng">Tài chính - Ngân hàng</SelectItem>
-                                                    <SelectItem value="Công nghệ tài chính">Công nghệ tài chính</SelectItem>
-                                                    <SelectItem value="Kế toán">Kế toán</SelectItem>
-                                                    <SelectItem value="Khác">Khác</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="faculty" className="font-bold text-slate-700">Khoa / Viện <span className="text-slate-400 font-normal">(Tự động)</span></Label>
-                                            <Select name="faculty" value={faculty} onValueChange={setFaculty} disabled={major !== "Khác" && major !== ""}>
-                                                <SelectTrigger id="faculty" className="h-12 rounded-xl bg-slate-50 border-slate-200">
-                                                    <SelectValue placeholder="Chọn Khoa / Viện" />
-                                                </SelectTrigger>
-                                                <SelectContent className="rounded-xl">
-                                                    <SelectItem value="Sức khỏe">Sức khỏe</SelectItem>
-                                                    <SelectItem value="Công nghệ thông tin">Công nghệ thông tin</SelectItem>
-                                                    <SelectItem value="Truyền thông">Truyền thông</SelectItem>
-                                                    <SelectItem value="Kinh doanh">Kinh doanh</SelectItem>
-                                                    <SelectItem value="Quản trị - Quản lý">Quản trị - Quản lý</SelectItem>
-                                                    <SelectItem value="Luật">Luật</SelectItem>
-                                                    <SelectItem value="Khoa học xã hội & Ngôn ngữ quốc tế">KHXH & Ngôn ngữ quốc tế</SelectItem>
-                                                    <SelectItem value="Tài chính ngân hàng">Tài chính ngân hàng</SelectItem>
-                                                    <SelectItem value="Khác">Khác</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="mssv">Mã số sinh viên <span className="text-red-500">*</span></Label>
+                                        <Input id="mssv" placeholder="21123456" required defaultValue={user?.studentId || ""} />
                                     </div>
                                 </div>
 
-                                {/* Contact Information */}
-                                <div className="space-y-6">
-                                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-blue-600">
-                                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-[10px]">2</span>
-                                        Liên hệ & Hồ sơ
+                                <div className="grid gap-2">
+                                    <Label htmlFor="major">Ngành học <span className="text-red-500">*</span></Label>
+                                    <Select name="major" value={major} onValueChange={handleMajorChange} required>
+                                        <SelectTrigger id="major">
+                                            <SelectValue placeholder="Chọn Ngành học" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Răng Hàm Mặt">Răng Hàm Mặt</SelectItem>
+                                            <SelectItem value="Kỹ thuật phục hồi chức năng">Kỹ thuật phục hồi chức năng</SelectItem>
+                                            <SelectItem value="Điều dưỡng">Điều dưỡng</SelectItem>
+                                            <SelectItem value="Công nghệ thông tin">Công nghệ thông tin</SelectItem>
+                                            <SelectItem value="Kỹ thuật phần mềm">Kỹ thuật phần mềm</SelectItem>
+                                            <SelectItem value="Mạng máy tính & Truyền thông dữ liệu">Mạng máy tính</SelectItem>
+                                            <SelectItem value="Trí tuệ nhân tạo">Trí tuệ nhân tạo</SelectItem>
+                                            <SelectItem value="Truyền thông đa phương tiện">Truyền thông đa phương tiện</SelectItem>
+                                            <SelectItem value="Công nghệ truyền thông">Công nghệ truyền thông</SelectItem>
+                                            <SelectItem value="Quan hệ công chúng">Quan hệ công chúng</SelectItem>
+                                            <SelectItem value="Kinh doanh quốc tế">Kinh doanh quốc tế</SelectItem>
+                                            <SelectItem value="Kinh doanh thương mại">Kinh doanh thương mại</SelectItem>
+                                            <SelectItem value="Thương mại điện tử">Thương mại điện tử</SelectItem>
+                                            <SelectItem value="Quản trị kinh doanh">Quản trị kinh doanh</SelectItem>
+                                            <SelectItem value="Marketing">Marketing</SelectItem>
+                                            <SelectItem value="Quản trị khách sạn">Quản trị khách sạn</SelectItem>
+                                            <SelectItem value="Quản trị dịch vụ du lịch & lữ hành">Du lịch</SelectItem>
+                                            <SelectItem value="Logistics & Quản lý chuỗi cung ứng">Logistics</SelectItem>
+                                            <SelectItem value="Luật">Luật</SelectItem>
+                                            <SelectItem value="Luật kinh tế">Luật kinh tế</SelectItem>
+                                            <SelectItem value="Ngôn ngữ Anh">Ngôn ngữ Anh</SelectItem>
+                                            <SelectItem value="Đông phương học">Đông phương học</SelectItem>
+                                            <SelectItem value="Tâm lý học">Tâm lý học</SelectItem>
+                                            <SelectItem value="Ngôn ngữ Trung Quốc">Ngôn ngữ Trung Quốc</SelectItem>
+                                            <SelectItem value="Tài chính - Ngân hàng">Tài chính - Ngân hàng</SelectItem>
+                                            <SelectItem value="Công nghệ tài chính">Công nghệ tài chính</SelectItem>
+                                            <SelectItem value="Kế toán">Kế toán</SelectItem>
+                                            <SelectItem value="Khác">Khác</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="faculty">Khoa / Viện <span className="text-gray-400 font-normal">(Tùy chọn)</span></Label>
+                                        <Select name="faculty" value={faculty} onValueChange={setFaculty} disabled={major !== "Khác" && major !== ""}>
+                                            <SelectTrigger id="faculty">
+                                                <SelectValue placeholder="Chọn Khoa / Viện" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Sức khỏe">Sức khỏe</SelectItem>
+                                                <SelectItem value="Công nghệ thông tin">Công nghệ thông tin</SelectItem>
+                                                <SelectItem value="Truyền thông">Truyền thông</SelectItem>
+                                                <SelectItem value="Kinh doanh">Kinh doanh</SelectItem>
+                                                <SelectItem value="Quản trị - Quản lý">Quản trị - Quản lý</SelectItem>
+                                                <SelectItem value="Luật">Luật</SelectItem>
+                                                <SelectItem value="Khoa học xã hội & Ngôn ngữ quốc tế">KHXH & Ngôn ngữ quốc tế</SelectItem>
+                                                <SelectItem value="Tài chính ngân hàng">Tài chính ngân hàng</SelectItem>
+                                                <SelectItem value="Khác">Khác</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="email" className="font-bold text-slate-700">Email cá nhân <span className="text-red-500">*</span></Label>
-                                            <Input
-                                                id="email"
-                                                type="email"
-                                                placeholder="example@gmail.com"
-                                                defaultValue={user?.email || ""}
-                                                required
-                                                className="h-12 rounded-xl"
-                                                onChange={(e) => {
-                                                    const val = e.target.value
-                                                    if (val && !val.endsWith("@gmail.com")) {
-                                                        setError("Email phải có định dạng @gmail.com")
-                                                    } else {
-                                                        setError(null)
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="phone" className="font-bold text-slate-700">Số điện thoại <span className="text-red-500">*</span></Label>
-                                            <Input
-                                                id="phone"
-                                                type="tel"
-                                                placeholder="0901234567"
-                                                required
-                                                defaultValue={user?.phone || ""}
-                                                value={phoneValue}
-                                                className="h-12 rounded-xl"
-                                                onChange={(e) => {
-                                                    const val = e.target.value
-                                                    const numericVal = val.replace(/\D/g, '')
-                                                    setPhoneValue(numericVal)
-                                                    if (numericVal.length > 0) {
-                                                        if (!numericVal.startsWith('0')) {
-                                                            setPhoneError("Số điện thoại phải bắt đầu bằng số 0")
-                                                        } else if (numericVal.length < 10 || numericVal.length > 11) {
-                                                            setPhoneError("Số điện thoại phải có 10-11 số")
-                                                        } else {
-                                                            setPhoneError("")
-                                                        }
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="cohort">Khóa <span className="text-gray-400 font-normal">(Tùy chọn)</span></Label>
+                                        <Select name="cohort" value={cohort} onValueChange={setCohort}>
+                                            <SelectTrigger id="cohort">
+                                                <SelectValue placeholder="Chọn Khóa" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="K14">K14</SelectItem>
+                                                <SelectItem value="K15">K15</SelectItem>
+                                                <SelectItem value="K16">K16</SelectItem>
+                                                <SelectItem value="K17">K17</SelectItem>
+                                                <SelectItem value="K18">K18</SelectItem>
+                                                <SelectItem value="K19">K19</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="email">Email cá nhân <span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            placeholder="example@gmail.com"
+                                            defaultValue={user?.email || ""}
+                                            required
+                                            onChange={(e) => {
+                                                const val = e.target.value
+                                                if (val && !val.endsWith("@gmail.com")) {
+                                                    setError("Email phải có định dạng @gmail.com")
+                                                } else {
+                                                    setError(null)
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="phone">Số điện thoại <span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="phone"
+                                            type="tel"
+                                            placeholder="0901234567"
+                                            required
+                                            defaultValue={user?.phone || ""}
+                                            value={phoneValue}
+                                            onChange={(e) => {
+                                                const val = e.target.value
+                                                // Only allow digits
+                                                const numericVal = val.replace(/\D/g, '')
+                                                setPhoneValue(numericVal)
+
+                                                if (numericVal.length > 0) {
+                                                    if (!numericVal.startsWith('0')) {
+                                                        setPhoneError("Số điện thoại phải bắt đầu bằng số 0")
+                                                    } else if (numericVal.length < 10 || numericVal.length > 11) {
+                                                        setPhoneError("Số điện thoại phải có 10-11 số")
                                                     } else {
                                                         setPhoneError("")
                                                     }
-                                                }}
-                                            />
-                                            {phoneError && (
-                                                <p className="text-red-500 text-xs mt-1 font-medium">{phoneError}</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* CV Upload */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                                    <div className="grid gap-4">
-                                        <Label htmlFor="cv" className="flex items-center gap-1 font-bold text-slate-700">
-                                            <span>CV / Hồ sơ đính kèm</span>
-                                            {((type) => {
-                                                const t = type?.toLowerCase()
-                                                return t === "full-time" || t === "toàn thời gian" || t === "internship" || t === "thực tập"
-                                            })(jobType) && (
-                                                    <span className="text-red-500">*</span>
-                                                )}
-                                        </Label>
-                                        <div
-                                            className={`border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center text-center transition-all cursor-pointer group h-[220px]
-                                                ${dragActive ? "border-blue-500 bg-blue-50 shadow-inner" : "border-slate-200 hover:border-blue-400 hover:bg-slate-50/50"}
-                                                ${error && !selectedFile ? "border-red-500 bg-red-50" : ""}
-                                            `}
-                                            onDragEnter={handleDrag}
-                                            onDragLeave={handleDrag}
-                                            onDragOver={handleDrag}
-                                            onDrop={handleDrop}
-                                            onClick={triggerFileInput}
-                                        >
-                                            <input
-                                                ref={inputRef}
-                                                id="cv"
-                                                type="file"
-                                                className="hidden"
-                                                accept=".pdf,.doc,.docx"
-                                                onChange={handleFileChange}
-                                            />
-
-                                            {selectedFile ? (
-                                                <div className="flex flex-col items-center">
-                                                    <div className="h-14 w-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-sm">
-                                                        <CheckCircle2 className="h-8 w-8" />
-                                                    </div>
-                                                    <p className="text-sm font-black text-slate-900 line-clamp-1 px-4">{selectedFile.name}</p>
-                                                    <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="mt-4 text-red-500 hover:text-red-700 hover:bg-red-50 h-9 px-4 rounded-xl font-bold text-xs"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setSelectedFile(null);
-                                                            setError(null);
-                                                        }}
-                                                    >
-                                                        Thay đổi file khác
-                                                    </Button>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <div className="h-16 w-16 bg-slate-50 border border-slate-100 rounded-3xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-blue-50 transition-all shadow-sm">
-                                                        <Upload className={`h-8 w-8 ${error && !selectedFile ? "text-red-500" : "text-slate-400 group-hover:text-blue-600"}`} />
-                                                    </div>
-                                                    <p className={`text-sm font-bold ${error && !selectedFile ? "text-red-600" : "text-slate-800"}`}>
-                                                        {error && !selectedFile ? error : "Nhấn để tải lên CV"}
-                                                    </p>
-                                                    <p className="text-xs text-slate-400 mt-2 font-medium">
-                                                        {dragActive ? "Thả file vào đây ngay" : "Hỗ trợ PDF, DOC, DOCX (Max 20MB)"}
-                                                    </p>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="grid gap-2 h-full">
-                                        <Label htmlFor="message" className="font-bold text-slate-700">Thư giới thiệu <span className="text-slate-400 font-normal">(Tùy chọn)</span></Label>
-                                        <Textarea
-                                            id="message"
-                                            placeholder="GDU Career khuyên bạn nên viết đôi lời giới thiệu về bản thân và lý do bạn phù hợp với vị trí này để ghi điểm với nhà tuyển dụng nhé..."
-                                            className="h-[220px] rounded-3xl resize-none p-6 border-slate-200 focus:ring-blue-500/10 placeholder:text-slate-400 text-sm leading-relaxed"
+                                                } else {
+                                                    setPhoneError("")
+                                                }
+                                            }}
                                         />
+                                        {phoneError && (
+                                            <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="cv" className="flex items-center gap-1">
+                                    <span>CV / Hồ sơ đính kèm</span>
+                                    {((type) => {
+                                        const t = type?.toLowerCase()
+                                        return t === "full-time" || t === "toàn thời gian" || t === "internship" || t === "thực tập"
+                                    })(jobType) && (
+                                            <span className="text-red-500">*</span>
+                                        )}
+                                </Label>
+                                <div
+                                    className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center transition-colors cursor-pointer group 
+                                        ${dragActive ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:bg-gray-50"}
+                                        ${error && !selectedFile ? "border-red-500 bg-red-50" : ""}
+                                    `}
+                                    onDragEnter={handleDrag}
+                                    onDragLeave={handleDrag}
+                                    onDragOver={handleDrag}
+                                    onDrop={handleDrop}
+                                    onClick={triggerFileInput}
+                                >
+                                    <input
+                                        ref={inputRef}
+                                        id="cv"
+                                        type="file"
+                                        className="hidden"
+                                        accept=".pdf,.doc,.docx"
+                                        onChange={handleFileChange}
+                                    />
 
-                        <div className="p-8 bg-white border-t border-slate-100 flex items-center justify-end gap-4 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
-                            <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} className="h-14 px-8 rounded-2xl font-bold uppercase tracking-widest text-xs">
-                                Hủy ứng tuyển
-                            </Button>
-                            <Button type="submit" disabled={isSubmitting} className="h-14 px-10 rounded-2xl bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white font-black uppercase tracking-[0.1em] text-xs shadow-xl shadow-blue-900/10">
-                                {isSubmitting ? "Đang xử lý hồ sơ..." : "Xác nhận gửi hồ sơ"}
-                            </Button>
+                                    {selectedFile ? (
+                                        <div className="flex flex-col items-center">
+                                            <div className="h-10 w-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2">
+                                                <CheckCircle2 className="h-5 w-5" />
+                                            </div>
+                                            <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
+                                            <p className="text-xs text-gray-500 mt-1">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="mt-2 text-red-500 hover:text-red-700 hover:bg-red-50 h-8"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedFile(null);
+                                                    setError(null);
+                                                }}
+                                            >
+                                                Xóa file
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center mb-2 group-hover:bg-gray-200 transition-colors">
+                                                <Upload className={`h-5 w-5 ${error && !selectedFile ? "text-red-500" : "text-gray-500"}`} />
+                                            </div>
+                                            <p className={`text-sm font-medium ${error && !selectedFile ? "text-red-600" : "text-gray-900"}`}>
+                                                {error && !selectedFile ? error : "Nhấn để tải lên CV"}
+                                            </p>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                {dragActive ? "Thả file vào đây" : "PDF, DOC, DOCX (Tối đa 20MB)"}
+                                            </p>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="message">Thư giới thiệu (Tùy chọn)</Label>
+                                <Textarea
+                                    id="message"
+                                    placeholder="Viết đôi lời giới thiệu về bản thân và lý do bạn phù hợp với vị trí này..."
+                                    className="min-h-[100px]"
+                                />
+                            </div>
                         </div>
+                        <DialogFooter>
+                            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+                                Hủy bỏ
+                            </Button>
+                            <Button type="submit" disabled={isSubmitting} className="bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white">
+                                {isSubmitting ? "Đang gửi..." : "Gửi hồ sơ ứng tuyển"}
+                            </Button>
+                        </DialogFooter>
                     </form>
                 )}
             </DialogContent>

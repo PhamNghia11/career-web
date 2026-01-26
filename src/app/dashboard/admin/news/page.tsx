@@ -324,271 +324,208 @@ export default function AdminNewsPage() {
 
             {/* Post/Edit Dialog - Professional Redesign */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-[32px] border-none shadow-2xl">
-                    <div className="bg-primary text-white p-8">
-                        <DialogHeader>
-                            <div className="flex items-center gap-4 mb-2">
-                                <div className="p-3 bg-white/10 rounded-2xl">
-                                    <Newspaper className="w-8 h-8 text-white" />
-                                </div>
-                                <div>
-                                    <DialogTitle className="text-2xl font-black tracking-tight">{isEditing ? "Hiệu chỉnh bài viết" : "Đăng Tin tức mới"}</DialogTitle>
-                                    <DialogDescription className="text-white/80 font-medium pt-1">Nhập thông tin chi tiết về bài phân tích hoặc tin thị trường lao động.</DialogDescription>
-                                </div>
-                            </div>
-                        </DialogHeader>
-                    </div>
+                <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>{isEditing ? "Chỉnh sửa bài viết" : "Đăng tin tức mới"}</DialogTitle>
+                        <DialogDescription>
+                            Điền đầy đủ thông tin bên dưới để chia sẻ tin tức đến sinh viên.
+                        </DialogDescription>
+                    </DialogHeader>
 
-                    <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-zinc-50/50">
-                        {/* Section 1: Basic Information */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-primary">
-                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-[10px]">1</span>
-                                Thông tin cơ bản
+                    <div className="grid gap-6 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="title">Tiêu đề <span className="text-red-500">*</span></Label>
+                            <Input
+                                id="title"
+                                value={currentNews.title}
+                                onChange={(e) => setCurrentNews({ ...currentNews, title: e.target.value })}
+                                placeholder="Tiêu đề bài viết"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="category">Chuyên mục <span className="text-red-500">*</span></Label>
+                                <Select
+                                    value={currentNews.category}
+                                    onValueChange={(val) => setCurrentNews({ ...currentNews, category: val })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Chọn chuyên mục" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {CATEGORIES.map(c => (
+                                            <SelectItem key={c} value={c}>{c}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
-                            <div className="grid gap-4">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="title" className="font-bold text-zinc-700">Tiêu đề bài viết <span className="text-red-500">*</span></Label>
-                                    <Input
-                                        id="title"
-                                        value={currentNews.title}
-                                        onChange={(e) => setCurrentNews({ ...currentNews, title: e.target.value })}
-                                        placeholder="VD: Xu hướng nhân lực IT 2025..."
-                                        className="h-14 rounded-xl border-border/60 focus:ring-primary/20 bg-white"
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="grid gap-2">
-                                        <Label className="font-bold text-zinc-700">Chuyên mục <span className="text-red-500">*</span></Label>
-                                        <Select
-                                            value={currentNews.category}
-                                            onValueChange={(val) => setCurrentNews({ ...currentNews, category: val })}
-                                        >
-                                            <SelectTrigger className="h-14 rounded-xl border-border/60 bg-white">
-                                                <SelectValue placeholder="Chọn chuyên mục" />
-                                            </SelectTrigger>
-                                            <SelectContent className="rounded-xl border-border/40">
-                                                {CATEGORIES.map(c => <SelectItem key={c} value={c} className="py-3 font-medium">{c}</SelectItem>)}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="source" className="font-bold text-zinc-700">Tên Nguồn tin <span className="text-red-500">*</span></Label>
-                                        <Input
-                                            id="source"
-                                            value={currentNews.sourceName}
-                                            onChange={(e) => setCurrentNews({ ...currentNews, sourceName: e.target.value })}
-                                            placeholder="VD: VietnamWorks, ITviec..."
-                                            className="h-14 rounded-xl border-border/60 focus:ring-primary/20 bg-white"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-6">
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="readingTime" className="font-bold text-zinc-700">Thời gian đọc (phút)</Label>
-                                            <Input
-                                                id="readingTime"
-                                                value={currentNews.readingTime}
-                                                onChange={(e) => setCurrentNews({ ...currentNews, readingTime: e.target.value })}
-                                                placeholder="VD: 5 phút"
-                                                className="h-14 rounded-xl border-border/60 focus:ring-primary/20 bg-white"
-                                            />
-                                        </div>
-                                        <div className="grid gap-2">
-                                            <Label htmlFor="tags" className="font-bold text-zinc-700">Từ khóa (Tags)</Label>
-                                            <Input
-                                                id="tags"
-                                                value={currentNews.tags?.join(", ")}
-                                                onChange={(e) => setCurrentNews({ ...currentNews, tags: e.target.value.split(",").map(t => t.trim()).filter(t => t !== "") })}
-                                                placeholder="VD: IT, Kỹ năng, GDU (cách nhau bằng dấu phẩy)"
-                                                className="h-14 rounded-xl border-border/60 focus:ring-primary/20 bg-white"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex items-center justify-between p-4 bg-primary/5 rounded-xl border border-primary/10 mt-4">
-                                    <div className="space-y-0.5">
-                                        <Label className="font-bold text-primary">Bài viết nổi bật (Featured)</Label>
-                                        <p className="text-xs text-muted-foreground font-medium">Hiển thị ở khu vực trang trọng nhất trên trang tin tức.</p>
-                                    </div>
-                                    <Switch
-                                        checked={currentNews.isFeatured}
-                                        onCheckedChange={(val) => setCurrentNews({ ...currentNews, isFeatured: val })}
-                                    />
-                                </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="source">Nguồn tin <span className="text-red-500">*</span></Label>
+                                <Input
+                                    id="source"
+                                    value={currentNews.sourceName}
+                                    onChange={(e) => setCurrentNews({ ...currentNews, sourceName: e.target.value })}
+                                    placeholder="Tên nguồn (VD: VietnamWorks)"
+                                />
                             </div>
                         </div>
 
-                        {/* Section 2: Links & Media */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-primary">
-                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-[10px]">2</span>
-                                Nguồn & Hình ảnh
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="readingTime">Thời gian đọc</Label>
+                                <Input
+                                    id="readingTime"
+                                    value={currentNews.readingTime}
+                                    onChange={(e) => setCurrentNews({ ...currentNews, readingTime: e.target.value })}
+                                    placeholder="VD: 5 phút"
+                                />
                             </div>
-                            <div className="grid gap-6">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="sourceUrl" className="font-bold text-zinc-700 flex items-center gap-2">
-                                        <ExternalLink className="w-4 h-4 text-muted-foreground" /> Link nguồn bài viết
-                                    </Label>
-                                    <Input
-                                        id="sourceUrl"
-                                        value={currentNews.sourceUrl}
-                                        onChange={(e) => setCurrentNews({ ...currentNews, sourceUrl: e.target.value })}
-                                        placeholder="https://vietnamworks.com/article/..."
-                                        className="h-14 rounded-xl border-border/60 focus:ring-primary/20 bg-white"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="imageUrl" className="font-bold text-zinc-700 flex items-center gap-2">
-                                        <TrendingUp className="w-4 h-4 text-muted-foreground" /> Link hình ảnh đại diện (Thumbnail)
-                                    </Label>
-                                    <Input
-                                        id="imageUrl"
-                                        value={currentNews.imageUrl}
-                                        onChange={(e) => setCurrentNews({ ...currentNews, imageUrl: e.target.value })}
-                                        placeholder="Link ảnh chính..."
-                                        className="h-14 rounded-xl border-border/60 focus:ring-primary/20 bg-white"
-                                    />
-                                </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="tags">Tags (cách nhau bằng dấu phẩy)</Label>
+                                <Input
+                                    id="tags"
+                                    value={currentNews.tags?.join(", ")}
+                                    onChange={(e) => setCurrentNews({ ...currentNews, tags: e.target.value.split(",").map(t => t.trim()).filter(t => t !== "") })}
+                                    placeholder="Xu hướng, Công nghệ..."
+                                />
+                            </div>
+                        </div>
 
-                                <Separator className="my-2" />
+                        <div className="grid gap-2">
+                            <Label htmlFor="sourceUrl">Link nguồn bài viết</Label>
+                            <Input
+                                id="sourceUrl"
+                                value={currentNews.sourceUrl}
+                                onChange={(e) => setCurrentNews({ ...currentNews, sourceUrl: e.target.value })}
+                                placeholder="URL đầy đủ"
+                            />
+                        </div>
 
-                                {/* Media Gallery and Videos in 2 columns */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    {/* Gallery Section */}
-                                    <div className="space-y-4">
-                                        <div className="flex items-center justify-between">
-                                            <Label className="font-bold text-zinc-700">Bộ sưu tập ảnh (Gallery)</Label>
-                                            <Button type="button" variant="outline" size="sm" onClick={() => addItem('gallery')} className="h-8 gap-1">
-                                                <Plus className="w-3 h-3" /> Thêm ảnh
-                                            </Button>
-                                        </div>
-                                        <div className="space-y-2">
-                                            {currentNews.gallery?.map((url, idx) => (
-                                                <div key={idx} className="flex gap-2">
-                                                    <Input
-                                                        value={url}
-                                                        onChange={(e) => handleArrayChange('gallery', idx, e.target.value)}
-                                                        placeholder="Link ảnh bổ sung..."
-                                                        className="h-10 rounded-lg"
-                                                    />
-                                                    <Button size="icon" variant="ghost" onClick={() => removeItem('gallery', idx)} className="text-red-500 hover:bg-red-50">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
-                                                </div>
-                                            ))}
-                                            {(!currentNews.gallery || currentNews.gallery.length === 0) && (
-                                                <div className="py-4 border border-dashed rounded-xl flex items-center justify-center text-xs text-muted-foreground">
-                                                    Chưa có ảnh trong bộ sưu tập
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="imageUrl">Link ảnh đại diện</Label>
+                            <Input
+                                id="imageUrl"
+                                value={currentNews.imageUrl}
+                                onChange={(e) => setCurrentNews({ ...currentNews, imageUrl: e.target.value })}
+                                placeholder="URL ảnh chính"
+                            />
+                        </div>
 
-                                    {/* Videos Section */}
-                                    <div className="space-y-4">
-                                        <div className="flex items-center justify-between">
-                                            <Label className="font-bold text-zinc-700">Danh sách Videos (URL)</Label>
-                                            <Button type="button" variant="outline" size="sm" onClick={() => addItem('videoUrls')} className="h-8 gap-1">
-                                                <Plus className="w-3 h-3" /> Thêm video
-                                            </Button>
-                                        </div>
-                                        <div className="space-y-2">
-                                            {currentNews.videoUrls?.map((url, idx) => (
-                                                <div key={idx} className="flex gap-2">
-                                                    <Input
-                                                        value={url}
-                                                        onChange={(e) => handleArrayChange('videoUrls', idx, e.target.value)}
-                                                        placeholder="https://youtube.com/watch?v=..."
-                                                        className="h-10 rounded-lg"
-                                                    />
-                                                    <Button size="icon" variant="ghost" onClick={() => removeItem('videoUrls', idx)} className="text-red-500 hover:bg-red-50">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
-                                                </div>
-                                            ))}
-                                            {(!currentNews.videoUrls || currentNews.videoUrls.length === 0) && (
-                                                <div className="py-4 border border-dashed rounded-xl flex items-center justify-center text-xs text-muted-foreground">
-                                                    Chưa có video liên quan
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <Separator className="my-2" />
-
-                                {/* Related Links Section */}
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <Label className="font-bold text-zinc-700">Liên kết liên quan (Related Links)</Label>
-                                        <Button type="button" variant="outline" size="sm" onClick={() => addItem('relatedLinks', { title: "", url: "" })} className="h-8 gap-1">
-                                            <Plus className="w-3 h-3" /> Thêm link
+                        <div className="grid gap-2">
+                            <div className="flex items-center justify-between">
+                                <Label>Bộ sưu tập ảnh (Gallery)</Label>
+                                <Button type="button" variant="outline" size="sm" onClick={() => addItem('gallery')}>
+                                    Thêm ảnh
+                                </Button>
+                            </div>
+                            <div className="space-y-2">
+                                {currentNews.gallery?.map((url, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                        <Input
+                                            value={url}
+                                            onChange={(e) => handleArrayChange('gallery', idx, e.target.value)}
+                                            placeholder="Link ảnh"
+                                        />
+                                        <Button size="icon" variant="destructive" onClick={() => removeItem('gallery', idx)}>
+                                            <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </div>
-                                    <div className="space-y-3">
-                                        {currentNews.relatedLinks?.map((link, idx) => (
-                                            <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 bg-zinc-50 rounded-xl relative border border-border/20">
-                                                <Input
-                                                    value={link.title}
-                                                    onChange={(e) => handleLinkChange(idx, 'title', e.target.value)}
-                                                    placeholder="Tên liên kết (VD: Báo cáo chi tiết)"
-                                                    className="h-9 text-xs"
-                                                />
-                                                <div className="flex gap-2">
-                                                    <Input
-                                                        value={link.url}
-                                                        onChange={(e) => handleLinkChange(idx, 'url', e.target.value)}
-                                                        placeholder="URL liên kết"
-                                                        className="h-9 text-xs"
-                                                    />
-                                                    <Button size="icon" variant="ghost" onClick={() => removeItem('relatedLinks', idx)} className="h-9 w-9 text-red-500 hover:bg-red-50">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        ))}
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="grid gap-2">
+                            <div className="flex items-center justify-between">
+                                <Label>Videos (URL)</Label>
+                                <Button type="button" variant="outline" size="sm" onClick={() => addItem('videoUrls')}>
+                                    Thêm video
+                                </Button>
+                            </div>
+                            <div className="space-y-2">
+                                {currentNews.videoUrls?.map((url, idx) => (
+                                    <div key={idx} className="flex gap-2">
+                                        <Input
+                                            value={url}
+                                            onChange={(e) => handleArrayChange('videoUrls', idx, e.target.value)}
+                                            placeholder="YouTube link"
+                                        />
+                                        <Button size="icon" variant="destructive" onClick={() => removeItem('videoUrls', idx)}>
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
                                     </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
 
-                        {/* Section 3: Content */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-primary">
-                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-[10px]">3</span>
-                                Nội dung chi tiết
+                        <div className="grid gap-2">
+                            <div className="flex items-center justify-between">
+                                <Label>Liên kết liên quan</Label>
+                                <Button type="button" variant="outline" size="sm" onClick={() => addItem('relatedLinks', { title: "", url: "" })}>
+                                    Thêm link
+                                </Button>
                             </div>
-                            <div className="grid gap-6">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="summary" className="font-bold text-zinc-700">Tóm tắt ngắn (Lôi cuốn)</Label>
-                                    <Textarea
-                                        id="summary"
-                                        value={currentNews.summary}
-                                        onChange={(e) => setCurrentNews({ ...currentNews, summary: e.target.value })}
-                                        placeholder="Viết một đoạn ngắn giới thiệu nội dung (2-3 câu)..."
-                                        className="min-h-[100px] rounded-xl border-border/60 focus:ring-primary/20 bg-white p-4 resize-none"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="content" className="font-bold text-zinc-700">Nội dung bài viết (Markdown hoặc Text)</Label>
-                                    <Textarea
-                                        id="content"
-                                        value={currentNews.content}
-                                        onChange={(e) => setCurrentNews({ ...currentNews, content: e.target.value })}
-                                        placeholder="Viết nội dung đầy đủ của bản tin/phân tích..."
-                                        className="min-h-[250px] rounded-xl border-border/60 focus:ring-primary/20 bg-white p-4 resize-y"
-                                    />
-                                </div>
+                            <div className="space-y-2">
+                                {currentNews.relatedLinks?.map((link, idx) => (
+                                    <div key={idx} className="grid grid-cols-2 gap-2 p-3 bg-muted/20 rounded-lg relative">
+                                        <Input
+                                            value={link.title}
+                                            onChange={(e) => handleLinkChange(idx, 'title', e.target.value)}
+                                            placeholder="Tiêu đề link"
+                                        />
+                                        <div className="flex gap-2">
+                                            <Input
+                                                value={link.url}
+                                                onChange={(e) => handleLinkChange(idx, 'url', e.target.value)}
+                                                placeholder="URL"
+                                            />
+                                            <Button size="icon" variant="destructive" onClick={() => removeItem('relatedLinks', idx)}>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="summary">Tóm tắt ngắn <span className="text-red-500">*</span></Label>
+                            <Textarea
+                                id="summary"
+                                value={currentNews.summary}
+                                onChange={(e) => setCurrentNews({ ...currentNews, summary: e.target.value })}
+                                placeholder="Viết một đoạn ngắn giới thiệu bài viết"
+                                className="h-20"
+                            />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="content">Nội dung chi tiết <span className="text-red-500">*</span></Label>
+                            <Textarea
+                                id="content"
+                                value={currentNews.content}
+                                onChange={(e) => setCurrentNews({ ...currentNews, content: e.target.value })}
+                                placeholder="Nội dung chính của bài viết"
+                                className="min-h-[200px]"
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Switch
+                                id="featured"
+                                checked={currentNews.isFeatured}
+                                onCheckedChange={(val) => setCurrentNews({ ...currentNews, isFeatured: val })}
+                            />
+                            <Label htmlFor="featured">Đặt làm bài viết nổi bật</Label>
                         </div>
                     </div>
 
-                    <div className="p-8 bg-white border-t border-border/40 flex items-center justify-end gap-4 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
-                        <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="h-14 px-8 rounded-xl font-bold">Hủy bỏ</Button>
-                        <Button onClick={handleSave} className="h-14 px-10 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black shadow-xl shadow-primary/20">
-                            {isEditing ? "Cập nhật bài viết" : "Xuất bản bài viết"}
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Hủy bỏ</Button>
+                        <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                            {isEditing ? "Cập nhật" : "Đăng tin"}
                         </Button>
-                    </div>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </div>
