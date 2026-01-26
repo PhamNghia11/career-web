@@ -110,7 +110,7 @@ export default async function JobPage(props: JobPageProps) {
                                         </div>
                                         Mô tả công việc
                                     </h2>
-                                    <div className="prose prose-blue max-w-none text-gray-600 leading-relaxed text-base md:text-lg">
+                                    <div className="prose prose-blue max-w-none text-gray-600 leading-relaxed text-base md:text-lg whitespace-pre-line">
                                         {job.description}
                                     </div>
                                 </section>
@@ -156,6 +156,19 @@ export default async function JobPage(props: JobPageProps) {
                                                 </div>
                                             ))}
                                         </div>
+                                        {job.detailedBenefits && job.detailedBenefits.length > 0 && (
+                                            <div className="mt-6 space-y-3 pt-4 border-t border-dashed border-gray-100">
+                                                <p className="font-semibold text-gray-900 text-sm italic">Chi tiết quyền lợi:</p>
+                                                <ul className="grid gap-2">
+                                                    {job.detailedBenefits.map((detail: string, idx: number) => (
+                                                        <li key={idx} className="flex items-start gap-3 text-gray-600">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-300 mt-2 flex-shrink-0" />
+                                                            <span className="text-base">{detail}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
                                     </section>
                                 )}
                             </CardContent>
