@@ -9,6 +9,7 @@ import Link from "next/link"
 import { ApplyJobDialog } from "@/components/jobs/apply-job-dialog"
 import { JobPreviewPanel } from "@/components/jobs/job-preview-panel"
 import { getFeaturedJobs, Job } from "@/lib/jobs-data"
+import { useAuth } from "@/lib/auth-context"
 
 const typeColors = {
   "full-time": "bg-green-500/20 text-green-700 border border-green-500/30",
@@ -25,6 +26,7 @@ const typeLabels = {
 }
 
 export function FeaturedJobs() {
+  const { user } = useAuth()
   const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string; jobType?: string } | null>(null)
   const [hoveredJob, setHoveredJob] = useState<Job | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
@@ -167,10 +169,14 @@ export function FeaturedJobs() {
               </CardContent>
               <CardFooter className="p-6 pt-0">
                 <Button
-                  className="w-full bg-primary hover:bg-primary/90"
-                  onClick={() => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)}
+                  className={`w-full ${(user?.role === "employer" || user?.role === "admin") ? "bg-gray-100 text-gray-400 hover:bg-gray-100" : "bg-primary hover:bg-primary/90"}`}
+                  onClick={() => {
+                    if (user?.role === "employer" || user?.role === "admin") return
+                    handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)
+                  }}
+                  disabled={user?.role === "employer" || user?.role === "admin"}
                 >
-                  Ứng tuyển ngay
+                  {user?.role === "employer" || user?.role === "admin" ? "Chỉ dành cho ứng viên" : "Ứng tuyển ngay"}
                 </Button>
               </CardFooter>
             </Card>

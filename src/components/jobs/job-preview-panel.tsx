@@ -6,6 +6,8 @@ import { Job } from "@/lib/jobs-data"
 import { Building, MapPin, DollarSign, Clock, CheckCircle2, Award, Briefcase } from "lucide-react"
 import Link from "next/link"
 
+import { useAuth } from "@/lib/auth-context"
+
 interface JobPreviewPanelProps {
     job: Job | null
     onApply: (job: Job) => void
@@ -14,6 +16,7 @@ interface JobPreviewPanelProps {
 }
 
 export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPanelProps) {
+    const { user } = useAuth()
     if (!job) {
         return (
             <Card className="h-full border-dashed flex flex-col items-center justify-center text-center p-8 text-gray-400 bg-gray-50/50">
@@ -125,18 +128,21 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
 
             <div className="p-4 pt-0 flex gap-3 shrink-0">
                 <Button
-                    className={`flex-1 h-9 text-sm ${job.deadline && new Date(job.deadline).getTime() > 0 && new Date(job.deadline).getTime() < new Date().getTime()
+                    className={`flex-1 h-9 text-sm ${(job.deadline && new Date(job.deadline).getTime() > 0 && new Date(job.deadline).getTime() < new Date().getTime()) || (user?.role === "employer" || user?.role === "admin")
                         ? "bg-gray-100 text-gray-400 hover:bg-gray-100 cursor-not-allowed"
                         : "bg-black hover:bg-black/90 text-white"}`}
-                    disabled={!!job.deadline && new Date(job.deadline).getTime() > 0 && new Date(job.deadline).getTime() < new Date().getTime()}
+                    disabled={(!!job.deadline && new Date(job.deadline).getTime() > 0 && new Date(job.deadline).getTime() < new Date().getTime()) || (user?.role === "employer" || user?.role === "admin")}
                     onClick={(e) => {
                         e.stopPropagation()
+                        if (user?.role === "employer" || user?.role === "admin") return
                         onApply(job)
                     }}
                 >
                     {job.deadline && new Date(job.deadline).getTime() > 0 && new Date(job.deadline).getTime() < new Date().getTime()
                         ? "Đã hết hạn"
-                        : "Ứng tuyển"}
+                        : (user?.role === "employer" || user?.role === "admin")
+                            ? "Dành cho ứng viên"
+                            : "Ứng tuyển"}
                 </Button>
                 <Link href={`/jobs/${job._id}`} className="flex-1">
                     <Button variant="outline" className="w-full h-9 text-sm border-gray-200">
