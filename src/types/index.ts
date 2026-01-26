@@ -80,4 +80,5 @@ export interface News {
   views: number
   isFeatured?: boolean
   tags?: string[]
+  readingTime?: string
 }

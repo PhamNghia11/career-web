@@ -184,36 +184,9 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     }
   }
 
-  // Merge jobs from MongoDB (dbJobs) with static JSON (allJobs)
-  // MongoDB jobs take priority (appear first), then JSON jobs that aren't duplicates
-  // Merge jobs from MongoDB (dbJobs) with static JSON (allJobs)
-  // MongoDB jobs take priority (appear first).
-  // We deduplicate based on normalized Title + Company to avoid showing the same job from both sources.
+  // No more merging with JSON. Everything is in the DB now. 
   const mergedJobs = useMemo(() => {
-    // 1. Create a map of content-based keys from DB jobs
-    const seenKeys = new Set<string>()
-    const normalize = (str: string) => (str || "").toLowerCase().replace(/[^a-z0-9]/g, "")
-
-    // Process DB jobs first (keep them)
-    dbJobs.forEach(job => {
-      const key = `${normalize(job.title)}|${normalize(job.company)}`
-      seenKeys.add(key)
-    })
-
-    // 2. Filter JSON jobs that duplicate DB content
-    const uniqueJsonJobs = allJobs.filter(job => {
-      // Also skip if ID exists (handled by previous logic, but good to keep)
-      if (dbJobs.some(dbJob => dbJob._id === job._id)) return false
-
-      const key = `${normalize(job.title)}|${normalize(job.company)}`
-      if (seenKeys.has(key)) return false
-
-      // If unique, add to seen so we don't add duplicate JSON jobs either
-      seenKeys.add(key)
-      return true
-    })
-
-    return [...dbJobs, ...uniqueJsonJobs]
+    return dbJobs
   }, [dbJobs])
 
   // Get unique companies with job counts and logos
@@ -749,7 +722,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
         <div className="hidden lg:block">
           <button
             onClick={() => setActiveDropdown(isOpen ? null : dropdownId)}
-            className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-full border transition-all shadow-sm ${value
+            className={`flex items-center gap-2 px-3 py-2.5 text-sm rounded-full border transition-all shadow-sm ${value
               ? "bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30 text-primary font-medium"
               : "bg-white border-gray-200 text-gray-600 hover:border-primary/30 hover:bg-gray-50/80 hover:shadow-md"
               }`}
@@ -936,9 +909,9 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   return (
     <div className="space-y-6">
       {/* Horizontal Filter Bar - STICKY */}
-      <div ref={dropdownRef} className="bg-white/95 backdrop-blur-md sticky top-[112px] lg:top-[128px] z-40 border-b border-gray-100 py-1.5 lg:py-2 mb-3 shadow-sm">
+      <div ref={dropdownRef} className="bg-white/95 backdrop-blur-md sticky top-[112px] lg:top-[128px] z-40 border-b border-gray-100 py-2.5 lg:py-4 mb-6 shadow-sm">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col gap-2 lg:gap-3">
+          <div className="flex flex-col gap-6">
             {/* Row 1: Filter Options */}
             <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               <FilterDropdown
@@ -1023,7 +996,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Tìm kiếm nhanh tên công việc, công ty..."
-                  className="w-full pl-11 pr-4 py-2 text-sm lg:text-base bg-gray-50/50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30 focus:bg-white transition-all font-medium placeholder:text-gray-400 shadow-sm hover:shadow-md"
+                  className="w-full pl-12 pr-4 py-3.5 text-sm lg:text-base bg-gray-50/50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30 focus:bg-white transition-all font-medium placeholder:text-gray-400 shadow-sm hover:shadow-md"
                 />
                 {searchQuery && (
                   <button

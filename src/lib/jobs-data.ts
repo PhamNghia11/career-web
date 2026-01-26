@@ -1,4 +1,5 @@
-import jobsData from "@/data/jobs.json"
+// This file formerly imported from jobs.json. 
+// Data has been migrated to MongoDB and should be fetched from the API or directly from the DB.
 
 export type Job = {
     _id: string
@@ -34,29 +35,26 @@ export type Job = {
     quantity?: number
 }
 
-// Support both array format and object format with .jobs property
-const rawJobs = Array.isArray(jobsData) ? jobsData : (jobsData as any).jobs || []
-export const allJobs: Job[] = rawJobs as Job[]
+// allJobs is now empty because data is in the database.
+// Components should fetch from the API.
+export const allJobs: Job[] = []
 
-// Helper function to get jobs by field
+// Helper function to get jobs by field - discouraged, use API
 export function getJobsByField(field: string): Job[] {
-    return allJobs.filter((job) => job.field === field)
+    return []
 }
 
-// Helper function to get jobs by company
+// Helper function to get jobs by company - discouraged, use API
 export function getJobsByCompany(companyId: string): Job[] {
-    return allJobs.filter((job) => job.companyId === companyId)
+    return []
 }
 
-// Helper function to get job by ID
+// Helper function to get job by ID - discouraged, use API
 export function getJobById(id: string): Job | undefined {
-    return allJobs.find((job) => job._id === id)
+    return undefined
 }
 
-// Helper function to get featured jobs (latest active jobs)
+// Helper function to get featured jobs - discouraged, use API
 export function getFeaturedJobs(limit: number = 6): Job[] {
-    return allJobs
-        .filter((job) => job.status === "active")
-        .sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
-        .slice(0, limit)
+    return []
 }

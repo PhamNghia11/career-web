@@ -259,7 +259,7 @@ export default function ProfilePage() {
                       if (!val.startsWith('0')) {
                         setPhoneError("Số điện thoại phải bắt đầu bằng số 0")
                       } else if (val.length < 10 || val.length > 11) {
-                        setPhoneError("Số điện thoại phải có 10-11 số")
+                        setPhoneError("Số điện thoại phải có 10-11 số (hiện có " + val.length + " số)")
                       } else {
                         setPhoneError("")
                       }

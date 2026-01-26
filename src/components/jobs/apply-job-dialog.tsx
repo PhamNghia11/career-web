@@ -60,20 +60,27 @@ export function ApplyJobDialog({
     const [phoneValue, setPhoneValue] = useState(user?.phone || "")
 
     useEffect(() => {
-        if (user?.phone && !phoneValue) {
-            setPhoneValue(user.phone)
+        if (isOpen && user) {
+            if (!phoneValue && user.phone) {
+                setPhoneValue(user.phone)
+            }
+            if (!major && user.major) {
+                setMajor(user.major)
+            }
+            // If user has a major but no faculty in profile, try to map it
+            if (!faculty) {
+                if (user.faculty) {
+                    setFaculty(user.faculty)
+                } else if (user.major) {
+                    const mapped = MAJOR_FACULTY_MAP[user.major] || ""
+                    if (mapped) setFaculty(mapped)
+                }
+            }
+            if (!cohort && user.cohort) {
+                setCohort(user.cohort)
+            }
         }
-        if (user?.major && !major) {
-            setMajor(user.major)
-        }
-        // If user has a major but no faculty in profile, try to map it
-        if (user?.major && !user.faculty && !faculty) {
-            const mapped = MAJOR_FACULTY_MAP[user.major] || ""
-            if (mapped) setFaculty(mapped)
-        } else if (user?.faculty && !faculty) {
-            setFaculty(user.faculty)
-        }
-    }, [user, major, faculty, phoneValue])
+    }, [user, isOpen])
 
     // Mapping of Majors to their corresponding Faculties (Official GDU List)
     const MAJOR_FACULTY_MAP: Record<string, string> = {
@@ -482,10 +489,10 @@ export function ApplyJobDialog({
                                         <Label htmlFor="phone">Số điện thoại <span className="text-red-500">*</span></Label>
                                         <Input
                                             id="phone"
+                                            name="phone"
                                             type="tel"
                                             placeholder="0901234567"
                                             required
-                                            defaultValue={user?.phone || ""}
                                             value={phoneValue}
                                             onChange={(e) => {
                                                 const val = e.target.value
@@ -497,7 +504,7 @@ export function ApplyJobDialog({
                                                     if (!numericVal.startsWith('0')) {
                                                         setPhoneError("Số điện thoại phải bắt đầu bằng số 0")
                                                     } else if (numericVal.length < 10 || numericVal.length > 11) {
-                                                        setPhoneError("Số điện thoại phải có 10-11 số")
+                                                        setPhoneError("Số điện thoại phải có 10-11 số (hiện có " + numericVal.length + " số)")
                                                     } else {
                                                         setPhoneError("")
                                                     }

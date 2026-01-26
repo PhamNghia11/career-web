@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { MapPin, DollarSign, Clock, Building, ChevronLeft, Calendar, CheckCircle2, Briefcase, Globe, Users, Award } from "lucide-react"
 import Link from "next/link"
-import { allJobs } from "@/lib/jobs-data"
 import { ApplyButton } from "@/components/jobs/apply-button"
 import { Separator } from "@/components/ui/separator"
 import { ViewTracker } from "@/components/jobs/view-tracker"
@@ -19,12 +18,6 @@ interface JobPageProps {
 }
 
 export const dynamic = "force-dynamic"
-
-export function generateStaticParams() {
-    return allJobs.map((job) => ({
-        id: job._id,
-    }))
-}
 
 export default async function JobPage(props: JobPageProps) {
     const params = await props.params;
@@ -46,10 +39,7 @@ export default async function JobPage(props: JobPageProps) {
         console.error("Error fetching job from DB:", error)
     }
 
-    // 2. Fallback: Try static data if not found in DB
-    if (!job) {
-        job = allJobs.find((j) => j._id === params.id)
-    }
+    // 2. Fallback: Removed (everything is in DB now)
 
     if (!job) {
         notFound()

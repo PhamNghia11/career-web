@@ -43,15 +43,9 @@ export function FeaturedJobs() {
 
         if (data.success && data.data?.jobs) {
           const dbJobs: Job[] = data.data.jobs
-          const staticJobs = getFeaturedJobs(10)
-
-          // Merge: DB jobs first (priority), then static jobs that aren't duplicates
-          const dbJobIds = new Set(dbJobs.map(job => job._id))
-          const uniqueStaticJobs = staticJobs.filter(job => !dbJobIds.has(job._id))
-          const allJobs = [...dbJobs, ...uniqueStaticJobs]
 
           // Sort by postedAt and take first 4
-          const sorted = allJobs
+          const sorted = dbJobs
             .sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
             .slice(0, 4)
 

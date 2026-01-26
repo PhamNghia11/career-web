@@ -68,6 +68,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Thiếu thông tin bắt buộc" }, { status: 400 })
     }
 
+    // Server-side strict phone validation
+    const cleanPhone = phone.replace(/\D/g, '')
+    if (!cleanPhone.startsWith('0') || cleanPhone.length < 10 || cleanPhone.length > 11) {
+      return NextResponse.json({ error: "Số điện thoại không hợp lệ. Phải bắt đầu bằng số 0 và có 10-11 chữ số." }, { status: 400 })
+    }
+
     let cvDataUrl = null
     let cvOriginalName = null
     let cvMimeType = null
