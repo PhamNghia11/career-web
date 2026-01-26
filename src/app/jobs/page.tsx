@@ -8,8 +8,14 @@ import { Job } from "@/lib/jobs-data"
 
 async function getActiveJobsFromDB(): Promise<Job[]> {
   try {
+    const today = new Date().toISOString().split('T')[0]
     const collection = await getCollection(COLLECTIONS.JOBS)
-    const jobs = await collection.find({ status: "active" }).sort({ postedAt: -1 }).toArray()
+
+    // Filter by active status AND deadline >= today
+    const jobs = await collection.find({
+      status: "active",
+      deadline: { $gte: today }
+    }).sort({ postedAt: -1 }).toArray()
 
     return jobs.map(job => ({
       ...job,

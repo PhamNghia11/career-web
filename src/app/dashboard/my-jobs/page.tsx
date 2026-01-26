@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, Plus, Filter, MoreHorizontal, Edit, Trash2, Eye, FileText, Users } from "lucide-react"
+import { Search, Plus, Filter, MoreHorizontal, Edit, Trash2, Eye, FileText, Users, RefreshCw } from "lucide-react"
 import Link from "next/link"
 import {
     DropdownMenu,
@@ -27,7 +27,21 @@ import {
 
 
 
-function JobActions({ job, setJobToDelete, setDeleteDialogOpen }: { job: any, setJobToDelete: (id: string) => void, setDeleteDialogOpen: (open: boolean) => void }) {
+function JobActions({
+    job,
+    setJobToDelete,
+    setDeleteDialogOpen,
+    setJobToRenew,
+    setRenewDialogOpen
+}: {
+    job: any,
+    setJobToDelete: (id: string) => void,
+    setDeleteDialogOpen: (open: boolean) => void,
+    setJobToRenew: (job: any) => void,
+    setRenewDialogOpen: (open: boolean) => void
+}) {
+    const isExpired = new Date(job.deadline) < new Date() && job.status === 'active'
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -46,6 +60,16 @@ function JobActions({ job, setJobToDelete, setDeleteDialogOpen }: { job: any, se
                         <FileText className="mr-2 h-4 w-4" /> Xem ứng viên
                     </DropdownMenuItem>
                 </Link>
+                {(job.status === 'closed' || isExpired) && (
+                    <DropdownMenuItem
+                        onClick={() => {
+                            setJobToRenew(job)
+                            setRenewDialogOpen(true)
+                        }}
+                    >
+                        <RefreshCw className="mr-2 h-4 w-4" /> Gia hạn tin
+                    </DropdownMenuItem>
+                )}
                 <Link href={`/dashboard/jobs/${job._id}/edit`}>
                     <DropdownMenuItem>
                         <Edit className="mr-2 h-4 w-4" /> Chỉnh sửa
@@ -76,6 +100,12 @@ export default function MyJobsPage() {
     // Delete Dialog logic
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [jobToDelete, setJobToDelete] = useState<string | null>(null)
+
+    // Renew Dialog logic
+    const [renewDialogOpen, setRenewDialogOpen] = useState(false)
+    const [jobToRenew, setJobToRenew] = useState<any | null>(null)
+    const [newDeadline, setNewDeadline] = useState("")
+    const [isRenewing, setIsRenewing] = useState(false)
 
     useEffect(() => {
         fetchJobs()
@@ -117,6 +147,37 @@ export default function MyJobsPage() {
         } finally {
             setDeleteDialogOpen(false)
             setJobToDelete(null)
+        }
+    }
+
+    const handleRenewJob = async () => {
+        if (!jobToRenew || !newDeadline) return
+
+        try {
+            setIsRenewing(true)
+            const response = await fetch(`/api/jobs/${jobToRenew._id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    deadline: newDeadline,
+                    status: 'active' // Reactivate if it was closed
+                })
+            })
+            const data = await response.json()
+
+            if (data.success) {
+                toast({ title: "Gia hạn thành công", description: `Tin "${jobToRenew.title}" đã được gia hạn đến ${new Date(newDeadline).toLocaleDateString('vi-VN')}.` })
+                fetchJobs() // Refresh the list
+            } else {
+                throw new Error(data.error)
+            }
+        } catch (e) {
+            toast({ title: "Lỗi", description: "Không thể gia hạn tin tuyển dụng.", variant: "destructive" })
+        } finally {
+            setIsRenewing(false)
+            setRenewDialogOpen(false)
+            setJobToRenew(null)
+            setNewDeadline("")
         }
     }
 
@@ -221,7 +282,13 @@ export default function MyJobsPage() {
                                                     {new Date(job.postedAt).toLocaleDateString('vi-VN')}
                                                 </td>
                                                 <td className="p-4 align-middle text-right">
-                                                    <JobActions job={job} setJobToDelete={setJobToDelete} setDeleteDialogOpen={setDeleteDialogOpen} />
+                                                    <JobActions
+                                                        job={job}
+                                                        setJobToDelete={setJobToDelete}
+                                                        setDeleteDialogOpen={setDeleteDialogOpen}
+                                                        setJobToRenew={setJobToRenew}
+                                                        setRenewDialogOpen={setRenewDialogOpen}
+                                                    />
                                                 </td>
                                             </tr>
                                         ))
@@ -254,13 +321,19 @@ export default function MyJobsPage() {
                                                 </div>
                                             </div>
                                             <div className="shrink-0">
-                                                <JobActions job={job} setJobToDelete={setJobToDelete} setDeleteDialogOpen={setDeleteDialogOpen} />
+                                                <JobActions
+                                                    job={job}
+                                                    setJobToDelete={setJobToDelete}
+                                                    setDeleteDialogOpen={setDeleteDialogOpen}
+                                                    setJobToRenew={setJobToRenew}
+                                                    setRenewDialogOpen={setRenewDialogOpen}
+                                                />
                                             </div>
                                         </div>
 
                                         <div className="flex items-center justify-between gap-2 pt-1">
-                                            <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : job.status === 'closed' ? 'outline' : 'destructive'} className="text-[10px] px-2 py-0.5">
-                                                {job.status === 'active' ? 'Hoạt động' : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'closed' ? 'Đã đóng' : 'Từ chối'}
+                                            <Badge variant={job.status === 'active' ? (new Date(job.deadline) < new Date() ? 'destructive' : 'default') : job.status === 'pending' ? 'secondary' : job.status === 'closed' ? 'outline' : 'destructive'} className="text-[10px] px-2 py-0.5">
+                                                {job.status === 'active' ? (new Date(job.deadline) < new Date() ? 'Đã hết hạn' : 'Hoạt động') : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'closed' ? 'Đã đóng' : 'Từ chối'}
                                             </Badge>
                                             <div className="flex items-center gap-4 text-xs text-muted-foreground font-medium">
                                                 <div className="flex items-center gap-1">
@@ -295,6 +368,37 @@ export default function MyJobsPage() {
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Hủy</Button>
                         <Button variant="destructive" onClick={handleDeleteJob}>Xóa vĩnh viễn</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={renewDialogOpen} onOpenChange={setRenewDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Gia hạn tin tuyển dụng</DialogTitle>
+                        <DialogDescription>
+                            Chọn ngày hết hạn mới cho tin tuyển dụng <strong>{jobToRenew?.title}</strong>.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4 space-y-4">
+                        <div className="grid gap-2">
+                            <label className="text-sm font-medium">Hạn chót mới</label>
+                            <Input
+                                type="date"
+                                value={newDeadline}
+                                min={new Date().toISOString().split('T')[0]}
+                                onChange={(e) => setNewDeadline(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setRenewDialogOpen(false)}>Hủy</Button>
+                        <Button
+                            onClick={handleRenewJob}
+                            disabled={!newDeadline || isRenewing}
+                        >
+                            {isRenewing ? "Đang xử lý..." : "Gia hạn ngay"}
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

@@ -35,8 +35,10 @@ export async function GET(req: Request) {
       if (status && status !== "all") {
         query.status = status
       } else if (!status) {
-        // Public view usually only wants active
+        // Public view usually only wants active AND not expired
+        const today = new Date().toISOString().split('T')[0]
         query.status = "active"
+        query.deadline = { $gte: today }
       }
     }
 
