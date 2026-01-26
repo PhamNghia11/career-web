@@ -10,6 +10,7 @@ import { ApplyJobDialog } from "@/components/jobs/apply-job-dialog"
 import { JobPreviewPanel } from "@/components/jobs/job-preview-panel"
 import { getFeaturedJobs, Job } from "@/lib/jobs-data"
 import { useAuth } from "@/lib/auth-context"
+import { useRouter } from "next/navigation"
 
 const typeColors = {
   "full-time": "bg-green-500/20 text-green-700 border border-green-500/30",
@@ -27,6 +28,7 @@ const typeLabels = {
 
 export function FeaturedJobs() {
   const { user } = useAuth()
+  const router = useRouter()
   const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string; jobType?: string } | null>(null)
   const [hoveredJob, setHoveredJob] = useState<Job | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
@@ -63,6 +65,10 @@ export function FeaturedJobs() {
   }, [])
 
   const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string) => {
+    if (!user) {
+      router.push("/login?redirect=/")
+      return
+    }
     setSelectedJob({
       title: jobTitle,
       company: company,

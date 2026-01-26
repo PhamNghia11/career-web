@@ -79,6 +79,10 @@ export default function InternshipsPage() {
     const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string; jobType?: string } | null>(null)
 
     const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string) => {
+        if (!user) {
+            router.push("/login?redirect=/internships")
+            return
+        }
         setSelectedJob({
             title: jobTitle,
             company: company,

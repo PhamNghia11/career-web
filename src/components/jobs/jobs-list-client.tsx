@@ -561,6 +561,10 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   }
 
   const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string) => {
+    if (!user) {
+      router.push("/login?redirect=" + window.location.pathname + window.location.search)
+      return
+    }
     setSelectedJob({
       title: jobTitle,
       company: company,
