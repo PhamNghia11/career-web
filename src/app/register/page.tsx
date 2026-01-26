@@ -22,6 +22,15 @@ export default function RegisterPage() {
     role: "student" as "student" | "employer",
     studentId: "",
     major: "",
+    // Employer Fields
+    contactPerson: "",
+    companyName: "",
+    companyType: "",
+    companySize: "",
+    foreignCapital: false,
+    province: "",
+    industry: "",
+    address: "",
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -30,7 +39,11 @@ export default function RegisterPage() {
   const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    const { name, value, type } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    }))
   }
 
   const handleEmailRegister = async (e: React.FormEvent) => {
@@ -42,7 +55,23 @@ export default function RegisterPage() {
     if (!formData.email.trim()) return setError("Vui lòng nhập email")
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(formData.email)) return setError("Vui lòng nhập địa chỉ email hợp lệ")
-    if (formData.phone && !/^0\d{9,10}$/.test(formData.phone)) return setError("Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số")
+    if (formData.role === "student") {
+      if (formData.phone && !/^0\d{9,10}$/.test(formData.phone)) return setError("Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số")
+    }
+
+    // Employer Validation
+    if (formData.role === "employer") {
+      if (!formData.contactPerson.trim()) return setError("Vui lòng nhập tên người liên hệ")
+      if (!formData.phone.trim()) return setError("Vui lòng nhập số điện thoại")
+      if (!/^0\d{9,10}$/.test(formData.phone)) return setError("Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số")
+      // if (!formData.companyType) return setError("Vui lòng chọn loại hình công ty") // Optional if select has default? No, needs selection
+      // if (!formData.companySize) return setError("Vui lòng chọn quy mô công ty")
+      if (!formData.companyName.trim()) return setError("Vui lòng nhập tên công ty")
+      // if (!formData.province) return setError("Vui lòng chọn tỉnh/thành")
+      // if (!formData.industry) return setError("Vui lòng chọn lĩnh vực")
+      if (!formData.address.trim()) return setError("Vui lòng nhập địa chỉ")
+    }
+
     if (formData.password !== formData.confirmPassword) return setError("Mật khẩu xác nhận không khớp")
     if (formData.password.length < 6) return setError("Mật khẩu phải có ít nhất 6 ký tự")
 
@@ -58,6 +87,10 @@ export default function RegisterPage() {
           phone: formData.phone.trim(),
           studentId: formData.studentId.trim(),
           major: formData.major.trim(),
+          // Employer trims
+          contactPerson: formData.contactPerson.trim(),
+          companyName: formData.companyName.trim(),
+          address: formData.address.trim(),
         }),
       })
 
@@ -162,21 +195,27 @@ export default function RegisterPage() {
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-gray-700 font-medium">Số điện thoại</Label>
-                <div className="relative group">
-                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="0912345678"
-                    className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
-                  />
+              {/* Phone Field - Hide for employer as it's in the business form below (or keep here?) - Actually design shows it inside business form. 
+                    Let's hide it here if employer, show if student.
+                    Or better, only show here if Student.
+                */}
+              {formData.role === "student" && (
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-gray-700 font-medium">Số điện thoại</Label>
+                  <div className="relative group">
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
+                    <input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="0912345678"
+                      className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
               {formData.role === "student" && (
                 <div className="grid grid-cols-2 gap-4">
@@ -216,6 +255,173 @@ export default function RegisterPage() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {formData.role === "employer" && (
+                <div className="space-y-5 animate-in slide-in-from-top-4 fade-in duration-300">
+                  <div className="border-t border-gray-100 pt-4">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4">Thông Tin Công Ty</h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Contact Person */}
+                      <div className="space-y-2">
+                        <Label htmlFor="contactPerson" className="text-gray-700 font-medium">Người liên hệ <span className="text-red-500">*</span></Label>
+                        <input
+                          id="contactPerson"
+                          name="contactPerson"
+                          type="text"
+                          value={formData.contactPerson}
+                          onChange={handleChange}
+                          placeholder="Nhập tên người liên hệ"
+                          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
+                        />
+                      </div>
+
+                      {/* Phone - required for employer */}
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-gray-700 font-medium">Số điện thoại <span className="text-red-500">*</span></Label>
+                        <input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          placeholder="Nhập số điện thoại"
+                          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      {/* Company Type */}
+                      <div className="space-y-2">
+                        <Label className="text-gray-700 font-medium">Loại hình Công ty <span className="text-red-500">*</span></Label>
+                        <Select value={formData.companyType} onValueChange={(val) => setFormData({ ...formData, companyType: val })}>
+                          <SelectTrigger className="w-full h-[46px] rounded-xl border-gray-200">
+                            <SelectValue placeholder="Chọn loại hình công ty" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="TNHH">Công ty TNHH</SelectItem>
+                            <SelectItem value="CP">Công ty Cổ phần</SelectItem>
+                            <SelectItem value="NN">Doanh nghiệp Nhà nước</SelectItem>
+                            <SelectItem value="DTVN">Doanh nghiệp tư nhân</SelectItem>
+                            <SelectItem value="LDOANH">Liên doanh</SelectItem>
+                            <SelectItem value="1TV">Công ty TNHH 1 thành viên</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Company Size */}
+                      <div className="space-y-2">
+                        <Label className="text-gray-700 font-medium">Quy mô Công ty <span className="text-red-500">*</span></Label>
+                        <Select value={formData.companySize} onValueChange={(val) => setFormData({ ...formData, companySize: val })}>
+                          <SelectTrigger className="w-full h-[46px] rounded-xl border-gray-200">
+                            <SelectValue placeholder="Chọn quy mô công ty" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="under_10">Dưới 10 nhân viên</SelectItem>
+                            <SelectItem value="10_50">10 - 50 nhân viên</SelectItem>
+                            <SelectItem value="50_100">50 - 100 nhân viên</SelectItem>
+                            <SelectItem value="100_500">100 - 500 nhân viên</SelectItem>
+                            <SelectItem value="500_1000">500 - 1000 nhân viên</SelectItem>
+                            <SelectItem value="over_1000">Trên 1000 nhân viên</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="foreignCapital"
+                        name="foreignCapital"
+                        checked={formData.foreignCapital}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
+                      />
+                      <Label htmlFor="foreignCapital" className="font-normal cursor-pointer">Vốn đầu tư nước ngoài</Label>
+                    </div>
+
+                    <div className="mt-4 space-y-2">
+                      <Label htmlFor="companyName" className="text-gray-700 font-medium">Tên Công ty <span className="text-red-500">*</span></Label>
+                      <input
+                        id="companyName"
+                        name="companyName"
+                        type="text"
+                        value={formData.companyName}
+                        onChange={handleChange}
+                        placeholder="Nhập tên công ty"
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      {/* Province */}
+                      <div className="space-y-2">
+                        <Label className="text-gray-700 font-medium">Tỉnh/Thành <span className="text-red-500">*</span></Label>
+                        <Select value={formData.province} onValueChange={(val) => setFormData({ ...formData, province: val })}>
+                          <SelectTrigger className="w-full h-[46px] rounded-xl border-gray-200">
+                            <SelectValue placeholder="Chọn tỉnh/thành" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="HCM">Hồ Chí Minh</SelectItem>
+                            <SelectItem value="HN">Hà Nội</SelectItem>
+                            <SelectItem value="DN">Đà Nẵng</SelectItem>
+                            <SelectItem value="BD">Bình Dương</SelectItem>
+                            <SelectItem value="DNAI">Đồng Nai</SelectItem>
+                            <SelectItem value="CT">Cần Thơ</SelectItem>
+                            {/* Add more as needed or fetch from API in future */}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Industry */}
+                      <div className="space-y-2">
+                        <Label className="text-gray-700 font-medium">Lĩnh vực công ty <span className="text-red-500">*</span></Label>
+                        <Select value={formData.industry} onValueChange={(val) => setFormData({ ...formData, industry: val })}>
+                          <SelectTrigger className="w-full h-[46px] rounded-xl border-gray-200">
+                            <SelectValue placeholder="Chọn lĩnh vực công ty" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="IT">Công nghệ thông tin</SelectItem>
+                            <SelectItem value="FINANCE">Tài chính / Ngân hàng</SelectItem>
+                            <SelectItem value="EDUCATION">Giáo dục / Đào tạo</SelectItem>
+                            <SelectItem value="MARKETING">Marketing / Truyền thông</SelectItem>
+                            <SelectItem value="HOSPITALITY">Du lịch / Khách sạn</SelectItem>
+                            <SelectItem value="CONSTRUCTION">Xây dựng</SelectItem>
+                            <SelectItem value="OTHER">Khác</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 space-y-2">
+                      <Label htmlFor="address" className="text-gray-700 font-medium">Địa chỉ <span className="text-red-500">*</span></Label>
+                      <input
+                        id="address"
+                        name="address"
+                        type="text"
+                        value={formData.address}
+                        onChange={handleChange}
+                        placeholder="Nhập địa chỉ"
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
+                      />
+                    </div>
+
+                    <div className="mt-4 flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="terms"
+                        required
+                        className="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
+                      />
+                      <Label htmlFor="terms" className="font-normal cursor-pointer text-sm">
+                        Tôi đồng ý với <Link href="/terms" className="text-blue-600 hover:underline">Điều khoản sử dụng</Link> và <Link href="/privacy" className="text-blue-600 hover:underline">Chính sách bảo mật</Link> của Viecoi.vn
+                      </Label>
+                    </div>
+
                   </div>
                 </div>
               )}

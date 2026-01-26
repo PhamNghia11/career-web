@@ -85,12 +85,39 @@ export async function POST(request: Request) {
         // Send notification to Admin after verification
         if (process.env.ADMIN_EMAIL) {
             try {
-                // Inline import to avoid potential circular dependencies or just use standard import if possible
+                // Inline import to avoid potential circular dependencies
                 const { sendEmail } = await import("@/services/email.service")
-                await sendEmail({
-                    to: process.env.ADMIN_EMAIL!,
-                    subject: `✨ Người dùng mới đã xác minh: ${user.name}`,
-                    html: `
+
+                // Customize message based on role
+                const isEmployer = user.role === "employer"
+                const subject = isEmployer
+                    ? `🏢 Nhà tuyển dụng mới đăng ký: ${user.companyName || user.name}`
+                    : `✨ Người dùng mới đã xác minh: ${user.name}`
+
+                const htmlContent = isEmployer
+                    ? `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <h2 style="color: #D32F2F;">Nhà tuyển dụng mới cần phê duyệt</h2>
+                        <p>Một nhà tuyển dụng mới vừa xác minh email và đang chờ phê duyệt.</p>
+                        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+                        <h3 style="color: #333;">Thông tin doanh nghiệp:</h3>
+                        <ul>
+                            <li><strong>Tên công ty:</strong> ${user.companyName || "Chưa cập nhật"}</li>
+                            <li><strong>Người liên hệ:</strong> ${user.contactPerson || user.name}</li>
+                            <li><strong>Email:</strong> ${user.email}</li>
+                            <li><strong>SĐT:</strong> ${user.phone || "Chưa cập nhật"}</li>
+                            <li><strong>Quy mô:</strong> ${user.companySize || "N/A"}</li>
+                            <li><strong>Ngành nghề:</strong> ${user.industry || "N/A"}</li>
+                        </ul>
+                        <div style="margin-top: 30px; text-align: center;">
+                            <a href="${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/users?role=employer" 
+                                style="background-color: #D32F2F; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                                Xem và Phê duyệt
+                            </a>
+                        </div>
+                        </div>
+                    `
+                    : `
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                         <h2 style="color: #0F52BA;">Người dùng mới đã xác minh tài khoản</h2>
                         <p>Thông tin chi tiết:</p>
@@ -105,7 +132,28 @@ export async function POST(request: Request) {
                         </a>
                         </div>
                     `
+
+                await sendEmail({
+                    to: process.env.ADMIN_EMAIL!,
+                    subject: subject,
+                    html: htmlContent
                 })
+
+                // Create In-App Notification for Admin
+                if (isEmployer) {
+                    const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+                    await notificationsCollection.insertOne({
+                        userId: undefined, // Broadcast/Targeted to role
+                        targetRole: "admin",
+                        type: "system",
+                        title: "Nhà tuyển dụng mới chờ duyệt",
+                        message: `${user.companyName || user.name} vừa đăng ký tài khoản nhà tuyển dụng.`,
+                        read: false,
+                        createdAt: new Date(),
+                        link: "/dashboard/users?role=employer"
+                    })
+                }
+
             } catch (emailError) {
                 console.error("Failed to trigger admin notification:", emailError)
             }

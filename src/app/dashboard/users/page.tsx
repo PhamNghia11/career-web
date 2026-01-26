@@ -39,6 +39,18 @@ const roleLabels = {
   admin: "Quản trị viên",
 }
 
+const statusColors = {
+  active: "bg-green-100 text-green-800",
+  pending: "bg-amber-100 text-amber-800",
+  rejected: "bg-red-100 text-red-800",
+}
+
+const statusLabels = {
+  active: "Hoạt động",
+  pending: "Đang chờ",
+  rejected: "Từ chối",
+}
+
 export default function UsersManagementPage() {
   const { user } = useAuth()
   const { toast } = useToast()
@@ -145,6 +157,25 @@ export default function UsersManagementPage() {
     } finally {
       setEditDialogOpen(false)
       setEditingUser(null)
+    }
+  }
+
+  const handleApproveUser = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'active', requesterEmail: user?.email })
+      })
+      const data = await response.json()
+      if (data.success) {
+        toast({ title: "Đã duyệt", description: "Tài khoản nhà tuyển dụng đã được kích hoạt." })
+        setUsers(prev => prev.map(u => u._id === userId ? { ...u, status: 'active' } : u))
+      } else {
+        throw new Error(data.error)
+      }
+    } catch (error) {
+      toast({ title: "Lỗi", description: "Không thể duyệt tài khoản.", variant: "destructive" })
     }
   }
 
@@ -395,11 +426,23 @@ export default function UsersManagementPage() {
                         </div>
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {u.emailVerified ? (
-                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Đã xác minh</Badge>
-                        ) : (
-                          <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">Chưa xác minh</Badge>
-                        )}
+                        <div className="flex flex-col gap-1 items-center">
+                          {u.status === 'pending' && u.role === 'employer' ? (
+                            <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-200 animate-pulse">
+                              Cần duyệt
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className={u.emailVerified ? "bg-green-50 text-green-700 border-green-200" : "bg-amber-50 text-amber-700 border-amber-200"}>
+                              {u.emailVerified ? "Đã xác minh" : "Chưa xác minh"}
+                            </Badge>
+                          )}
+                          {/* Show explicit status if exists */}
+                          {u.status && (
+                            <Badge className={`text-[10px] ${statusColors[u.status as keyof typeof statusColors] || "bg-gray-100"}`}>
+                              {statusLabels[u.status as keyof typeof statusLabels] || u.status}
+                            </Badge>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3 px-4 text-muted-foreground">
                         {new Date(u.createdAt).toLocaleDateString("vi-VN")}
@@ -442,6 +485,18 @@ export default function UsersManagementPage() {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         ) : null}
+
+                        {/* Quick Approve Button for Pending Employers */}
+                        {u.role === 'employer' && u.status === 'pending' && (
+                          <Button
+                            size="sm"
+                            className="ml-2 bg-green-600 hover:bg-green-700 text-white h-8 w-8 p-0"
+                            title="Duyệt nhanh"
+                            onClick={() => handleApproveUser(u._id)}
+                          >
+                            <ShieldCheck className="h-4 w-4" />
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   )))}
@@ -518,6 +573,22 @@ export default function UsersManagementPage() {
                         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-100 text-[10px] px-2.5">Đã xác minh</Badge>
                       ) : (
                         <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-100 text-[10px] px-2.5">Chưa xác minh</Badge>
+                      )}
+
+                      {u.status && (
+                        <Badge className={`text-[10px] ${statusColors[u.status as keyof typeof statusColors] || "bg-gray-100"} px-2.5`}>
+                          {statusLabels[u.status as keyof typeof statusLabels] || u.status}
+                        </Badge>
+                      )}
+
+                      {u.role === 'employer' && u.status === 'pending' && (
+                        <Button
+                          size="sm"
+                          className="ml-auto bg-green-600 hover:bg-green-700 text-white h-6 text-[10px] px-2"
+                          onClick={() => handleApproveUser(u._id)}
+                        >
+                          Duyệt
+                        </Button>
                       )}
                       <span className="text-[10px] text-gray-400 font-medium ml-auto self-center">
                         {new Date(u.createdAt).toLocaleDateString("vi-VN")}

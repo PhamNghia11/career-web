@@ -34,6 +34,14 @@ export async function POST(request: Request) {
       }, { status: 403 })
     }
 
+    // Check for employer approval status
+    if (user.role === "employer" && user.status === "pending") {
+      return NextResponse.json({
+        error: "Tài khoản đang chờ Admin phê duyệt. Vui lòng kiểm tra email hoặc liên hệ Admin.",
+        pendingApproval: true
+      }, { status: 403 })
+    }
+
     // 2FA for Admin Role
     if (user.role === "admin") {
       const otp = Math.floor(100000 + Math.random() * 900000).toString()

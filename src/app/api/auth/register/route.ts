@@ -128,6 +128,7 @@ export async function POST(request: Request) {
       email,
       phone: phone || "",
       emailVerified: false,
+      status: role === "employer" ? "pending" : "active",
       avatar: `/placeholder.svg?height=100&width=100&query=${encodeURIComponent(name)}`,
       createdAt: new Date(),
     }
@@ -135,6 +136,17 @@ export async function POST(request: Request) {
     if (role === "student") {
       newUser.studentId = studentId || ""
       newUser.major = major || ""
+    }
+
+    if (role === "employer") {
+      newUser.contactPerson = body.contactPerson || ""
+      newUser.companyName = body.companyName || ""
+      newUser.companyType = body.companyType || ""
+      newUser.companySize = body.companySize || ""
+      newUser.foreignCapital = body.foreignCapital || false
+      newUser.province = body.province || ""
+      newUser.industry = body.industry || ""
+      newUser.address = body.address || ""
     }
 
     const otp = generateOTP()
