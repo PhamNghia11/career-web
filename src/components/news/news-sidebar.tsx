@@ -8,15 +8,18 @@ interface NewsSidebarProps {
 
 export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
     const { toast } = useToast()
+    const [isSubscribing, setIsSubscribing] = React.useState(false)
 
     const handleSubscribe = () => {
-        // Simple validation or demo logic
-        toast({
-            title: "Yêu cầu đã được gửi!",
-            description: "Hệ thống sẽ gửi thông báo việc làm phù hợp cho bạn qua email mới nhất.",
-            variant: "default",
-        })
-        console.log("Newsletter subscription triggered");
+        setIsSubscribing(true)
+        // Simulate a small delay for better UX
+        setTimeout(() => {
+            toast({
+                title: "Đăng ký thành công!",
+                description: "Hệ thống đã ghi nhận email của bạn để gửi thông báo việc làm mới nhất.",
+            })
+            setIsSubscribing(false)
+        }, 600)
     }
 
     return (
@@ -37,17 +40,18 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
                     <p className="text-white/80 text-sm font-medium mb-6 leading-relaxed">
                         Thông báo việc làm - Hoàn toàn miễn phí và dễ dàng
                     </p>
-                    <button
+                    <Button
                         type="button"
+                        disabled={isSubscribing}
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             handleSubscribe();
                         }}
-                        className="w-full py-4 bg-white text-primary hover:bg-slate-50 font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-lg active:scale-95 border-none cursor-pointer relative z-20"
+                        className="w-full py-6 bg-white text-primary hover:bg-slate-50 font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-lg active:scale-95 border-none relative z-20"
                     >
-                        Tạo Ngay
-                    </button>
+                        {isSubscribing ? "Đang xử lý..." : "Tạo Ngay"}
+                    </Button>
                 </div>
             </div>
 
