@@ -15,14 +15,14 @@ export async function POST(request: Request) {
     const user = await collection.findOne({ email: normalizedEmail })
 
     if (!user) {
-      return NextResponse.json({ error: "Email hoặc mật khẩu không đúng" }, { status: 401 })
+      return NextResponse.json({ error: "Email chưa được đăng ký" }, { status: 401 })
     }
 
     // Verify password
     const passwordMatch = await bcrypt.compare(password, user.password)
 
     if (!passwordMatch) {
-      return NextResponse.json({ error: "Email hoặc mật khẩu không đúng" }, { status: 401 })
+      return NextResponse.json({ error: "Mật khẩu không đúng" }, { status: 401 })
     }
 
     // Check if email is verified
