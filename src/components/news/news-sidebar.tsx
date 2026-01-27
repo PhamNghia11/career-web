@@ -17,10 +17,11 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
         setTimeout(() => {
             toast({
                 title: "Đăng ký thành công!",
-                description: "Hệ thống đã ghi nhận email của bạn để gửi thông báo việc làm mới nhất.",
+                description: "Hệ thống đã ghi nhận yêu cầu của bạn.",
+                variant: "success" as any, // Use success variant if available
             })
             setIsSubscribing(false)
-        }, 600)
+        }, 500)
     }
 
     return (
@@ -49,9 +50,9 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
                             e.stopPropagation();
                             handleSubscribe();
                         }}
-                        className="w-full py-6 bg-white text-primary hover:bg-slate-50 font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-lg active:scale-95 border-none relative z-20"
+                        className="w-full py-6 bg-white text-primary hover:bg-gray-50 font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-xl active:scale-95 border-0 relative z-30 cursor-pointer"
                     >
-                        {isSubscribing ? "Đang xử lý..." : "Tạo Ngay"}
+                        {isSubscribing ? "ĐANG XỬ LÝ..." : "TẠO NGAY"}
                     </Button>
                 </div>
             </div>
