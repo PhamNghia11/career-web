@@ -4,7 +4,7 @@ const fs = require('fs');
 const uri = "mongodb+srv://admin:0268541395%40plN@cluster0.wkvcpro.mongodb.net/gdu_career?appName=Cluster0";
 const client = new MongoClient(uri);
 
-const TARGET_EMAIL = "phamlenghia113dx@gmail.com";
+const TARGET_EMAIL = "nagaki50023010@gmail.com";
 
 async function diagnose() {
     const report = {
@@ -17,17 +17,11 @@ async function diagnose() {
         await client.connect();
         const db = client.db("gdu_career");
 
-        const collectionsToCheck = ["users", "pending_users", "companies", "applications", "notifications", "saved_jobs"];
+        const collectionsToCheck = ["users", "pending_users"];
 
         for (const collName of collectionsToCheck) {
             const coll = db.collection(collName);
-            const query = {
-                $or: [
-                    { email: { $regex: new RegExp(`^${TARGET_EMAIL}$`, 'i') } },
-                    { userEmail: { $regex: new RegExp(`^${TARGET_EMAIL}$`, 'i') } },
-                    { applicantEmail: { $regex: new RegExp(`^${TARGET_EMAIL}$`, 'i') } }
-                ]
-            };
+            const query = { email: { $regex: new RegExp(`^${TARGET_EMAIL}$`, 'i') } };
 
             const results = await coll.find(query).toArray();
             report.results[collName] = results.map(r => ({
@@ -35,11 +29,9 @@ async function diagnose() {
                 email: r.email,
                 role: r.role,
                 name: r.name,
-                fullName: r.fullName,
                 status: r.status,
                 emailVerified: r.emailVerified,
-                createdAt: r.createdAt,
-                updatedAt: r.updatedAt
+                createdAt: r.createdAt
             }));
         }
 

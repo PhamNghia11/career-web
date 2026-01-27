@@ -1,23 +1,18 @@
 {
-  "target": "phamlenghia113dx@gmail.com",
-  "timestamp": "2026-01-27T02:05:09.878Z",
+  "target": "nagaki50023010@gmail.com",
+  "timestamp": "2026-01-27T02:21:36.811Z",
   "results": {
-    "users": [
+    "users": [],
+    "pending_users": [
       {
-        "_id": "6976c9352f5693ed842118c1",
-        "email": "phamlenghia113dx@gmail.com",
-        "role": "admin",
-        "name": "Admin GDU",
-        "fullName": "Admin GDU",
-        "emailVerified": true,
-        "createdAt": "2026-01-26T01:53:57.756Z",
-        "updatedAt": "2026-01-26T01:53:57.756Z"
+        "_id": "697817dc550cdcf294291c0d",
+        "email": "nagaki50023010@gmail.com",
+        "role": "employer",
+        "name": "Minh Khôi",
+        "status": "pending",
+        "emailVerified": false,
+        "createdAt": "2026-01-27T01:41:48.992Z"
       }
-    ],
-    "pending_users": [],
-    "companies": [],
-    "applications": [],
-    "notifications": [],
-    "saved_jobs": []
+    ]
   }
 }
