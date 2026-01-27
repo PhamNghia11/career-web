@@ -43,6 +43,8 @@ export async function POST(request: Request) {
 
     // 2. Check if user exists in PENDING_USERS or is unverified in USERS (Legacy case)
     let pendingUser = await pendingCollection.findOne({ email: normalizedEmail })
+    let foundInPending = !!pendingUser
+
     if (!pendingUser) {
       // Check for legacy unverified user in main collection
       pendingUser = await collection.findOne({ email: normalizedEmail, emailVerified: false })
@@ -55,7 +57,7 @@ export async function POST(request: Request) {
       const expiresAt = new Date(Date.now() + 5 * 60 * 1000)
 
       // Update the relevant collection
-      const targetCollection = pendingUser.emailVerified === false ? collection : pendingCollection
+      const targetCollection = foundInPending ? pendingCollection : collection
       await targetCollection.updateOne(
         { email: normalizedEmail },
         {
