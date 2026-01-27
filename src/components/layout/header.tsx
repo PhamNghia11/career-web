@@ -101,9 +101,9 @@ export function Header() {
               <>
                 {user.role === 'employer' && (
                   <Link href="/dashboard/jobs/new" className="hidden lg:block ml-2">
-                    <Button className="bg-red-600 hover:bg-red-700 text-white font-bold px-5 h-11 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-red-100 hover:shadow-red-200 active:scale-[0.98]">
+                    <Button className="bg-primary hover:bg-primary/90 text-white font-bold px-5 h-11 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-primary/10 hover:shadow-primary/20 active:scale-[0.98]">
                       <PlusCircle className="w-5 h-5" />
-                      <span>Đăng tin ngay</span>
+                      <span>Đăng tuyển ngay</span>
                     </Button>
                   </Link>
                 )}
@@ -221,11 +221,11 @@ export function Header() {
                 {user.role === 'employer' && (
                   <Link
                     href="/dashboard/jobs/new"
-                    className="flex items-center gap-3 px-4 py-4 rounded-xl bg-red-600 text-white font-bold shadow-lg shadow-red-100 mb-3 active:scale-[0.98]"
+                    className="flex items-center gap-3 px-4 py-4 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/10 mb-3 active:scale-[0.98]"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <PlusCircle className="w-6 h-6" />
-                    <span>Đăng tin tuyển dụng ngay</span>
+                    <span>Đăng tuyển dụng ngay</span>
                   </Link>
                 )}
                 <Link
