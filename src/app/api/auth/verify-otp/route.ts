@@ -11,8 +11,9 @@ export async function POST(request: Request) {
     try {
         const body = await request.json()
         const { email, otp, type } = body
+        const normalizedEmail = email?.toLowerCase().trim();
 
-        if (!email || !otp) {
+        if (!normalizedEmail || !otp) {
             return NextResponse.json({ error: "Thiếu thông tin xác thực" }, { status: 400 })
         }
 
@@ -20,12 +21,12 @@ export async function POST(request: Request) {
         const pendingCollection = await getCollection(COLLECTIONS.PENDING_USERS)
 
         // 1. First, search in main USERS (Legacy unverified users or already verified)
-        let user = await collection.findOne({ email })
+        let user = await collection.findOne({ email: normalizedEmail })
         let isFromPending = false
 
         if (!user) {
             // 2. Search in PENDING collection
-            user = await pendingCollection.findOne({ email })
+            user = await pendingCollection.findOne({ email: normalizedEmail })
             isFromPending = true
         }
 
@@ -63,12 +64,17 @@ export async function POST(request: Request) {
 
         if (isFromPending) {
             // Move from PENDING to USERS
-            await collection.insertOne(finalizedUser)
+            // Use replaceOne with upsert to ensure we don't create duplicates and replace any existing junk
+            await collection.replaceOne(
+                { email: normalizedEmail },
+                finalizedUser,
+                { upsert: true }
+            )
             await pendingCollection.deleteOne({ _id })
         } else {
             // Legacy unverified user in main collection
             await collection.updateOne(
-                { _id },
+                { email: normalizedEmail },
                 {
                     $set: {
                         emailVerified: true,
@@ -160,7 +166,7 @@ export async function POST(request: Request) {
         }
 
         // Get updated user WITHOUT password
-        const updatedUser = await collection.findOne({ email }, { projection: { password: 0 } })
+        const updatedUser = await collection.findOne({ email: normalizedEmail }, { projection: { password: 0 } })
 
         if (!updatedUser) {
             return NextResponse.json({ error: "Lỗi sau khi cập nhật xác minh" }, { status: 500 })

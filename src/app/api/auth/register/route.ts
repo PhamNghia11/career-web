@@ -30,20 +30,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số" }, { status: 400 })
     }
 
+    const normalizedEmail = email.toLowerCase().trim()
+
     const collection = await getCollection(COLLECTIONS.USERS)
     const pendingCollection = await getCollection(COLLECTIONS.PENDING_USERS)
 
     // 1. Check if email exists in main USERS collection (Verified accounts)
-    const existingVerifiedUser = await collection.findOne({ email, emailVerified: true })
+    const existingVerifiedUser = await collection.findOne({ email: normalizedEmail, emailVerified: true })
     if (existingVerifiedUser) {
       return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 })
     }
 
     // 2. Check if user exists in PENDING_USERS or is unverified in USERS (Legacy case)
-    let pendingUser = await pendingCollection.findOne({ email })
+    let pendingUser = await pendingCollection.findOne({ email: normalizedEmail })
     if (!pendingUser) {
       // Check for legacy unverified user in main collection
-      pendingUser = await collection.findOne({ email, emailVerified: false })
+      pendingUser = await collection.findOne({ email: normalizedEmail, emailVerified: false })
     }
 
     if (pendingUser) {
@@ -55,7 +57,7 @@ export async function POST(request: Request) {
       // Update the relevant collection
       const targetCollection = pendingUser.emailVerified === false ? collection : pendingCollection
       await targetCollection.updateOne(
-        { email },
+        { email: normalizedEmail },
         {
           $set: {
             name, // Update name/data in case they changed it
@@ -125,7 +127,7 @@ export async function POST(request: Request) {
       name,
       password: hashedPassword,
       role: role,
-      email,
+      email: normalizedEmail,
       phone: phone || "",
       emailVerified: false,
       status: role === "employer" ? "pending" : "active",

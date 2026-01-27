@@ -1,0 +1,149 @@
+{
+  "users": [
+    {
+      "_id": "6943bae14760e16db6a53589",
+      "email": "cvhduyen1612005@gmail.com",
+      "role": "student",
+      "name": "CAO VĂN HOÀNG DUYÊN",
+      "emailVerified": true,
+      "createdAt": "2025-12-18T08:27:13.252Z"
+    },
+    {
+      "_id": "6943bb2a4760e16db6a5358a",
+      "email": "nagaki50023010@gmail.com",
+      "role": "student",
+      "name": "minh khôi",
+      "emailVerified": true,
+      "createdAt": "2025-12-18T08:28:26.721Z"
+    },
+    {
+      "_id": "6944fc151c5c0e1ae4c27b9f",
+      "email": "student@gdu.edu.vn",
+      "role": "student",
+      "name": "Nguyen Van A",
+      "createdAt": "2025-12-19T07:17:41.184Z"
+    },
+    {
+      "_id": "6944fc151c5c0e1ae4c27ba0",
+      "email": "employer@company.com",
+      "role": "employer",
+      "name": "Tran Thi B",
+      "createdAt": "2025-12-19T07:17:41.250Z"
+    },
+    {
+      "_id": "69489bf9473f88a50d8716b1",
+      "email": "nguyenvuminhkhoibeo2005@gmail.com",
+      "role": "student",
+      "name": "Họa Sĩ Người Áo",
+      "createdAt": "2025-12-22T01:16:41.437Z"
+    },
+    {
+      "_id": "69489c13473f88a50d8716b2",
+      "email": "mtlh0812@gmail.com",
+      "role": "student",
+      "name": "Bách Nguyễn",
+      "createdAt": "2025-12-22T01:17:07.569Z"
+    },
+    {
+      "_id": "6976c9352f5693ed842118c1",
+      "email": "phamlenghia113dx@gmail.com",
+      "role": "admin",
+      "name": "Admin GDU",
+      "fullName": "Admin GDU",
+      "emailVerified": true,
+      "createdAt": "2026-01-26T01:53:57.756Z"
+    },
+    {
+      "_id": "6976cb41546328fb3dba5e42",
+      "email": "amlangtiende2005@gmail.com",
+      "role": "employer",
+      "name": "Florentino",
+      "emailVerified": true,
+      "createdAt": "2026-01-26T01:59:18.562Z"
+    },
+    {
+      "_id": "6976d144112f2705690d1143",
+      "email": "caovanhoangduyen@gmail.com",
+      "role": "student",
+      "name": "DuyenCao",
+      "emailVerified": true,
+      "createdAt": "2026-01-26T02:28:04.660Z"
+    },
+    {
+      "_id": "6976d3a0738291263208f496",
+      "email": "nvmkdtnvt01032005@gmail.com",
+      "role": "employer",
+      "name": "BỐ ĐỜI",
+      "emailVerified": true,
+      "createdAt": "2026-01-26T02:37:12.671Z"
+    },
+    {
+      "_id": "6976d5397acec2d2f6353328",
+      "email": "nvmkdtnvt@gmail.com",
+      "role": "admin",
+      "name": "Nguyễn Vũ Minh KHôi",
+      "emailVerified": true,
+      "createdAt": "2026-01-26T02:45:13.163Z"
+    },
+    {
+      "_id": "6976d6e8127d893f3fa4c81e",
+      "email": "caovanhoangduyen1@gmail.com",
+      "role": "employer",
+      "name": "HDC",
+      "emailVerified": true,
+      "createdAt": "2026-01-26T02:52:02.208Z"
+    },
+    {
+      "_id": "6976e93e07b7723868bc27ce",
+      "email": "caovanhoangduyen2@gmail.com",
+      "role": "student",
+      "name": "DuyenCaotwo",
+      "emailVerified": true,
+      "createdAt": "2026-01-26T04:10:09.280Z"
+    },
+    {
+      "_id": "697774e8ec61d9d2612706b9",
+      "email": "phamlenghiadx2@gmail.com",
+      "role": "employer",
+      "name": "Pham Nghia",
+      "status": "active",
+      "emailVerified": true,
+      "createdAt": "2026-01-26T14:06:15.911Z"
+    },
+    {
+      "_id": "697811ee438fb3cffde1233a",
+      "email": "anh.gy24@gmail.com",
+      "role": "student",
+      "name": "Nguyễn Quốc Anh",
+      "status": "active",
+      "emailVerified": true,
+      "createdAt": "2026-01-27T01:16:04.183Z"
+    }
+  ],
+  "pending": [
+    {
+      "_id": "697772edec61d9d2612706a9",
+      "email": "cvhduyen1612005@gmail.com",
+      "role": "employer",
+      "name": "Cao Văn Hoàng Duyên",
+      "status": "pending",
+      "createdAt": "2026-01-26T13:58:05.686Z"
+    },
+    {
+      "_id": "697816f720168506725b2eda",
+      "email": "employer@company.com",
+      "role": "employer",
+      "name": "Minh Khôi",
+      "status": "pending",
+      "createdAt": "2026-01-27T01:37:59.679Z"
+    },
+    {
+      "_id": "697817dc550cdcf294291c0d",
+      "email": "nagaki50023010@gmail.com",
+      "role": "employer",
+      "name": "Minh Khôi",
+      "status": "pending",
+      "createdAt": "2026-01-27T01:41:48.992Z"
+    }
+  ]
+}

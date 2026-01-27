@@ -7,11 +7,12 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { email, password } = body
+    const normalizedEmail = email.toLowerCase().trim()
 
     const collection = await getCollection(COLLECTIONS.USERS)
 
     // Find user by email
-    const user = await collection.findOne({ email })
+    const user = await collection.findOne({ email: normalizedEmail })
 
     if (!user) {
       return NextResponse.json({ error: "Email hoặc mật khẩu không đúng" }, { status: 401 })
