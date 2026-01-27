@@ -48,7 +48,7 @@ export function Footer() {
           </div>
 
           {/* Contact Info */}
-          <div className="lg:col-span-4 md:col-span-1">
+          <div className="lg:col-span-5 md:col-span-1">
             <h4 className="text-white font-semibold text-lg mb-6 flex items-center gap-2">
               <span className="w-8 h-0.5 bg-purple-500 rounded-full" />
               Thông tin liên hệ
