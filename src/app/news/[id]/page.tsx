@@ -121,14 +121,16 @@ export default function NewsDetailPage({ params }: { params: Promise<{ id: strin
                         <article className="flex-1 max-w-4xl">
                             <div className="prose prose-lg md:prose-xl max-w-none prose-slate">
                                 <div className="p-10 md:p-14 bg-slate-50/50 rounded-[40px] border border-slate-100/50 mb-16">
-                                    <p className="text-xl md:text-2xl font-semibold italic text-slate-800 leading-[1.6] m-0">
-                                        {news.summary}
-                                    </p>
+                                    <div
+                                        className="text-xl md:text-2xl font-semibold italic text-slate-800 leading-[1.6] m-0"
+                                        dangerouslySetInnerHTML={{ __html: news.summary }}
+                                    />
                                 </div>
 
-                                <div className="whitespace-pre-line text-[17px] md:text-[19px] leading-[1.8] text-slate-600 space-y-10 font-normal mb-16">
-                                    {news.content}
-                                </div>
+                                <div
+                                    className="whitespace-pre-line text-[17px] md:text-[19px] leading-[1.8] text-slate-600 space-y-10 font-normal mb-16"
+                                    dangerouslySetInnerHTML={{ __html: news.content }}
+                                />
 
                                 {/* Rich Media: Gallery */}
                                 {news.gallery && news.gallery.length > 0 && (
