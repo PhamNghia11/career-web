@@ -25,19 +25,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (savedUser) {
         try {
           const parsedUser = JSON.parse(savedUser)
+          // Set user immediately to provide fast UI feedback
+          setUser(parsedUser)
 
-          // Verify with server if user still exists
-          if (parsedUser.id) {
-            const res = await fetch(`/api/users/${parsedUser.id}`)
-            if (res.status === 404) {
-              console.warn("[Auth] User not found on server, logging out.")
-              logout()
-              return
+          // Verify with server if user still exists (in background)
+          const userId = parsedUser.id || parsedUser._id
+          if (userId) {
+            try {
+              const res = await fetch(`/api/users/${userId}`)
+              if (res.status === 404) {
+                console.warn("[Auth] User not found on server, logging out.")
+                logout()
+                return
+              }
+
+              if (res.ok) {
+                const data = await res.json()
+                if (data.success && data.user) {
+                  // Update with fresh data if successful
+                  setUser(data.user)
+                  localStorage.setItem("gdu_user", JSON.stringify(data.user))
+                }
+              }
+            } catch (fetchErr) {
+              // If fetch fails (abort, network error, server down), 
+              // we trust the local session instead of logging out
+              console.log("[Auth] Background verify bypassed due to connection issue/abort")
             }
           }
-
-          setUser(parsedUser)
         } catch (e) {
+          console.error("[Auth] Session data corrupted:", e)
           localStorage.removeItem("gdu_user")
         }
       }
