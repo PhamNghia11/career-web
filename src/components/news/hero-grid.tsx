@@ -96,7 +96,7 @@ export function HeroGrid({ featuredNews }: HeroGridProps) {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                         <h4 className="text-xl font-black mb-2 relative z-10">Cẩm nang tuyển dụng 2026</h4>
                         <p className="text-white/60 text-sm font-medium relative z-10 mb-4">Tải ngay bản báo cáo mới nhất</p>
-                        <Link href="#" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/80 group-hover:text-white transition-colors">
+                        <Link href="/news?category=Cẩm nang" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/80 group-hover:text-white transition-colors">
                             Tìm hiểu ngay <ArrowUpRight className="w-3.5 h-3.5" />
                         </Link>
                     </div>

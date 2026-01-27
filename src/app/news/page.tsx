@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { News } from "@/types"
 import { NewsCard } from "@/components/home/news-card"
-import { TrendingUp, Search, Filter, Newspaper, ArrowRight, ArrowUpRight, ExternalLink, RefreshCw, ArrowLeft, Mail } from "lucide-react"
+import { TrendingUp, Search, Filter, Newspaper, ArrowRight, ArrowUpRight, ExternalLink, RefreshCw, ArrowLeft, Mail, ChevronDown } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -49,10 +50,26 @@ const SOURCES = [
 ]
 
 export default function NewsPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary"></div>
+            </div>
+        }>
+            <NewsPageContent />
+        </Suspense>
+    )
+}
+
+function NewsPageContent() {
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const urlCategory = searchParams.get("category")
+
     const [news, setNews] = useState<News[]>([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
-    const [category, setCategory] = useState("Tất cả")
+    const [category, setCategory] = useState(urlCategory || "Tất cả")
     const [sortBy, setSortBy] = useState("newest")
 
     // States for specialized categories
@@ -137,6 +154,27 @@ export default function NewsPage() {
         fetchSpecializedNews()
     }, [category])
 
+    // Sync with URL category
+    useEffect(() => {
+        if (urlCategory && urlCategory !== category) {
+            setCategory(urlCategory)
+
+            // Smooth scroll to results when category changes via URL
+            setTimeout(() => {
+                const element = document.getElementById('results-section');
+                if (element) {
+                    const headerOffset = 180;
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 100);
+        }
+    }, [urlCategory])
+
     const filteredAndSortedNews = news
         .filter(item =>
             item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -150,92 +188,61 @@ export default function NewsPage() {
         })
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 via-white to-slate-50/50">
+        <div className="bg-white min-h-screen">
             <Header />
 
-            <main className="flex-1">
-                {/* Restored Blue Hero Section with Back Button */}
-                <div className="relative py-16 md:py-24 lg:py-28 overflow-hidden">
-                    {/* Background Image */}
-                    <div
-                        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                        style={{ backgroundImage: "url('/hero-bg.png')" }}
-                    />
-                    {/* Dark Overlay */}
-                    <div className="absolute inset-0 bg-primary/95 lg:bg-primary/90" />
+            <main className="pt-24">
+                {/* News Hero Grid Section */}
+                {news.length > 0 && <HeroGrid featuredNews={news.slice(0, 3)} />}
 
-                    <div className="container px-4 mx-auto relative z-10">
-                        <div className="max-w-4xl">
-                            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight tracking-tight">
-                                Tin tức & Phân tích <br />
-                                Thị trường Lao động
-                            </h1>
-
-                            <p className="text-base md:text-lg text-white/60 leading-relaxed max-w-2xl font-light">
-                                Cập nhật xu hướng tuyển dụng, báo cáo thị trường và kiến thức phát triển sự nghiệp từ đội ngũ chuyên gia GDU.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Modern Hero Grid Section */}
-                {news.length > 0 && (
-                    <HeroGrid featuredNews={[...news].sort((a, b) => {
-                        if (a.isFeatured && !b.isFeatured) return -1
-                        if (!a.isFeatured && b.isFeatured) return 1
-                        return b.views - a.views
-                    }).slice(0, 3)} />
-                )}
-
-                {/* Compact & Integrated Toolbar Section */}
-                <div className="bg-white border-b border-slate-100 sticky top-0 z-40 backdrop-blur-sm bg-white/80">
-                    <div className="container px-4 mx-auto py-8">
-                        <div className="flex flex-col gap-10">
-                            {/* Consolidated Topics - Full Width & Softened Style */}
-                            <div className="flex flex-nowrap items-center w-full overflow-x-auto [&::-webkit-scrollbar]:hidden -ms-overflow-style:none [scrollbar-width:none] gap-3 pb-2">
-                                {CATEGORIES.map(cat => (
+                {/* News Search & Filter Section */}
+                <div className="bg-white border-y border-slate-100 sticky top-[72px] z-40 backdrop-blur-md bg-white/90">
+                    <div className="container px-4 mx-auto py-6">
+                        <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+                            {/* Categories */}
+                            <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-4 md:pb-0 scrollbar-hide">
+                                {CATEGORIES.map((cat) => (
                                     <button
                                         key={cat}
                                         onClick={() => setCategory(cat)}
-                                        className={`px-6 py-3 rounded-full text-[15px] font-bold transition-all duration-300 whitespace-nowrap border ${category === cat
-                                            ? "bg-[#002855] text-white border-[#002855] shadow-lg shadow-[#002855]/20"
-                                            : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300"}`}
+                                        className={`px-6 py-2.5 rounded-full text-xs font-black transition-all whitespace-nowrap uppercase tracking-widest ${category === cat
+                                            ? "bg-primary text-white shadow-lg shadow-primary/20 scale-105"
+                                            : "bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 border border-slate-100"
+                                            }`}
                                     >
                                         {cat}
                                     </button>
                                 ))}
                             </div>
 
-                            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 pb-2">
-                                <div className="relative group max-w-2xl flex-1">
-                                    <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-primary transition-colors" />
-                                    <input
-                                        placeholder="Tìm kiếm nội dung bài viết..."
-                                        className="w-full pl-9 pr-4 py-3 bg-transparent border-b border-slate-200 focus:border-primary focus:outline-none text-sm transition-all placeholder:text-slate-500 font-medium"
+                            {/* Search & Sort */}
+                            <div className="flex items-center gap-4 w-full md:w-auto">
+                                <div className="relative flex-1 md:w-64">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <Input
+                                        placeholder="Tìm kiếm tin tức..."
+                                        className="pl-12 h-12 rounded-xl border-slate-100 bg-slate-50 focus:ring-primary focus:border-primary font-medium"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                 </div>
 
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <button className="flex items-center gap-2.5 px-6 py-2.5 rounded-full border border-slate-200 text-[11px] font-bold text-slate-500 hover:bg-slate-50 hover:text-primary transition-all uppercase tracking-widest">
-                                                <TrendingUp className="w-4 h-4" />
-                                                SẮP XẾP: {sortBy === "newest" ? "MỚI NHẤT" : sortBy === "popular" ? "THỊNH HÀNH" : "CŨ NHẤT"}
+                                            <button className="h-12 px-6 flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all font-black text-xs uppercase tracking-widest">
+                                                <Filter className="w-4 h-4" />
+                                                {sortBy === "newest" ? "Mới nhất" : sortBy === "oldest" ? "Cũ nhất" : "Xem nhiều"}
+                                                <ChevronDown className="w-4 h-4" />
                                             </button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent className="w-48 rounded-xl p-1 shadow-xl border-slate-100" align="end">
+                                        <DropdownMenuContent align="end" className="w-[200px] rounded-2xl p-2">
+                                            <DropdownMenuLabel className="font-black text-[10px] uppercase tracking-widest text-slate-400 px-4 py-3">Sắp xếp theo</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
                                             <DropdownMenuRadioGroup value={sortBy} onValueChange={setSortBy}>
-                                                <DropdownMenuRadioItem value="newest" className="rounded-lg py-3 text-sm cursor-pointer">
-                                                    Mới nhất
-                                                </DropdownMenuRadioItem>
-                                                <DropdownMenuRadioItem value="popular" className="rounded-lg py-3 text-sm cursor-pointer">
-                                                    Thịnh hành
-                                                </DropdownMenuRadioItem>
-                                                <DropdownMenuRadioItem value="oldest" className="rounded-lg py-3 text-sm cursor-pointer">
-                                                    Cũ nhất
-                                                </DropdownMenuRadioItem>
+                                                <DropdownMenuRadioItem value="newest" className="rounded-xl cursor-not-allowed cursor-pointer focus:bg-slate-50 py-3 font-bold text-slate-600">Đăng gần nhất</DropdownMenuRadioItem>
+                                                <DropdownMenuRadioItem value="oldest" className="rounded-xl cursor-pointer focus:bg-slate-50 py-3 font-bold text-slate-600">Đăng xa nhất</DropdownMenuRadioItem>
+                                                <DropdownMenuRadioItem value="popular" className="rounded-xl cursor-pointer focus:bg-slate-50 py-3 font-bold text-slate-600">Nhiều lượt xem nhất</DropdownMenuRadioItem>
                                             </DropdownMenuRadioGroup>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -268,10 +275,11 @@ export default function NewsPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     {[1, 2, 3, 4].map((i) => (
                                         <div key={i} className="animate-pulse flex flex-col gap-6">
-                                            <div className="aspect-[16/10] bg-muted rounded-[32px]" />
-                                            <div className="space-y-3">
-                                                <div className="h-8 w-full bg-muted rounded-xl" />
-                                                <div className="h-4 w-1/2 bg-muted rounded-full" />
+                                            <div className="aspect-[16/10] bg-slate-100 rounded-[32px]" />
+                                            <div className="space-y-4">
+                                                <div className="h-4 bg-slate-100 rounded w-1/4" />
+                                                <div className="h-8 bg-slate-100 rounded w-full" />
+                                                <div className="h-20 bg-slate-100 rounded w-full" />
                                             </div>
                                         </div>
                                     ))}

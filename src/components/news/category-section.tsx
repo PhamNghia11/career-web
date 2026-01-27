@@ -58,6 +58,7 @@ export function CategorySection({ title, description, news, viewAllHref }: Categ
 
                     <Link
                         href={viewAllHref}
+                        scroll={false}
                         className="group flex items-center gap-2 text-sm font-black uppercase tracking-[0.2em] text-primary hover:text-primary/70 transition-all"
                     >
                         Xem thêm
