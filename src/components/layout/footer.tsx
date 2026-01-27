@@ -71,6 +71,19 @@ export function Footer() {
                   Studentcentre@giadinh.edu.vn
                 </a>
               </li>
+              <li className="flex items-center gap-3 group">
+                <div className="p-2 bg-slate-800/50 rounded-lg group-hover:bg-blue-600/20 transition-colors text-blue-400">
+                  <Facebook className="h-5 w-5" />
+                </div>
+                <a
+                  href="https://www.facebook.com/GDUStudentCenter"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm hover:text-white transition-colors"
+                >
+                  Facebook: GDU Student Center
+                </a>
+              </li>
 
             </ul>
           </div>
