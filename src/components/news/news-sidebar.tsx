@@ -1,5 +1,6 @@
-import { Mail, Calculator, ArrowRight, TrendingUp } from "lucide-react"
+import { Mail, ArrowRight, TrendingUp } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
 
 interface NewsSidebarProps {
     onTagClick: (tag: string) => void
@@ -30,12 +31,15 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
                 <p className="text-white/80 text-sm font-medium mb-6 leading-relaxed">
                     Thông báo việc làm - Hoàn toàn miễn phí và dễ dàng
                 </p>
-                <button
-                    onClick={handleSubscribe}
-                    className="w-full py-4 bg-white text-primary font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-slate-50 transition-all shadow-lg active:scale-95"
+                <Button
+                    onClick={(e) => {
+                        e.preventDefault();
+                        handleSubscribe();
+                    }}
+                    className="w-full py-6 bg-white text-primary hover:bg-slate-50 font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-lg active:scale-95"
                 >
                     Tạo Ngay
-                </button>
+                </Button>
             </div>
 
             {/* Trending Tags Section */}

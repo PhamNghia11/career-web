@@ -5,7 +5,8 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { News } from "@/types"
 import { NewsCard } from "@/components/home/news-card"
-import { TrendingUp, Search, Filter, Newspaper, ArrowRight, ArrowUpRight, ExternalLink, RefreshCw, ArrowLeft } from "lucide-react"
+import { TrendingUp, Search, Filter, Newspaper, ArrowRight, ArrowUpRight, ExternalLink, RefreshCw, ArrowLeft, Mail } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -259,7 +260,7 @@ export default function NewsPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                         {/* Main Content Area */}
                         <div className="lg:col-span-8 min-h-[800px]">
-                            <div id="results-section" className="flex items-center justify-between mb-10 border-b border-slate-100 pb-4">
+                            <div id="results-section" className="flex items-center justify-between mb-10 border-b border-slate-100 pb-4 scroll-mt-48">
                                 <h2 className="text-2xl font-black uppercase tracking-tight text-slate-800">Bài viết mới nhất</h2>
                             </div>
 
