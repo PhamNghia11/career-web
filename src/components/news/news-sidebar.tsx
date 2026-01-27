@@ -18,7 +18,8 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
     return (
         <aside className="space-y-8">
             {/* Newsletter Subscription Card */}
-            <div className="bg-[#FF3B5C] rounded-[32px] p-8 text-white relative overflow-hidden group">
+            <div className="bg-primary rounded-[32px] p-8 text-white relative overflow-hidden group shadow-xl shadow-primary/10">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
                 <div className="absolute top-4 right-4 bg-white/20 p-3 rounded-2xl">
                     <Mail className="w-6 h-6" />
                 </div>
@@ -28,7 +29,7 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
                 </p>
                 <button
                     onClick={handleSubscribe}
-                    className="w-full py-4 bg-white text-[#FF3B5C] font-black uppercase text-xs tracking-widest rounded-2xl hover:scale-105 transform transition-all shadow-xl"
+                    className="w-full py-4 bg-white text-primary font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-slate-50 transition-all shadow-lg active:scale-95"
                 >
                     Tạo Ngay
                 </button>
