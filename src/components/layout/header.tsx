@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { Menu, X, Search, User, ChevronDown } from "lucide-react"
+import { Menu, X, Search, User, ChevronDown, PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -99,6 +99,14 @@ export function Header() {
 
             {user ? (
               <>
+                {user.role === 'employer' && (
+                  <Link href="/dashboard/jobs/new" className="hidden lg:block ml-2">
+                    <Button className="bg-red-600 hover:bg-red-700 text-white font-bold px-5 h-11 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-red-100 hover:shadow-red-200 active:scale-[0.98]">
+                      <PlusCircle className="w-5 h-5" />
+                      <span>Đăng tin ngay</span>
+                    </Button>
+                  </Link>
+                )}
                 <NotificationBell />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -210,6 +218,16 @@ export function Header() {
 
             {user && (
               <div className="pt-6 mt-6 border-t border-gray-100 space-y-3">
+                {user.role === 'employer' && (
+                  <Link
+                    href="/dashboard/jobs/new"
+                    className="flex items-center gap-3 px-4 py-4 rounded-xl bg-red-600 text-white font-bold shadow-lg shadow-red-100 mb-3 active:scale-[0.98]"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <PlusCircle className="w-6 h-6" />
+                    <span>Đăng tin tuyển dụng ngay</span>
+                  </Link>
+                )}
                 <Link
                   href="/dashboard"
                   className="block px-4 py-3 rounded-xl bg-primary/5 font-bold text-primary"
