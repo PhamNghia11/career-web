@@ -306,7 +306,6 @@ export default function NewsPage() {
                         <div className="lg:col-span-4">
                             <NewsSidebar onTagClick={(tag) => {
                                 setSearchQuery(tag);
-                                // Use a small timeout to ensure state update and re-render are in progress
                                 setTimeout(() => {
                                     const element = document.getElementById('results-section');
                                     if (element) {

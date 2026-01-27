@@ -42,18 +42,16 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
                     <p className="text-white/80 text-sm font-medium mb-6 leading-relaxed">
                         Thông báo việc làm - Hoàn toàn miễn phí và dễ dàng
                     </p>
-                    <Button
+                    <button
                         type="button"
-                        disabled={isSubscribing}
                         onClick={(e) => {
                             e.preventDefault();
-                            e.stopPropagation();
                             handleSubscribe();
                         }}
-                        className="w-full py-6 bg-white text-primary hover:bg-gray-50 font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-xl active:scale-95 border-0 relative z-30 cursor-pointer"
+                        className="w-full py-4 bg-white text-primary hover:bg-slate-50 font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-lg active:scale-95 border-none cursor-pointer relative z-20"
                     >
-                        {isSubscribing ? "ĐANG XỬ LÝ..." : "TẠO NGAY"}
-                    </Button>
+                        Tạo Ngay
+                    </button>
                 </div>
             </div>
 
