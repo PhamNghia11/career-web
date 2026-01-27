@@ -9,10 +9,13 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
     const { toast } = useToast()
 
     const handleSubscribe = () => {
+        // Simple validation or demo logic
         toast({
-            title: "Đăng ký thành công!",
-            description: "Bạn sẽ nhận được thông báo việc làm mới nhất qua email.",
+            title: "Yêu cầu đã được gửi!",
+            description: "Hệ thống sẽ gửi thông báo việc làm phù hợp cho bạn qua email mới nhất.",
+            variant: "default",
         })
+        console.log("Newsletter subscription triggered");
     }
 
     return (
@@ -45,8 +48,12 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
                     {["Thực tập sinh", "Fresher IT", "CV Mẫu", "Phỏng vấn", "GDU Alumni", "Skill Up"].map(tag => (
                         <button
                             key={tag}
-                            onClick={() => onTagClick(tag)}
-                            className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:text-primary hover:border-primary transition-all"
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onTagClick(tag);
+                            }}
+                            className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:text-primary hover:border-primary transition-all hover:bg-slate-50 active:scale-95 shadow-sm"
                         >
                             {tag}
                         </button>
