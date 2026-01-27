@@ -305,7 +305,7 @@ export default function NewsPage() {
                         <div className="lg:col-span-4">
                             <NewsSidebar onTagClick={(tag) => {
                                 setSearchQuery(tag)
-                                window.scrollTo({ top: 400, behavior: 'smooth' })
+                                // Remove forced scroll that was causing "jumps"
                             }} />
                         </div>
                     </div>

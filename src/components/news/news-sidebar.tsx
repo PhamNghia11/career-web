@@ -1,13 +1,18 @@
 import { Mail, Calculator, ArrowRight, TrendingUp } from "lucide-react"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 
 interface NewsSidebarProps {
     onTagClick: (tag: string) => void
 }
 
 export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
+    const { toast } = useToast()
+
     const handleSubscribe = () => {
-        toast.success("Đã đăng ký nhận tin thành công!")
+        toast({
+            title: "Đăng ký thành công!",
+            description: "Bạn sẽ nhận được thông báo việc làm mới nhất qua email.",
+        })
     }
 
     return (
