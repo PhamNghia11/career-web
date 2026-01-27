@@ -305,12 +305,21 @@ export default function NewsPage() {
                         {/* Sidebar Area */}
                         <div className="lg:col-span-4">
                             <NewsSidebar onTagClick={(tag) => {
-                                setSearchQuery(tag)
-                                // Smooth scroll to results instead of direct jump
-                                const element = document.getElementById('results-section');
-                                if (element) {
-                                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                }
+                                setSearchQuery(tag);
+                                // Use a small timeout to ensure state update and re-render are in progress
+                                setTimeout(() => {
+                                    const element = document.getElementById('results-section');
+                                    if (element) {
+                                        const headerOffset = 180; // Account for sticky header
+                                        const elementPosition = element.getBoundingClientRect().top;
+                                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                                        window.scrollTo({
+                                            top: offsetPosition,
+                                            behavior: 'smooth'
+                                        });
+                                    }
+                                }, 100);
                             }} />
                         </div>
                     </div>

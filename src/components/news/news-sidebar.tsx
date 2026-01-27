@@ -32,11 +32,14 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
                     Thông báo việc làm - Hoàn toàn miễn phí và dễ dàng
                 </p>
                 <Button
+                    type="button"
                     onClick={(e) => {
                         e.preventDefault();
+                        e.stopPropagation();
+                        console.log("Newsletter button clicked at", new Date().toISOString());
                         handleSubscribe();
                     }}
-                    className="w-full py-6 bg-white text-primary hover:bg-slate-50 font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-lg active:scale-95"
+                    className="w-full py-6 bg-white text-primary hover:bg-slate-50 font-black uppercase text-xs tracking-widest rounded-2xl transition-all shadow-lg active:scale-95 border-none"
                 >
                     Tạo Ngay
                 </Button>
