@@ -308,11 +308,18 @@ export default function NewsPage() {
                                 setSearchQuery(tag);
                                 // Improved scroll to results: more robust for different screen sizes
                                 setTimeout(() => {
-                                    const section = document.getElementById('results-section');
-                                    if (section) {
-                                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    const element = document.getElementById('results-section');
+                                    if (element) {
+                                        const headerOffset = 150; // Account for sticky header
+                                        const elementPosition = element.getBoundingClientRect().top;
+                                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                                        window.scrollTo({
+                                            top: Math.max(0, offsetPosition),
+                                            behavior: 'smooth'
+                                        });
                                     }
-                                }, 50);
+                                }, 150);
                             }} />
                         </div>
                     </div>
