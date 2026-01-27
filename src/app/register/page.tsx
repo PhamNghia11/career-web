@@ -227,9 +227,13 @@ export default function RegisterPage() {
                         id="studentId"
                         name="studentId"
                         type="text"
+                        inputMode="numeric"
                         value={formData.studentId}
-                        onChange={handleChange}
-                        placeholder="GDU..."
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          setFormData(prev => ({ ...prev, studentId: value }));
+                        }}
+                        placeholder="Nhập MSSV (chỉ nhập số)"
                         className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
                       />
                     </div>
