@@ -218,7 +218,7 @@ export default function RegisterPage() {
               )}
 
               {formData.role === "student" && (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="studentId" className="text-gray-700 font-medium">MSSV</Label>
                     <div className="relative group">
@@ -233,7 +233,7 @@ export default function RegisterPage() {
                           const value = e.target.value.replace(/\D/g, "");
                           setFormData(prev => ({ ...prev, studentId: value }));
                         }}
-                        placeholder="Nhập MSSV (chỉ nhập số)"
+                        placeholder="Nhập MSSV"
                         className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
                       />
                     </div>
