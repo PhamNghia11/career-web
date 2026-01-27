@@ -101,20 +101,15 @@ export function MobileNav() {
 
             <div className="px-4 py-4 border-b border-sidebar-border">
               <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className="w-12 h-12 rounded-full border-2 border-sidebar-primary/20 p-0.5">
-                    <div className="w-full h-full rounded-full bg-sidebar-accent flex items-center justify-center overflow-hidden border border-sidebar-border">
-                      {user?.avatar ? (
-                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <User className="h-6 w-6 text-sidebar-foreground/70" />
-                      )}
-                    </div>
-                  </div>
-                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-sidebar rounded-full"></div>
+                <div className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden">
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <User className="h-6 w-6 text-slate-500" />
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold truncate">{user?.name}</p>
+                  <p className="font-bold text-sm truncate">{user?.name}</p>
                   <p className="text-xs text-sidebar-foreground/60 truncate">{user?.email}</p>
                 </div>
               </div>

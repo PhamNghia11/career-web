@@ -111,19 +111,12 @@ export function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="text-primary hover:bg-primary/10 gap-2 pr-2 pl-2 h-12">
-                      <div className="relative">
-                        <div className="h-10 w-10 rounded-full border-2 border-primary/10 p-0.5">
-                          {user.avatar ? (
-                            <div className="h-full w-full rounded-full overflow-hidden border border-primary/10">
-                              <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" />
-                            </div>
-                          ) : (
-                            <div className="h-full w-full rounded-full bg-primary/5 flex items-center justify-center text-primary border border-primary/10">
-                              <User className="h-5 w-5" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
+                      <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden">
+                        {user.avatar ? (
+                          <img src={user.avatar} alt="Avatar" className="h-full w-full object-cover" />
+                        ) : (
+                          <User className="h-5 w-5 text-slate-500" />
+                        )}
                       </div>
                       <span className="hidden md:inline font-bold text-sm">{user.name}</span>
                       <ChevronDown className="h-4 w-4 opacity-50" />
