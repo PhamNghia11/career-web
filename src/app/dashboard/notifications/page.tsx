@@ -55,17 +55,19 @@ export default function NotificationsPage() {
   const { user } = useAuth()
 
   useEffect(() => {
-    if (user?.id) {
+    const userId = user?.id || (user as any)?._id
+    if (userId) {
       fetchNotifications()
     }
-  }, [user?.id])
+  }, [user?.id, (user as any)?._id])
 
   const fetchNotifications = async () => {
-    if (!user?.id) return
+    const userId = user?.id || (user as any)?._id
+    if (!userId) return
 
     setLoading(true)
     try {
-      const response = await fetch(`/api/notifications?userId=${user.id}&role=${user.role || ''}`)
+      const response = await fetch(`/api/notifications?userId=${userId}&role=${user?.role || ''}`)
       const result = await response.json()
 
       if (result.success) {
@@ -128,13 +130,14 @@ export default function NotificationsPage() {
   }
 
   const markAllAsRead = async () => {
-    if (!user?.id) return
+    const userId = user?.id || (user as any)?._id
+    if (!userId) return
 
     try {
       const response = await fetch("/api/notifications", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id, action: "mark_all_read", role: user.role }),
+        body: JSON.stringify({ userId, action: "mark_all_read", role: user?.role }),
       })
 
       if (response.ok) {
@@ -150,12 +153,13 @@ export default function NotificationsPage() {
   }
 
   const deleteAllNotifications = async () => {
-    if (!user?.id) return
+    const userId = user?.id || (user as any)?._id
+    if (!userId) return
 
     if (!confirm("Bạn có chắc chắn muốn xóa tất cả thông báo không?")) return
 
     try {
-      const response = await fetch(`/api/notifications?action=delete_all&userId=${user.id}&role=${user.role || ''}`, {
+      const response = await fetch(`/api/notifications?action=delete_all&userId=${userId}&role=${user?.role || ''}`, {
         method: "DELETE"
       })
       const result = await response.json()

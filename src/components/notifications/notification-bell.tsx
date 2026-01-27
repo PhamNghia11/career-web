@@ -48,11 +48,12 @@ export function NotificationBell() {
     const [open, setOpen] = useState(false)
 
     const fetchNotifications = async () => {
-        if (!user?.id) return
+        const userId = user?.id || (user as any)?._id
+        if (!userId) return
 
         try {
             setLoading(true)
-            const response = await fetch(`/api/notifications?userId=${user.id}&role=${user.role || ''}`)
+            const response = await fetch(`/api/notifications?userId=${userId}&role=${user?.role || ''}`)
             const data = await response.json()
 
             if (data.success) {
@@ -71,7 +72,7 @@ export function NotificationBell() {
         // Poll for new notifications every 30 seconds
         const interval = setInterval(fetchNotifications, 30000)
         return () => clearInterval(interval)
-    }, [user?.id])
+    }, [user?.id, (user as any)?._id])
 
     const markAsRead = async (notificationId: string) => {
         try {
@@ -90,13 +91,14 @@ export function NotificationBell() {
     }
 
     const markAllAsRead = async () => {
-        if (!user?.id) return
+        const userId = user?.id || (user as any)?._id
+        if (!userId) return
 
         try {
             await fetch("/api/notifications", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: user.id, action: "mark_all_read", role: user.role }),
+                body: JSON.stringify({ userId, action: "mark_all_read", role: user?.role }),
             })
             setNotifications(prev => prev.map(n => ({ ...n, read: true })))
             setUnreadCount(0)

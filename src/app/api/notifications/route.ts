@@ -45,11 +45,12 @@ export async function GET(request: Request) {
           const currentUser = await usersCollection.findOne({ _id: new ObjectId(userId) })
           if (currentUser?.createdAt) {
             userCreatedAt = new Date(currentUser.createdAt)
+            console.log("[Notifications API] User created at:", userCreatedAt)
           }
         }
       }
     } catch (e) {
-      console.error("Error fetching user for notification filter", e)
+      console.error("[Notifications API] Error fetching user created date:", e)
     }
 
     if (role === 'admin') {
@@ -66,6 +67,7 @@ export async function GET(request: Request) {
           }
         ]
       }
+      console.log("[Notifications API] ADMIN Query Filter - role match found")
     } else if (role === 'employer') {
       // Employer sees: their own notifications OR notifications targeted at 'employer' role
       query = {

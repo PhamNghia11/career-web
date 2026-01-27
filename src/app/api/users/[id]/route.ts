@@ -24,6 +24,7 @@ export async function GET(
             success: true,
             user: {
                 ...user,
+                id: user._id.toString(),
                 _id: user._id.toString(),
             }
         })
