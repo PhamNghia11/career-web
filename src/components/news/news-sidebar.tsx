@@ -1,3 +1,4 @@
+import React from "react"
 import { Mail, ArrowRight, TrendingUp } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"

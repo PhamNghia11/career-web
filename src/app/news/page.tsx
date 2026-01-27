@@ -306,7 +306,15 @@ export default function NewsPage() {
                         <div className="lg:col-span-4">
                             <NewsSidebar onTagClick={(tag) => {
                                 setSearchQuery(tag);
-                            }, 150);
+                                // Robust smooth scroll with header offset
+                                setTimeout(() => {
+                                    const element = document.getElementById('results-section');
+                                    if (element) {
+                                        const headerHeight = 160; // Approximate height of the sticky header
+                                        const y = element.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+                                        window.scrollTo({ top: y, behavior: 'smooth' });
+                                    }
+                                }, 200);
                             }} />
                         </div>
                     </div>
