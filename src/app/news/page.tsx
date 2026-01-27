@@ -306,12 +306,20 @@ export default function NewsPage() {
                         <div className="lg:col-span-4">
                             <NewsSidebar onTagClick={(tag) => {
                                 setSearchQuery(tag);
+                                // Use a slightly longer timeout to allow for DOM settles
                                 setTimeout(() => {
                                     const element = document.getElementById('results-section');
                                     if (element) {
-                                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        const headerOffset = 180; // Buffer for sticky header
+                                        const elementPosition = element.getBoundingClientRect().top;
+                                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                                        window.scrollTo({
+                                            top: offsetPosition,
+                                            behavior: 'smooth'
+                                        });
                                     }
-                                }, 100);
+                                }, 300);
                             }} />
                         </div>
                     </div>
