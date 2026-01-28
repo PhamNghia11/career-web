@@ -326,10 +326,10 @@ function ManageApplicationsContent() {
                     <div className="flex gap-2">
                         <Select value={companyFilter} onValueChange={setCompanyFilter}>
                             <SelectTrigger className="h-10 flex-1">
-                                <SelectValue placeholder="Công ty" />
+                                <SelectValue placeholder="Doanh nghiệp" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">Tất cả công ty</SelectItem>
+                                <SelectItem value="all">Tất cả doanh nghiệp</SelectItem>
                                 {uniqueCompanies.map(company => (
                                     <SelectItem key={company} value={company}>{company}</SelectItem>
                                 ))}

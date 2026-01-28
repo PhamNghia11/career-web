@@ -1060,7 +1060,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                       <div className="flex items-center justify-between cursor-pointer mb-3" onClick={() => toggleSection('company')}>
                         <Label className="text-sm font-medium flex items-center gap-2 cursor-pointer">
                           <Building2 className="h-4 w-4" />
-                          Công ty
+                          Doanh nghiệp
                         </Label>
                         <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${expandedSections.company ? "rotate-180" : ""}`} />
                       </div>

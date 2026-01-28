@@ -433,9 +433,9 @@ export default function PostJobPage() {
                                 name="website"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Website công ty</FormLabel>
+                                        <FormLabel>Website doanh nghiệp</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="https://website-cong-ty.com" {...field} />
+                                            <Input placeholder="https://website-doanh-nghiep.com" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

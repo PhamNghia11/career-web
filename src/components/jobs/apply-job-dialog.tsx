@@ -318,7 +318,7 @@ export function ApplyJobDialog({
                                     <p className="font-medium text-gray-900 truncate" title={jobTitle}>{jobTitle}</p>
                                 </div>
                                 <div>
-                                    <p className="text-gray-500">Công ty</p>
+                                    <p className="text-gray-500">Doanh nghiệp</p>
                                     <p className="font-medium text-gray-900 truncate" title={companyName}>{companyName}</p>
                                 </div>
                                 <div>

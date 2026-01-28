@@ -139,7 +139,7 @@ export default function MyApplicationsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Vị trí & Công ty</TableHead>
+                    <TableHead>Vị trí & Doanh nghiệp</TableHead>
                     <TableHead>Ngày nộp</TableHead>
                     <TableHead>Hồ sơ đã nộp</TableHead>
                     <TableHead>Trạng thái</TableHead>

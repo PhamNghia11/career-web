@@ -266,7 +266,7 @@ export default function RegisterPage() {
               {formData.role === "employer" && (
                 <div className="space-y-5 animate-in slide-in-from-top-4 fade-in duration-300">
                   <div className="border-t border-gray-100 pt-4">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Thông Tin Công Ty</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-4">Thông Tin Doanh Nghiệp</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Contact Person */}

@@ -39,7 +39,7 @@ const employerNav = [
   { name: "Đăng tin tuyển dụng", href: "/dashboard/jobs/new", icon: Briefcase },
   { name: "Quản lý tin đăng", href: "/dashboard/my-jobs", icon: FileText },
   { name: "Quản lý ứng tuyển", href: "/dashboard/applicants-manager", icon: Users },
-  { name: "Công ty", href: "/dashboard/company", icon: Building },
+  { name: "Doanh nghiệp", href: "/dashboard/company", icon: Building },
   { name: "Thông báo", href: "/dashboard/notifications", icon: Bell },
   { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },
 ]

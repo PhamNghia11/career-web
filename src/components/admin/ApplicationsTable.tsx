@@ -128,7 +128,7 @@ export function ApplicationsTable({ initialApplications }: ApplicationsTableProp
                             <TableRow>
                                 <TableHead className="w-[120px] font-semibold">Ngày ứng tuyển</TableHead>
                                 <TableHead className="font-semibold">Ứng viên</TableHead>
-                                <TableHead className="font-semibold">Vị trí / Công ty</TableHead>
+                                <TableHead className="font-semibold">Vị trí / Doanh nghiệp</TableHead>
                                 <TableHead className="font-semibold">Trạng thái</TableHead>
                                 <TableHead className="font-semibold">Liên hệ</TableHead>
                                 <TableHead className="font-semibold">CV</TableHead>
