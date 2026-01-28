@@ -35,15 +35,21 @@ export async function PATCH(
             return NextResponse.json({ error: "Job not found" }, { status: 404 })
         }
 
+        const now = new Date().toISOString()
+        const updateFields: any = {
+            status: status,
+            adminFeedback: feedback || "",
+            updatedAt: now
+        }
+
+        // If job is being activated, refresh the postedAt date
+        if (status === 'active') {
+            updateFields.postedAt = now
+        }
+
         const result = await collection.updateOne(
             { _id: new ObjectId(id) },
-            {
-                $set: {
-                    status: status,
-                    adminFeedback: feedback || "",
-                    updatedAt: new Date().toISOString()
-                }
-            }
+            { $set: updateFields }
         )
 
         if (result.matchedCount === 0) {

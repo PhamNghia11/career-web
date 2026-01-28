@@ -57,7 +57,11 @@ export default function AdminJobsPage() {
             const response = await fetch('/api/jobs?status=all')
             const data = await response.json()
             if (data.success) {
-                setJobs(data.data.jobs)
+                // Sort by postedAt descending
+                const sortedJobs = (data.data.jobs || []).sort((a: Job, b: Job) =>
+                    new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
+                )
+                setJobs(sortedJobs)
             }
         } catch (error) {
             console.error("Failed to fetch jobs", error)
@@ -87,9 +91,20 @@ export default function AdminJobsPage() {
                     description: `Trạng thái tin tuyển dụng đã được cập nhật thành: ${newStatus}`,
                 })
                 // Refresh list locally
-                setJobs(prev => prev.map(job =>
-                    job._id === id ? { ...job, status: newStatus as any } : job
-                ))
+                setJobs(prev => {
+                    const newNow = new Date().toISOString()
+                    const updated = prev.map(job =>
+                        job._id === id ? {
+                            ...job,
+                            status: newStatus as any,
+                            postedAt: newStatus === 'active' ? newNow : job.postedAt
+                        } : job
+                    )
+                    // Re-sort after status update because activation refreshes dates
+                    return updated.sort((a, b) =>
+                        new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
+                    )
+                })
             } else {
                 throw new Error(data.error)
             }

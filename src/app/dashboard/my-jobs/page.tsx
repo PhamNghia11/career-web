@@ -118,7 +118,10 @@ export default function MyJobsPage() {
             const res = await fetch(`/api/jobs?creatorId=${user._id}`)
             const data = await res.json()
             if (data.success) {
-                setJobs(data.data.jobs || [])
+                const sorted = (data.data.jobs || []).sort((a: any, b: any) =>
+                    new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
+                )
+                setJobs(sorted)
             }
         } catch (error) {
             console.error("Failed to fetch jobs", error)
