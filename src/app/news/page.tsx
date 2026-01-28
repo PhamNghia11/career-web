@@ -191,12 +191,38 @@ function NewsPageContent() {
         <div className="bg-white min-h-screen">
             <Header />
 
-            <main className="pt-24">
+            <main>
+                {/* Blue Hero Header */}
+                <div className="relative py-16 md:py-24 lg:py-28 overflow-hidden">
+                    <div
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                        style={{ backgroundImage: "url('/hero-bg.png')" }}
+                    />
+                    <div className="absolute inset-0 bg-primary/95 lg:bg-primary/90" />
+
+                    <div className="container px-4 mx-auto relative z-10">
+                        <div className="max-w-4xl">
+                            <span className="inline-block px-4 py-1 bg-white/10 text-white text-[10px] font-bold rounded-full uppercase tracking-[0.3em] mb-6 border border-white/10">
+                                GDU NEWSROOM
+                            </span>
+                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight">
+                                Tin tức & <br />Xu hướng
+                            </h1>
+                            <p className="text-lg md:text-xl text-white/60 max-w-2xl font-medium leading-relaxed">
+                                Cập nhật những chuyển động mới nhất về thị trường việc làm,
+                                công nghệ và những câu chuyện thành công từ cộng đồng GDU.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 {/* News Hero Grid Section */}
-                {news.length > 0 && <HeroGrid featuredNews={news.slice(0, 3)} />}
+                <div className="bg-white">
+                    {news.length > 0 && <HeroGrid featuredNews={news.slice(0, 3)} />}
+                </div>
 
                 {/* News Search & Filter Section */}
-                <div className="bg-white border-y border-slate-100 sticky top-[72px] z-40 backdrop-blur-md bg-white/90">
+                <div className="bg-white border-y border-slate-100 sticky top-[112px] lg:top-[128px] z-40 backdrop-blur-md bg-white/90">
                     <div className="container px-4 mx-auto py-6">
                         <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
                             {/* Categories */}
