@@ -54,10 +54,17 @@ export async function PATCH(
         // Filter fields to safeguard
         const { _id, creatorId, ...updateFields } = body
 
-        // Auto update updated timestamp
-        const updateData = {
+        // Auto update timestamps
+        const now = new Date().toISOString()
+        const updateData: any = {
             ...updateFields,
-            updatedAt: new Date().toISOString()
+            updatedAt: now
+        }
+
+        // If job is being activated or renewed, refresh the postedAt date
+        // to bump it to the top of "Newest" and "Featured" lists
+        if (updateFields.status === 'active') {
+            updateData.postedAt = now
         }
 
         // Lấy thông tin job cũ để biết creatorId và status cũ

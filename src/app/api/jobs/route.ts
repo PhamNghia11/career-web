@@ -34,11 +34,24 @@ export async function GET(req: Request) {
       // Public view or Admin All Jobs view
       if (status && status !== "all") {
         query.status = status
+        // If explicitly requesting active jobs, also apply deadline filtering
+        if (status === "active") {
+          const today = new Date().toISOString().split('T')[0]
+          query.$or = [
+            { deadline: { $gte: today } },
+            { deadline: { $in: [null, "", "Vô thời hạn"] } },
+            { deadline: { $exists: false } }
+          ]
+        }
       } else if (!status) {
         // Public view usually only wants active AND not expired
         const today = new Date().toISOString().split('T')[0]
         query.status = "active"
-        query.deadline = { $gte: today }
+        query.$or = [
+          { deadline: { $gte: today } },
+          { deadline: { $in: [null, "", "Vô thời hạn"] } },
+          { deadline: { $exists: false } }
+        ]
       }
     }
 

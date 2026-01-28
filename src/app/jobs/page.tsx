@@ -14,7 +14,11 @@ async function getActiveJobsFromDB(): Promise<Job[]> {
     // Filter by active status AND deadline >= today
     const jobs = await collection.find({
       status: "active",
-      deadline: { $gte: today }
+      $or: [
+        { deadline: { $gte: today } },
+        { deadline: { $in: [null, "", "Vô thời hạn"] } },
+        { deadline: { $exists: false } }
+      ]
     }).sort({ postedAt: -1 }).toArray()
 
     return jobs.map(job => ({
