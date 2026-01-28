@@ -40,7 +40,15 @@ function JobActions({
     setJobToRenew: (job: any) => void,
     setRenewDialogOpen: (open: boolean) => void
 }) {
-    const isExpired = new Date(job.deadline) < new Date() && job.status === 'active'
+    const parseDateHelper = (dateStr: string) => {
+        if (!dateStr) return new Date(0)
+        if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+            const [day, month, year] = dateStr.split('/').map(Number)
+            return new Date(year, month - 1, day)
+        }
+        return new Date(dateStr)
+    }
+    const isExpired = parseDateHelper(job.deadline) < new Date() && job.status === 'active'
 
     return (
         <DropdownMenu>

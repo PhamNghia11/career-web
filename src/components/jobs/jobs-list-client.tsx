@@ -109,7 +109,14 @@ interface JobsListClientProps {
 // Helper function to format date and time in Vietnamese format
 const formatDateTime = (dateString: string): string => {
   try {
-    const date = new Date(dateString)
+    let date: Date
+    if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+      const [day, month, year] = dateString.split('/').map(Number)
+      date = new Date(year, month - 1, day)
+    } else {
+      date = new Date(dateString)
+    }
+
     if (isNaN(date.getTime())) return dateString
     return date.toLocaleString("vi-VN", {
       hour: "2-digit",
@@ -536,7 +543,14 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   // Simple helper for deadline display (no time needed)
   const formatDeadline = (dateString: string): string => {
     try {
-      const date = new Date(dateString)
+      let date: Date
+      if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        const [day, month, year] = dateString.split('/').map(Number)
+        date = new Date(year, month - 1, day)
+      } else {
+        date = new Date(dateString)
+      }
+
       if (isNaN(date.getTime())) return dateString
       return date.toLocaleDateString("vi-VN", {
         day: "2-digit",

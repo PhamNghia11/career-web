@@ -197,7 +197,11 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                         detailedBenefits: Array.isArray(job.detailedBenefits) ? job.detailedBenefits.join('\n') : job.detailedBenefits || "",
                         quantity: job.quantity === -1 ? 1 : (job.quantity || 1),
                         unlimitedQuantity: job.quantity === -1,
-                        deadline: job.deadline ? new Date(job.deadline.split('/').reverse().join('-')) : undefined, // Parse DD/MM/YYYY to Date
+                        deadline: job.deadline ? (
+                            job.deadline.includes('-')
+                                ? new Date(job.deadline) // YYYY-MM-DD
+                                : new Date(job.deadline.split('/').reverse().join('-')) // DD/MM/YYYY
+                        ) : undefined,
                         contactEmail: job.contactEmail || "",
                         contactPhone: job.contactPhone || "",
                         documentUrl: job.documentUrl || "",
@@ -264,10 +268,10 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             // Format deadline to DD/MM/YYYY for API
             let formattedDeadline = ""
             if (values.deadline) {
-                const day = values.deadline.getDate().toString().padStart(2, '0')
-                const month = (values.deadline.getMonth() + 1).toString().padStart(2, '0')
                 const year = values.deadline.getFullYear()
-                formattedDeadline = `${day}/${month}/${year}`
+                const month = (values.deadline.getMonth() + 1).toString().padStart(2, '0')
+                const day = values.deadline.getDate().toString().padStart(2, '0')
+                formattedDeadline = `${year}-${month}-${day}`
             }
 
             const payload = {

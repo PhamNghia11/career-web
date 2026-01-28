@@ -54,10 +54,13 @@ export async function GET(req: Request) {
         }
       } else if (!status) {
         // Public view usually only wants active AND not expired
-        const today = new Date().toISOString().split('T')[0]
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        const todayStr = today.toISOString().split('T')[0]
+
         query.status = "active"
         query.$or = [
-          { deadline: { $gte: today } },
+          { deadline: { $gte: todayStr } },
           { deadline: { $in: [null, "", "Vô thời hạn"] } },
           { deadline: { $exists: false } }
         ]
