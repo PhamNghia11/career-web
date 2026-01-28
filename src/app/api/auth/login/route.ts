@@ -45,44 +45,25 @@ export async function POST(request: Request) {
 
     // 2FA for Admin Role
     if (user.role === "admin") {
-      const otp = Math.floor(100000 + Math.random() * 900000).toString()
-      const otpExpires = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
-
-      await collection.updateOne(
-        { _id: user._id },
-        {
-          $set: {
-            twoFactorToken: otp,
-            twoFactorExpires: otpExpires
-          }
-        }
-      )
-
-      await sendEmail({
-        to: user.email,
-        subject: "[GDU Career] Mã xác thực 2FA",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <img src="${process.env.NEXT_PUBLIC_APP_URL}/gdu-logo.png" alt="GDU Logo" style="height: 60px; width: auto;">
-            </div>
-            <h2 style="color: #d32f2f; text-align: center;">Mã xác thực đăng nhập (2FA)</h2>
-            <p>Xin chào Admin <strong>${user.fullName || user.email}</strong>,</p>
-            <p>Bạn đang đăng nhập vào trang quản trị GDU Career. Vui lòng sử dụng mã OTP dưới đây để hoàn tất xác thực:</p>
-            <div style="text-align: center; margin: 30px 0;">
-              <span style="background-color: #f5f5f5; color: #333; padding: 15px 30px; font-size: 24px; font-weight: bold; letter-spacing: 5px; border-radius: 5px; border: 1px solid #ccc;">${otp}</span>
-            </div>
-            <p style="text-align: center; color: #666;">Mã này sẽ hết hạn sau 10 phút.</p>
-            <p style="color: #d32f2f; font-weight: bold; font-size: 13px;">Lưu ý: Nếu không phải bạn thực hiện đăng nhập này, vui lòng báo cáo ngay cho Root Admin.</p>
-          </div>
-        `
-      })
-
-      return NextResponse.json({
-        success: true,
-        needs2FA: true,
-        email: user.email
-      })
+      // Check if TOTP is enabled
+      if (user.totpEnabled) {
+        // User has Google Authenticator set up - request TOTP code
+        return NextResponse.json({
+          success: true,
+          needs2FA: true,
+          totpEnabled: true,
+          email: user.email
+        })
+      } else {
+        // TOTP not set up yet - require setup
+        return NextResponse.json({
+          success: true,
+          needs2FA: true,
+          needsTotpSetup: true,
+          email: user.email,
+          userId: user._id.toString()
+        })
+      }
     }
 
     // Remove password from response
