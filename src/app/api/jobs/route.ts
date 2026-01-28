@@ -124,10 +124,17 @@ export async function POST(req: Request) {
     let userExists = null
     try {
       if (ObjectId.isValid(creatorId)) {
-        userExists = await usersCollection.findOne({ _id: new ObjectId(creatorId) })
+        userExists = await usersCollection.findOne({
+          $or: [
+            { _id: new ObjectId(creatorId) },
+            { _id: creatorId }
+          ]
+        })
+      } else {
+        userExists = await usersCollection.findOne({ _id: creatorId })
       }
     } catch (e) {
-      console.error("Invalid creatorId format", e)
+      console.error("Error verifying creatorId:", e)
     }
 
     if (!userExists) { // User might have been deleted

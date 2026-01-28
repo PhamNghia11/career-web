@@ -219,12 +219,8 @@ export default function PostJobPage() {
                 const day = values.deadline.getDate().toString().padStart(2, '0')
                 const month = (values.deadline.getMonth() + 1).toString().padStart(2, '0')
                 const year = values.deadline.getFullYear()
-                formattedDeadline = `${year}-${month}-${day}` // Standard ISO for DB or whatever backend expects?
-                // Looking at old code: `values.deadline` was likely YYYY-MM-DD from input[date].
-                // And payload used `deadline: values.deadline.split('-').reverse().join('/')` -> DD/MM/YYYY.
-                // So backend expects DD/MM/YYYY?
-                // Let's verify backend or just match old behavior:
-                formattedDeadline = `${day}/${month}/${year}`
+                // Use standard YYYY-MM-DD for database comparison
+                formattedDeadline = `${year}-${month}-${day}`
             }
 
             const payload = {
@@ -235,7 +231,7 @@ export default function PostJobPage() {
                 requirements: requirementsList,
                 detailedBenefits: detailedBenefitsList,
                 logo: logoBase64 || "/placeholder.svg?height=100&width=100",
-                creatorId: user?._id,
+                creatorId: user?.id || user?._id,
                 role: user?.role,
             }
 
@@ -256,16 +252,36 @@ export default function PostJobPage() {
             })
 
             router.push("/dashboard/jobs")
-        } catch (error) {
+        } catch (error: any) {
             console.error("Submit error:", error)
             toast({
                 title: "Không thể đăng tin",
-                description: "Vui lòng kiểm tra lại thông tin.",
+                description: error.message || "Vui lòng kiểm tra lại thông tin.",
                 variant: "destructive",
             })
         } finally {
             setIsLoading(false)
         }
+    }
+
+    const onInvalid = (errors: any) => {
+        // Find the first error and scroll to it
+        const firstErrorPath = Object.keys(errors)[0]
+        if (firstErrorPath) {
+            const element = document.getElementsByName(firstErrorPath)[0] ||
+                document.querySelector(`[id="${firstErrorPath}"]`) ||
+                document.querySelector(`[aria-describedby*="${firstErrorPath}"]`)
+
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth", block: "center" })
+            }
+        }
+
+        toast({
+            title: "Thông tin chưa chính xác",
+            description: "Vui lòng kiểm tra các mục đánh dấu đỏ.",
+            variant: "destructive",
+        })
     }
 
     const handlePreview = async () => {
@@ -320,7 +336,7 @@ export default function PostJobPage() {
             </div>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-8">
                     {/* General Info */}
                     <Card>
                         <CardHeader>
