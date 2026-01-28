@@ -307,12 +307,22 @@ export async function GET(request: Request) {
 
     const collection = await getCollection(COLLECTIONS.APPLICATIONS)
     let query: Record<string, any> = {}
+    const queryParts: any[] = []
 
     if (role === "admin") {
-      query = {} // All for admins
+      // All for admins
     } else if (role === "employer") {
       if (employerId) {
-        query = { employerId: employerId }
+        if (ObjectId.isValid(employerId)) {
+          queryParts.push({
+            $or: [
+              { employerId: employerId },
+              { employerId: new ObjectId(employerId) }
+            ]
+          })
+        } else {
+          queryParts.push({ employerId: employerId })
+        }
       } else {
         // If role is employer but no ID, return empty list to prevent leakage
         return NextResponse.json({ success: true, data: [] })
@@ -320,7 +330,7 @@ export async function GET(request: Request) {
     } else {
       // Default to student view: filter by email
       if (email) {
-        query = { email: email }
+        queryParts.push({ email: email })
       } else {
         // No email provided for student? Return empty
         return NextResponse.json({ success: true, data: [] })
@@ -329,7 +339,22 @@ export async function GET(request: Request) {
 
     // Add jobId filter if provided
     if (jobId) {
-      query.jobId = jobId
+      if (ObjectId.isValid(jobId)) {
+        queryParts.push({
+          $or: [
+            { jobId: jobId },
+            { jobId: new ObjectId(jobId) }
+          ]
+        })
+      } else {
+        queryParts.push({ jobId: jobId })
+      }
+    }
+
+    if (queryParts.length === 1) {
+      query = queryParts[0]
+    } else if (queryParts.length > 1) {
+      query = { $and: queryParts }
     }
 
     // Don't return cvBase64 in list to save bandwidth

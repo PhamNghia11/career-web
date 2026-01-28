@@ -39,6 +39,7 @@ export const dynamic = "force-dynamic"
 function ManageApplicationsContent() {
     const router = useRouter()
     const { user, isLoading } = useAuth()
+    const currentUserId = user?.id || user?._id
     const searchParams = useSearchParams()
     const { toast } = useToast()
 
@@ -101,7 +102,7 @@ function ManageApplicationsContent() {
                 // Students shouldn't really be here, but if they are, show nothing or their Own
                 queryParams.set("email", user?.email || "")
             } else if (role === "employer") {
-                queryParams.set("employerId", user?.id || "")
+                queryParams.set("employerId", currentUserId || "")
             }
 
             console.log("Fetching applications with params:", queryParams.toString())
@@ -431,7 +432,7 @@ function ManageApplicationsContent() {
                                                     <Select
                                                         value={app.status}
                                                         onValueChange={(value) => handleStatusChange(app._id, value)}
-                                                        disabled={user?.role === 'employer' && app.employerId !== user?.id}
+                                                        disabled={user?.role === 'employer' && app.employerId !== currentUserId}
                                                     >
                                                         <SelectTrigger className="w-[140px] h-8">
                                                             <SelectValue>{getStatusBadge(app.status)}</SelectValue>
@@ -527,7 +528,7 @@ function ManageApplicationsContent() {
                                                 <Select
                                                     value={app.status}
                                                     onValueChange={(value) => handleStatusChange(app._id, value)}
-                                                    disabled={user?.role === 'employer' && app.employerId !== user?.id}
+                                                    disabled={user?.role === 'employer' && app.employerId !== currentUserId}
                                                 >
                                                     <SelectTrigger className="flex-1 h-9">
                                                         <SelectValue />

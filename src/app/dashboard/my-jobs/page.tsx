@@ -107,15 +107,17 @@ export default function MyJobsPage() {
     const [newDeadline, setNewDeadline] = useState("")
     const [isRenewing, setIsRenewing] = useState(false)
 
+    const userId = user?.id || user?._id
+
     useEffect(() => {
-        fetchJobs()
-    }, [user?._id])
+        if (userId) fetchJobs()
+    }, [userId])
 
     const fetchJobs = async () => {
-        if (!user?._id) return
+        if (!userId) return
         try {
             setLoading(true)
-            const res = await fetch(`/api/jobs?creatorId=${user._id}`)
+            const res = await fetch(`/api/jobs?creatorId=${userId}`)
             const data = await res.json()
             if (data.success) {
                 const sorted = (data.data.jobs || []).sort((a: any, b: any) =>

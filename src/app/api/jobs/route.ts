@@ -25,7 +25,16 @@ export async function GET(req: Request) {
     // In this case, we default to ALL statuses unless specific one is requested.
 
     if (creatorId) {
-      query.creatorId = creatorId
+      // Robust matching: allow both string and ObjectId for creatorId
+      if (ObjectId.isValid(creatorId)) {
+        query.$or = [
+          { creatorId: creatorId },
+          { creatorId: new ObjectId(creatorId) }
+        ]
+      } else {
+        query.creatorId = creatorId
+      }
+
       if (status && status !== "all") {
         query.status = status
       }
