@@ -193,24 +193,21 @@ function NewsPageContent() {
 
             <main>
                 {/* Blue Hero Header */}
-                <div className="relative py-16 md:py-24 lg:py-28 overflow-hidden">
+                <div className="relative py-14 md:py-20 lg:py-24 overflow-hidden">
                     <div
                         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                         style={{ backgroundImage: "url('/hero-bg.png')" }}
                     />
-                    <div className="absolute inset-0 bg-primary/95 lg:bg-primary/90" />
+                    <div className="absolute inset-0 bg-[#162744]/95 lg:bg-[#162744]/90" />
 
                     <div className="container px-4 mx-auto relative z-10">
                         <div className="max-w-4xl">
-                            <span className="inline-block px-4 py-1 bg-white/10 text-white text-[10px] font-bold rounded-full uppercase tracking-[0.3em] mb-6 border border-white/10">
-                                GDU NEWSROOM
-                            </span>
-                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight">
-                                Tin tức & <br />Xu hướng
+                            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
+                                Tin tức & Phân tích <br />Thị trường Lao động
                             </h1>
-                            <p className="text-lg md:text-xl text-white/60 max-w-2xl font-medium leading-relaxed">
-                                Cập nhật những chuyển động mới nhất về thị trường việc làm,
-                                công nghệ và những câu chuyện thành công từ cộng đồng GDU.
+                            <p className="text-sm md:text-lg text-white/50 max-w-2xl font-medium leading-relaxed">
+                                Cập nhật xu hướng tuyển dụng, báo cáo thị trường và kiến thức phát triển sự
+                                nghiệp từ đội ngũ chuyên gia GDU.
                             </p>
                         </div>
                     </div>
@@ -224,16 +221,16 @@ function NewsPageContent() {
                 {/* News Search & Filter Section */}
                 <div className="bg-white border-y border-slate-100 sticky top-[112px] lg:top-[128px] z-40 backdrop-blur-md bg-white/90">
                     <div className="container px-4 mx-auto py-6">
-                        <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
-                            {/* Categories */}
-                            <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-4 md:pb-0 scrollbar-hide">
+                        <div className="flex flex-col gap-6">
+                            {/* Categories Row */}
+                            <div className="flex flex-wrap items-center gap-3">
                                 {CATEGORIES.map((cat) => (
                                     <button
                                         key={cat}
                                         onClick={() => setCategory(cat)}
-                                        className={`px-6 py-2.5 rounded-full text-xs font-black transition-all whitespace-nowrap uppercase tracking-widest ${category === cat
-                                            ? "bg-primary text-white shadow-lg shadow-primary/20 scale-105"
-                                            : "bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 border border-slate-100"
+                                        className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-sm ${category === cat
+                                            ? "bg-[#0A2647] text-white shadow-md shadow-blue-900/20"
+                                            : "bg-white text-slate-600 border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30"
                                             }`}
                                     >
                                         {cat}
@@ -241,34 +238,35 @@ function NewsPageContent() {
                                 ))}
                             </div>
 
-                            {/* Search & Sort */}
-                            <div className="flex items-center gap-4 w-full md:w-auto">
-                                <div className="relative flex-1 md:w-64">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <Input
-                                        placeholder="Tìm kiếm tin tức..."
-                                        className="pl-12 h-12 rounded-xl border-slate-100 bg-slate-50 focus:ring-primary focus:border-primary font-medium"
+                            {/* Search & Sort Row */}
+                            <div className="flex flex-col md:flex-row gap-4 items-center justify-between pt-2">
+                                <div className="relative w-full max-w-lg">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Tìm kiếm nội dung bài viết..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-none rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all outline-none"
                                     />
                                 </div>
 
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-3">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <button className="h-12 px-6 flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all font-black text-xs uppercase tracking-widest">
-                                                <Filter className="w-4 h-4" />
-                                                {sortBy === "newest" ? "Mới nhất" : sortBy === "oldest" ? "Cũ nhất" : "Xem nhiều"}
-                                                <ChevronDown className="w-4 h-4" />
+                                            <button className="px-5 py-2.5 bg-white border border-slate-100 rounded-full flex items-center gap-2 shadow-sm hover:bg-slate-50 transition-colors">
+                                                <TrendingUp className="h-4 w-4 text-slate-400" />
+                                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                                                    Sắp xếp: {sortBy === "newest" ? "Mới nhất" : sortBy === "oldest" ? "Cũ nhất" : "Xem nhiều"}
+                                                    <ChevronDown className="w-3 h-3" />
+                                                </span>
                                             </button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="w-[200px] rounded-2xl p-2">
-                                            <DropdownMenuLabel className="font-black text-[10px] uppercase tracking-widest text-slate-400 px-4 py-3">Sắp xếp theo</DropdownMenuLabel>
-                                            <DropdownMenuSeparator />
                                             <DropdownMenuRadioGroup value={sortBy} onValueChange={setSortBy}>
-                                                <DropdownMenuRadioItem value="newest" className="rounded-xl cursor-not-allowed cursor-pointer focus:bg-slate-50 py-3 font-bold text-slate-600">Đăng gần nhất</DropdownMenuRadioItem>
-                                                <DropdownMenuRadioItem value="oldest" className="rounded-xl cursor-pointer focus:bg-slate-50 py-3 font-bold text-slate-600">Đăng xa nhất</DropdownMenuRadioItem>
-                                                <DropdownMenuRadioItem value="popular" className="rounded-xl cursor-pointer focus:bg-slate-50 py-3 font-bold text-slate-600">Nhiều lượt xem nhất</DropdownMenuRadioItem>
+                                                <DropdownMenuRadioItem value="newest" className="rounded-xl cursor-pointer">Mới nhất</DropdownMenuRadioItem>
+                                                <DropdownMenuRadioItem value="oldest" className="rounded-xl cursor-pointer">Cũ nhất</DropdownMenuRadioItem>
+                                                <DropdownMenuRadioItem value="popular" className="rounded-xl cursor-pointer">Xem nhiều nhất</DropdownMenuRadioItem>
                                             </DropdownMenuRadioGroup>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -279,9 +277,9 @@ function NewsPageContent() {
                                             setSearchQuery("")
                                             fetchNews()
                                         }}
-                                        className="h-12 w-12 flex items-center justify-center rounded-xl border border-slate-100 bg-slate-50 text-slate-400 hover:text-[#002855] hover:bg-slate-100 transition-all"
+                                        className="p-2.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-400 transition-colors border border-slate-100 shadow-sm"
                                     >
-                                        <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                                        <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                                     </button>
                                 </div>
                             </div>
@@ -293,8 +291,8 @@ function NewsPageContent() {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                         {/* Main Content Area */}
                         <div className="lg:col-span-8 min-h-[800px]">
-                            <div id="results-section" className="flex items-center justify-between mb-10 border-b border-slate-100 pb-4 scroll-mt-48">
-                                <h2 className="text-2xl font-black uppercase tracking-tight text-slate-800">Bài viết mới nhất</h2>
+                            <div id="results-section" className="flex items-center justify-between mb-8 pb-4 scroll-mt-48/72">
+                                <h2 className="text-2xl font-black uppercase tracking-tight text-[#0A2647]">Bài viết mới nhất</h2>
                             </div>
 
                             {loading ? (
