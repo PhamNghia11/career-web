@@ -277,7 +277,7 @@ function LoginContent() {
                           value={otp}
                           onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                           placeholder="000000"
-                          className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all text-center text-xl font-bold tracking-[0.5em] placeholder:text-gray-300"
+                          className="w-full px-11 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all text-center text-xl font-bold tracking-[0.5em] placeholder:text-gray-300"
                           required
                           maxLength={6}
                           autoFocus
@@ -404,7 +404,7 @@ function LoginContent() {
                       value={otp}
                       onChange={(e) => setOtp(useRecoveryCode ? e.target.value.toUpperCase() : e.target.value.replace(/\D/g, ""))}
                       placeholder={useRecoveryCode ? "XXXXXXXX" : "000000"}
-                      className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all text-center text-xl font-bold tracking-[0.3em] placeholder:text-gray-300 placeholder:tracking-normal"
+                      className="w-full px-11 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all text-center text-xl font-bold tracking-[0.3em] placeholder:text-gray-300 placeholder:tracking-normal"
                       required
                       maxLength={useRecoveryCode ? 8 : 6}
                       autoFocus
