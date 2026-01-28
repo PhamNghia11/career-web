@@ -147,7 +147,7 @@ export default function CompanyDetailPage() {
                 <div className="flex-1 flex items-center justify-center p-4">
                     <Card className="p-12 text-center max-w-lg w-full">
                         <Building className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                        <h2 className="text-xl font-bold mb-4">Không tìm thấy công ty</h2>
+                        <h2 className="text-xl font-bold mb-4">Không tìm thấy doanh nghiệp</h2>
                         <p className="text-muted-foreground mb-6">Công ty bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
                         <Button onClick={() => router.push("/companies")} variant="outline">
                             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -265,7 +265,7 @@ export default function CompanyDetailPage() {
                                                 value="culture"
                                                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-700 data-[state=active]:shadow-none px-0 py-3 text-base"
                                             >
-                                                Văn hóa công ty
+                                                Văn hóa doanh nghiệp
                                             </TabsTrigger>
                                         </TabsList>
 

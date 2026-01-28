@@ -271,7 +271,7 @@ export default async function JobPage(props: JobPageProps) {
                                             <Globe className="h-5 w-5 text-gray-600" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-semibold text-gray-900">Website công ty</p>
+                                            <p className="text-sm font-semibold text-gray-900">Website doanh nghiệp</p>
                                             <a
                                                 href={job.website || "#"}
                                                 target={job.website ? "_blank" : "_self"}

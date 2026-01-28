@@ -21,7 +21,7 @@ export default function CompaniesPage() {
           <div className="container mx-auto px-4 relative z-10">
             <h1 className="text-3xl lg:text-4xl font-bold mb-3 text-white">Khám phá doanh nghiệp</h1>
             <p className="text-lg text-white/90">
-              Tìm hiểu về các công ty hàng đầu và cơ hội nghề nghiệp dành cho bạn
+              Tìm hiểu về các doanh nghiệp hàng đầu và cơ hội nghề nghiệp dành cho bạn
             </p>
           </div>
         </div>

@@ -193,7 +193,7 @@ export default function AdminJobsPage() {
                                 <TableRow>
                                     <TableHead className="w-[120px]">Ngày đăng</TableHead>
                                     <TableHead className="min-w-[200px]">Vị trí</TableHead>
-                                    <TableHead className="min-w-[150px]">Công ty</TableHead>
+                                    <TableHead className="min-w-[150px]">Doanh nghiệp</TableHead>
                                     <TableHead className="w-[150px]">Mức lương</TableHead>
                                     <TableHead className="w-[130px]">Trạng thái</TableHead>
                                     <TableHead className="text-center w-[180px]">Hành động</TableHead>

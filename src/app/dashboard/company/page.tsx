@@ -87,7 +87,7 @@ export default function CompanyPage() {
 
             if (data.success) {
                 await updateProfile({ avatar: data.url })
-                toast({ title: "Thành công", description: "Logo công ty đã được cập nhật." })
+                toast({ title: "Thành công", description: "Logo doanh nghiệp đã được cập nhật." })
             } else {
                 toast({ title: "Lỗi", description: data.error, variant: "destructive" })
             }
@@ -120,7 +120,7 @@ export default function CompanyPage() {
             if (response.ok) {
                 // Update local context
                 await updateProfile(formData)
-                toast({ title: "Thành công", description: "Thông tin công ty đã được cập nhật." })
+                toast({ title: "Thành công", description: "Thông tin doanh nghiệp đã được cập nhật." })
             } else {
                 toast({ title: "Lỗi", description: data.error || "Có lỗi xảy ra", variant: "destructive" })
             }
@@ -136,16 +136,16 @@ export default function CompanyPage() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-2xl lg:text-3xl font-bold font-display tracking-tight text-foreground">
-                    Hồ sơ công ty
+                    Hồ sơ doanh nghiệp
                 </h1>
                 <p className="text-muted-foreground mt-1">
-                    Cập nhật thông tin công ty để thu hút ứng viên
+                    Cập nhật thông tin doanh nghiệp để thu hút ứng viên
                 </p>
             </div>
 
             <Tabs defaultValue="company" className="space-y-4">
                 <TabsList>
-                    <TabsTrigger value="company">Thông tin công ty</TabsTrigger>
+                    <TabsTrigger value="company">Thông tin doanh nghiệp</TabsTrigger>
                     <TabsTrigger value="representative">Thông tin người đại diện</TabsTrigger>
                 </TabsList>
 
@@ -180,19 +180,19 @@ export default function CompanyPage() {
                                         onChange={handleFileChange}
                                     />
                                     <div className="space-y-1">
-                                        <h4 className="font-medium text-sm">Logo công ty</h4>
+                                        <h4 className="font-medium text-sm">Logo doanh nghiệp</h4>
                                         <p className="text-xs text-muted-foreground">Khuyến nghị: Tỉ lệ 1:1, tối đa 2MB.</p>
                                     </div>
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="companyName">Tên công ty</Label>
+                                    <Label htmlFor="companyName">Tên doanh nghiệp</Label>
                                     <Input
                                         id="companyName"
                                         name="companyName"
                                         value={formData.companyName}
                                         onChange={handleChange}
-                                        placeholder="Nhập tên công ty"
+                                        placeholder="Nhập tên doanh nghiệp"
                                     />
                                 </div>
 
@@ -208,7 +208,7 @@ export default function CompanyPage() {
                                         />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="size">Quy mô công ty</Label>
+                                        <Label htmlFor="size">Quy mô doanh nghiệp</Label>
                                         <Input
                                             id="size"
                                             name="size"
@@ -231,13 +231,13 @@ export default function CompanyPage() {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="description">Giới thiệu về công ty</Label>
+                                    <Label htmlFor="description">Giới thiệu về doanh nghiệp</Label>
                                     <Textarea
                                         id="description"
                                         name="description"
                                         value={formData.description}
                                         onChange={handleChange}
-                                        placeholder="Mô tả ngắn gọn về công ty, văn hóa, lĩnh vực hoạt động..."
+                                        placeholder="Mô tả ngắn gọn về doanh nghiệp, văn hóa, lĩnh vực hoạt động..."
                                         rows={5}
                                     />
                                 </div>

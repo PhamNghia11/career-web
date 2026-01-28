@@ -64,9 +64,9 @@ export default function RegisterPage() {
       if (!formData.contactPerson.trim()) return setError("Vui lòng nhập tên người liên hệ")
       if (!formData.phone.trim()) return setError("Vui lòng nhập số điện thoại")
       if (!/^0\d{9,10}$/.test(formData.phone)) return setError("Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số")
-      // if (!formData.companyType) return setError("Vui lòng chọn loại hình công ty") // Optional if select has default? No, needs selection
-      // if (!formData.companySize) return setError("Vui lòng chọn quy mô công ty")
-      if (!formData.companyName.trim()) return setError("Vui lòng nhập tên công ty")
+      // if (!formData.companyType) return setError("Vui lòng chọn loại hình doanh nghiệp") // Optional if select has default? No, needs selection
+      // if (!formData.companySize) return setError("Vui lòng chọn quy mô doanh nghiệp")
+      if (!formData.companyName.trim()) return setError("Vui lòng nhập tên doanh nghiệp")
       // if (!formData.province) return setError("Vui lòng chọn tỉnh/thành")
       // if (!formData.industry) return setError("Vui lòng chọn lĩnh vực")
       if (!formData.address.trim()) return setError("Vui lòng nhập địa chỉ")
@@ -301,28 +301,28 @@ export default function RegisterPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                       {/* Company Type */}
                       <div className="space-y-2">
-                        <Label className="text-gray-700 font-medium">Loại hình Công ty <span className="text-red-500">*</span></Label>
+                        <Label className="text-gray-700 font-medium">Loại hình Doanh nghiệp <span className="text-red-500">*</span></Label>
                         <Select value={formData.companyType} onValueChange={(val) => setFormData({ ...formData, companyType: val })}>
                           <SelectTrigger className="w-full h-[46px] rounded-xl border-gray-200">
-                            <SelectValue placeholder="Chọn loại hình công ty" />
+                            <SelectValue placeholder="Chọn loại hình doanh nghiệp" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="TNHH">Công ty TNHH</SelectItem>
-                            <SelectItem value="CP">Công ty Cổ phần</SelectItem>
+                            <SelectItem value="TNHH">Doanh nghiệp TNHH</SelectItem>
+                            <SelectItem value="CP">Doanh nghiệp Cổ phần</SelectItem>
                             <SelectItem value="NN">Doanh nghiệp Nhà nước</SelectItem>
                             <SelectItem value="DTVN">Doanh nghiệp tư nhân</SelectItem>
                             <SelectItem value="LDOANH">Liên doanh</SelectItem>
-                            <SelectItem value="1TV">Công ty TNHH 1 thành viên</SelectItem>
+                            <SelectItem value="1TV">Doanh nghiệp TNHH 1 thành viên</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       {/* Company Size */}
                       <div className="space-y-2">
-                        <Label className="text-gray-700 font-medium">Quy mô Công ty <span className="text-red-500">*</span></Label>
+                        <Label className="text-gray-700 font-medium">Quy mô Doanh nghiệp <span className="text-red-500">*</span></Label>
                         <Select value={formData.companySize} onValueChange={(val) => setFormData({ ...formData, companySize: val })}>
                           <SelectTrigger className="w-full h-[46px] rounded-xl border-gray-200">
-                            <SelectValue placeholder="Chọn quy mô công ty" />
+                            <SelectValue placeholder="Chọn quy mô doanh nghiệp" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="under_10">Dưới 10 nhân viên</SelectItem>
@@ -349,14 +349,14 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="mt-4 space-y-2">
-                      <Label htmlFor="companyName" className="text-gray-700 font-medium">Tên Công ty <span className="text-red-500">*</span></Label>
+                      <Label htmlFor="companyName" className="text-gray-700 font-medium">Tên Doanh nghiệp <span className="text-red-500">*</span></Label>
                       <input
                         id="companyName"
                         name="companyName"
                         type="text"
                         value={formData.companyName}
                         onChange={handleChange}
-                        placeholder="Nhập tên công ty"
+                        placeholder="Nhập tên doanh nghiệp"
                         className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
                       />
                     </div>
@@ -383,10 +383,10 @@ export default function RegisterPage() {
 
                       {/* Industry */}
                       <div className="space-y-2">
-                        <Label className="text-gray-700 font-medium">Lĩnh vực công ty <span className="text-red-500">*</span></Label>
+                        <Label className="text-gray-700 font-medium">Lĩnh vực doanh nghiệp <span className="text-red-500">*</span></Label>
                         <Select value={formData.industry} onValueChange={(val) => setFormData({ ...formData, industry: val })}>
                           <SelectTrigger className="w-full h-[46px] rounded-xl border-gray-200">
-                            <SelectValue placeholder="Chọn lĩnh vực công ty" />
+                            <SelectValue placeholder="Chọn lĩnh vực doanh nghiệp" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="IT">Công nghệ thông tin</SelectItem>

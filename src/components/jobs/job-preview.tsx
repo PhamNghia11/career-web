@@ -97,7 +97,7 @@ export function JobPreview({ data, onBack, onSubmit, isLoading }: JobPreviewProp
                             <div className="flex flex-wrap items-center gap-3 text-blue-100/90 text-sm md:text-base">
                                 <span className="flex items-center gap-1.5">
                                     <Building className="h-4 w-4" />
-                                    {data.company || "Tên công ty"}
+                                    {data.company || "Tên doanh nghiệp"}
                                 </span>
                                 <span className="hidden md:inline text-blue-100/30">•</span>
                                 <span className="flex items-center gap-1.5">
@@ -274,7 +274,7 @@ export function JobPreview({ data, onBack, onSubmit, isLoading }: JobPreviewProp
                                         <Globe className="h-4 w-4 text-gray-600" />
                                     </div>
                                     <div className="overflow-hidden">
-                                        <p className="text-sm font-semibold text-gray-900">Website công ty</p>
+                                        <p className="text-sm font-semibold text-gray-900">Website doanh nghiệp</p>
                                         <p className="text-sm text-blue-600 truncate">
                                             {data.website || "Đang cập nhật"}
                                         </p>

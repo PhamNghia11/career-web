@@ -54,7 +54,7 @@ const COMMON_BENEFITS = [
 
 const formSchema = z.object({
     title: z.string().min(5, "Tiêu đề phải có ít nhất 5 ký tự"),
-    company: z.string().min(2, "Tên công ty phải có ít nhất 2 ký tự"),
+    company: z.string().min(2, "Tên doanh nghiệp phải có ít nhất 2 ký tự"),
     website: z.string().url("Vui lòng nhập đúng định dạng URL (http://...)").optional().or(z.literal("")),
     location: z.string().min(5, "Địa điểm phải có ít nhất 5 ký tự"),
     type: z.enum(["full-time", "part-time", "internship"]),
@@ -363,7 +363,7 @@ export default function PostJobPage() {
                                     name="company"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Tên công ty <span className="text-red-500">*</span></FormLabel>
+                                            <FormLabel>Tên doanh nghiệp <span className="text-red-500">*</span></FormLabel>
                                             <FormControl>
                                                 <Input placeholder="Tên doanh nghiệp của bạn" {...field} />
                                             </FormControl>
@@ -391,7 +391,7 @@ export default function PostJobPage() {
 
                             {/* Logo Upload Section */}
                             <div className="space-y-3">
-                                <FormLabel>Logo công ty</FormLabel>
+                                <FormLabel>Logo doanh nghiệp</FormLabel>
                                 <div className="flex items-center gap-4">
                                     {logoPreview ? (
                                         <div className="relative">
@@ -520,7 +520,7 @@ export default function PostJobPage() {
                                         <FormItem>
                                             <FormLabel>Email nhận hồ sơ / liên hệ</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="tuyendung@congty.com" {...field} />
+                                                <Input placeholder="tuyendung@doanhnghiep.com" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
