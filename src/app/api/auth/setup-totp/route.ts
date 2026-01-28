@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/database/connection"
+import { ObjectId } from "mongodb"
 import crypto from "crypto"
 import QRCode from "qrcode"
 
@@ -85,12 +86,15 @@ export async function POST(request: Request) {
         }
 
         const collection = await getCollection(COLLECTIONS.USERS)
-        const user = await collection.findOne({
-            $or: [
-                { _id: userId },
-                { id: userId }
-            ]
-        })
+
+        let query = {}
+        if (ObjectId.isValid(userId)) {
+            query = { _id: new ObjectId(userId) }
+        } else {
+            query = { id: userId }
+        }
+
+        const user = await collection.findOne(query)
 
         if (!user) {
             return NextResponse.json({ error: "Không tìm thấy người dùng" }, { status: 404 })
@@ -165,12 +169,15 @@ export async function PUT(request: Request) {
         }
 
         const collection = await getCollection(COLLECTIONS.USERS)
-        const user = await collection.findOne({
-            $or: [
-                { _id: userId },
-                { id: userId }
-            ]
-        })
+
+        let query = {}
+        if (ObjectId.isValid(userId)) {
+            query = { _id: new ObjectId(userId) }
+        } else {
+            query = { id: userId }
+        }
+
+        const user = await collection.findOne(query)
 
         if (!user) {
             return NextResponse.json({ error: "Không tìm thấy người dùng" }, { status: 404 })
@@ -229,12 +236,15 @@ export async function DELETE(request: Request) {
 
         const bcrypt = await import("bcryptjs")
         const collection = await getCollection(COLLECTIONS.USERS)
-        const user = await collection.findOne({
-            $or: [
-                { _id: userId },
-                { id: userId }
-            ]
-        })
+
+        let query = {}
+        if (ObjectId.isValid(userId)) {
+            query = { _id: new ObjectId(userId) }
+        } else {
+            query = { id: userId }
+        }
+
+        const user = await collection.findOne(query)
 
         if (!user) {
             return NextResponse.json({ error: "Không tìm thấy người dùng" }, { status: 404 })
