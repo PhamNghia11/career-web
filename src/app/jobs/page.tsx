@@ -32,7 +32,8 @@ async function getActiveJobsFromDB(): Promise<Job[]> {
   }
 }
 
-export const dynamic = 'force-dynamic'
+// ISR: Cache page for 60 seconds, then revalidate in background
+export const revalidate = 60
 
 export default async function JobsPage() {
   const dbJobs = await getActiveJobsFromDB()
