@@ -107,17 +107,18 @@ interface JobsListClientProps {
 }
 
 // Helper function to format date and time in Vietnamese format
-const formatDateTime = (dateString: string): string => {
+const formatDateTime = (dateVal: any): string => {
+  if (!dateVal) return ""
   try {
     let date: Date
-    if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-      const [day, month, year] = dateString.split('/').map(Number)
+    if (typeof dateVal === 'string' && dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+      const [day, month, year] = dateVal.split('/').map(Number)
       date = new Date(year, month - 1, day)
     } else {
-      date = new Date(dateString)
+      date = new Date(dateVal)
     }
 
-    if (isNaN(date.getTime())) return dateString
+    if (isNaN(date.getTime())) return typeof dateVal === 'string' ? dateVal : ""
     return date.toLocaleString("vi-VN", {
       hour: "2-digit",
       minute: "2-digit",
@@ -127,7 +128,7 @@ const formatDateTime = (dateString: string): string => {
       timeZone: "Asia/Ho_Chi_Minh"
     })
   } catch {
-    return dateString
+    return typeof dateVal === 'string' ? dateVal : ""
   }
 }
 
@@ -240,16 +241,24 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   }
 
   // Helper function to safely parse date strings (handles DD/MM/YYYY and ISO)
-  const parseDateHelper = (dateString: string): number => {
-    if (!dateString) return 0
+  const parseDateHelper = (dateVal: any): number => {
+    if (!dateVal) return 0
     try {
-      // Check if DD/MM/YYYY format
-      if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-        const [day, month, year] = dateString.split('/').map(Number)
-        return new Date(year, month - 1, day).getTime()
+      // If it's already a Date object
+      if (dateVal instanceof Date) return dateVal.getTime()
+
+      // If it's a string, check format
+      if (typeof dateVal === 'string') {
+        if (dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+          const [day, month, year] = dateVal.split('/').map(Number)
+          return new Date(year, month - 1, day).getTime()
+        }
+        const date = new Date(dateVal)
+        return isNaN(date.getTime()) ? 0 : date.getTime()
       }
-      // Fallback to standard parsing
-      const date = new Date(dateString)
+
+      // Fallback
+      const date = new Date(dateVal)
       return isNaN(date.getTime()) ? 0 : date.getTime()
     } catch {
       return 0
@@ -257,8 +266,9 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   }
 
   // Helper function to parse minimum salary from string
-  const parseMinSalary = (salary: string): number => {
-    const s = salary.toLowerCase().trim()
+  const parseMinSalary = (salaryVal: any): number => {
+    if (!salaryVal || typeof salaryVal !== 'string') return 0
+    const s = salaryVal.toLowerCase().trim()
     if (!s) return 0
 
     let value = 0
@@ -300,8 +310,9 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   }
 
   // Helper function to parse maximum salary from string like "5-8 triệu", "20-35 triệu", or "40.000 - 90.000 VND/giờ"
-  const parseMaxSalary = (salary: string): number => {
-    const s = salary.toLowerCase().trim()
+  const parseMaxSalary = (salaryVal: any): number => {
+    if (!salaryVal || typeof salaryVal !== 'string') return 0
+    const s = salaryVal.toLowerCase().trim()
     if (!s) return 0
 
     let value = 0
@@ -541,24 +552,25 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   }, [filteredJobs, sortBy])
 
   // Simple helper for deadline display (no time needed)
-  const formatDeadline = (dateString: string): string => {
+  const formatDeadline = (dateVal: any): string => {
+    if (!dateVal) return ""
     try {
       let date: Date
-      if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-        const [day, month, year] = dateString.split('/').map(Number)
+      if (typeof dateVal === 'string' && dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        const [day, month, year] = dateVal.split('/').map(Number)
         date = new Date(year, month - 1, day)
       } else {
-        date = new Date(dateString)
+        date = new Date(dateVal)
       }
 
-      if (isNaN(date.getTime())) return dateString
+      if (isNaN(date.getTime())) return typeof dateVal === 'string' ? dateVal : ""
       return date.toLocaleDateString("vi-VN", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric"
       })
     } catch {
-      return dateString
+      return typeof dateVal === 'string' ? dateVal : ""
     }
   }
 
