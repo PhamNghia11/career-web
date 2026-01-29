@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/lib/auth-context"
 import { toast } from "@/components/ui/use-toast"
+import { normalizeWhitespace } from "@/lib/utils"
 
 export default function ProfilePage() {
   const { user, updateProfile } = useAuth()
@@ -93,7 +94,15 @@ export default function ProfilePage() {
     }
 
     setIsSaving(true)
-    await updateProfile(formData)
+    // Normalize string fields
+    const normalizedData = Object.entries(formData).reduce((acc, [key, value]) => {
+      acc[key as keyof typeof formData] = normalizeWhitespace(value)
+      return acc
+    }, {} as typeof formData)
+
+    await updateProfile(normalizedData)
+    // Update local state to reflect normalized text
+    setFormData(normalizedData)
     setIsEditing(false)
     setIsSaving(false)
     toast({ title: "Đã lưu", description: "Thông tin hồ sơ đã được cập nhật." })

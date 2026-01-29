@@ -26,6 +26,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Loader2, Briefcase, MapPin, DollarSign, Building, ArrowLeft, ImagePlus, X, ChevronDown, Eye, Paperclip, FileText } from "lucide-react"
 import { JobPreview } from "@/components/jobs/job-preview"
 import { DatePicker } from "@/components/ui/date-picker"
+import { normalizeWhitespace } from "@/lib/utils"
 
 // Constants (Duplicated from new/page.tsx for simplicity)
 const JOB_TYPES = [
@@ -231,13 +232,22 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true)
         try {
+            // Normalize string values
+            const normalizedValues = { ...values };
+            (Object.keys(normalizedValues) as Array<keyof typeof values>).forEach(key => {
+                const val = normalizedValues[key]
+                if (typeof val === 'string') {
+                    (normalizedValues as any)[key] = normalizeWhitespace(val)
+                }
+            })
+
             // Format data logic same as POST
             let salaryString = "Thỏa thuận"
-            if (!values.isNegotiable) {
-                const min = values.salaryMin || 0
-                const max = values.salaryMax || 0
+            if (!normalizedValues.isNegotiable) {
+                const min = normalizedValues.salaryMin || 0
+                const max = normalizedValues.salaryMax || 0
 
-                if (values.type === "part-time") {
+                if (normalizedValues.type === "part-time") {
                     if (min && max) {
                         salaryString = `${min.toLocaleString()} - ${max.toLocaleString()} VNĐ/giờ`
                     } else if (min) {
@@ -262,21 +272,22 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                 }
             }
 
-            const requirementsList = values.requirements.split('\n').filter(line => line.trim() !== "")
-            const detailedBenefitsList = values.detailedBenefits ? values.detailedBenefits.split('\n').filter(line => line.trim() !== "") : []
+            const requirementsList = normalizedValues.requirements.split('\n').filter(line => line.trim() !== "")
+            const detailedBenefitsList = normalizedValues.detailedBenefits ? normalizedValues.detailedBenefits.split('\n').filter(line => line.trim() !== "") : []
 
             // Format deadline to DD/MM/YYYY for API
             let formattedDeadline = ""
-            if (values.deadline) {
-                const year = values.deadline.getFullYear()
-                const month = (values.deadline.getMonth() + 1).toString().padStart(2, '0')
-                const day = values.deadline.getDate().toString().padStart(2, '0')
+            if (normalizedValues.deadline) {
+                const d = normalizedValues.deadline as Date
+                const year = d.getFullYear()
+                const month = (d.getMonth() + 1).toString().padStart(2, '0')
+                const day = d.getDate().toString().padStart(2, '0')
                 formattedDeadline = `${year}-${month}-${day}`
             }
 
             const payload = {
-                ...values,
-                quantity: values.unlimitedQuantity ? -1 : values.quantity,
+                ...normalizedValues,
+                quantity: normalizedValues.unlimitedQuantity ? -1 : normalizedValues.quantity,
                 deadline: formattedDeadline,
                 salary: salaryString,
                 requirements: requirementsList,

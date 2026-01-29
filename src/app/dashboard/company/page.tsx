@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { UserProfileForm } from "@/components/dashboard/user-profile-form"
 import { useEffect } from "react"
+import { normalizeWhitespace } from "@/lib/utils"
 
 export default function CompanyPage() {
     const { user, updateProfile } = useAuth()
@@ -103,23 +104,30 @@ export default function CompanyPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!user) return
-
         setIsLoading(true)
         const userId = user._id || user.id
+
+        // Normalize whitespace in all string fields
+        const normalizedData = Object.entries(formData).reduce((acc, [key, value]) => {
+            acc[key as keyof typeof formData] = normalizeWhitespace(value)
+            return acc
+        }, {} as typeof formData)
 
         try {
             // Update to API
             const response = await fetch(`/api/users/${userId}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(normalizedData)
             })
 
             const data = await response.json()
 
             if (response.ok) {
                 // Update local context
-                await updateProfile(formData)
+                await updateProfile(normalizedData)
+                // Update local state to reflect normalized text
+                setFormData(normalizedData)
                 toast({ title: "Thành công", description: "Thông tin doanh nghiệp đã được cập nhật." })
             } else {
                 toast({ title: "Lỗi", description: data.error || "Có lỗi xảy ra", variant: "destructive" })

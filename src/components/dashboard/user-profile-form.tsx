@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/lib/auth-context"
 import { toast } from "@/components/ui/use-toast"
+import { normalizeWhitespace } from "@/lib/utils"
 
 interface UserProfileFormProps {
     title?: string
@@ -57,11 +58,16 @@ export function UserProfileForm({
         }
 
         setIsSaving(true)
+        const normalizedName = normalizeWhitespace(formData.name)
+        const normalizedPhone = normalizeWhitespace(formData.phone)
+
         await updateProfile({
-            name: formData.name,
-            phone: formData.phone
+            name: normalizedName,
+            phone: normalizedPhone
             // Email is usually not editable or requires special handling, but let's keep it consistent
         })
+        // Update local state to reflect normalized text
+        setFormData(prev => ({ ...prev, name: normalizedName, phone: normalizedPhone }))
         setIsEditing(false)
         setIsSaving(false)
         toast({ title: "Đã lưu", description: "Thông tin hồ sơ đã được cập nhật." })
