@@ -17,14 +17,18 @@ export default function ProfilePage() {
   const [isUploading, setIsUploading] = useState(false)
   const [phoneError, setPhoneError] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [formData, setFormData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    studentId: user?.studentId || "",
-    major: user?.major || "",
-    faculty: user?.faculty || "",
-    cohort: user?.cohort || "",
+  const [formData, setFormData] = useState(() => {
+    const major = user?.major || ""
+    const faculty = user?.faculty || (major ? MAJOR_FACULTY_MAP[major] : "") || ""
+    return {
+      name: user?.name || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      studentId: user?.studentId || "",
+      major: major,
+      faculty: faculty,
+      cohort: user?.cohort || "",
+    }
   })
 
   // Mapping of Majors to their corresponding Faculties (Official GDU List)
@@ -73,7 +77,7 @@ export default function ProfilePage() {
       setFormData({
         ...formData,
         [name]: value,
-        faculty: matchedFaculty || formData.faculty
+        faculty: matchedFaculty || "" // Default to empty if no match, allow manual selection
       })
     } else {
       setFormData({ ...formData, [name]: value })
@@ -361,7 +365,7 @@ export default function ProfilePage() {
                       name="faculty"
                       value={formData.faculty}
                       onChange={handleChange}
-                      disabled={!isEditing || (formData.major !== "" && MAJOR_FACULTY_MAP[formData.major] !== undefined)}
+                      disabled={!isEditing}
                       className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed bg-background"
                     >
                       <option value="">Chọn khoa / viện</option>
