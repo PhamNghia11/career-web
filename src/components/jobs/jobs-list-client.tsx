@@ -627,6 +627,15 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
       return
     }
 
+    if (user.role === "employer" || user.role === "admin") {
+      toast({
+        title: "Không khả dụng",
+        description: "Tính năng lưu việc làm chỉ dành cho ứng viên",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
       // Optimistic update
       const isSaved = savedJobs.includes(jobId)
@@ -1326,18 +1335,20 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                       </div>
 
                       <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-gray-500 hover:text-primary hover:bg-transparent -ml-2 font-medium"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleSave(job._id, job.title)
-                          }}
-                        >
-                          <Bookmark className={`h-5 w-5 mr-2 ${savedJobs.includes(job._id) ? "fill-primary text-primary" : ""}`} />
-                          {savedJobs.includes(job._id) ? "Đã lưu" : "Lưu tin"}
-                        </Button>
+                        {!(user?.role === "employer" || user?.role === "admin") && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-gray-500 hover:text-primary hover:bg-transparent -ml-2 font-medium"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleSave(job._id, job.title)
+                            }}
+                          >
+                            <Bookmark className={`h-5 w-5 mr-2 ${savedJobs.includes(job._id) ? "fill-primary text-primary" : ""}`} />
+                            {savedJobs.includes(job._id) ? "Đã lưu" : "Lưu tin"}
+                          </Button>
+                        )}
                         <Button
                           onClick={(e) => {
                             e.stopPropagation()
