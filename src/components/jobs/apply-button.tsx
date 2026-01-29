@@ -16,6 +16,8 @@ interface ApplyButtonProps {
     companyWebsite?: string
     jobType?: string
     deadline?: string
+    quantity?: number
+    hiredCount?: number
 }
 
 export function ApplyButton({
@@ -27,13 +29,16 @@ export function ApplyButton({
     companyPhone,
     companyWebsite,
     jobType,
-    deadline
+    deadline,
+    quantity,
+    hiredCount = 0
 }: ApplyButtonProps) {
     const { user } = useAuth()
     const router = useRouter()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const isEmployer = user?.role === "employer" || user?.role === "admin"
     const isExpired = deadline && new Date(deadline).getTime() > 0 && new Date(deadline).getTime() < new Date().getTime()
+    const isFull = quantity !== undefined && quantity !== -1 && hiredCount >= (quantity || 1)
 
     const handleApplyClick = () => {
         if (!user) {
@@ -48,10 +53,10 @@ export function ApplyButton({
         <>
             <Button
                 onClick={handleApplyClick}
-                disabled={!!isExpired || isEmployer}
-                className={`w-full h-12 text-lg shadow-md transition-all hover:shadow-lg ${isExpired || isEmployer ? "bg-gray-100 text-gray-400 hover:bg-gray-100 cursor-not-allowed" : "bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white"}`}
+                disabled={!!isExpired || isEmployer || isFull}
+                className={`w-full h-12 text-lg shadow-md transition-all hover:shadow-lg ${isExpired || isEmployer || isFull ? "bg-gray-100 text-gray-400 hover:bg-gray-100 cursor-not-allowed" : "bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white"}`}
             >
-                {isExpired ? "Đã hết hạn" : isEmployer ? "Chỉ dành cho ứng viên" : "Ứng tuyển ngay"}
+                {isExpired ? "Đã hết hạn" : isEmployer ? "Chỉ dành cho ứng viên" : isFull ? "Đã đóng nhận hồ sơ" : "Ứng tuyển ngay"}
             </Button>
 
             <ApplyJobDialog

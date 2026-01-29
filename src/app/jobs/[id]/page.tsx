@@ -24,19 +24,27 @@ export default async function JobPage(props: JobPageProps) {
     let job: any = null
 
     // 1. Try to fetch from DB first (Most up-to-date)
+    let hiredCount = 0
     try {
         const { getCollection, COLLECTIONS } = await import("@/database/connection")
         const { ObjectId } = await import("mongodb")
-        const collection = await getCollection(COLLECTIONS.JOBS)
+        const jobsCollection = await getCollection(COLLECTIONS.JOBS)
+        const appsCollection = await getCollection(COLLECTIONS.APPLICATIONS)
 
         if (ObjectId.isValid(params.id)) {
-            const dbJob = await collection.findOne({ _id: new ObjectId(params.id) })
+            const dbJob = await jobsCollection.findOne({ _id: new ObjectId(params.id) })
             if (dbJob) {
                 job = { ...dbJob, _id: dbJob._id.toString() }
+
+                // Fetch hired count
+                hiredCount = await appsCollection.countDocuments({
+                    jobId: params.id,
+                    status: "hired"
+                })
             }
         }
     } catch (error) {
-        console.error("Error fetching job from DB:", error)
+        console.error("Error fetching job or hired count from DB:", error)
     }
 
     // 2. Fallback: Removed (everything is in DB now)
@@ -254,6 +262,8 @@ export default async function JobPage(props: JobPageProps) {
                                             companyWebsite={job.website}
                                             jobType={job.type}
                                             deadline={job.deadline}
+                                            quantity={job.quantity}
+                                            hiredCount={hiredCount}
                                         />
 
                                         <p className="text-center text-xs text-gray-400 mt-3">

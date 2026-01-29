@@ -33,6 +33,7 @@ export type Job = {
     contactEmail?: string
     contactPhone?: string
     quantity?: number
+    hiredCount?: number
 }
 
 // allJobs is now empty because data is in the database.

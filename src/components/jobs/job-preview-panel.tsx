@@ -128,10 +128,10 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
 
             <div className="p-4 pt-0 flex gap-3 shrink-0">
                 <Button
-                    className={`flex-1 h-9 text-sm ${(job.deadline && new Date(job.deadline).getTime() > 0 && new Date(job.deadline).getTime() < new Date().getTime()) || (user?.role === "employer" || user?.role === "admin")
+                    className={`flex-1 h-9 text-sm ${(job.deadline && new Date(job.deadline).getTime() > 0 && new Date(job.deadline).getTime() < new Date().getTime()) || (user?.role === "employer" || user?.role === "admin") || (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))
                         ? "bg-gray-100 text-gray-400 hover:bg-gray-100 cursor-not-allowed"
                         : "bg-black hover:bg-black/90 text-white"}`}
-                    disabled={(!!job.deadline && new Date(job.deadline).getTime() > 0 && new Date(job.deadline).getTime() < new Date().getTime()) || (user?.role === "employer" || user?.role === "admin")}
+                    disabled={(!!job.deadline && new Date(job.deadline).getTime() > 0 && new Date(job.deadline).getTime() < new Date().getTime()) || (user?.role === "employer" || user?.role === "admin") || (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))}
                     onClick={(e) => {
                         e.stopPropagation()
                         if (user?.role === "employer" || user?.role === "admin") return
@@ -140,9 +140,11 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
                 >
                     {job.deadline && new Date(job.deadline).getTime() > 0 && new Date(job.deadline).getTime() < new Date().getTime()
                         ? "Đã hết hạn"
-                        : (user?.role === "employer" || user?.role === "admin")
-                            ? "Dành cho ứng viên"
-                            : "Ứng tuyển"}
+                        : (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))
+                            ? "Đã đóng nhận hồ sơ"
+                            : (user?.role === "employer" || user?.role === "admin")
+                                ? "Dành cho ứng viên"
+                                : "Ứng tuyển"}
                 </Button>
                 <Link href={`/jobs/${job._id}`} className="flex-1">
                     <Button variant="outline" className="w-full h-9 text-sm border-gray-200">

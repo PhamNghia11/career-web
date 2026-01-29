@@ -15,20 +15,58 @@ async function getActiveJobsFromDB(): Promise<Job[]> {
     const collection = await getCollection(COLLECTIONS.JOBS)
 
     // Filter by active status AND deadline >= today
-    const jobs = await collection.find({
-      status: "active",
-      $or: [
-        { deadline: { $gte: todayStr } },
-        { deadline: { $in: [null, "", "Vô thời hạn"] } },
-        { deadline: { $exists: false } }
-      ]
-    }).sort({ postedAt: -1 }).toArray()
+    // Using aggregation to get hiredCount
+    const jobs = await collection.aggregate([
+      {
+        $match: {
+          status: "active",
+          $or: [
+            { deadline: { $gte: todayStr } },
+            { deadline: { $in: [null, "", "Vô thời hạn"] } },
+            { deadline: { $exists: false } }
+          ]
+        }
+      },
+      {
+        $lookup: {
+          from: COLLECTIONS.APPLICATIONS,
+          let: { jobIdStr: { $toString: "$_id" } },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$jobId", "$$jobIdStr"] },
+                    { $eq: ["$status", "hired"] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "hiredApplications"
+        }
+      },
+      {
+        $addFields: {
+          hiredCount: { $size: "$hiredApplications" }
+        }
+      },
+      {
+        $project: {
+          hiredApplications: 0
+        }
+      },
+      {
+        $sort: { postedAt: -1 }
+      }
+    ]).toArray()
 
     return jobs.map(job => ({
       ...job,
       _id: job._id.toString(),
-      skills: job.skills || []
-    })) as Job[]
+      skills: job.skills || [],
+      hiredCount: job.hiredCount || 0
+    })) as any[]
   } catch (error) {
     console.error("Error fetching jobs from MongoDB:", error)
     return []
