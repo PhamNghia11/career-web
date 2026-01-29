@@ -356,12 +356,12 @@ export default function SettingsPage() {
               checked: user?.notificationSettings?.newJobs ?? true
             }
           ].map((item, id) => (
-            <div key={id} className="flex items-center justify-between py-6 group">
+            <label key={id} className="flex items-center justify-between py-6 group cursor-pointer">
               <div className="space-y-1">
                 <p className="font-bold text-gray-800 group-hover:text-primary transition-colors">{item.label}</p>
                 <p className="text-sm font-medium text-gray-400">{item.desc}</p>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <div className="relative inline-flex items-center">
                 <input
                   type="checkbox"
                   className="sr-only peer"
@@ -373,9 +373,9 @@ export default function SettingsPage() {
                     }
                   })}
                 />
-                <div className="w-12 h-6.5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary shadow-inner"></div>
-              </label>
-            </div>
+                <div className="w-12 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary shadow-inner"></div>
+              </div>
+            </label>
           ))}
         </CardContent>
       </Card>
