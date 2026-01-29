@@ -196,7 +196,16 @@ function LoginContent() {
         </div>
 
         <Card className="shadow-xl border-0 ring-1 ring-gray-200/50 bg-white/80 backdrop-blur-sm">
-          <CardHeader className="text-center pb-6">
+          <CardHeader className="text-center pb-6 relative">
+            {!needs2FA && !needsTotpSetup && (
+              <button
+                onClick={() => router.back()}
+                className="absolute left-6 top-7 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-500 transition-all group/back"
+                title="Quay lại"
+              >
+                <ArrowLeft className="h-6 w-6 transition-transform group-hover/back:-translate-x-1" />
+              </button>
+            )}
             <CardTitle className="text-2xl font-bold tracking-tight text-gray-900">
               {needsTotpSetup
                 ? (setupStep === "codes" ? "Lưu mã khôi phục" : "Thiết lập xác thực 2 bước")
