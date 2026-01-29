@@ -242,8 +242,12 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
         return (minJob >= 10 && minJob < 15) || (maxJob > 10 && maxJob <= 15) || (minJob < 10 && maxJob > 15)
       case "15-20":
         return (minJob >= 15 && minJob < 20) || (maxJob > 15 && maxJob <= 20) || (minJob < 15 && maxJob > 20)
+      case "10-20": // Sidebar range
+        return (minJob >= 10 && minJob < 20) || (maxJob > 10 && maxJob <= 20) || (minJob < 10 && maxJob > 20)
       case "20-30":
         return (minJob >= 20 && minJob < 30) || (maxJob > 20 && maxJob <= 30) || (minJob < 20 && maxJob > 30)
+      case "above-20": // Sidebar range
+        return maxJob >= 20
       case "above-30":
         return maxJob >= 30
       default:
@@ -956,6 +960,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     { id: "5-10", label: "5 - 10 triệu" },
     { id: "10-20", label: "10 - 20 triệu" },
     { id: "above-20", label: "Trên 20 triệu" },
+    { id: "negotiate", label: "Thỏa thuận" },
   ]
 
   return (
