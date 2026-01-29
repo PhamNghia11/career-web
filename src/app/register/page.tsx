@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Mail, Lock, User, Phone, GraduationCap, BookOpen, ChevronDown } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, User, Phone, GraduationCap, BookOpen, ChevronDown, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -129,7 +129,14 @@ export default function RegisterPage() {
         </div>
 
         <Card className="shadow-xl border-0 ring-1 ring-gray-200/50 bg-white/80 backdrop-blur-sm">
-          <CardHeader className="text-center pb-6">
+          <CardHeader className="text-center pb-6 relative">
+            <button
+              onClick={() => router.back()}
+              className="absolute left-6 top-7 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-500 transition-all group/back"
+              title="Quay lại"
+            >
+              <ArrowLeft className="h-6 w-6 transition-transform group-hover/back:-translate-x-1" />
+            </button>
             <CardTitle className="text-2xl font-bold tracking-tight text-gray-900">Đăng ký tài khoản</CardTitle>
             <CardDescription className="text-base">Mở khóa cơ hội nghề nghiệp của bạn</CardDescription>
           </CardHeader>
