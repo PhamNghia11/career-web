@@ -51,7 +51,7 @@ export default function CompanyPage() {
                         website: u.website || "",
                         address: u.address || "",
                         description: u.description || "",
-                        size: u.size || "10-50 nhân viên"
+                        size: u.size || ""
                     })
                 }
             } catch (error) {
