@@ -30,6 +30,7 @@ export function MobileNav() {
     { name: "Quản lý tin đăng", href: "/dashboard/my-jobs", icon: FileText },
     { name: "Quản lý ứng tuyển", href: "/dashboard/applicants-manager", icon: Users },
     { name: "Doanh nghiệp", href: "/dashboard/company", icon: Building },
+    { name: "Việc làm đã lưu", href: "/dashboard/saved-jobs", icon: Briefcase },
     { name: "Thông báo", href: "/dashboard/notifications", icon: Bell },
     { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },
   ]
@@ -47,6 +48,7 @@ export function MobileNav() {
     { name: "Đánh giá Google", href: "/dashboard/reviews", icon: Star },
     { name: "Liên hệ", href: "/dashboard/messages", icon: MessageSquare },
     { name: "Báo cáo vi phạm", href: "/dashboard/admin/reports", icon: Flag },
+    { name: "Việc làm đã lưu", href: "/dashboard/saved-jobs", icon: Briefcase },
     { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },
   ]
 
