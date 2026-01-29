@@ -355,23 +355,50 @@ export default function SettingsPage() {
               desc: 'Cập nhật khi có công việc chuyển môn phù hợp',
               checked: user?.notificationSettings?.newJobs ?? true
             }
-          ].map((item, id) => (
-            <label key={id} className="flex items-center justify-between py-6 group cursor-pointer">
+          ].map((item) => (
+            <label
+              key={item.key}
+              htmlFor={`notif-${item.key}`}
+              className="flex items-center justify-between py-6 group cursor-pointer"
+            >
               <div className="space-y-1">
                 <p className="font-bold text-gray-800 group-hover:text-primary transition-colors">{item.label}</p>
                 <p className="text-sm font-medium text-gray-400">{item.desc}</p>
               </div>
               <div className="relative inline-flex items-center">
                 <input
+                  id={`notif-${item.key}`}
                   type="checkbox"
                   className="sr-only peer"
                   checked={item.checked}
-                  onChange={(e) => updateProfile({
-                    notificationSettings: {
-                      ...(user?.notificationSettings || { email: true, push: false, newJobs: true }),
-                      [item.key]: e.target.checked
+                  onChange={async (e) => {
+                    const newValue = e.target.checked
+                    try {
+                      const success = await updateProfile({
+                        notificationSettings: {
+                          email: user?.notificationSettings?.email ?? true,
+                          push: user?.notificationSettings?.push ?? false,
+                          newJobs: user?.notificationSettings?.newJobs ?? true,
+                          [item.key]: newValue
+                        }
+                      })
+
+                      if (success) {
+                        toast({
+                          title: "Thành công",
+                          description: `Đã ${newValue ? "bật" : "tắt"} ${item.label.toLowerCase()}`,
+                        })
+                      } else {
+                        throw new Error("Update failed")
+                      }
+                    } catch (error) {
+                      toast({
+                        title: "Lỗi",
+                        description: "Không thể cập nhật cài đặt thông báo",
+                        variant: "destructive"
+                      })
                     }
-                  })}
+                  }}
                 />
                 <div className="w-12 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary shadow-inner"></div>
               </div>
