@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { getCollection, COLLECTIONS } from '@/database/connection'
 import { sendEmail } from '@/services/email.service'
 import { ObjectId } from 'mongodb'
+import { checkNotificationPreference } from '@/lib/notification-utils'
 
 export async function GET(req: Request) {
     try {
@@ -73,46 +74,56 @@ export async function POST(req: Request) {
 
             // Send Email to Admin
             if (process.env.ADMIN_EMAIL) {
-                const host = req.headers.get('host')
-                const protocol = host?.includes('localhost') ? 'http' : 'https'
-                const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (host ? `${protocol}://${host}` : 'http://localhost:3000')
-                const reportLink = `${baseUrl.replace(/\/$/, '')}/dashboard/admin/reports`
+                // Look up admin user to check preference
+                const usersCollection = await getCollection(COLLECTIONS.USERS)
+                const adminUser = await usersCollection.findOne({ email: process.env.ADMIN_EMAIL })
+                const shouldSendAdminEmail = await checkNotificationPreference(adminUser?._id, 'email')
 
-                await sendEmail({
-                    to: process.env.ADMIN_EMAIL,
-                    subject: `[GDU Career] Báo cáo vi phạm mới: ${jobTitle}`,
-                    html: `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ffeded; border-radius: 8px; overflow: hidden;">
-                            <div style="background-color: #d32f2f; color: white; padding: 20px; text-align: center;">
-                                <h2 style="margin: 0;">Cảnh báo báo cáo vi phạm</h2>
-                            </div>
-                            <div style="padding: 20px; line-height: 1.6;">
-                                <p>Hệ thống vừa nhận được một báo cáo vi phạm đối với tin tuyển dụng sau:</p>
-                                <div style="background-color: #fff5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #ffebea;">
-                                    <p style="margin: 5px 0;"><strong>Tin tuyển dụng:</strong> ${jobTitle}</p>
-                                    <p style="margin: 5px 0;"><strong>Công ty:</strong> ${companyName}</p>
-                                    <hr style="border: none; border-top: 1px solid #fee2e1; margin: 10px 0;"/>
-                                    <p style="margin: 5px 0;"><strong>Người báo cáo:</strong> ${reporterName}</p>
-                                    <p style="margin: 5px 0;"><strong>Email:</strong> ${reporterEmail || "N/A"}</p>
-                                    <p style="margin: 5px 0;"><strong>Số điện thoại:</strong> ${reporterPhone}</p>
+                if (shouldSendAdminEmail) {
+                    const host = req.headers.get('host')
+                    const protocol = host?.includes('localhost') ? 'http' : 'https'
+                    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (host ? `${protocol}://${host}` : 'http://localhost:3000')
+                    const reportLink = `${baseUrl.replace(/\/$/, '')}/dashboard/admin/reports`
+
+                    await sendEmail({
+                        to: process.env.ADMIN_EMAIL,
+                        subject: `[GDU Career] Báo cáo vi phạm mới: ${jobTitle}`,
+                        html: `
+                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ffeded; border-radius: 8px; overflow: hidden;">
+                                <div style="background-color: #d32f2f; color: white; padding: 20px; text-align: center;">
+                                    <h2 style="margin: 0;">Cảnh báo báo cáo vi phạm</h2>
                                 </div>
-                                <div style="padding: 15px; background: #fafafa; border-radius: 5px; margin-bottom: 20px;">
-                                    <p style="margin: 0 0 10px 0; font-weight: bold; color: #333;">Nội dung phản ánh:</p>
-                                    <div style="color: #666; font-style: italic;">"${content}"</div>
+                                <div style="padding: 20px; line-height: 1.6;">
+                                    <p>Hệ thống vừa nhận được một báo cáo vi phạm đối với tin tuyển dụng sau:</p>
+                                    <div style="background-color: #fff5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #ffebea;">
+                                        <p style="margin: 5px 0;"><strong>Tin tuyển dụng:</strong> ${jobTitle}</p>
+                                        <p style="margin: 5px 0;"><strong>Công ty:</strong> ${companyName}</p>
+                                        <hr style="border: none; border-top: 1px solid #fee2e1; margin: 10px 0;"/>
+                                        <p style="margin: 5px 0;"><strong>Người báo cáo:</strong> ${reporterName}</p>
+                                        <p style="margin: 5px 0;"><strong>Email:</strong> ${reporterEmail || "N/A"}</p>
+                                        <p style="margin: 5px 0;"><strong>Số điện thoại:</strong> ${reporterPhone}</p>
+                                    </div>
+                                    <div style="padding: 15px; background: #fafafa; border-radius: 5px; margin-bottom: 20px;">
+                                        <p style="margin: 0 0 10px 0; font-weight: bold; color: #333;">Nội dung phản ánh:</p>
+                                        <div style="color: #666; font-style: italic;">"${content}"</div>
+                                    </div>
+                                    <div style="text-align: center; margin-top: 30px;">
+                                        <a href="${reportLink}" 
+                                           style="background-color: #d32f2f; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                                            Xem và xử lý ngay
+                                        </a>
+                                    </div>
                                 </div>
-                                <div style="text-align: center; margin-top: 30px;">
-                                    <a href="${reportLink}" 
-                                       style="background-color: #d32f2f; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-                                        Xem và xử lý ngay
-                                    </a>
+                                <div style="background-color: #f9f9f9; color: #888; padding: 15px; text-align: center; font-size: 12px;">
+                                    <p>Email này được gửi tự động để đảm bảo an toàn cho sàn tuyển dụng GDU.</p>
                                 </div>
                             </div>
-                            <div style="background-color: #f9f9f9; color: #888; padding: 15px; text-align: center; font-size: 12px;">
-                                <p>Email này được gửi tự động để đảm bảo an toàn cho sàn tuyển dụng GDU.</p>
-                            </div>
-                        </div>
-                    `
-                })
+                        `
+                    })
+                    console.log("[Reports API] Admin email sent for report")
+                } else {
+                    console.log("[Reports API] Admin email skipped (preference off)")
+                }
             }
         } catch (err) {
             console.error('Failed to trigger admin notifications for report:', err)

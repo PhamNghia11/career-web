@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/database/connection"
 import { sendEmail } from "@/services/email.service"
 import { ObjectId } from "mongodb"
+import { checkNotificationPreference } from "@/lib/notification-utils"
 
 export async function POST(request: Request) {
   try {
@@ -255,11 +256,21 @@ export async function POST(request: Request) {
     // Send email to admin
     try {
       if (process.env.ADMIN_EMAIL) {
-        await sendEmail({
-          to: process.env.ADMIN_EMAIL,
-          subject: emailSubject,
-          html: emailHtml
-        })
+        // Look up admin user to check preference
+        const usersCollection = await getCollection(COLLECTIONS.USERS)
+        const adminUser = await usersCollection.findOne({ email: process.env.ADMIN_EMAIL })
+        const shouldSendAdminEmail = await checkNotificationPreference(adminUser?._id, 'email')
+
+        if (shouldSendAdminEmail) {
+          await sendEmail({
+            to: process.env.ADMIN_EMAIL,
+            subject: emailSubject,
+            html: emailHtml
+          })
+          console.log("[Applications API] Admin email sent")
+        } else {
+          console.log("[Applications API] Admin email skipped (preference off)")
+        }
       }
     } catch (emailError) {
       console.error("Failed to send admin email:", emailError)
@@ -271,12 +282,20 @@ export async function POST(request: Request) {
         const usersCollection = await getCollection(COLLECTIONS.USERS)
         const { ObjectId } = await import("mongodb")
         const employer = await usersCollection.findOne({ _id: new ObjectId(employerId) })
+
         if (employer?.email) {
-          await sendEmail({
-            to: employer.email,
-            subject: emailSubject,
-            html: emailHtml
-          })
+          const shouldSendEmployerEmail = await checkNotificationPreference(employerId, 'email')
+
+          if (shouldSendEmployerEmail) {
+            await sendEmail({
+              to: employer.email,
+              subject: emailSubject,
+              html: emailHtml
+            })
+            console.log("[Applications API] Employer email sent to:", employer.email)
+          } else {
+            console.log("[Applications API] Employer email skipped (preference off) for:", employer.email)
+          }
         }
       } catch (emailError) {
         console.error("Failed to send employer email:", emailError)

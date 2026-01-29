@@ -3,6 +3,7 @@ import { getCollection, COLLECTIONS } from "@/database/connection"
 import { ObjectId } from "mongodb"
 import { sendEmail } from "@/services/email.service"
 import { getInterviewEmailTemplate, getRejectedEmailTemplate, getHiredEmailTemplate } from "@/lib/email-templates"
+import { checkNotificationPreference } from "@/lib/notification-utils"
 
 // GET - Get application details by ID (including CV)
 export async function GET(
@@ -182,11 +183,18 @@ export async function PATCH(
                     }
 
                     if (emailSubject && candidateEmail) {
-                        sendEmail({
-                            to: candidateEmail,
-                            subject: emailSubject,
-                            html: emailHtml
-                        }).catch(err => console.error("Async email sending failed:", err))
+                        // Check student's email preference
+                        const shouldSendEmail = await checkNotificationPreference(currentApplication.applicantId, 'email')
+
+                        if (shouldSendEmail) {
+                            sendEmail({
+                                to: candidateEmail,
+                                subject: emailSubject,
+                                html: emailHtml
+                            }).catch(err => console.error("Async email sending failed:", err))
+                        } else {
+                            console.log(`[Applications API] Email skipped for ${candidateEmail} (preference off)`)
+                        }
                     }
                 }
             } catch (notifError) {
