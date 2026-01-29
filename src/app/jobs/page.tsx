@@ -30,13 +30,18 @@ async function getActiveJobsFromDB(): Promise<Job[]> {
       {
         $lookup: {
           from: COLLECTIONS.APPLICATIONS,
-          let: { jobIdStr: { $toString: "$_id" } },
+          let: { jobIdStr: { $toString: "$_id" }, jobIdObj: "$_id" },
           pipeline: [
             {
               $match: {
                 $expr: {
                   $and: [
-                    { $eq: ["$jobId", "$$jobIdStr"] },
+                    {
+                      $or: [
+                        { $eq: ["$jobId", "$$jobIdStr"] },
+                        { $eq: ["$jobId", "$$jobIdObj"] }
+                      ]
+                    },
                     { $eq: ["$status", "hired"] }
                   ]
                 }

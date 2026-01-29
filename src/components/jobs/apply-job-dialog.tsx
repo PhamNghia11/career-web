@@ -23,6 +23,8 @@ interface ApplyJobDialogProps {
     companyPhone?: string
     companyWebsite?: string
     jobType?: string
+    quantity?: number
+    hiredCount?: number
 }
 
 export function ApplyJobDialog({
@@ -35,7 +37,9 @@ export function ApplyJobDialog({
     companyEmail,
     companyPhone,
     companyWebsite,
-    jobType
+    jobType,
+    quantity,
+    hiredCount
 }: ApplyJobDialogProps) {
     const { toast } = useToast()
     const { user } = useAuth()
@@ -177,8 +181,19 @@ export function ApplyJobDialog({
         inputRef.current?.click()
     }
 
+    const isFull = quantity !== undefined && quantity !== -1 && hiredCount !== undefined && hiredCount >= (quantity || 1);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        if (isFull) {
+            toast({
+                title: "Không thể ứng tuyển",
+                description: "Xin lỗi, vị trí này đã tuyển đủ số lượng.",
+                variant: "destructive"
+            })
+            return
+        }
 
         if (user?.role === "employer" || user?.role === "admin") {
             toast({
@@ -598,10 +613,15 @@ export function ApplyJobDialog({
                             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
                                 Hủy bỏ
                             </Button>
-                            <Button type="submit" disabled={isSubmitting} className="bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white">
-                                {isSubmitting ? "Đang gửi..." : "Gửi hồ sơ ứng tuyển"}
+                            <Button type="submit" disabled={isSubmitting || isFull} className={`bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white ${isFull ? "opacity-50 cursor-not-allowed" : ""}`}>
+                                {isSubmitting ? "Đang gửi..." : isFull ? "Đã đóng nhận hồ sơ" : "Gửi hồ sơ ứng tuyển"}
                             </Button>
                         </DialogFooter>
+                        {isFull && (
+                            <p className="text-center text-red-500 text-sm mt-2 pb-4">
+                                Vị trí này hiện đã đạt đủ số lượng tuyển dụng.
+                            </p>
+                        )}
                     </form>
                 )}
             </DialogContent>

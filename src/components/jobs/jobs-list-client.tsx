@@ -145,7 +145,18 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const [selectedSalary, setSelectedSalary] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<string>("newest")
   const [savedJobs, setSavedJobs] = useState<string[]>([])
-  const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string; jobType?: string } | null>(null)
+  const [selectedJob, setSelectedJob] = useState<{
+    title: string;
+    company: string;
+    jobId: string;
+    creatorId?: string;
+    companyEmail?: string;
+    companyPhone?: string;
+    companyWebsite?: string;
+    jobType?: string;
+    quantity?: number;
+    hiredCount?: number;
+  } | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
   const [hoveredJob, setHoveredJob] = useState<Job | null>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -586,7 +597,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     setSelectedCompany(prev => prev === company ? null : company)
   }
 
-  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string) => {
+  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string, quantity?: number, hiredCount?: number) => {
     if (!user) {
       router.push("/login?redirect=" + window.location.pathname + window.location.search)
       return
@@ -599,7 +610,9 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
       companyEmail: email,
       companyPhone: phone,
       companyWebsite: website,
-      jobType: jobType
+      jobType: jobType,
+      quantity: quantity,
+      hiredCount: hiredCount
     })
     setIsApplyDialogOpen(true)
   }
@@ -1262,7 +1275,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                               <div className="absolute top-full left-0 z-50 mt-2 w-[450px] md:w-[600px] shadow-2xl rounded-xl border border-gray-200 bg-white animate-in fade-in zoom-in-95 duration-200">
                                 <JobPreviewPanel
                                   job={job}
-                                  onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)}
+                                  onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type, job.quantity, job.hiredCount)}
                                   onSave={(job) => handleSave(job._id, job.title)}
                                   isSaved={savedJobs.includes(job._id)}
                                 />
@@ -1373,6 +1386,8 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
         companyPhone={selectedJob?.companyPhone}
         companyWebsite={selectedJob?.companyWebsite}
         jobType={selectedJob?.jobType}
+        quantity={selectedJob?.quantity}
+        hiredCount={selectedJob?.hiredCount}
       />
     </div>
   )

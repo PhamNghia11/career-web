@@ -36,9 +36,12 @@ export default async function JobPage(props: JobPageProps) {
             if (dbJob) {
                 job = { ...dbJob, _id: dbJob._id.toString() }
 
-                // Fetch hired count
+                // Fetch hired count - robust check for both string and ObjectId
                 hiredCount = await appsCollection.countDocuments({
-                    jobId: params.id,
+                    $or: [
+                        { jobId: params.id },
+                        { jobId: new ObjectId(params.id) }
+                    ],
                     status: "hired"
                 })
             }
