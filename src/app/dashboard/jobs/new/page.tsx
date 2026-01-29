@@ -69,6 +69,7 @@ const formSchema = z.object({
     requirements: z.string().min(20, "Yêu cầu công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     detailedBenefits: z.string().optional(),
     deadline: z.date().optional(),
+    unlimitedDeadline: z.boolean().default(false),
     quantity: z.coerce.number().optional(),
     unlimitedQuantity: z.boolean().default(false),
     contactEmail: z.string().email("Vui lòng nhập đúng định dạng email").optional().or(z.literal("")),
@@ -121,6 +122,7 @@ export default function PostJobPage() {
             requirements: "",
             detailedBenefits: "",
             deadline: undefined,
+            unlimitedDeadline: false,
             quantity: 1,
             unlimitedQuantity: false,
             contactEmail: "",
@@ -132,6 +134,7 @@ export default function PostJobPage() {
 
     const isNegotiable = form.watch("isNegotiable")
     const unlimitedQuantity = form.watch("unlimitedQuantity")
+    const unlimitedDeadline = form.watch("unlimitedDeadline")
     const jobType = form.watch("type")
 
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -225,7 +228,7 @@ export default function PostJobPage() {
             // Wait, previous logic was: deadline: values.deadline.split('-').reverse().join('/')
             // If values.deadline is Date, we format it.
             let formattedDeadline = ""
-            if (normalizedValues.deadline) {
+            if (!normalizedValues.unlimitedDeadline && normalizedValues.deadline) {
                 const d = normalizedValues.deadline as Date
                 const day = d.getDate().toString().padStart(2, '0')
                 const month = (d.getMonth() + 1).toString().padStart(2, '0')
@@ -558,11 +561,39 @@ export default function PostJobPage() {
                                     name="deadline"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
-                                            <FormLabel>Hạn nộp hồ sơ</FormLabel>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <FormLabel>Hạn nộp hồ sơ</FormLabel>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="unlimitedDeadline"
+                                                    render={({ field: checkField }) => (
+                                                        <div className="flex items-center space-x-2">
+                                                            <Checkbox
+                                                                id="unlimited-deadline-new"
+                                                                checked={checkField.value}
+                                                                onCheckedChange={(checked) => {
+                                                                    checkField.onChange(checked);
+                                                                    if (checked) {
+                                                                        form.setValue("deadline", undefined);
+                                                                        form.clearErrors("deadline");
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <label
+                                                                htmlFor="unlimited-deadline-new"
+                                                                className="text-sm font-normal text-gray-500 cursor-pointer select-none"
+                                                            >
+                                                                Vô thời hạn
+                                                            </label>
+                                                        </div>
+                                                    )}
+                                                />
+                                            </div>
                                             <DatePicker
                                                 date={field.value}
                                                 setDate={field.onChange}
                                                 placeholder="dd/mm/yyyy"
+                                                disabled={unlimitedDeadline}
                                             />
                                             <FormMessage />
                                         </FormItem>

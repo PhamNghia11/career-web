@@ -69,6 +69,7 @@ const formSchema = z.object({
     requirements: z.string().min(20, "Yêu cầu công việc phải chi tiết hơn (tối thiểu 20 ký tự)"),
     detailedBenefits: z.string().optional(),
     deadline: z.date().optional(),
+    unlimitedDeadline: z.boolean().default(false),
     quantity: z.coerce.number().optional(),
     unlimitedQuantity: z.boolean().default(false),
     contactEmail: z.string().email("Vui lòng nhập đúng định dạng email").optional().or(z.literal("")),
@@ -122,6 +123,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             requirements: "",
             detailedBenefits: "",
             deadline: undefined,
+            unlimitedDeadline: false,
             quantity: 1,
             unlimitedQuantity: false,
             contactEmail: "",
@@ -133,6 +135,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
 
     const isNegotiable = form.watch("isNegotiable")
     const unlimitedQuantity = form.watch("unlimitedQuantity")
+    const unlimitedDeadline = form.watch("unlimitedDeadline")
     const jobType = form.watch("type")
 
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -198,6 +201,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                         detailedBenefits: Array.isArray(job.detailedBenefits) ? job.detailedBenefits.join('\n') : job.detailedBenefits || "",
                         quantity: job.quantity === -1 ? 1 : (job.quantity || 1),
                         unlimitedQuantity: job.quantity === -1,
+                        unlimitedDeadline: !job.deadline,
                         deadline: job.deadline ? (
                             job.deadline.includes('-')
                                 ? new Date(job.deadline) // YYYY-MM-DD
@@ -275,9 +279,9 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             const requirementsList = normalizedValues.requirements.split('\n').filter(line => line.trim() !== "")
             const detailedBenefitsList = normalizedValues.detailedBenefits ? normalizedValues.detailedBenefits.split('\n').filter(line => line.trim() !== "") : []
 
-            // Format deadline to DD/MM/YYYY for API
+            // Format deadline to YYYY-MM-DD for API
             let formattedDeadline = ""
-            if (normalizedValues.deadline) {
+            if (!normalizedValues.unlimitedDeadline && normalizedValues.deadline) {
                 const d = normalizedValues.deadline as Date
                 const year = d.getFullYear()
                 const month = (d.getMonth() + 1).toString().padStart(2, '0')
@@ -581,11 +585,39 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                                     name="deadline"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
-                                            <FormLabel>Hạn nộp hồ sơ</FormLabel>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <FormLabel>Hạn nộp hồ sơ</FormLabel>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="unlimitedDeadline"
+                                                    render={({ field: checkField }) => (
+                                                        <div className="flex items-center space-x-2">
+                                                            <Checkbox
+                                                                id="unlimited-deadline-edit"
+                                                                checked={checkField.value}
+                                                                onCheckedChange={(checked) => {
+                                                                    checkField.onChange(checked);
+                                                                    if (checked) {
+                                                                        form.setValue("deadline", undefined);
+                                                                        form.clearErrors("deadline");
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <label
+                                                                htmlFor="unlimited-deadline-edit"
+                                                                className="text-sm font-normal text-gray-500 cursor-pointer select-none"
+                                                            >
+                                                                Vô thời hạn
+                                                            </label>
+                                                        </div>
+                                                    )}
+                                                />
+                                            </div>
                                             <DatePicker
                                                 date={field.value}
                                                 setDate={field.onChange}
                                                 placeholder="dd/mm/yyyy"
+                                                disabled={unlimitedDeadline}
                                             />
                                             <FormMessage />
                                         </FormItem>
