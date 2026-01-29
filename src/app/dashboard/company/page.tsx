@@ -11,6 +11,7 @@ import { Building, Globe, MapPin, Upload, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { UserProfileForm } from "@/components/dashboard/user-profile-form"
 import { useEffect } from "react"
 import { normalizeWhitespace } from "@/lib/utils"
@@ -217,13 +218,22 @@ export default function CompanyPage() {
                                     </div>
                                     <div className="grid gap-2">
                                         <Label htmlFor="size">Quy mô doanh nghiệp</Label>
-                                        <Input
-                                            id="size"
-                                            name="size"
+                                        <Select
                                             value={formData.size}
-                                            onChange={handleChange}
-                                            placeholder="Ví dụ: 50-100 nhân viên"
-                                        />
+                                            onValueChange={(value) => setFormData(prev => ({ ...prev, size: value }))}
+                                        >
+                                            <SelectTrigger id="size">
+                                                <SelectValue placeholder="Chọn quy mô doanh nghiệp" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Dưới 10 nhân viên">Dưới 10 nhân viên</SelectItem>
+                                                <SelectItem value="10-50 nhân viên">10-50 nhân viên</SelectItem>
+                                                <SelectItem value="50-100 nhân viên">50-100 nhân viên</SelectItem>
+                                                <SelectItem value="100-500 nhân viên">100-500 nhân viên</SelectItem>
+                                                <SelectItem value="500-1000 nhân viên">500-1000 nhân viên</SelectItem>
+                                                <SelectItem value="Trên 1000 nhân viên">Trên 1000 nhân viên</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
 
