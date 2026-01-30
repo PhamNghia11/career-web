@@ -36,8 +36,6 @@ export function AdminQuickActions() {
     const [quickUrl, setQuickUrl] = useState("")
     const [isFetching, setIsFetching] = useState(false)
 
-    if (!user || user.role !== "admin") return null
-
     useEffect(() => {
         const handleClose = () => setIsOpen(false)
         window.addEventListener("close-admin-menu", handleClose)
@@ -51,6 +49,8 @@ export function AdminQuickActions() {
             window.dispatchEvent(new CustomEvent("close-chat-menu"))
         }
     }
+
+    if (!user || user.role !== "admin") return null
 
     const handleQuickNews = async () => {
         if (!quickUrl) {
