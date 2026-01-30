@@ -166,9 +166,12 @@ export default function AdminNewsPage() {
         }
     }
 
+    const [selectedSource, setSelectedSource] = useState<string | null>(null)
+
     const filteredNews = news.filter(item =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.sourceName.toLowerCase().includes(searchQuery.toLowerCase())
+        (item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.sourceName.toLowerCase().includes(searchQuery.toLowerCase())) &&
+        (!selectedSource || item.sourceName === selectedSource)
     )
 
     return (
@@ -219,11 +222,29 @@ export default function AdminNewsPage() {
                                 />
                             </div>
                             <div className="space-y-2 pt-2">
-                                <Label className="text-xs font-bold uppercase tracking-wider opacity-60">Theo nguồn tin</Label>
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-xs font-bold uppercase tracking-wider opacity-60">Theo nguồn tin</Label>
+                                    {selectedSource && (
+                                        <button
+                                            onClick={() => setSelectedSource(null)}
+                                            className="text-[10px] text-red-500 font-bold hover:underline"
+                                        >
+                                            Xóa lọc
+                                        </button>
+                                    )}
+                                </div>
                                 <div className="grid grid-cols-1 gap-2">
                                     {["VietnamWorks", "TopCV", "GDU Research"].map(s => (
-                                        <Button key={s} variant="ghost" className="justify-start gap-2 h-10 rounded-lg font-medium text-sm hover:bg-primary/5 hover:text-primary px-3">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-border" />
+                                        <Button
+                                            key={s}
+                                            variant={selectedSource === s ? "default" : "ghost"}
+                                            onClick={() => setSelectedSource(selectedSource === s ? null : s)}
+                                            className={`justify-start gap-2 h-10 rounded-lg font-medium text-sm px-3 ${selectedSource === s
+                                                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                                                    : "hover:bg-primary/5 hover:text-primary"
+                                                }`}
+                                        >
+                                            <div className={`w-1.5 h-1.5 rounded-full ${selectedSource === s ? "bg-white" : "bg-border"}`} />
                                             {s}
                                         </Button>
                                     ))}
