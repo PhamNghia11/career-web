@@ -573,7 +573,9 @@ export default function PostJobPage() {
                                     name="contactEmail"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Email nhận hồ sơ / liên hệ</FormLabel>
+                                            <div className="flex items-center h-6 mb-2">
+                                                <FormLabel className="mb-0">Email nhận hồ sơ / liên hệ</FormLabel>
+                                            </div>
                                             <FormControl>
                                                 <Input placeholder="tuyendung@doanhnghiep.com" {...field} />
                                             </FormControl>
@@ -586,7 +588,9 @@ export default function PostJobPage() {
                                     name="contactPhone"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Số điện thoại liên hệ</FormLabel>
+                                            <div className="flex items-center h-6 mb-2">
+                                                <FormLabel className="mb-0">Số điện thoại liên hệ</FormLabel>
+                                            </div>
                                             <FormControl>
                                                 <Input placeholder="0901 234 567" {...field} />
                                             </FormControl>
@@ -602,7 +606,9 @@ export default function PostJobPage() {
                                     name="postedAt"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
-                                            <FormLabel>Thời gian đăng tin</FormLabel>
+                                            <div className="flex items-center h-6 mb-2">
+                                                <FormLabel className="mb-0">Thời gian đăng tin</FormLabel>
+                                            </div>
                                             <DatePicker
                                                 date={field.value}
                                                 setDate={field.onChange}
@@ -617,8 +623,8 @@ export default function PostJobPage() {
                                     name="deadline"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <FormLabel>Hạn nộp hồ sơ</FormLabel>
+                                            <div className="flex items-center justify-between h-6 mb-2">
+                                                <FormLabel className="mb-0">Hạn nộp hồ sơ</FormLabel>
                                                 <FormField
                                                     control={form.control}
                                                     name="unlimitedDeadline"
@@ -637,7 +643,7 @@ export default function PostJobPage() {
                                                             />
                                                             <label
                                                                 htmlFor="unlimited-deadline-new"
-                                                                className="text-sm font-normal text-gray-500 cursor-pointer select-none"
+                                                                className="text-xs font-normal text-gray-500 cursor-pointer select-none"
                                                             >
                                                                 Vô thời hạn
                                                             </label>
@@ -663,8 +669,8 @@ export default function PostJobPage() {
                                     name="quantity"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <div className="flex items-center justify-between">
-                                                <FormLabel>Số lượng tuyển <span className="text-red-500">*</span></FormLabel>
+                                            <div className="flex items-center justify-between h-6 mb-2">
+                                                <FormLabel className="mb-0">Số lượng tuyển <span className="text-red-500">*</span></FormLabel>
                                                 <FormField
                                                     control={form.control}
                                                     name="unlimitedQuantity"
@@ -683,7 +689,7 @@ export default function PostJobPage() {
                                                             />
                                                             <label
                                                                 htmlFor="unlimited-new"
-                                                                className="text-sm font-normal text-gray-500 cursor-pointer select-none"
+                                                                className="text-xs font-normal text-gray-500 cursor-pointer select-none"
                                                             >
                                                                 Không giới hạn
                                                             </label>
@@ -709,7 +715,9 @@ export default function PostJobPage() {
                                     name="type"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Hình thức làm việc</FormLabel>
+                                            <div className="flex items-center h-6 mb-2">
+                                                <FormLabel className="mb-0">Hình thức làm việc</FormLabel>
+                                            </div>
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
@@ -734,7 +742,9 @@ export default function PostJobPage() {
                                     name="field"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Lĩnh vực / Ngành nghề <span className="text-red-500">*</span></FormLabel>
+                                            <div className="flex items-center h-6 mb-2">
+                                                <FormLabel className="mb-0">Lĩnh vực / Ngành nghề <span className="text-red-500">*</span></FormLabel>
+                                            </div>
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
