@@ -152,6 +152,35 @@ export default function AdminNewsPage() {
             return
         }
         fetchNews()
+
+        // Check for quick post metadata from global actions
+        const quickMetadata = sessionStorage.getItem("quick_post_metadata")
+        if (quickMetadata) {
+            try {
+                const metadata = JSON.parse(quickMetadata)
+                setIsEditing(false)
+                setCurrentNews({
+                    title: metadata.title || "",
+                    summary: metadata.description || "",
+                    content: "",
+                    category: CATEGORIES[0],
+                    sourceName: metadata.sourceName || "GDU Research",
+                    sourceUrl: metadata.sourceUrl || "#",
+                    imageUrl: metadata.image || "",
+                    gallery: [],
+                    videoUrls: [],
+                    relatedLinks: [],
+                    tags: [],
+                    isFeatured: false,
+                    readingTime: "5 phút",
+                })
+                setIsDialogOpen(true)
+                sessionStorage.removeItem("quick_post_metadata")
+                toast({ title: "Đã nạp thông tin", description: "Vui lòng hoàn tất nội dung bài viết." })
+            } catch (e) {
+                console.error("Error parsing quick metadata:", e)
+            }
+        }
     }, [user, authLoading])
 
     const handleSave = async () => {
