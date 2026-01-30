@@ -84,12 +84,10 @@ export function AdminQuickActions() {
             <DropdownMenu onOpenChange={setIsMenuOpen}>
                 <DropdownMenuTrigger asChild>
                     <Button
-                        className={`h-14 px-6 rounded-2xl shadow-2xl transition-all duration-300 bg-[#0A2647] hover:bg-[#0A2647]/90 active:scale-95 flex items-center gap-3 border border-white/20`}
+                        size="icon"
+                        className={`h-16 w-16 rounded-full shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all duration-300 bg-[#0A2647] hover:bg-[#0A2647]/90 active:scale-95 border-2 border-yellow-500/50 ring-4 ring-yellow-500/10`}
                     >
-                        <div className={`transition-transform duration-300 ${isMenuOpen ? "rotate-45" : ""}`}>
-                            <Plus className="w-6 h-6 text-white" />
-                        </div>
-                        <span className="font-bold text-white tracking-wide">POST MENU</span>
+                        <Zap className={`w-8 h-8 text-yellow-400 fill-yellow-400 transition-transform duration-300 ${isMenuOpen ? "scale-110" : ""}`} />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="mb-4 w-64 rounded-2xl p-3 shadow-2xl border-slate-200">
