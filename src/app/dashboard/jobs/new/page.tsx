@@ -612,10 +612,6 @@ export default function PostJobPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <div className="hidden md:block"></div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
                                     name="deadline"
@@ -659,6 +655,9 @@ export default function PostJobPage() {
                                         </FormItem>
                                     )}
                                 />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
                                     name="quantity"
@@ -705,9 +704,6 @@ export default function PostJobPage() {
                                         </FormItem>
                                     )}
                                 />
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
                                     name="type"
@@ -730,6 +726,9 @@ export default function PostJobPage() {
                                         </FormItem>
                                     )}
                                 />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormField
                                     control={form.control}
                                     name="field"
