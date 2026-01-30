@@ -10,7 +10,7 @@ interface NewsSidebarProps {
 const SOURCES = [
     { name: "VietnamWorks", logo: "https://www.google.com/s2/favicons?domain=vietnamworks.com&sz=128", url: "https://www.vietnamworks.com/" },
     { name: "TopCV", logo: "https://www.google.com/s2/favicons?domain=topcv.vn&sz=128", url: "https://www.topcv.vn/" },
-    { name: "GDU Research", logo: "https://www.google.com/s2/favicons?domain=giadinh.edu.vn&sz=128", url: "https://s.net.vn/P1V6" }
+    { name: "GDU Research", logo: "https://www.google.com/s2/favicons?domain=giadinh.edu.vn&sz=128", url: "https://jsgdu.vn/" }
 ]
 
 export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
