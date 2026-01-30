@@ -57,6 +57,8 @@ export default function RegisterPage() {
     if (!emailRegex.test(formData.email)) return setError("Vui lòng nhập địa chỉ email hợp lệ")
     if (formData.role === "student") {
       if (formData.phone && !/^0\d{9,10}$/.test(formData.phone)) return setError("Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số")
+      if (!formData.studentId.trim()) return setError("Vui lòng nhập MSSV")
+      if (!formData.major) return setError("Vui lòng chọn ngành học")
     }
 
     // Employer Validation
@@ -227,7 +229,7 @@ export default function RegisterPage() {
               {formData.role === "student" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="studentId" className="text-gray-700 font-medium">MSSV</Label>
+                    <Label htmlFor="studentId" className="text-gray-700 font-medium">MSSV <span className="text-red-500">*</span></Label>
                     <div className="relative group">
                       <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                       <input
@@ -242,11 +244,12 @@ export default function RegisterPage() {
                         }}
                         placeholder="Nhập MSSV"
                         className="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
+                        required
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="major" className="text-gray-700 font-medium">Ngành học</Label>
+                    <Label htmlFor="major" className="text-gray-700 font-medium">Ngành học <span className="text-red-500">*</span></Label>
                     <div className="relative group">
                       <BookOpen className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors" />
                       <Select
