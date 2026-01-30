@@ -968,7 +968,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
       {/* Horizontal Filter Bar - STICKY */}
       <div ref={dropdownRef} className="bg-white/95 backdrop-blur-md sticky top-[112px] lg:top-[128px] z-40 border-b border-gray-100 py-2.5 lg:py-4 mb-6 shadow-sm">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-3">
             {/* Row 1: Filter Options */}
             <div className="flex flex-nowrap lg:flex-wrap items-center gap-2 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               <FilterDropdown
@@ -1053,7 +1053,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Tìm kiếm nhanh tên công việc, công ty..."
-                  className="w-full pl-12 pr-4 py-3.5 text-sm lg:text-base bg-gray-50/50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30 focus:bg-white transition-all font-medium placeholder:text-gray-400 shadow-sm hover:shadow-md"
+                  className="w-full pl-12 pr-4 py-2 text-sm lg:text-base bg-gray-50/50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30 focus:bg-white transition-all font-medium placeholder:text-gray-400 shadow-sm hover:shadow-md"
                 />
                 {searchQuery && (
                   <button
