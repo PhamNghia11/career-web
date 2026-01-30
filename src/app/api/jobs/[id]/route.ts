@@ -62,8 +62,9 @@ export async function PATCH(
         }
 
         // If job is being activated or renewed, refresh the postedAt date
-        // to bump it to the top of "Newest" and "Featured" lists
-        if (updateFields.status === 'active') {
+        // to bump it to the top of "Newest" and "Featured" lists,
+        // unless a specific postedAt was provided in the update.
+        if (updateFields.status === 'active' && !updateFields.postedAt) {
             updateData.postedAt = now
         }
 

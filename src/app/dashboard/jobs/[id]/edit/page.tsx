@@ -90,6 +90,7 @@ const formSchema = z.object({
     documentName: z.string().optional(),
 
     logoFit: z.enum(["cover", "contain"]).default("cover"),
+    postedAt: z.date().optional(),
 }).refine((data) => {
     if (!data.isNegotiable && data.salaryMin && data.salaryMax && data.salaryMax < data.salaryMin) {
         return false
@@ -145,6 +146,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
             documentUrl: "",
             documentName: "",
             logoFit: "cover",
+            postedAt: new Date(),
         },
     })
 
@@ -227,6 +229,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                         documentUrl: job.documentUrl || "",
                         documentName: job.documentName || "",
                         logoFit: job.logoFit || "cover",
+                        postedAt: job.postedAt ? new Date(job.postedAt) : new Date(),
                     })
 
                     // Load existing logo
@@ -618,6 +621,25 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
                                         </FormItem>
                                     )}
                                 />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="postedAt"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>Thời gian đăng tin</FormLabel>
+                                            <DatePicker
+                                                date={field.value}
+                                                setDate={field.onChange}
+                                                placeholder="Chọn ngày đăng"
+                                            />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <div className="hidden md:block"></div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

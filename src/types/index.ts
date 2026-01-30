@@ -40,6 +40,7 @@ export interface Job {
   deadline: Date
   applicants: number
   status: "active" | "closed" | "draft"
+  postedAt?: string | Date
 }
 
 export interface GoogleReview {

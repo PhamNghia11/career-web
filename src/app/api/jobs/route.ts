@@ -166,7 +166,7 @@ export async function POST(req: Request) {
       detailedBenefits: Array.isArray(detailedBenefits) ? detailedBenefits : [],
       relatedMajors: Array.isArray(relatedMajors) ? relatedMajors : [],
 
-      postedAt: new Date().toISOString(),
+      postedAt: body.postedAt || new Date().toISOString(),
       status: role === 'admin' ? 'active' : 'pending', // Admin posts are active immediately
       applicants: 0,
       creatorId,
