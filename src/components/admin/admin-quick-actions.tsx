@@ -80,19 +80,21 @@ export function AdminQuickActions() {
     }
 
     return (
-        <div className="fixed bottom-8 right-8 z-[100] group">
+        <div className="fixed bottom-32 right-8 z-[100] group">
             <DropdownMenu onOpenChange={setIsMenuOpen}>
                 <DropdownMenuTrigger asChild>
                     <Button
-                        size="icon"
-                        className={`h-16 w-16 rounded-full shadow-2xl transition-all duration-300 ${isMenuOpen ? "rotate-45" : ""} bg-[#0A2647] hover:bg-[#0A2647]/90 active:scale-95`}
+                        className={`h-14 px-6 rounded-2xl shadow-2xl transition-all duration-300 bg-[#0A2647] hover:bg-[#0A2647]/90 active:scale-95 flex items-center gap-3 border border-white/20`}
                     >
-                        <Plus className="w-8 h-8 text-white" />
+                        <div className={`transition-transform duration-300 ${isMenuOpen ? "rotate-45" : ""}`}>
+                            <Plus className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="font-bold text-white tracking-wide">POST MENU</span>
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="mb-4 w-64 rounded-2xl p-3 shadow-2xl border-slate-200">
                     <div className="px-3 py-2 mb-2">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Admin Quick Actions</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-[#0A2647]">Admin Quick Actions</p>
                     </div>
                     <DropdownMenuItem
                         onClick={() => setIsQuickNewsOpen(true)}
