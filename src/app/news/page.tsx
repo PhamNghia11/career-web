@@ -40,14 +40,7 @@ const CATEGORIES = [
     "Thông báo"
 ]
 
-const SOURCES = [
-    { name: "VietnamWorks", logo: "https://images.vietnamworks.com/img/logo.png", url: "https://www.vietnamworks.com/" },
-    { name: "TopCV", logo: "https://static.topcv.vn/v4/image/logo-v2.png", url: "https://www.topcv.vn/" },
-    { name: "ITviec", logo: "https://itviec.com/assets/logo-itviec-449dd542.png", url: "https://itviec.com/" },
-    { name: "LinkedIn", logo: "https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png", url: "https://www.linkedin.com/" },
-    { name: "World Bank", logo: "https://www.worldbank.org/content/dam/wbr/logo/logo-wb-header-en.svg", url: "https://www.worldbank.org/" },
-    { name: "GDU Research", logo: "/gdu-logo.png", url: "#" }
-]
+
 
 export default function NewsPage() {
     return (

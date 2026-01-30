@@ -7,6 +7,12 @@ interface NewsSidebarProps {
     onTagClick: (tag: string) => void
 }
 
+const SOURCES = [
+    { name: "VietnamWorks", logo: "https://images.vietnamworks.com/img/logo.png", url: "https://www.vietnamworks.com/" },
+    { name: "TopCV", logo: "https://static.topcv.vn/v4/image/logo-v2.png", url: "https://www.topcv.vn/" },
+    { name: "GDU Research", logo: "/gdu-logo.png", url: "https://s.net.vn/P1V6" }
+]
+
 export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
     const { toast } = useToast()
     const [isSubscribing, setIsSubscribing] = React.useState(false)
@@ -77,6 +83,43 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
                         >
                             {tag}
                         </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Sources Section */}
+            <div className="p-8 bg-white border border-slate-100 rounded-[32px] shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                    </div>
+                    <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Theo nguồn tin</h3>
+                </div>
+                <div className="space-y-4">
+                    {SOURCES.map((source) => (
+                        <a
+                            key={source.name}
+                            href={source.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-4 group p-3 rounded-2xl hover:bg-slate-50 transition-all cursor-pointer border border-transparent hover:border-slate-100"
+                        >
+                            <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 p-1.5 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                                <img
+                                    src={source.logo}
+                                    alt={source.name}
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <span className="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors block">
+                                    {source.name}
+                                </span>
+                            </div>
+                            <div className="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                                <ArrowRight className="w-3 h-3 text-slate-400 group-hover:text-primary" />
+                            </div>
+                        </a>
                     ))}
                 </div>
             </div>
