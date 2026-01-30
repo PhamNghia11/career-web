@@ -79,7 +79,7 @@ export function AdminQuickActions() {
                 <Card className="absolute bottom-20 right-0 w-80 shadow-2xl animate-in slide-in-from-bottom-5 border-none overflow-hidden rounded-[32px]">
                     <CardHeader className="bg-[#0A2647] text-white pb-3 pt-6 px-6">
                         <div className="flex items-center justify-between">
-                            <CardTitle className="text-xs font-black uppercase tracking-[0.2em]">Admin Quick Actions</CardTitle>
+                            <CardTitle className="text-xs font-black uppercase tracking-[0.2em]">Menu Quản trị nhanh</CardTitle>
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -101,8 +101,8 @@ export function AdminQuickActions() {
                                     <Zap className="h-5 w-5 text-yellow-600 fill-yellow-600" />
                                 </div>
                                 <div>
-                                    <div className="font-bold text-slate-900 group-hover/item:text-yellow-700">Quick Post News</div>
-                                    <div className="text-[10px] text-slate-500 font-medium tracking-wide">Auto-fill via URL</div>
+                                    <div className="font-bold text-slate-900 group-hover/item:text-yellow-700">Đăng tin nhanh</div>
+                                    <div className="text-[10px] text-slate-500 font-medium tracking-wide">Tự động lấy tin từ URL</div>
                                 </div>
                             </button>
 
@@ -119,7 +119,7 @@ export function AdminQuickActions() {
                                 </div>
                                 <div>
                                     <div className="font-bold text-slate-900 group-hover/item:text-blue-700">Đăng việc làm</div>
-                                    <div className="text-[10px] text-slate-500 font-medium tracking-wide">Open job creation form</div>
+                                    <div className="text-[10px] text-slate-500 font-medium tracking-wide">Mở form tạo việc làm mới</div>
                                 </div>
                             </button>
 
@@ -136,7 +136,7 @@ export function AdminQuickActions() {
                                 <div className="bg-slate-100 p-2.5 rounded-xl group-hover/item:scale-110 transition-transform">
                                     <LayoutDashboard className="h-5 w-5 text-slate-600" />
                                 </div>
-                                <div className="font-bold text-slate-700 group-hover/item:text-slate-900">Dashboard Admin</div>
+                                <div className="font-bold text-slate-700 group-hover/item:text-slate-900">Trang quản trị chính</div>
                             </button>
                         </div>
                     </CardContent>
@@ -161,9 +161,9 @@ export function AdminQuickActions() {
                         <div className="w-12 h-12 rounded-2xl bg-yellow-100 flex items-center justify-center mb-4">
                             <Zap className="w-6 h-6 text-yellow-600 fill-yellow-600" />
                         </div>
-                        <DialogTitle className="text-2xl font-black text-[#0A2647]">Quick Post News</DialogTitle>
+                        <DialogTitle className="text-2xl font-black text-[#0A2647]">Đăng tin tức nhanh</DialogTitle>
                         <DialogDescription className="text-base font-medium">
-                            Dán link bài báo vào đây, hệ thống sẽ tự động lấy thông tin cơ bản.
+                            Dán link bài báo vào đây, hệ thống sẽ tự động trích xuất thông tin cơ bản.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="py-6">
