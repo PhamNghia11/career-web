@@ -24,7 +24,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
-import { Check, X, Loader2, Trash2, Eye } from "lucide-react"
+import { Check, X, Loader2, Trash2, Eye, Pencil } from "lucide-react"
 import { JobPreviewDialog, type Job } from "./job-preview-dialog"
 
 // Types matching API response
@@ -215,7 +215,7 @@ export default function AdminJobsPage() {
                                             <TableCell className="text-center">
                                                 <div className="flex justify-center items-center">
                                                     {/* Slot 1: Eye icon */}
-                                                    <div className="w-10 flex justify-center">
+                                                    <div className="flex items-center gap-1 mr-2 border-r pr-2 border-gray-100">
                                                         <Button
                                                             size="sm"
                                                             variant="ghost"
@@ -224,6 +224,15 @@ export default function AdminJobsPage() {
                                                             title="Xem chi tiết"
                                                         >
                                                             <Eye className="h-4.5 w-4.5" />
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="ghost"
+                                                            className="h-9 w-9 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-50"
+                                                            onClick={() => router.push(`/dashboard/jobs/${job._id}/edit`)}
+                                                            title="Chỉnh sửa"
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
                                                         </Button>
                                                     </div>
 
@@ -309,15 +318,24 @@ export default function AdminJobsPage() {
                                         </div>
 
                                         <div className="flex items-center justify-between pt-1">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="h-9 px-4 text-blue-600 font-bold"
-                                                onClick={() => setPreviewJob(job)}
-                                            >
-                                                <Eye className="h-4 w-4 mr-2" />
-                                                Chi tiết
-                                            </Button>
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="h-9 px-3 text-blue-600 font-bold"
+                                                    onClick={() => setPreviewJob(job)}
+                                                >
+                                                    <Eye className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="h-9 px-3 text-amber-600 font-bold"
+                                                    onClick={() => router.push(`/dashboard/jobs/${job._id}/edit`)}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                            </div>
 
                                             <div className="flex items-center gap-2">
                                                 {job.status === 'pending' && (
