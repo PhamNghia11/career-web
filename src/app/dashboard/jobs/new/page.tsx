@@ -73,7 +73,19 @@ const formSchema = z.object({
     quantity: z.coerce.number().optional(),
     unlimitedQuantity: z.boolean().default(false),
     contactEmail: z.string().email("Vui lòng nhập đúng định dạng email").optional().or(z.literal("")),
-    contactPhone: z.string().optional(),
+    contactPhone: z.string()
+        .optional()
+        .or(z.literal(""))
+        .refine((val) => {
+            if (!val) return true;
+            const clean = val.replace(/\s/g, "");
+            return clean.startsWith("0");
+        }, "Số điện thoại phải bắt đầu bằng số 0")
+        .refine((val) => {
+            if (!val) return true;
+            const clean = val.replace(/\s/g, "");
+            return clean.length >= 10 && clean.length <= 11;
+        }, "Số điện thoại phải có từ 10 đến 11 chữ số"),
     documentUrl: z.string().optional(),
     documentName: z.string().optional(),
 }).refine((data) => {
