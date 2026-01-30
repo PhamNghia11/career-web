@@ -8,9 +8,9 @@ interface NewsSidebarProps {
 }
 
 const SOURCES = [
-    { name: "VietnamWorks", logo: "https://images.vietnamworks.com/img/logo.png", url: "https://www.vietnamworks.com/" },
-    { name: "TopCV", logo: "https://static.topcv.vn/v4/image/logo-v2.png", url: "https://www.topcv.vn/" },
-    { name: "GDU Research", logo: "/gdu-logo.png", url: "https://s.net.vn/P1V6" }
+    { name: "VietnamWorks", logo: "https://www.google.com/s2/favicons?domain=vietnamworks.com&sz=128", url: "https://www.vietnamworks.com/" },
+    { name: "TopCV", logo: "https://www.google.com/s2/favicons?domain=topcv.vn&sz=128", url: "https://www.topcv.vn/" },
+    { name: "GDU Research", logo: "https://www.google.com/s2/favicons?domain=giadinh.edu.vn&sz=128", url: "https://s.net.vn/P1V6" }
 ]
 
 export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
@@ -104,11 +104,11 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
                             rel="noopener noreferrer"
                             className="flex items-center gap-4 group p-3 rounded-2xl hover:bg-slate-50 transition-all cursor-pointer border border-transparent hover:border-slate-100"
                         >
-                            <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 p-1.5 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                            <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 overflow-hidden flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform relative">
                                 <img
                                     src={source.logo}
                                     alt={source.name}
-                                    className="w-full h-full object-contain"
+                                    className="w-full h-full object-cover"
                                 />
                             </div>
                             <div className="flex-1">
@@ -116,8 +116,8 @@ export function NewsSidebar({ onTagClick }: NewsSidebarProps) {
                                     {source.name}
                                 </span>
                             </div>
-                            <div className="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                                <ArrowRight className="w-3 h-3 text-slate-400 group-hover:text-primary" />
+                            <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-white group-hover:shadow-md transition-all">
+                                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-primary" />
                             </div>
                         </a>
                     ))}
