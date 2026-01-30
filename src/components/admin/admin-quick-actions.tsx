@@ -13,13 +13,7 @@ import {
     ExternalLink
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-    DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Dialog,
     DialogContent,
@@ -37,7 +31,7 @@ export function AdminQuickActions() {
     const { user } = useAuth()
     const router = useRouter()
     const { toast } = useToast()
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
     const [isQuickNewsOpen, setIsQuickNewsOpen] = useState(false)
     const [quickUrl, setQuickUrl] = useState("")
     const [isFetching, setIsFetching] = useState(false)
@@ -60,13 +54,13 @@ export function AdminQuickActions() {
             const result = await res.json()
 
             if (result.success) {
-                // Store metadata in session storage to pass it to the news management page
                 sessionStorage.setItem("quick_post_metadata", JSON.stringify({
                     ...result.data,
                     sourceUrl: quickUrl
                 }))
                 setIsQuickNewsOpen(false)
                 setQuickUrl("")
+                setIsOpen(false)
                 router.push("/dashboard/admin/news")
                 toast({ title: "Đang chuyển hướng...", description: "Hệ thống đang mở trang đăng tin với thông tin đã lấy được." })
             } else {
@@ -80,53 +74,85 @@ export function AdminQuickActions() {
     }
 
     return (
-        <div className="fixed bottom-6 right-24 z-[100] group">
-            <DropdownMenu onOpenChange={setIsMenuOpen}>
-                <DropdownMenuTrigger asChild>
-                    <Button
-                        size="icon"
-                        className={`h-14 w-14 rounded-full shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all duration-300 bg-[#0A2647] hover:bg-[#0A2647]/90 active:scale-95 border-2 border-yellow-500/50 ring-4 ring-yellow-500/10`}
-                    >
-                        <Zap className={`w-7 h-7 text-yellow-400 fill-yellow-400 transition-transform duration-300 ${isMenuOpen ? "scale-110" : ""}`} />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="mb-4 w-64 rounded-2xl p-3 shadow-2xl border-slate-200">
-                    <div className="px-3 py-2 mb-2">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-[#0A2647]">Admin Quick Actions</p>
-                    </div>
-                    <DropdownMenuItem
-                        onClick={() => setIsQuickNewsOpen(true)}
-                        className="rounded-xl p-3 cursor-pointer hover:bg-yellow-50 focus:bg-yellow-50 group/item"
-                    >
-                        <Zap className="w-5 h-5 mr-3 text-yellow-500 fill-yellow-500" />
-                        <div>
-                            <p className="font-bold text-slate-900 group-hover/item:text-yellow-700 transition-colors">Quick Post News</p>
-                            <p className="text-[10px] text-slate-500 font-medium">Auto-fill via URL</p>
+        <div className="fixed bottom-24 right-6 z-50">
+            {isOpen && (
+                <Card className="absolute bottom-20 right-0 w-80 shadow-2xl animate-in slide-in-from-bottom-5 border-none overflow-hidden rounded-[32px]">
+                    <CardHeader className="bg-[#0A2647] text-white pb-3 pt-6 px-6">
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-xs font-black uppercase tracking-[0.2em]">Admin Quick Actions</CardTitle>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-white hover:bg-white/10 h-8 w-8 rounded-xl"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
                         </div>
-                    </DropdownMenuItem>
+                    </CardHeader>
+                    <CardContent className="p-4 bg-white">
+                        <div className="space-y-2">
+                            {/* News Card */}
+                            <button
+                                onClick={() => setIsQuickNewsOpen(true)}
+                                className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-yellow-50 transition-all group/item text-left border border-transparent hover:border-yellow-100"
+                            >
+                                <div className="bg-yellow-100 p-2.5 rounded-xl group-hover/item:scale-110 transition-transform">
+                                    <Zap className="h-5 w-5 text-yellow-600 fill-yellow-600" />
+                                </div>
+                                <div>
+                                    <div className="font-bold text-slate-900 group-hover/item:text-yellow-700">Quick Post News</div>
+                                    <div className="text-[10px] text-slate-500 font-medium tracking-wide">Auto-fill via URL</div>
+                                </div>
+                            </button>
 
-                    <DropdownMenuItem
-                        onClick={() => router.push("/dashboard/jobs/new")}
-                        className="rounded-xl p-3 cursor-pointer hover:bg-blue-50 focus:bg-blue-50 group/item"
-                    >
-                        <Briefcase className="w-5 h-5 mr-3 text-blue-600" />
-                        <div>
-                            <p className="font-bold text-slate-900 group-hover/item:text-blue-700 transition-colors">Đăng việc làm</p>
-                            <p className="text-[10px] text-slate-500 font-medium">Open job creation form</p>
+                            {/* Job Card */}
+                            <button
+                                onClick={() => {
+                                    router.push("/dashboard/jobs/new")
+                                    setIsOpen(false)
+                                }}
+                                className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-blue-50 transition-all group/item text-left border border-transparent hover:border-blue-100"
+                            >
+                                <div className="bg-blue-100 p-2.5 rounded-xl group-hover/item:scale-110 transition-transform">
+                                    <Briefcase className="h-5 w-5 text-blue-600" />
+                                </div>
+                                <div>
+                                    <div className="font-bold text-slate-900 group-hover/item:text-blue-700">Đăng việc làm</div>
+                                    <div className="text-[10px] text-slate-500 font-medium tracking-wide">Open job creation form</div>
+                                </div>
+                            </button>
+
+                            <div className="h-px bg-slate-100 mx-2 my-2" />
+
+                            {/* Dashboard Card */}
+                            <button
+                                onClick={() => {
+                                    router.push("/dashboard")
+                                    setIsOpen(false)
+                                }}
+                                className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-100 transition-all group/item text-left"
+                            >
+                                <div className="bg-slate-100 p-2.5 rounded-xl group-hover/item:scale-110 transition-transform">
+                                    <LayoutDashboard className="h-5 w-5 text-slate-600" />
+                                </div>
+                                <div className="font-bold text-slate-700 group-hover/item:text-slate-900">Dashboard Admin</div>
+                            </button>
                         </div>
-                    </DropdownMenuItem>
+                    </CardContent>
+                </Card>
+            )}
 
-                    <DropdownMenuSeparator className="my-2" />
-
-                    <DropdownMenuItem
-                        onClick={() => router.push("/dashboard")}
-                        className="rounded-xl p-3 cursor-pointer hover:bg-slate-50 focus:bg-slate-50 group/item"
-                    >
-                        <LayoutDashboard className="w-5 h-5 mr-3 text-slate-400" />
-                        <span className="font-bold text-slate-700">Dashboard Admin</span>
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`h-14 w-14 rounded-full shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all duration-300 bg-[#0A2647] hover:bg-[#0A2647]/90 active:scale-95 border-2 border-yellow-500/50 ring-4 ring-yellow-500/10`}
+            >
+                {isOpen ? (
+                    <X className="h-7 w-7 text-white" />
+                ) : (
+                    <Zap className="h-7 w-7 text-yellow-400 fill-yellow-400" />
+                )}
+            </Button>
 
             {/* Quick News Modal */}
             <Dialog open={isQuickNewsOpen} onOpenChange={setIsQuickNewsOpen}>
