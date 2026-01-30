@@ -38,6 +38,20 @@ export function AdminQuickActions() {
 
     if (!user || user.role !== "admin") return null
 
+    useEffect(() => {
+        const handleClose = () => setIsOpen(false)
+        window.addEventListener("close-admin-menu", handleClose)
+        return () => window.removeEventListener("close-admin-menu", handleClose)
+    }, [])
+
+    const toggleMenu = () => {
+        const nextState = !isOpen
+        setIsOpen(nextState)
+        if (nextState) {
+            window.dispatchEvent(new CustomEvent("close-chat-menu"))
+        }
+    }
+
     const handleQuickNews = async () => {
         if (!quickUrl) {
             toast({ title: "Thiếu URL", description: "Vui lòng nhập link bài báo", variant: "destructive" })
@@ -79,7 +93,7 @@ export function AdminQuickActions() {
                 <Card className="absolute bottom-20 right-0 w-80 shadow-2xl animate-in slide-in-from-bottom-5 border-none overflow-hidden rounded-[32px]">
                     <CardHeader className="bg-[#0A2647] text-white pb-3 pt-6 px-6">
                         <div className="flex items-center justify-between">
-                            <CardTitle className="text-xs font-black uppercase tracking-[0.2em]">Menu Quản trị nhanh</CardTitle>
+                            <CardTitle className="text-lg">Menu Quản trị nhanh</CardTitle>
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -144,7 +158,7 @@ export function AdminQuickActions() {
             )}
 
             <Button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={toggleMenu}
                 className={`h-14 w-14 rounded-full shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all duration-300 bg-[#0A2647] hover:bg-[#0A2647]/90 active:scale-95 border-2 border-yellow-500/50 ring-4 ring-yellow-500/10`}
             >
                 {isOpen ? (

@@ -4,9 +4,24 @@ import { useState } from "react"
 import { MessageCircle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useEffect } from "react"
 
 export function SocialChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    const handleClose = () => setIsOpen(false)
+    window.addEventListener("close-chat-menu", handleClose)
+    return () => window.removeEventListener("close-chat-menu", handleClose)
+  }, [])
+
+  const toggleOpen = () => {
+    const nextState = !isOpen
+    setIsOpen(nextState)
+    if (nextState) {
+      window.dispatchEvent(new CustomEvent("close-admin-menu"))
+    }
+  }
 
   // Direct links - click to open immediately
   const handleZaloClick = () => {
@@ -73,7 +88,7 @@ export function SocialChatWidget() {
       )}
 
       <Button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleOpen}
         className="h-14 w-14 rounded-full shadow-lg bg-secondary hover:bg-secondary/90 text-secondary-foreground"
       >
         {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
