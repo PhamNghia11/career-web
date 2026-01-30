@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Search, Filter, MoreVertical, Edit2, Trash2, Newspaper, TrendingUp, Calendar, Eye, ExternalLink, Loader2 } from "lucide-react"
+import { Plus, Search, Filter, MoreVertical, Edit2, Trash2, Newspaper, TrendingUp, Calendar, Eye, ExternalLink, Loader2, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -55,6 +55,56 @@ export default function AdminNewsPage() {
         readingTime: "5 phút",
     })
     const { toast } = useToast()
+    const [isQuickPostOpen, setIsQuickPostOpen] = useState(false)
+    const [quickPostUrl, setQuickPostUrl] = useState("")
+    const [isFetchingMetadata, setIsFetchingMetadata] = useState(false)
+
+    const handleQuickPost = async () => {
+        if (!quickPostUrl) {
+            toast({ title: "Thiếu URL", description: "Vui lòng nhập URL bài viết", variant: "destructive" })
+            return
+        }
+
+        setIsFetchingMetadata(true)
+        try {
+            const res = await fetch("/api/news/metadata", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url: quickPostUrl }),
+            })
+            const result = await res.json()
+
+            if (result.success) {
+                const metadata = result.data
+                setIsEditing(false)
+                setCurrentNews({
+                    title: metadata.title || "",
+                    summary: metadata.description || "",
+                    content: "", // Content still needs to be filled manually or from description
+                    category: CATEGORIES[0],
+                    sourceName: metadata.sourceName || "GDU Research",
+                    sourceUrl: quickPostUrl,
+                    imageUrl: metadata.image || "",
+                    gallery: [],
+                    videoUrls: [],
+                    relatedLinks: [],
+                    tags: [],
+                    isFeatured: false,
+                    readingTime: "5 phút",
+                })
+                setIsQuickPostOpen(false)
+                setIsDialogOpen(true)
+                setQuickPostUrl("")
+                toast({ title: "Lấy thông tin thành công", description: "Vui lòng kiểm tra và bổ sung nội dung bài viết." })
+            } else {
+                toast({ title: "Lỗi", description: result.error || "Không thể lấy thông tin từ URL này", variant: "destructive" })
+            }
+        } catch (error) {
+            toast({ title: "Lỗi", description: "Có lỗi xảy ra khi kết nối máy chủ", variant: "destructive" })
+        } finally {
+            setIsFetchingMetadata(false)
+        }
+    }
 
     // Helper to add/remove items from arrays
     const handleArrayChange = (field: keyof News, index: number, value: string) => {
@@ -181,27 +231,36 @@ export default function AdminNewsPage() {
                     <h1 className="text-3xl lg:text-4xl font-black tracking-tight">Hệ thống Quản lý Tin tức</h1>
                     <p className="text-muted-foreground mt-2 text-lg">Đăng tải và điều phối các bài phân tích, xu hướng thị trường lao động cho sinh viên.</p>
                 </div>
-                <Button onClick={() => {
-                    setIsEditing(false)
-                    setCurrentNews({
-                        title: "",
-                        summary: "",
-                        content: "",
-                        category: CATEGORIES[0],
-                        sourceName: "GDU Research",
-                        sourceUrl: "#",
-                        imageUrl: "",
-                        gallery: [],
-                        videoUrls: [],
-                        relatedLinks: [],
-                        tags: [],
-                        isFeatured: false,
-                        readingTime: "5 phút",
-                    })
-                    setIsDialogOpen(true)
-                }} className="h-14 px-8 rounded-2xl gap-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95">
-                    <Plus className="w-5 h-5" /> Đăng bài viết mới
-                </Button>
+                <div className="flex gap-3">
+                    <Button
+                        variant="outline"
+                        onClick={() => setIsQuickPostOpen(true)}
+                        className="h-14 px-6 rounded-2xl gap-3 border-primary/20 hover:bg-primary/5 text-primary font-bold transition-all hover:scale-[1.02] active:scale-95"
+                    >
+                        <Zap className="w-5 h-5" /> Quick Post
+                    </Button>
+                    <Button onClick={() => {
+                        setIsEditing(false)
+                        setCurrentNews({
+                            title: "",
+                            summary: "",
+                            content: "",
+                            category: CATEGORIES[0],
+                            sourceName: "GDU Research",
+                            sourceUrl: "#",
+                            imageUrl: "",
+                            gallery: [],
+                            videoUrls: [],
+                            relatedLinks: [],
+                            tags: [],
+                            isFeatured: false,
+                            readingTime: "5 phút",
+                        })
+                        setIsDialogOpen(true)
+                    }} className="h-14 px-8 rounded-2xl gap-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95">
+                        <Plus className="w-5 h-5" /> Đăng bài viết mới
+                    </Button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -240,8 +299,8 @@ export default function AdminNewsPage() {
                                             variant={selectedSource === s ? "default" : "ghost"}
                                             onClick={() => setSelectedSource(selectedSource === s ? null : s)}
                                             className={`justify-start gap-2 h-10 rounded-lg font-medium text-sm px-3 ${selectedSource === s
-                                                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                                                    : "hover:bg-primary/5 hover:text-primary"
+                                                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                                                : "hover:bg-primary/5 hover:text-primary"
                                                 }`}
                                         >
                                             <div className={`w-1.5 h-1.5 rounded-full ${selectedSource === s ? "bg-white" : "bg-border"}`} />
@@ -545,6 +604,50 @@ export default function AdminNewsPage() {
                         <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Hủy bỏ</Button>
                         <Button onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground">
                             {isEditing ? "Cập nhật" : "Đăng tin"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Quick Post Dialog */}
+            <Dialog open={isQuickPostOpen} onOpenChange={setIsQuickPostOpen}>
+                <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Zap className="w-5 h-5 text-yellow-500 fill-yellow-500" /> Quick Post News
+                        </DialogTitle>
+                        <DialogDescription>
+                            Dán link bài báo vào đây, hệ thống sẽ tự động lấy tiêu đề, ảnh và mô tả.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="quick-url">Link bài báo (URL)</Label>
+                            <Input
+                                id="quick-url"
+                                placeholder="https://..."
+                                value={quickPostUrl}
+                                onChange={(e) => setQuickPostUrl(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleQuickPost()
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsQuickPostOpen(false)}>Hủy</Button>
+                        <Button
+                            onClick={handleQuickPost}
+                            disabled={isFetchingMetadata}
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[120px]"
+                        >
+                            {isFetchingMetadata ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Đang lấy...
+                                </>
+                            ) : (
+                                "Tiếp tục"
+                            )}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
