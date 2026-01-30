@@ -25,11 +25,12 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
 export function AdminQuickActions() {
     const { user } = useAuth()
     const router = useRouter()
+    const pathname = usePathname()
     const { toast } = useToast()
     const [isOpen, setIsOpen] = useState(false)
     const [isQuickNewsOpen, setIsQuickNewsOpen] = useState(false)
@@ -50,7 +51,7 @@ export function AdminQuickActions() {
         }
     }
 
-    if (!user || user.role !== "admin") return null
+    if (!user || user.role !== "admin" || pathname?.startsWith('/dashboard')) return null
 
     const handleQuickNews = async () => {
         if (!quickUrl) {

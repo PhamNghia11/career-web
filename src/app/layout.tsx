@@ -6,6 +6,7 @@ import { AuthProvider } from "@/lib/auth-context"
 import { VisitorTracker } from "@/components/visitor-tracker"
 import { Toaster } from "@/components/ui/toaster"
 import { AdminQuickActions } from "@/components/admin/admin-quick-actions"
+import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin", "vietnamese"] })
@@ -45,6 +46,7 @@ export default function RootLayout({
           <VisitorTracker />
           {children}
           <AdminQuickActions />
+          <SocialChatWidget />
           <Toaster />
         </AuthProvider>
         <Analytics />

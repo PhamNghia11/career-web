@@ -1,6 +1,5 @@
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import { CompaniesListClient } from "@/components/companies/companies-list-client"
 
 export default function CompaniesPage() {
@@ -30,7 +29,6 @@ export default function CompaniesPage() {
         </div>
       </main>
       <Footer />
-      <SocialChatWidget />
     </div>
   )
 }

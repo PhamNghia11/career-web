@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { MapPin, DollarSign, Clock, Building, ChevronLeft, Calendar, CheckCircle2, Briefcase, Globe, Users, Award } from "lucide-react"
@@ -307,7 +306,6 @@ export default async function JobPage(props: JobPageProps) {
                 </div>
             </main>
             <Footer />
-            <SocialChatWidget />
             <ViewTracker jobId={job._id} />
         </div>
     )

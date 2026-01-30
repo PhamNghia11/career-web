@@ -1,7 +1,6 @@
 import { Suspense } from "react"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import { JobsListClient } from "@/components/jobs/jobs-list-client"
 import { getCollection, COLLECTIONS } from "@/database/connection"
 import { Job } from "@/lib/jobs-data"
@@ -114,7 +113,6 @@ export default async function JobsPage() {
         </div>
       </main>
       <Footer />
-      <SocialChatWidget />
     </div>
   )
 }

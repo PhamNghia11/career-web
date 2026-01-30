@@ -1,6 +1,5 @@
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import { ContactForm } from "@/components/contact/contact-form"
 import { MapPin, Mail, Clock, MessageCircle } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -130,7 +129,6 @@ export default function ContactPage() {
         </div>
       </main>
       <Footer />
-      <SocialChatWidget />
     </div>
   )
 }

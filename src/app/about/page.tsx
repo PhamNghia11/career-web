@@ -2,7 +2,6 @@
 
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -236,7 +235,6 @@ export default function AboutPage() {
                 </section>
             </main>
             <Footer />
-            <SocialChatWidget />
         </div>
     )
 }

@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useState } from "react"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import { JobsListClient } from "@/components/jobs/jobs-list-client"
 import { ApplyJobDialog } from "@/components/jobs/apply-job-dialog"
 import { Card, CardContent } from "@/components/ui/card"
@@ -458,7 +457,6 @@ export default function InternshipsPage() {
                 </div>
             </main>
             <Footer />
-            <SocialChatWidget />
         </div>
     )
 }

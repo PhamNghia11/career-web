@@ -1,6 +1,5 @@
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import { Target, Users, BarChart3, Clock, Shield, Zap } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -161,11 +160,10 @@ export default function EmployerPage() {
                 {packages.map((pkg, index) => (
                   <Card
                     key={index}
-                    className={`p-8 ${
-                      pkg.highlight
-                        ? "border-secondary border-2 shadow-xl bg-gradient-to-br from-secondary/5 to-secondary/10 backdrop-blur-sm"
-                        : "bg-card/80 backdrop-blur-sm"
-                    }`}
+                    className={`p-8 ${pkg.highlight
+                      ? "border-secondary border-2 shadow-xl bg-gradient-to-br from-secondary/5 to-secondary/10 backdrop-blur-sm"
+                      : "bg-card/80 backdrop-blur-sm"
+                      }`}
                   >
                     {pkg.highlight && (
                       <div className="bg-secondary text-secondary-foreground text-sm font-semibold px-3 py-1 rounded-full w-fit mb-4">
@@ -185,9 +183,8 @@ export default function EmployerPage() {
                       ))}
                     </ul>
                     <Button
-                      className={`w-full ${
-                        pkg.highlight ? "bg-secondary hover:bg-secondary/90" : "bg-primary hover:bg-primary/90"
-                      }`}
+                      className={`w-full ${pkg.highlight ? "bg-secondary hover:bg-secondary/90" : "bg-primary hover:bg-primary/90"
+                        }`}
                     >
                       {pkg.price === "Liên hệ" ? "Liên hệ tư vấn" : "Chọn gói"}
                     </Button>
@@ -238,7 +235,6 @@ export default function EmployerPage() {
           </div>
         </main>
         <Footer />
-        <SocialChatWidget />
       </div>
     </div>
   )

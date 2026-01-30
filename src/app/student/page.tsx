@@ -1,6 +1,5 @@
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
-import { SocialChatWidget } from "@/components/chat/social-chat-widget"
 import { GraduationCap, Briefcase, FileText, TrendingUp, BookOpen, Users } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -185,7 +184,6 @@ export default function StudentPage() {
           </div>
         </main>
         <Footer />
-        <SocialChatWidget />
       </div>
     </div>
   )

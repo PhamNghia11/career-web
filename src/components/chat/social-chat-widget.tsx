@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { MessageCircle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useEffect } from "react"
+import { usePathname } from "next/navigation"
 
 export function SocialChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname()
 
   useEffect(() => {
     const handleClose = () => setIsOpen(false)
@@ -22,6 +23,8 @@ export function SocialChatWidget() {
       window.dispatchEvent(new CustomEvent("close-admin-menu"))
     }
   }
+
+  if (pathname?.startsWith('/dashboard')) return null
 
   // Direct links - click to open immediately
   const handleZaloClick = () => {
