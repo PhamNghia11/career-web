@@ -88,6 +88,8 @@ const formSchema = z.object({
         }, "Số điện thoại phải có từ 10 đến 11 chữ số"),
     documentUrl: z.string().optional(),
     documentName: z.string().optional(),
+
+    logoFit: z.enum(["cover", "contain"]).default("cover"),
 }).refine((data) => {
     if (!data.isNegotiable && data.salaryMin && data.salaryMax && data.salaryMax < data.salaryMin) {
         return false
@@ -141,6 +143,7 @@ export default function PostJobPage() {
             contactPhone: "",
             documentUrl: "",
             documentName: "",
+            logoFit: "cover",
         },
     })
 
@@ -424,7 +427,7 @@ export default function PostJobPage() {
                                             <img
                                                 src={logoPreview}
                                                 alt="Logo preview"
-                                                className="w-24 h-24 object-contain rounded-lg border bg-white"
+                                                className={`w-24 h-24 rounded-lg border bg-white ${form.watch('logoFit') === 'contain' ? 'object-contain' : 'object-cover'}`}
                                             />
                                             <button
                                                 type="button"
@@ -452,6 +455,30 @@ export default function PostJobPage() {
                                         <p>Kích thước khuyến nghị: 200x200px</p>
                                     </div>
                                 </div>
+                                <FormField
+                                    control={form.control}
+                                    name="logoFit"
+                                    render={({ field }) => (
+                                        <FormItem className="space-y-2">
+                                            <FormLabel>Chế độ hiển thị logo</FormLabel>
+                                            <div className="flex gap-4">
+                                                <div
+                                                    className={`px-4 py-2 border rounded-lg cursor-pointer transition-colors ${field.value === 'cover' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'hover:bg-gray-50'}`}
+                                                    onClick={() => field.onChange('cover')}
+                                                >
+                                                    <span className="text-sm font-medium">Lấp đầy (Khuyên dùng)</span>
+                                                </div>
+                                                <div
+                                                    className={`px-4 py-2 border rounded-lg cursor-pointer transition-colors ${field.value === 'contain' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'hover:bg-gray-50'}`}
+                                                    onClick={() => field.onChange('contain')}
+                                                >
+                                                    <span className="text-sm font-medium">Vừa vặn</span>
+                                                </div>
+                                            </div>
+                                            <p className="text-xs text-gray-500">Chọn "Lấp đầy" để logo tràn viền đẹp mắt, hoặc "Vừa vặn" nếu logo bị cắt.</p>
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
 
                             <FormField

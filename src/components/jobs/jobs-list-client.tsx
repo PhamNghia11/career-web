@@ -210,13 +210,13 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
 
   // Get unique companies with job counts and logos
   const companies = useMemo(() => {
-    const companyMap = new Map<string, { name: string; logo: string; count: number }>()
+    const companyMap = new Map<string, { name: string; logo: string; logoFit?: "cover" | "contain"; count: number }>()
     mergedJobs.forEach(job => {
       if (companyMap.has(job.company)) {
         const existing = companyMap.get(job.company)!
         existing.count++
       } else {
-        companyMap.set(job.company, { name: job.company, logo: job.logo || "", count: 1 })
+        companyMap.set(job.company, { name: job.company, logo: job.logo || "", logoFit: job.logoFit, count: 1 })
       }
     })
     return Array.from(companyMap.values()).sort((a, b) => b.count - a.count)
@@ -1130,7 +1130,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                             >
                               <div className="w-8 h-8 rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
                                 {company.logo ? (
-                                  <img src={company.logo} alt={company.name} className="w-full h-full object-contain" />
+                                  <img src={company.logo} alt={company.name} className={`w-full h-full ${company.logoFit === 'contain' ? 'object-contain' : 'object-cover'}`} />
                                 ) : (
                                   <Building className="h-4 w-4 text-gray-400" />
                                 )}
@@ -1253,9 +1253,9 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row gap-6">
                     {/* Logo */}
-                    <div className="w-16 h-16 rounded-lg border border-gray-100 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                    <div className="w-16 h-16 rounded-lg border border-gray-100 bg-white flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform overflow-hidden">
                       {job.logo ? (
-                        <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
+                        <img src={job.logo} alt={job.company} className={`w-full h-full ${job.logoFit === 'contain' ? 'object-contain' : 'object-cover'}`} />
                       ) : (
                         <Building className="h-8 w-8 text-gray-400" />
                       )}

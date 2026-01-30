@@ -7,6 +7,7 @@ export type Job = {
     company: string
     companyId: string
     logo?: string
+    logoFit?: "cover" | "contain"
     location: string
     type: "internship" | "full-time" | "part-time" | "freelance"
     field: string

@@ -84,9 +84,9 @@ export function JobPreview({ data, onBack, onSubmit, isLoading }: JobPreviewProp
 
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="flex flex-col md:flex-row gap-6 items-start">
-                        <div className="w-20 h-20 md:w-28 md:h-28 rounded-xl bg-white p-3 flex items-center justify-center shadow-lg flex-shrink-0">
+                        <div className="w-20 h-20 md:w-28 md:h-28 rounded-xl bg-white flex items-center justify-center shadow-lg flex-shrink-0 overflow-hidden">
                             {data.logoPreview || data.logo ? (
-                                <img src={data.logoPreview || data.logo} alt={data.company} className="w-full h-full object-contain" />
+                                <img src={data.logoPreview || data.logo} alt={data.company} className={`w-full h-full ${data.logoFit === 'contain' ? 'object-contain' : 'object-cover'}`} />
                             ) : (
                                 <Building className="h-10 w-10 text-gray-400" />
                             )}

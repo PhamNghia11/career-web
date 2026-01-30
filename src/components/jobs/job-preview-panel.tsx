@@ -33,9 +33,9 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
         <Card className="h-full flex flex-col overflow-hidden shadow-none rounded-none border-none bg-white">
             <div className="p-4 pb-0">
                 <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 bg-white rounded-lg border border-gray-100 p-1.5 flex items-center justify-center shadow-sm shrink-0">
+                    <div className="w-12 h-12 bg-white rounded-lg border border-gray-100 flex items-center justify-center shadow-sm shrink-0 overflow-hidden">
                         {job.logo ? (
-                            <img src={job.logo} alt={job.company} className="w-full h-full object-contain" />
+                            <img src={job.logo} alt={job.company} className={`w-full h-full ${job.logoFit === 'contain' ? 'object-contain' : 'object-cover'}`} />
                         ) : (
                             <Building className="h-6 w-6 text-gray-300" />
                         )}

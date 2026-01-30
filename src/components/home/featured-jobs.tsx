@@ -105,11 +105,11 @@ export function FeaturedJobs() {
             >
               <CardContent className="p-6 flex-1">
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-14 h-14 rounded-lg bg-white border flex items-center justify-center p-2 flex-shrink-0">
+                  <div className="w-14 h-14 rounded-lg bg-white border flex items-center justify-center flex-shrink-0 overflow-hidden">
                     <img
                       src={job.logo || "/placeholder.svg"}
                       alt={job.company}
-                      className="w-full h-full object-contain"
+                      className={`w-full h-full ${job.logoFit === 'contain' ? 'object-contain' : 'object-cover'}`}
                     />
                   </div>
                   <div className="flex-1 min-w-0">
