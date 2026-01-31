@@ -146,25 +146,42 @@ export default function AdminHeroPage() {
         }
     }
 
+    const handleImportDefaults = async () => {
+        if (!confirm("Bạn có muốn nhập dữ liệu mặc định (3 ảnh gốc của trang chủ) không?")) return
+        setLoading(true)
+        try {
+            const res = await fetch("/api/admin/hero-slides/import", { method: "POST" })
+            const data = await res.json()
+            if (data.success) {
+                toast.success(data.message)
+                refreshData()
+            }
+        } catch (e) {
+            toast.error("Lỗi khi nhập dữ liệu")
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const filteredSlides = slides.filter(s => s.page === activeTab)
     const currentPageInfo = PAGES.find(p => p.id === activeTab)
 
     return (
         <div className="p-4 lg:p-8 max-w-7xl mx-auto min-h-screen">
-            {/* Header section with gradient background */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#0077B6] to-[#00B4D8] p-8 lg:p-12 mb-8 text-white shadow-xl">
+            {/* Header section - Updated to GDU Colors */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#003580] to-[#004fa3] p-8 lg:p-12 mb-8 text-white shadow-xl">
                 <div className="relative z-10 max-w-2xl">
                     <h1 className="text-3xl lg:text-4xl font-bold mb-3 flex items-center gap-3">
-                        <Layout className="w-10 h-10" />
-                        Quản lý Giao diện & Banner
+                        <Layout className="w-10 h-10 text-yellow-400" />
+                        Quản lý Banner & Giao diện
                     </h1>
                     <p className="text-white/80 text-lg">
-                        Tùy chỉnh hình nền, tiêu đề và nút bấm cho từng chuyển mục trên website. Giúp trang web luôn mới mẻ và chuyên nghiệp.
+                        Tùy chỉnh hình nền, tiêu đề và nút bấm cho từng chuyên mục trên website. Giúp trang web luôn mới mẻ và đúng nhận diện thương hiệu.
                     </p>
                 </div>
                 {/* Decorative circles */}
-                <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
-                <div className="absolute -bottom-12 right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                <div className="absolute -top-12 -right-12 w-48 h-48 bg-yellow-400/10 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-12 right-24 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
             </div>
 
             {/* Page Tabs */}
@@ -176,14 +193,14 @@ export default function AdminHeroPage() {
                         className={cn(
                             "px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2",
                             activeTab === page.id
-                                ? "bg-white text-[#0077B6] shadow-md"
+                                ? "bg-white text-[#003580] shadow-md"
                                 : "text-slate-500 hover:text-slate-700 hover:bg-slate-200"
                         )}
                     >
                         {page.name}
                         <span className={cn(
                             "px-2 py-0.5 rounded-full text-xs",
-                            activeTab === page.id ? "bg-[#0077B6] text-white" : "bg-slate-200 text-slate-500"
+                            activeTab === page.id ? "bg-[#003580] text-white" : "bg-slate-200 text-slate-500"
                         )}>
                             {slides.filter(s => s.page === page.id).length}
                         </span>
@@ -213,7 +230,7 @@ export default function AdminHeroPage() {
                         isActive: true,
                         page: activeTab
                     })}
-                    className="bg-[#0077B6] hover:bg-[#0077B6]/90 shadow-lg shadow-[#0077B6]/20 px-6 py-6 rounded-xl text-lg h-auto"
+                    className="bg-[#003580] hover:bg-[#003580]/90 shadow-lg shadow-[#003580]/20 px-6 py-6 rounded-xl text-lg h-auto"
                 >
                     <Plus className="w-5 h-5 mr-2" /> Thêm thiết kế mới
                 </Button>
@@ -271,7 +288,7 @@ export default function AdminHeroPage() {
                                 </button>
                             </div>
                             <div className="p-5 flex-1 flex flex-col">
-                                <h3 className="font-bold text-slate-800 text-lg leading-tight group-hover:text-[#0077B6] transition-colors line-clamp-1">
+                                <h3 className="font-bold text-slate-800 text-lg leading-tight group-hover:text-[#003580] transition-colors line-clamp-1">
                                     {slide.title || "Chưa đặt tiêu đề"}
                                 </h3>
                                 <p className="text-slate-500 text-sm mt-2 line-clamp-2 min-h-[40px]">
@@ -286,7 +303,7 @@ export default function AdminHeroPage() {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => setEditingSlide(slide)}
-                                        className="text-[#0077B6] font-bold hover:bg-[#0077B6]/10"
+                                        className="text-[#003580] font-bold hover:bg-[#003580]/10"
                                     >
                                         Chỉnh sửa
                                     </Button>
@@ -302,23 +319,35 @@ export default function AdminHeroPage() {
                     </div>
                     <h3 className="text-2xl font-bold text-slate-800 mb-2">Chưa có thiết kế nào cho trang này</h3>
                     <p className="text-slate-500 max-w-md mx-auto mb-8">
-                        Bạn chưa thiết lập bất kỳ hình ảnh nào cho mục <strong>{currentPageInfo?.name}</strong>. Hãy nhấn nút bên dưới để bắt đầu.
+                        Bạn chưa thiết lập bất kỳ hình ảnh nào cho mục <strong>{currentPageInfo?.name}</strong>. Hãy nhấn nút bên dưới để bắt đầu hoặc nhập dữ liệu mặc định từ hệ thống.
                     </p>
-                    <Button
-                        onClick={() => setEditingSlide({
-                            title: "",
-                            subtitle: "",
-                            image: "",
-                            cta: "Khám phá ngay",
-                            link: "/jobs",
-                            order: 0,
-                            isActive: true,
-                            page: activeTab
-                        })}
-                        className="bg-[#0077B6] hover:bg-[#0077B6]/90 px-8 py-6 rounded-xl h-auto font-bold text-lg"
-                    >
-                        <Plus className="w-5 h-5 mr-1.5" /> Thêm Slide {currentPageInfo?.name}
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <Button
+                            onClick={() => setEditingSlide({
+                                title: "",
+                                subtitle: "",
+                                image: "",
+                                cta: "Khám phá ngay",
+                                link: "/jobs",
+                                order: 0,
+                                isActive: true,
+                                page: activeTab
+                            })}
+                            className="bg-[#003580] hover:bg-[#003580]/90 px-8 py-6 rounded-xl h-auto font-bold text-lg"
+                        >
+                            <Plus className="w-5 h-5 mr-1.5" /> Thêm Slide {currentPageInfo?.name}
+                        </Button>
+
+                        {activeTab === "home" && (
+                            <Button
+                                variant="outline"
+                                onClick={handleImportDefaults}
+                                className="border-2 border-[#003580] text-[#003580] hover:bg-slate-50 px-8 py-6 rounded-xl h-auto font-bold text-lg"
+                            >
+                                <ImageIcon className="w-5 h-5 mr-1.5" /> Nhập dữ liệu mặc định
+                            </Button>
+                        )}
+                    </div>
                 </div>
             )}
 
@@ -329,14 +358,14 @@ export default function AdminHeroPage() {
                         {/* Modal Header */}
                         <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-[#0077B6]">
+                                <div className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-[#003580]">
                                     <Settings2 className="w-6 h-6" />
                                 </div>
                                 <div>
                                     <h2 className="text-2xl font-bold text-slate-800 leading-none">
                                         {editingSlide._id ? "Cập nhật thiết kế" : "Tạo thiết kế mới"}
                                     </h2>
-                                    <p className="text-slate-500 text-sm mt-1.5">Vị trí hiển thị: <span className="font-bold text-[#0077B6]">{PAGES.find(p => p.id === editingSlide.page)?.name}</span></p>
+                                    <p className="text-slate-500 text-sm mt-1.5">Vị trí hiển thị: <span className="font-bold text-[#003580]">{PAGES.find(p => p.id === editingSlide.page)?.name}</span></p>
                                 </div>
                             </div>
                             <button
@@ -358,7 +387,7 @@ export default function AdminHeroPage() {
                                             <span className="text-[10px] font-medium bg-slate-100 px-2 py-0.5 rounded-full text-slate-500 uppercase tracking-wider">Khuyên dùng: 1920x1080</span>
                                         </label>
                                         <div
-                                            className="group relative border-2 border-dashed border-slate-200 rounded-[1.5rem] p-4 flex flex-col items-center justify-center bg-slate-50/50 hover:bg-white hover:border-[#0077B6] hover:shadow-xl hover:shadow-[#0077B6]/5 transition-all duration-500 cursor-pointer min-h-[220px]"
+                                            className="group relative border-2 border-dashed border-slate-200 rounded-[1.5rem] p-4 flex flex-col items-center justify-center bg-slate-50/50 hover:bg-white hover:border-[#003580] hover:shadow-xl hover:shadow-[#003580]/5 transition-all duration-500 cursor-pointer min-h-[220px]"
                                             onClick={() => document.getElementById('image-upload')?.click()}
                                         >
                                             {editingSlide.image ? (
@@ -371,7 +400,7 @@ export default function AdminHeroPage() {
                                             ) : (
                                                 <>
                                                     <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                                        <ImageIcon className="w-8 h-8 text-[#0077B6]" />
+                                                        <ImageIcon className="w-8 h-8 text-[#003580]" />
                                                     </div>
                                                     <p className="text-sm font-bold text-slate-800">Tải ảnh lên hệ thống</p>
                                                     <p className="text-xs text-slate-400 mt-1">Dung lượng tối đa 2MB</p>
@@ -388,7 +417,7 @@ export default function AdminHeroPage() {
                                             <Input
                                                 value={editingSlide.title}
                                                 onChange={(e) => setEditingSlide({ ...editingSlide, title: e.target.value })}
-                                                className="rounded-xl border-slate-200 h-12 focus:ring-[#0077B6]"
+                                                className="rounded-xl border-slate-200 h-12 focus:ring-[#003580]"
                                                 placeholder="VD: Gia Định University - Nâng tầm trí tuệ"
                                             />
                                         </div>
@@ -397,7 +426,7 @@ export default function AdminHeroPage() {
                                             <Textarea
                                                 value={editingSlide.subtitle}
                                                 onChange={(e) => setEditingSlide({ ...editingSlide, subtitle: e.target.value })}
-                                                className="rounded-xl border-slate-200 min-h-[100px] focus:ring-[#0077B6] resize-none"
+                                                className="rounded-xl border-slate-200 min-h-[100px] focus:ring-[#003580] resize-none"
                                                 placeholder="Nhập nội dung mô tả hiển thị dưới tiêu đề chính..."
                                             />
                                         </div>
@@ -421,7 +450,7 @@ export default function AdminHeroPage() {
                                             <select
                                                 value={editingSlide.page}
                                                 onChange={(e) => setEditingSlide({ ...editingSlide, page: e.target.value })}
-                                                className="w-full rounded-xl border-slate-200 border h-12 px-3 focus:ring-[#0077B6] focus:border-[#0077B6] outline-none text-sm"
+                                                className="w-full rounded-xl border-slate-200 border h-12 px-3 focus:ring-[#003580] focus:border-[#003580] outline-none text-sm"
                                             >
                                                 {PAGES.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                                             </select>
@@ -434,7 +463,7 @@ export default function AdminHeroPage() {
                                             <Input
                                                 value={editingSlide.cta}
                                                 onChange={(e) => setEditingSlide({ ...editingSlide, cta: e.target.value })}
-                                                className="rounded-xl border-slate-200 h-12"
+                                                className="rounded-xl border-slate-200 h-12 shadow-sm focus:ring-[#003580]"
                                                 placeholder="Tìm hiểu ngay"
                                             />
                                         </div>
@@ -443,7 +472,7 @@ export default function AdminHeroPage() {
                                             <Input
                                                 value={editingSlide.link}
                                                 onChange={(e) => setEditingSlide({ ...editingSlide, link: e.target.value })}
-                                                className="rounded-xl border-slate-200 h-12"
+                                                className="rounded-xl border-slate-200 h-12 shadow-sm focus:ring-[#003580]"
                                                 placeholder="/jobs"
                                             />
                                         </div>
@@ -462,7 +491,7 @@ export default function AdminHeroPage() {
                                                     <div className="absolute inset-x-8 top-1/2 -translate-y-1/2 text-white max-w-[80%]">
                                                         <h4 className="text-lg font-bold leading-tight line-clamp-2">{editingSlide.title || "TIÊU ĐỀ PREVIEW"}</h4>
                                                         <p className="text-[10px] text-white/70 mt-1.5 line-clamp-2">{editingSlide.subtitle || "Nội dung mô tả sẽ hiển thị ở đây..."}</p>
-                                                        <div className="mt-3 inline-block bg-[#0077B6] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">
+                                                        <div className="mt-3 inline-block bg-[#003580] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">
                                                             {editingSlide.cta || "CHI TIẾT"}
                                                         </div>
                                                     </div>
