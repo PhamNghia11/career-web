@@ -7,6 +7,13 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 interface HeroSlide {
     _id?: string
@@ -374,39 +381,127 @@ export default function AdminHeroPage() {
 
                         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                                {/* Left side: Image Upload */}
-                                <div className="space-y-3">
-                                    <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                                        Hình ảnh nền thiết kế
-                                        <span className="text-[10px] font-medium bg-slate-100 px-2 py-0.5 rounded-full text-slate-500 uppercase tracking-wider">Khuyên dùng: 1920x1080</span>
-                                    </label>
-                                    <div
-                                        className="group relative border-2 border-dashed border-slate-200 rounded-[1.5rem] p-4 flex flex-col items-center justify-center bg-slate-50/50 hover:bg-white hover:border-[#003580] hover:shadow-xl hover:shadow-[#003580]/5 transition-all duration-500 cursor-pointer min-h-[220px]"
-                                        onClick={() => document.getElementById('image-upload')?.click()}
-                                    >
-                                        {editingSlide.image ? (
-                                            <div className="relative w-full h-full min-h-[188px]">
-                                                <img src={editingSlide.image} className="absolute inset-0 w-full h-full object-cover rounded-[1rem] shadow-sm" />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 rounded-[1rem] transition-opacity flex items-center justify-center">
-                                                    <span className="bg-white px-4 py-2 rounded-xl text-slate-800 font-bold text-sm">Thay đổi hình ảnh</span>
+                                {/* Left side: Image & Text Fields */}
+                                <div className="space-y-8">
+                                    {/* Image Section */}
+                                    <div className="space-y-3">
+                                        <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                            Hình ảnh nền thiết kế
+                                            <span className="text-[10px] font-medium bg-slate-100 px-2 py-0.5 rounded-full text-slate-500 uppercase tracking-wider">Khuyên dùng: 1920x1080</span>
+                                        </label>
+                                        <div
+                                            className="group relative border-2 border-dashed border-slate-200 rounded-[1.5rem] p-4 flex flex-col items-center justify-center bg-slate-50/50 hover:bg-white hover:border-[#003580] hover:shadow-xl hover:shadow-[#003580]/5 transition-all duration-500 cursor-pointer min-h-[220px]"
+                                            onClick={() => document.getElementById('image-upload')?.click()}
+                                        >
+                                            {editingSlide.image ? (
+                                                <div className="relative w-full h-full min-h-[188px]">
+                                                    <img src={editingSlide.image} className="absolute inset-0 w-full h-full object-cover rounded-[1rem] shadow-sm" />
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 rounded-[1rem] transition-opacity flex items-center justify-center">
+                                                        <span className="bg-white px-4 py-2 rounded-xl text-slate-800 font-bold text-sm">Thay đổi hình ảnh</span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                                    <ImageIcon className="w-8 h-8 text-[#003580]" />
-                                                </div>
-                                                <p className="text-sm font-bold text-slate-800">Tải ảnh lên hệ thống</p>
-                                                <p className="text-xs text-slate-400 mt-1">Dung lượng tối đa 2MB</p>
-                                            </>
-                                        )}
-                                        <input type="file" id="image-upload" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                                            ) : (
+                                                <>
+                                                    <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                                        <ImageIcon className="w-8 h-8 text-[#003580]" />
+                                                    </div>
+                                                    <p className="text-sm font-bold text-slate-800">Tải ảnh lên hệ thống</p>
+                                                    <p className="text-xs text-slate-400 mt-1">Dung lượng tối đa 2MB</p>
+                                                </>
+                                            )}
+                                            <input type="file" id="image-upload" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                                        </div>
+                                    </div>
+
+                                    {/* Text Fields (Left Column) */}
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-slate-700">Tiêu đề (H1/H2)</label>
+                                            <Input
+                                                value={editingSlide.title}
+                                                onChange={(e) => setEditingSlide({ ...editingSlide, title: e.target.value })}
+                                                className="rounded-xl border-slate-200 h-12 focus:ring-[#003580]"
+                                                placeholder="VD: Gia Định University - Nâng tầm trí tuệ"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-slate-700">Mô tả ngắn (Subtitle)</label>
+                                            <Textarea
+                                                value={editingSlide.subtitle}
+                                                onChange={(e) => setEditingSlide({ ...editingSlide, subtitle: e.target.value })}
+                                                className="rounded-xl border-slate-200 min-h-[80px] focus:ring-[#003580] resize-none"
+                                                placeholder="Nhập nội dung mô tả hiển thị dưới tiêu đề chính..."
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
                                 {/* Right side: Controls & Preview */}
                                 <div className="space-y-6">
-                                    {/* Live Preview moved to top */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {/* Order & Status */}
+                                        {editingSlide.page === "home" ? (
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-bold text-slate-700">Thứ tự hiển thị</label>
+                                                <Select
+                                                    value={editingSlide.order.toString()}
+                                                    onValueChange={(val) => setEditingSlide({ ...editingSlide, order: parseInt(val) })}
+                                                >
+                                                    <SelectTrigger className="rounded-xl border-slate-200 h-12 shadow-none focus:ring-[#003580]">
+                                                        <SelectValue placeholder="Chọn vị trí" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="rounded-xl border-slate-200 shadow-xl">
+                                                        {[0, 1, 2].map((idx) => (
+                                                            <SelectItem key={idx} value={idx.toString()} className="rounded-lg">
+                                                                Vị trí {idx + 1}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        ) : null}
+                                        <div className={cn("space-y-2", editingSlide.page !== "home" && "col-span-2")}>
+                                            <label className="text-sm font-bold text-slate-700">Trạng thái</label>
+                                            <div className="flex items-center gap-3 h-12 bg-slate-50 rounded-xl px-4 border border-slate-200">
+                                                <button
+                                                    onClick={() => setEditingSlide({ ...editingSlide, isActive: !editingSlide.isActive })}
+                                                    className={cn(
+                                                        "flex items-center gap-2 text-sm font-bold transition-colors w-full",
+                                                        editingSlide.isActive ? "text-green-600" : "text-slate-400"
+                                                    )}
+                                                >
+                                                    {editingSlide.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                                                    {editingSlide.isActive ? "Đang hiển thị" : "Đang ẩn"}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* CTA Buttons (Home only) */}
+                                    {editingSlide.page === "home" && (
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-bold text-slate-700">Tên nút (Button)</label>
+                                                <Input
+                                                    value={editingSlide.cta}
+                                                    onChange={(e) => setEditingSlide({ ...editingSlide, cta: e.target.value })}
+                                                    className="rounded-xl border-slate-200 h-12 shadow-sm focus:ring-[#003580]"
+                                                    placeholder="Tìm hiểu ngay"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-bold text-slate-700">Link điều hướng</label>
+                                                <Input
+                                                    value={editingSlide.link}
+                                                    onChange={(e) => setEditingSlide({ ...editingSlide, link: e.target.value })}
+                                                    className="rounded-xl border-slate-200 h-12 shadow-sm focus:ring-[#003580]"
+                                                    placeholder="/jobs"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Live Preview */}
                                     <div className="space-y-3">
                                         <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
                                             Preview trực quan (Live)
@@ -446,83 +541,6 @@ export default function AdminHeroPage() {
                                             )}
                                         </div>
                                     </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {/* Order & Status */}
-                                        {editingSlide.page === "home" ? (
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-bold text-slate-700">Thứ tự hiển thị</label>
-                                                <Input
-                                                    type="number"
-                                                    min={0}
-                                                    value={editingSlide.order}
-                                                    onChange={(e) => setEditingSlide({ ...editingSlide, order: Math.max(0, parseInt(e.target.value) || 0) })}
-                                                    className="rounded-xl border-slate-200 h-12"
-                                                />
-                                            </div>
-                                        ) : null}
-                                        <div className={cn("space-y-2", editingSlide.page !== "home" && "col-span-2")}>
-                                            <label className="text-sm font-bold text-slate-700">Trạng thái</label>
-                                            <div className="flex items-center gap-3 h-12 bg-slate-50 rounded-xl px-4 border border-slate-200">
-                                                <button
-                                                    onClick={() => setEditingSlide({ ...editingSlide, isActive: !editingSlide.isActive })}
-                                                    className={cn(
-                                                        "flex items-center gap-2 text-sm font-bold transition-colors",
-                                                        editingSlide.isActive ? "text-green-600" : "text-slate-400"
-                                                    )}
-                                                >
-                                                    {editingSlide.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                                                    {editingSlide.isActive ? "Đang hiển thị" : "Đang ẩn"}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Text Fields */}
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-bold text-slate-700">Tiêu đề (H1/H2)</label>
-                                            <Input
-                                                value={editingSlide.title}
-                                                onChange={(e) => setEditingSlide({ ...editingSlide, title: e.target.value })}
-                                                className="rounded-xl border-slate-200 h-12 focus:ring-[#003580]"
-                                                placeholder="VD: Gia Định University - Nâng tầm trí tuệ"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-bold text-slate-700">Mô tả ngắn (Subtitle)</label>
-                                            <Textarea
-                                                value={editingSlide.subtitle}
-                                                onChange={(e) => setEditingSlide({ ...editingSlide, subtitle: e.target.value })}
-                                                className="rounded-xl border-slate-200 min-h-[80px] focus:ring-[#003580] resize-none"
-                                                placeholder="Nhập nội dung mô tả hiển thị dưới tiêu đề chính..."
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* CTA Buttons (Home only) */}
-                                    {editingSlide.page === "home" && (
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-bold text-slate-700">Tên nút (Button)</label>
-                                                <Input
-                                                    value={editingSlide.cta}
-                                                    onChange={(e) => setEditingSlide({ ...editingSlide, cta: e.target.value })}
-                                                    className="rounded-xl border-slate-200 h-12 shadow-sm focus:ring-[#003580]"
-                                                    placeholder="Tìm hiểu ngay"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-bold text-slate-700">Link điều hướng</label>
-                                                <Input
-                                                    value={editingSlide.link}
-                                                    onChange={(e) => setEditingSlide({ ...editingSlide, link: e.target.value })}
-                                                    className="rounded-xl border-slate-200 h-12 shadow-sm focus:ring-[#003580]"
-                                                    placeholder="/jobs"
-                                                />
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </div>
