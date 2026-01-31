@@ -406,6 +406,47 @@ export default function AdminHeroPage() {
 
                                 {/* Right side: Controls & Preview */}
                                 <div className="space-y-6">
+                                    {/* Live Preview moved to top */}
+                                    <div className="space-y-3">
+                                        <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                            Preview trực quan (Live)
+                                            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                                        </label>
+                                        <div className={cn(
+                                            "rounded-[1.5rem] bg-slate-900 overflow-hidden relative shadow-inner ring-1 ring-black/10 transition-all duration-500",
+                                            editingSlide.page === "home" ? "aspect-video" : "aspect-[21/9]"
+                                        )}>
+                                            {editingSlide.image ? (
+                                                <>
+                                                    <img src={editingSlide.image} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+                                                    <div className={cn(
+                                                        "absolute inset-0 text-white flex flex-col justify-center px-8",
+                                                        editingSlide.page === "home" ? "items-start text-left" : "items-center text-center"
+                                                    )}>
+                                                        <h4 className={cn(
+                                                            "font-bold leading-tight line-clamp-2 transition-all duration-500",
+                                                            editingSlide.page === "home" ? "text-xl" : "text-lg"
+                                                        )}>
+                                                            {editingSlide.title || "TIÊU ĐỀ PREVIEW"}
+                                                        </h4>
+                                                        <p className="text-[10px] text-white/70 mt-1.5 line-clamp-2 max-w-[90%]">
+                                                            {editingSlide.subtitle || "Nội dung mô tả sẽ hiển thị ở đây..."}
+                                                        </p>
+                                                        {editingSlide.page === "home" && editingSlide.cta && (
+                                                            <div className="mt-3 inline-block bg-[#003580] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">
+                                                                {editingSlide.cta}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="absolute inset-0 flex items-center justify-center text-slate-500 font-bold text-sm bg-slate-100/50">
+                                                    Vui lòng tải ảnh để xem preview
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
                                     <div className="grid grid-cols-2 gap-4">
                                         {/* Order & Status */}
                                         {editingSlide.page === "home" ? (
@@ -482,47 +523,6 @@ export default function AdminHeroPage() {
                                             </div>
                                         </div>
                                     )}
-
-                                    {/* Live Preview */}
-                                    <div className="space-y-3">
-                                        <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                                            Preview trực quan (Live)
-                                            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                                        </label>
-                                        <div className={cn(
-                                            "rounded-[1.5rem] bg-slate-900 overflow-hidden relative shadow-inner ring-1 ring-black/10 transition-all duration-500",
-                                            editingSlide.page === "home" ? "aspect-video" : "aspect-[21/9]"
-                                        )}>
-                                            {editingSlide.image ? (
-                                                <>
-                                                    <img src={editingSlide.image} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-50" />
-                                                    <div className={cn(
-                                                        "absolute inset-0 text-white flex flex-col justify-center px-8",
-                                                        editingSlide.page === "home" ? "items-start text-left" : "items-center text-center"
-                                                    )}>
-                                                        <h4 className={cn(
-                                                            "font-bold leading-tight line-clamp-2 transition-all duration-500",
-                                                            editingSlide.page === "home" ? "text-xl" : "text-lg"
-                                                        )}>
-                                                            {editingSlide.title || "TIÊU ĐỀ PREVIEW"}
-                                                        </h4>
-                                                        <p className="text-[10px] text-white/70 mt-1.5 line-clamp-2 max-w-[90%]">
-                                                            {editingSlide.subtitle || "Nội dung mô tả sẽ hiển thị ở đây..."}
-                                                        </p>
-                                                        {editingSlide.page === "home" && editingSlide.cta && (
-                                                            <div className="mt-3 inline-block bg-[#003580] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">
-                                                                {editingSlide.cta}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <div className="absolute inset-0 flex items-center justify-center text-slate-500 font-bold text-sm bg-slate-100/50">
-                                                    Vui lòng tải ảnh để xem preview
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
