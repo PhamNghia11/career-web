@@ -3,10 +3,19 @@ import { getCollection, COLLECTIONS } from "@/database/connection"
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
+        const { searchParams } = new URL(req.url)
+        const page = searchParams.get("page") || "home"
+
         const collection = await getCollection(COLLECTIONS.HERO_SLIDES)
-        const slides = await collection.find({ isActive: true }).sort({ order: 1, createdAt: -1 }).toArray()
+
+        let query: any = { isActive: true }
+        if (page !== "all") {
+            query.page = page
+        }
+
+        const slides = await collection.find(query).sort({ order: 1, createdAt: -1 }).toArray()
 
         return NextResponse.json({
             success: true,

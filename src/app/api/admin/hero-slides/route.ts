@@ -2,11 +2,25 @@ import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/database/connection"
 import { ObjectId } from "mongodb"
 
+// Get All (for Admin Management)
+export async function GET() {
+    try {
+        const collection = await getCollection(COLLECTIONS.HERO_SLIDES)
+        const slides = await collection.find({}).sort({ page: 1, order: 1 }).toArray()
+        return NextResponse.json({
+            success: true,
+            data: slides.map(s => ({ ...s, _id: s._id.toString() }))
+        })
+    } catch (error) {
+        return NextResponse.json({ success: false, error: "Failed to fetch slides" }, { status: 500 })
+    }
+}
+
 // Create or Update
 export async function POST(req: Request) {
     try {
         const body = await req.json()
-        const { id, title, subtitle, image, cta, link, order, isActive } = body
+        const { id, title, subtitle, image, cta, link, order, isActive, page } = body
 
         const collection = await getCollection(COLLECTIONS.HERO_SLIDES)
 
@@ -21,6 +35,7 @@ export async function POST(req: Request) {
                         image,
                         cta,
                         link,
+                        page: page || "home",
                         order: parseInt(order) || 0,
                         isActive: isActive ?? true,
                         updatedAt: new Date()
@@ -36,6 +51,7 @@ export async function POST(req: Request) {
                 image,
                 cta,
                 link,
+                page: page || "home",
                 order: parseInt(order) || 0,
                 isActive: true,
                 createdAt: new Date(),

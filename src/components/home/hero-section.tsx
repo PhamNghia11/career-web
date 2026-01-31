@@ -23,7 +23,7 @@ export function HeroSection() {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const res = await fetch("/api/hero-slides")
+        const res = await fetch("/api/hero-slides?page=home")
         const data = await res.json()
         if (data.success && data.data.length > 0) {
           setSlides(data.data)
