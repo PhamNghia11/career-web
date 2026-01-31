@@ -4,7 +4,22 @@ import { ContactForm } from "@/components/contact/contact-form"
 import { MapPin, Mail, Clock, MessageCircle } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
-export default function ContactPage() {
+async function getBannerData() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/hero-slides?page=contact`, { next: { revalidate: 60 } })
+    const data = await res.json()
+    if (data.success && data.data.length > 0) {
+      return data.data[0]
+    }
+    return null
+  } catch (error) {
+    console.error("Error fetching contact banner:", error)
+    return null
+  }
+}
+
+export default async function ContactPage() {
+  const banner = await getBannerData()
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/30 to-background">
       <Header />
@@ -12,17 +27,19 @@ export default function ContactPage() {
         <div className="relative py-20 overflow-hidden">
           {/* Background Image */}
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/hero-bg.png')" }}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
+            style={{ backgroundImage: `url('${banner?.image || '/hero-bg.png'}')` }}
           />
           {/* Dark Overlay */}
           <div className="absolute inset-0 bg-primary/85" />
 
           {/* Content */}
           <div className="container mx-auto px-4 text-center relative z-10">
-            <h1 className="text-3xl lg:text-4xl font-bold mb-3 text-white">Liên hệ với chúng tôi</h1>
+            <h1 className="text-3xl lg:text-5xl font-bold mb-3 text-white tracking-tight">
+              {banner?.title || "Liên hệ với chúng tôi"}
+            </h1>
             <p className="text-lg text-white/90 max-w-2xl mx-auto">
-              Chúng tôi luôn sẵn sàng hỗ trợ bạn. Hãy liên hệ với chúng tôi qua các kênh bên dưới.
+              {banner?.subtitle || "Chúng tôi luôn sẵn sàng hỗ trợ bạn. Hãy liên hệ với chúng tôi qua các kênh bên dưới."}
             </p>
           </div>
         </div>

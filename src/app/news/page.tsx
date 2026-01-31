@@ -142,9 +142,24 @@ function NewsPageContent() {
         }
     }
 
+    const [banner, setBanner] = useState<any>(null)
+
+    const fetchBanner = async () => {
+        try {
+            const res = await fetch('/api/hero-slides?page=news')
+            const data = await res.json()
+            if (data.success && data.data.length > 0) {
+                setBanner(data.data[0])
+            }
+        } catch (error) {
+            console.error("Error fetching news banner:", error)
+        }
+    }
+
     useEffect(() => {
         fetchNews()
         fetchSpecializedNews()
+        fetchBanner()
     }, [category])
 
     // Sync with URL category
@@ -188,19 +203,22 @@ function NewsPageContent() {
                 {/* Blue Hero Header */}
                 <div className="relative py-14 md:py-20 lg:py-24 overflow-hidden">
                     <div
-                        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                        style={{ backgroundImage: "url('/hero-bg.png')" }}
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
+                        style={{ backgroundImage: `url('${banner?.image || '/hero-bg.png'}')` }}
                     />
                     <div className="absolute inset-0 bg-[#162744]/95 lg:bg-[#162744]/90" />
 
                     <div className="container px-4 mx-auto relative z-10">
                         <div className="max-w-4xl">
                             <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
-                                Tin tức & Phân tích <br />Thị trường Lao động
+                                {banner?.title || (
+                                    <>
+                                        Tin tức & Phân tích <br />Thị trường Lao động
+                                    </>
+                                )}
                             </h1>
                             <p className="text-sm md:text-lg text-white/50 max-w-2xl font-medium leading-relaxed">
-                                Cập nhật xu hướng tuyển dụng, báo cáo thị trường và kiến thức phát triển sự
-                                nghiệp từ đội ngũ chuyên gia GDU.
+                                {banner?.subtitle || "Cập nhật xu hướng tuyển dụng, báo cáo thị trường và kiến thức phát triển sự nghiệp từ đội ngũ chuyên gia GDU."}
                             </p>
                         </div>
                     </div>

@@ -23,8 +23,9 @@ interface HeroSlide {
 const PAGES = [
     { id: "home", name: "Trang chủ", description: "Banner xoay (Carousel) ở đầu trang chủ" },
     { id: "jobs", name: "Trang việc làm", description: "Ảnh nền tiêu đề trang danh sách việc làm" },
+    { id: "companies", name: "Trang doanh nghiệp", description: "Ảnh nền tiêu đề trang danh sách doanh nghiệp" },
     { id: "news", name: "Trang tin tức", description: "Ảnh nền tiêu đề trang tin tức" },
-    // { id: "contact", name: "Liên hệ", description: "Ảnh nền trang liên hệ" },
+    { id: "contact", name: "Trang liên hệ", description: "Ảnh nền tiêu đề trang liên hệ" },
 ]
 
 export default function AdminHeroPage() {
@@ -446,14 +447,19 @@ export default function AdminHeroPage() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold text-slate-700">Thuộc trang</label>
-                                            <select
-                                                value={editingSlide.page}
-                                                onChange={(e) => setEditingSlide({ ...editingSlide, page: e.target.value })}
-                                                className="w-full rounded-xl border-slate-200 border h-12 px-3 focus:ring-[#003580] focus:border-[#003580] outline-none text-sm"
-                                            >
-                                                {PAGES.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                            </select>
+                                            <label className="text-sm font-bold text-slate-700">Trạng thái</label>
+                                            <div className="flex items-center gap-3 h-12 bg-slate-50 rounded-xl px-4 border border-slate-200">
+                                                <button
+                                                    onClick={() => setEditingSlide({ ...editingSlide, isActive: !editingSlide.isActive })}
+                                                    className={cn(
+                                                        "flex items-center gap-2 text-sm font-bold transition-colors",
+                                                        editingSlide.isActive ? "text-green-600" : "text-slate-400"
+                                                    )}
+                                                >
+                                                    {editingSlide.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                                                    {editingSlide.isActive ? "Đang hiển thị" : "Đang ẩn"}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -484,24 +490,38 @@ export default function AdminHeroPage() {
                                             Preview trực quan (Live)
                                             <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                                         </label>
-                                        <div className="aspect-video rounded-[1.5rem] bg-slate-900 overflow-hidden relative shadow-inner ring-1 ring-black/10">
+                                        <div className={cn(
+                                            "rounded-[1.5rem] bg-slate-900 overflow-hidden relative shadow-inner ring-1 ring-black/10 transition-all duration-500",
+                                            editingSlide.page === "home" ? "aspect-video" : "aspect-[21/9]"
+                                        )}>
                                             {editingSlide.image ? (
                                                 <>
-                                                    <img src={editingSlide.image} className="absolute inset-0 w-full h-full object-cover opacity-60" />
-                                                    <div className="absolute inset-x-8 top-1/2 -translate-y-1/2 text-white max-w-[80%]">
-                                                        <h4 className="text-lg font-bold leading-tight line-clamp-2">{editingSlide.title || "TIÊU ĐỀ PREVIEW"}</h4>
-                                                        <p className="text-[10px] text-white/70 mt-1.5 line-clamp-2">{editingSlide.subtitle || "Nội dung mô tả sẽ hiển thị ở đây..."}</p>
-                                                        <div className="mt-3 inline-block bg-[#003580] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">
-                                                            {editingSlide.cta || "CHI TIẾT"}
-                                                        </div>
+                                                    <img src={editingSlide.image} className="absolute inset-0 w-full h-full object-cover opacity-50 transition-opacity duration-700" />
+                                                    <div className={cn(
+                                                        "absolute inset-0 text-white flex flex-col justify-center px-8",
+                                                        editingSlide.page === "home" ? "items-start text-left" : "items-center text-center"
+                                                    )}>
+                                                        <h4 className={cn(
+                                                            "font-bold leading-tight line-clamp-2 transition-all duration-500",
+                                                            editingSlide.page === "home" ? "text-xl" : "text-lg"
+                                                        )}>
+                                                            {editingSlide.title || "TIÊU ĐỀ PREVIEW"}
+                                                        </h4>
+                                                        <p className="text-[10px] text-white/70 mt-1.5 line-clamp-2 max-w-[90%]">
+                                                            {editingSlide.subtitle || "Nội dung mô tả sẽ hiển thị ở đây..."}
+                                                        </p>
+                                                        {editingSlide.page === "home" && (
+                                                            <div className="mt-3 inline-block bg-[#003580] text-white px-3 py-1.5 rounded-lg text-[10px] font-bold">
+                                                                {editingSlide.cta || "CHI TIẾT"}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </>
                                             ) : (
-                                                <div className="absolute inset-0 flex items-center justify-center text-slate-700 font-bold text-sm">
+                                                <div className="absolute inset-0 flex items-center justify-center text-slate-500 font-bold text-sm bg-slate-100/50">
                                                     Vui lòng tải ảnh để xem preview
                                                 </div>
                                             )}
-                                            <div className="absolute inset-0 bg-primary/30 pointer-events-none" />
                                         </div>
                                     </div>
                                 </div>

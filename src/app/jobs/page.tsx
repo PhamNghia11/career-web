@@ -80,8 +80,23 @@ async function getActiveJobsFromDB(): Promise<Job[]> {
 // ISR: Cache page for 60 seconds, then revalidate in background
 export const revalidate = 60
 
+async function getBannerData() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/hero-slides?page=jobs`, { next: { revalidate: 60 } })
+    const data = await res.json()
+    if (data.success && data.data.length > 0) {
+      return data.data[0]
+    }
+    return null
+  } catch (error) {
+    console.error("Error fetching jobs banner:", error)
+    return null
+  }
+}
+
 export default async function JobsPage() {
   const dbJobs = await getActiveJobsFromDB()
+  const banner = await getBannerData()
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/50 via-background to-muted/30">
@@ -90,8 +105,8 @@ export default async function JobsPage() {
         <div className="relative py-20 overflow-hidden">
           {/* Background Image */}
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/hero-bg.png')" }}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
+            style={{ backgroundImage: `url('${banner?.image || '/hero-bg.png'}')` }}
           />
           {/* Dark Overlay */}
           <div className="absolute inset-0 bg-[#1e3a5f]/85" />
@@ -99,10 +114,10 @@ export default async function JobsPage() {
           {/* Content */}
           <div className="container mx-auto px-4 text-center relative z-10">
             <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white tracking-tight">
-              Tìm kiếm cơ hội nghề nghiệp
+              {banner?.title || "Tìm kiếm cơ hội nghề nghiệp"}
             </h1>
             <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Khám phá hàng ngàn việc làm hấp dẫn từ các doanh nghiệp hàng đầu dành cho sinh viên GDU
+              {banner?.subtitle || "Khám phá hàng ngàn việc làm hấp dẫn từ các doanh nghiệp hàng đầu dành cho sinh viên GDU"}
             </p>
           </div>
         </div>
