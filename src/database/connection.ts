@@ -59,4 +59,5 @@ export const COLLECTIONS = {
   REPORTS: "reports",
   PENDING_USERS: "pending_users",
   NEWS: "news",
+  HERO_SLIDES: "hero_slides",
 } as const

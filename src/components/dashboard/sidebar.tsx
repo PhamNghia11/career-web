@@ -21,6 +21,7 @@ import {
   Eye,
   Flag,
   Newspaper,
+  Image as ImageIcon,
 } from "lucide-react"
 import { useAuth } from "@/lib/auth-context"
 import { cn } from "@/lib/utils"
@@ -55,6 +56,7 @@ const adminNav = [
   { name: "Quản lý đối tác", href: "/dashboard/admin/partners", icon: Building },
   { name: "Đăng tin tuyển dụng", href: "/dashboard/jobs/new", icon: Briefcase },
   { name: "Khách truy cập", href: "/dashboard/visitors", icon: Eye },
+  { name: "Quản lý Hero", href: "/dashboard/admin/hero", icon: ImageIcon },
   { name: "Đánh giá Google", href: "/dashboard/reviews", icon: Star },
   { name: "Liên hệ", href: "/dashboard/messages", icon: MessageSquare },
   { name: "Báo cáo vi phạm", href: "/dashboard/admin/reports", icon: Flag },

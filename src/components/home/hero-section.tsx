@@ -5,50 +5,89 @@ import { useRouter } from "next/navigation"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-const slides = [
-  {
-    title: "Tìm việc làm phù hợp cho sinh viên GDU",
-    subtitle: "Kết nối sinh viên với hàng ngàn cơ hội việc làm từ các doanh nghiệp uy tín",
-    image: "/students-working-together-university.jpg",
-    cta: "Khám phá ngay",
-    link: "/jobs",
-  },
-  {
-    title: "Thực tập sinh - Bước đệm sự nghiệp",
-    subtitle: "Hơn 500+ vị trí thực tập tại các công ty hàng đầu đang chờ bạn",
-    image: "/internship-program-students-learning.jpg",
-    cta: "Xem vị trí thực tập",
-    link: "/internships",
-  },
-  {
-    title: "Hội chợ việc làm GDU 2025",
-    subtitle: "Sự kiện kết nối sinh viên với 100+ doanh nghiệp - Đăng ký ngay!",
-    image: "/job-fair-event-with-students-and-employers.jpg",
-    cta: "Đăng ký tham gia",
-    link: "/contact",
-  },
-]
+interface HeroSlide {
+  _id: string
+  title: string
+  subtitle: string
+  image: string
+  cta: string
+  link: string
+}
 
 export function HeroSection() {
+  const [slides, setSlides] = useState<HeroSlide[]>([])
   const [current, setCurrent] = useState(0)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
+    const fetchSlides = async () => {
+      try {
+        const res = await fetch("/api/hero-slides")
+        const data = await res.json()
+        if (data.success && data.data.length > 0) {
+          setSlides(data.data)
+        } else {
+          // Fallback static slides if none in DB
+          setSlides([
+            {
+              _id: "1",
+              title: "Tìm việc làm phù hợp cho sinh viên GDU",
+              subtitle: "Kết nối sinh viên với hàng ngàn cơ hội việc làm từ các doanh nghiệp uy tín",
+              image: "/students-working-together-university.jpg",
+              cta: "Khám phá ngay",
+              link: "/jobs",
+            },
+            {
+              _id: "2",
+              title: "Thực tập sinh - Bước đệm sự nghiệp",
+              subtitle: "Hơn 500+ vị trí thực tập tại các công ty hàng đầu đang chờ bạn",
+              image: "/internship-program-students-learning.jpg",
+              cta: "Xem vị trí thực tập",
+              link: "/internships",
+            },
+            {
+              _id: "3",
+              title: "Hội chợ việc làm GDU 2025",
+              subtitle: "Sự kiện kết nối sinh viên với 100+ doanh nghiệp - Đăng ký ngay!",
+              image: "/job-fair-event-with-students-and-employers.jpg",
+              cta: "Đăng ký tham gia",
+              link: "/contact",
+            },
+          ])
+        }
+      } catch (error) {
+        console.error("Failed to fetch slides", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchSlides()
+  }, [])
+
+  useEffect(() => {
+    if (slides.length <= 1) return
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [])
+  }, [slides.length])
 
   const prev = () => setCurrent((current - 1 + slides.length) % slides.length)
   const next = () => setCurrent((current + 1) % slides.length)
+
+  if (loading) {
+    return <section className="h-[60vh] lg:h-[70vh] bg-slate-100 animate-pulse" />
+  }
+
+  if (slides.length === 0) return null
 
   return (
     <section className="relative h-[60vh] lg:h-[70vh] overflow-hidden">
       {/* Slides */}
       {slides.map((slide, index) => (
         <div
-          key={index}
+          key={slide._id}
           className={`absolute inset-0 transition-opacity duration-700 ${index === current ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
         >
