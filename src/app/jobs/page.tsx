@@ -102,14 +102,14 @@ export default async function JobsPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/50 via-background to-muted/30">
       <Header />
       <main className="flex-1">
-        <div className="relative py-20 overflow-hidden">
+        <div className="relative py-32 overflow-hidden">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
             style={{ backgroundImage: `url('${banner?.image || '/hero-bg.png'}')` }}
           />
-          {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-[#1e3a5f]/85" />
+          {/* Light Overlay for clarity */}
+          <div className="absolute inset-0 bg-black/20" />
 
           {/* Content */}
           <div className="container mx-auto px-4 text-center relative z-10">

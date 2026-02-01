@@ -25,36 +25,52 @@ export function HeroSection() {
       try {
         const res = await fetch("/api/hero-slides?page=home")
         const data = await res.json()
+
+        const defaultSlides: HeroSlide[] = [
+          {
+            _id: "default-1",
+            title: "Tìm việc làm phù hợp cho sinh viên GDU",
+            subtitle: "Kết nối sinh viên với hàng ngàn cơ hội việc làm từ các doanh nghiệp uy tín",
+            image: "/students-working-together-university.jpg",
+            cta: "Khám phá ngay",
+            link: "/jobs",
+          },
+          {
+            _id: "default-2",
+            title: "Thực tập sinh - Bước đệm sự nghiệp",
+            subtitle: "Hơn 500+ vị trí thực tập tại các công ty hàng đầu đang chờ bạn",
+            image: "/internship-program-students-learning.jpg",
+            cta: "Xem vị trí thực tập",
+            link: "/internships",
+          },
+          {
+            _id: "default-3",
+            title: "Hội chợ việc làm GDU 2025",
+            subtitle: "Sự kiện kết nối sinh viên với 100+ doanh nghiệp - Đăng ký ngay!",
+            image: "/job-fair-event-with-students-and-employers.jpg",
+            cta: "Đăng ký tham gia",
+            link: "/contact",
+          },
+        ]
+
         if (data.success && data.data.length > 0) {
-          setSlides(data.data)
+          // Merge logic: Map DB slides to their intended positions, or fill in gaps
+          const dbSlides = data.data as HeroSlide[]
+          // We'll create a 3-slot array and fill it. 
+          // If DB has a slide at order 0, it replaces default 0.
+          const merged = [...defaultSlides]
+          dbSlides.forEach(s => {
+            const order = (s as any).order ?? 0
+            if (order >= 0 && order < 3) {
+              merged[order] = { ...s, _id: s._id?.toString() || `db-${order}` }
+            } else if (order >= 3) {
+              // Add extra slides if order is > 2
+              merged.push({ ...s, _id: s._id?.toString() || `db-${order}` })
+            }
+          })
+          setSlides(merged)
         } else {
-          // Fallback static slides if none in DB
-          setSlides([
-            {
-              _id: "1",
-              title: "Tìm việc làm phù hợp cho sinh viên GDU",
-              subtitle: "Kết nối sinh viên với hàng ngàn cơ hội việc làm từ các doanh nghiệp uy tín",
-              image: "/students-working-together-university.jpg",
-              cta: "Khám phá ngay",
-              link: "/jobs",
-            },
-            {
-              _id: "2",
-              title: "Thực tập sinh - Bước đệm sự nghiệp",
-              subtitle: "Hơn 500+ vị trí thực tập tại các công ty hàng đầu đang chờ bạn",
-              image: "/internship-program-students-learning.jpg",
-              cta: "Xem vị trí thực tập",
-              link: "/internships",
-            },
-            {
-              _id: "3",
-              title: "Hội chợ việc làm GDU 2025",
-              subtitle: "Sự kiện kết nối sinh viên với 100+ doanh nghiệp - Đăng ký ngay!",
-              image: "/job-fair-event-with-students-and-employers.jpg",
-              cta: "Đăng ký tham gia",
-              link: "/contact",
-            },
-          ])
+          setSlides(defaultSlides)
         }
       } catch (error) {
         console.error("Failed to fetch slides", error)
@@ -94,7 +110,7 @@ export function HeroSection() {
           <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${slide.image})` }}>
             <div className="absolute inset-0 bg-black/20" />
           </div>
-          <div className="relative h-full min-h-[80vh] lg:min-h-[85vh] container mx-auto px-4 flex flex-col justify-center">
+          <div className="relative h-full min-h-[80vh] lg:min-h-[85vh] container mx-auto px-4 flex flex-col justify-center pt-24 lg:pt-32">
             <div className="max-w-3xl">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight text-balance drop-shadow-lg">
                 {slide.title}
@@ -102,7 +118,7 @@ export function HeroSection() {
               <p className="text-xl md:text-2xl text-white mb-10 drop-shadow-md font-medium">{slide.subtitle}</p>
               <Button
                 onClick={() => router.push(slide.link)}
-                className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-10 py-8 rounded-xl shadow-xl transition-all hover:scale-105"
+                className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-10 py-8 rounded-xl shadow-xl transition-all hover:scale-105 mt-10"
               >
                 {slide.cta}
               </Button>

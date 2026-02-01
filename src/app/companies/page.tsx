@@ -22,14 +22,14 @@ export default async function CompaniesPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/30 to-background">
       <Header />
       <main className="flex-1">
-        <div className="relative py-20 overflow-hidden">
+        <div className="relative py-32 overflow-hidden">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
             style={{ backgroundImage: `url('${banner?.image || '/hero-bg.png'}')` }}
           />
-          {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-primary/85" />
+          {/* Light Overlay for clarity */}
+          <div className="absolute inset-0 bg-black/20" />
 
           {/* Content */}
           <div className="container mx-auto px-4 relative z-10 text-center">
