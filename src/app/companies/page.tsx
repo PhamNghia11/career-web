@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import Link from "next/link"
 import { CompaniesListClient } from "@/components/companies/companies-list-client"
 
 async function getBannerData() {
@@ -22,7 +23,7 @@ export default async function CompaniesPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/30 to-background">
       <Header />
       <main className="flex-1">
-        <div className="relative min-h-[80vh] overflow-hidden flex flex-col justify-start pt-52 lg:pt-72">
+        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-52 lg:pt-72">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
@@ -37,9 +38,17 @@ export default async function CompaniesPage() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg">
                 {banner?.title || "Khám phá doanh nghiệp"}
               </h1>
-              <p className="text-xl md:text-2xl text-white drop-shadow-md font-medium">
+              <p className="text-xl md:text-2xl text-white mb-10 drop-shadow-md font-medium">
                 {banner?.subtitle || "Tìm hiểu về các doanh nghiệp hàng đầu và cơ hội nghề nghiệp dành cho bạn"}
               </p>
+              {banner?.cta && (
+                <Link
+                  href={banner.link || "/companies"}
+                  className="inline-flex items-center justify-center bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-12 py-5 rounded-xl shadow-xl transition-all hover:scale-105 mt-8 min-w-[280px] w-fit"
+                >
+                  {banner.cta}
+                </Link>
+              )}
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { JobsListClient } from "@/components/jobs/jobs-list-client"
@@ -102,7 +103,7 @@ export default async function JobsPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/50 via-background to-muted/30">
       <Header />
       <main className="flex-1">
-        <div className="relative min-h-[80vh] overflow-hidden flex flex-col justify-start pt-52 lg:pt-72">
+        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-52 lg:pt-72">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
@@ -117,9 +118,17 @@ export default async function JobsPage() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg">
                 {banner?.title || "Tìm kiếm cơ hội nghề nghiệp"}
               </h1>
-              <p className="text-xl md:text-2xl text-white drop-shadow-md font-medium">
+              <p className="text-xl md:text-2xl text-white mb-10 drop-shadow-md font-medium">
                 {banner?.subtitle || "Khám phá hàng ngàn việc làm hấp dẫn từ các doanh nghiệp hàng đầu dành cho sinh viên GDU"}
               </p>
+              {banner?.cta && (
+                <Link
+                  href={banner.link || "/jobs"}
+                  className="inline-flex items-center justify-center bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-12 py-5 rounded-xl shadow-xl transition-all hover:scale-105 mt-8 min-w-[280px] w-fit"
+                >
+                  {banner.cta}
+                </Link>
+              )}
             </div>
           </div>
         </div>
