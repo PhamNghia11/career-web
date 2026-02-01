@@ -118,7 +118,7 @@ export default async function JobsPage() {
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 text-white tracking-tight drop-shadow-lg">
                 {banner?.title || "Tìm kiếm cơ hội nghề nghiệp"}
               </h1>
-              <p className="text-lg md:text-xl text-white mb-4 drop-shadow-md font-medium">
+              <p className="text-lg md:text-xl text-white mb-2 drop-shadow-md font-medium">
                 {banner?.subtitle || "Khám phá hàng ngàn việc làm hấp dẫn từ các doanh nghiệp hàng đầu dành cho sinh viên GDU"}
               </p>
               {banner?.cta && (

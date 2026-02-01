@@ -217,7 +217,7 @@ function NewsPageContent() {
                                     </>
                                 )}
                             </h1>
-                            <p className="text-lg md:text-xl text-white mb-4 drop-shadow-md font-medium max-w-3xl">
+                            <p className="text-lg md:text-xl text-white mb-2 drop-shadow-md font-medium max-w-3xl">
                                 {banner?.subtitle || "Cập nhật xu hướng tuyển dụng, báo cáo thị trường và kiến thức phát triển sự nghiệp từ đội ngũ chuyên gia GDU."}
                             </p>
                             {banner?.cta && (

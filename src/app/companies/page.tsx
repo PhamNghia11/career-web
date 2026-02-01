@@ -38,7 +38,7 @@ export default async function CompaniesPage() {
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 text-white tracking-tight drop-shadow-lg">
                 {banner?.title || "Khám phá doanh nghiệp"}
               </h1>
-              <p className="text-lg md:text-xl text-white mb-4 drop-shadow-md font-medium">
+              <p className="text-lg md:text-xl text-white mb-2 drop-shadow-md font-medium">
                 {banner?.subtitle || "Tìm hiểu về các doanh nghiệp hàng đầu và cơ hội nghề nghiệp dành cho bạn"}
               </p>
               {banner?.cta && (

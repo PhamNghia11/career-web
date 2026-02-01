@@ -120,7 +120,7 @@ export function HeroSection() {
               </div>
 
               {/* Subtitle with fixed height space for 2 lines */}
-              <div className="min-h-[50px] md:min-h-[70px] flex items-start mb-4">
+              <div className="min-h-[40px] md:min-h-[56px] flex items-start mb-2">
                 <p className="text-lg md:text-xl text-white drop-shadow-md font-medium opacity-95">
                   {slide.subtitle || "\u00A0"}
                 </p>
