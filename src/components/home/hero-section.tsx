@@ -83,7 +83,7 @@ export function HeroSection() {
   if (slides.length === 0) return null
 
   return (
-    <section className="relative h-[60vh] lg:h-[70vh] overflow-hidden">
+    <section className="relative min-h-[80vh] lg:min-h-[85vh] overflow-hidden">
       {/* Slides */}
       {slides.map((slide, index) => (
         <div
@@ -91,18 +91,18 @@ export function HeroSection() {
           className={`absolute inset-0 transition-opacity duration-700 ${index === current ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
         >
-          <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${slide.image})` }}>
-            <div className="absolute inset-0 bg-primary/70" />
+          <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${slide.image})` }}>
+            <div className="absolute inset-0 bg-black/20" />
           </div>
-          <div className="relative h-full container mx-auto px-4 flex flex-col justify-center">
+          <div className="relative h-full min-h-[80vh] lg:min-h-[85vh] container mx-auto px-4 flex flex-col justify-center">
             <div className="max-w-3xl">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight text-balance">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight text-balance drop-shadow-lg">
                 {slide.title}
               </h1>
-              <p className="text-lg md:text-xl text-white/90 mb-8">{slide.subtitle}</p>
+              <p className="text-xl md:text-2xl text-white mb-10 drop-shadow-md font-medium">{slide.subtitle}</p>
               <Button
                 onClick={() => router.push(slide.link)}
-                className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-semibold text-lg px-8 py-6"
+                className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-10 py-8 rounded-xl shadow-xl transition-all hover:scale-105"
               >
                 {slide.cta}
               </Button>

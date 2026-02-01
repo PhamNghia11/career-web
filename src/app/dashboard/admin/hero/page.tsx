@@ -440,26 +440,24 @@ export default function AdminHeroPage() {
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-2 gap-4">
                                         {/* Order & Status */}
-                                        {editingSlide.page === "home" ? (
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-bold text-slate-700">Thứ tự hiển thị</label>
-                                                <Select
-                                                    value={editingSlide.order.toString()}
-                                                    onValueChange={(val) => setEditingSlide({ ...editingSlide, order: parseInt(val) })}
-                                                >
-                                                    <SelectTrigger className="rounded-xl border-slate-200 h-12 shadow-none focus:ring-[#003580]">
-                                                        <SelectValue placeholder="Chọn vị trí" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="rounded-xl border-slate-200 shadow-xl">
-                                                        {[0, 1, 2].map((idx) => (
-                                                            <SelectItem key={idx} value={idx.toString()} className="rounded-lg">
-                                                                Vị trí {idx + 1}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        ) : null}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-slate-700">Thứ tự hiển thị</label>
+                                            <Select
+                                                value={editingSlide.order.toString()}
+                                                onValueChange={(val) => setEditingSlide({ ...editingSlide, order: parseInt(val) })}
+                                            >
+                                                <SelectTrigger className="rounded-xl border-slate-200 h-12 shadow-none focus:ring-[#003580]">
+                                                    <SelectValue placeholder="Chọn vị trí" />
+                                                </SelectTrigger>
+                                                <SelectContent className="rounded-xl border-slate-200 shadow-xl">
+                                                    {Array.from({ length: Math.max(slides.filter(s => s.page === editingSlide.page).length + 1, 5) }).map((_, idx) => (
+                                                        <SelectItem key={idx} value={idx.toString()} className="rounded-lg">
+                                                            Vị trí {idx + 1}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
                                         <div className={cn("space-y-2", editingSlide.page !== "home" && "col-span-2")}>
                                             <label className="text-sm font-bold text-slate-700">Trạng thái</label>
                                             <div className="flex items-center gap-3 h-12 bg-slate-50 rounded-xl px-4 border border-slate-200">
