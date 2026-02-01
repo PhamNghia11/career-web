@@ -450,7 +450,7 @@ export default function AdminHeroPage() {
                                                     <SelectValue placeholder="Chọn vị trí" />
                                                 </SelectTrigger>
                                                 <SelectContent className="rounded-xl border-slate-200 shadow-xl">
-                                                    {Array.from({ length: Math.max(slides.filter(s => s.page === editingSlide.page).length + 1, 5) }).map((_, idx) => (
+                                                    {Array.from({ length: editingSlide.page === "home" ? 3 : 1 }).map((_, idx) => (
                                                         <SelectItem key={idx} value={idx.toString()} className="rounded-lg">
                                                             Vị trí {idx + 1}
                                                         </SelectItem>
