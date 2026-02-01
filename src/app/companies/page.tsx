@@ -23,7 +23,7 @@ export default async function CompaniesPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/30 to-background">
       <Header />
       <main className="flex-1">
-        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-36 lg:pt-48">
+        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-44 lg:pt-64">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
