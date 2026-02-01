@@ -23,7 +23,7 @@ export default async function CompaniesPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/30 to-background">
       <Header />
       <main className="flex-1">
-        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-32 lg:pt-48">
+        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-32 lg:pt-40">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
@@ -35,16 +35,16 @@ export default async function CompaniesPage() {
           {/* Content */}
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 text-white tracking-tight drop-shadow-lg">
                 {banner?.title || "Khám phá doanh nghiệp"}
               </h1>
-              <p className="text-xl md:text-2xl text-white mb-10 drop-shadow-md font-medium">
+              <p className="text-lg md:text-xl text-white mb-8 drop-shadow-md font-medium">
                 {banner?.subtitle || "Tìm hiểu về các doanh nghiệp hàng đầu và cơ hội nghề nghiệp dành cho bạn"}
               </p>
               {banner?.cta && (
                 <Link
                   href={banner.link || "/companies"}
-                  className="inline-flex items-center justify-center bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-12 py-5 rounded-xl shadow-xl transition-all hover:scale-105 mt-8 min-w-[280px] w-fit"
+                  className="inline-flex items-center justify-center bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-lg px-10 h-[60px] rounded-xl shadow-xl transition-all hover:scale-105 min-w-[240px] w-fit"
                 >
                   {banner.cta}
                 </Link>

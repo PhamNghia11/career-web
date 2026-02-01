@@ -201,7 +201,7 @@ function NewsPageContent() {
 
             <main>
                 {/* Blue Hero Header */}
-                <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-32 lg:pt-48">
+                <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-32 lg:pt-40">
                     <div
                         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
                         style={{ backgroundImage: `url('${banner?.image || '/hero-bg.png'}')` }}
@@ -210,20 +210,20 @@ function NewsPageContent() {
 
                     <div className="container px-4 mx-auto relative z-10">
                         <div className="max-w-4xl">
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight drop-shadow-lg">
+                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4 leading-tight tracking-tight drop-shadow-lg">
                                 {banner?.title || (
                                     <>
                                         Tin tức & Phân tích <br />Thị trường Lao động
                                     </>
                                 )}
                             </h1>
-                            <p className="text-xl md:text-2xl text-white mb-10 drop-shadow-md font-medium max-w-3xl">
+                            <p className="text-lg md:text-xl text-white mb-8 drop-shadow-md font-medium max-w-3xl">
                                 {banner?.subtitle || "Cập nhật xu hướng tuyển dụng, báo cáo thị trường và kiến thức phát triển sự nghiệp từ đội ngũ chuyên gia GDU."}
                             </p>
                             {banner?.cta && (
                                 <Button
                                     onClick={() => router.push(banner.link || "/news")}
-                                    className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-12 py-8 rounded-xl shadow-xl transition-all hover:scale-105 mt-8 min-w-[280px] w-fit"
+                                    className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-lg px-10 h-[64px] rounded-xl shadow-xl transition-all hover:scale-105 min-w-[260px] w-fit"
                                 >
                                     {banner.cta}
                                 </Button>
