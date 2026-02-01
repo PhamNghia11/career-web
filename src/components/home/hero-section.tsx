@@ -110,17 +110,25 @@ export function HeroSection() {
           <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${slide.image})` }}>
             <div className="absolute inset-0 bg-black/20" />
           </div>
-          <div className="relative h-full min-h-[80vh] lg:min-h-[85vh] container mx-auto px-4 flex flex-col justify-start pt-52 lg:pt-72">
+          <div className="relative h-full min-h-[80vh] lg:min-h-[85vh] container mx-auto px-4 flex flex-col justify-start pt-52 lg:pt-80">
             <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight text-balance drop-shadow-lg min-h-[2.4em] flex items-end">
-                {slide.title || "\u00A0"}
-              </h1>
-              <p className="text-xl md:text-2xl text-white mb-10 drop-shadow-md font-medium min-h-[3.2em] flex items-start">
-                {slide.subtitle || "\u00A0"}
-              </p>
+              {/* Title with fixed height space for 2 lines */}
+              <div className="min-h-[120px] md:min-h-[160px] flex items-end mb-6">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight text-balance drop-shadow-lg">
+                  {slide.title || "\u00A0"}
+                </h1>
+              </div>
+
+              {/* Subtitle with fixed height space for 2 lines */}
+              <div className="min-h-[60px] md:min-h-[80px] flex items-start mb-12">
+                <p className="text-xl md:text-2xl text-white drop-shadow-md font-medium opacity-95">
+                  {slide.subtitle || "\u00A0"}
+                </p>
+              </div>
+
               <Button
                 onClick={() => router.push(slide.link)}
-                className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-12 py-8 rounded-xl shadow-xl transition-all hover:scale-105 mt-8 min-w-[280px] w-fit"
+                className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-12 h-[72px] rounded-xl shadow-xl transition-all hover:scale-105 min-w-[300px] w-fit"
               >
                 {slide.cta}
               </Button>
