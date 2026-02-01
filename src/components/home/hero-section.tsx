@@ -112,10 +112,10 @@ export function HeroSection() {
           </div>
           <div className="relative h-full min-h-[80vh] lg:min-h-[85vh] container mx-auto px-4 flex flex-col justify-start pt-52 lg:pt-72">
             <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight text-balance drop-shadow-lg min-h-[1.2em]">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight text-balance drop-shadow-lg min-h-[2.4em] flex items-end">
                 {slide.title || "\u00A0"}
               </h1>
-              <p className="text-xl md:text-2xl text-white mb-10 drop-shadow-md font-medium min-h-[1.5em]">
+              <p className="text-xl md:text-2xl text-white mb-10 drop-shadow-md font-medium min-h-[3.2em] flex items-start">
                 {slide.subtitle || "\u00A0"}
               </p>
               <Button
