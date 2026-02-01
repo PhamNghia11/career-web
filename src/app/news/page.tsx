@@ -220,14 +220,12 @@ function NewsPageContent() {
                             <p className="text-xl md:text-2xl text-white mb-6 drop-shadow-md font-medium max-w-3xl">
                                 {banner?.subtitle || "Cập nhật xu hướng tuyển dụng, báo cáo thị trường và kiến thức phát triển sự nghiệp từ đội ngũ chuyên gia GDU."}
                             </p>
-                            {banner?.cta && (
-                                <Button
-                                    onClick={() => router.push(banner.link || "/news")}
-                                    className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-12 h-[72px] rounded-xl shadow-xl transition-all hover:scale-105 min-w-[300px] w-fit"
-                                >
-                                    {banner.cta}
-                                </Button>
-                            )}
+                            <Button
+                                onClick={() => router.push(banner?.link || "#results-section")}
+                                className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-12 h-[72px] rounded-xl shadow-xl transition-all hover:scale-105 min-w-[300px] w-fit"
+                            >
+                                {banner?.cta || "Khám phá ngay"}
+                            </Button>
                         </div>
                     </div>
                 </div>
