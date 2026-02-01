@@ -118,6 +118,8 @@ export default function PostJobPage() {
     const [logoBase64, setLogoBase64] = useState<string | null>(null)
     const [showPreview, setShowPreview] = useState(false)
     const [previewData, setPreviewData] = useState<any>(null)
+    const [customField, setCustomField] = useState<string>("")
+    const [logoError, setLogoError] = useState<string | null>(null)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -195,6 +197,18 @@ export default function PostJobPage() {
     }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        // Validate logo is required
+        if (!logoBase64) {
+            setLogoError("Vui lòng tải logo doanh nghiệp")
+            toast({
+                title: "Thiếu logo doanh nghiệp",
+                description: "Logo là bắt buộc để đăng tin tuyển dụng.",
+                variant: "destructive",
+            })
+            return
+        }
+        setLogoError(null)
+
         setIsLoading(true)
         try {
             // Normalize string values
@@ -254,14 +268,20 @@ export default function PostJobPage() {
                 formattedDeadline = `${year}-${month}-${day}`
             }
 
+            // Determine final field value (use customField if "Khác" is selected)
+            const finalField = normalizedValues.field === "Khác" && customField.trim()
+                ? customField.trim()
+                : normalizedValues.field
+
             const payload = {
                 ...normalizedValues,
+                field: finalField,
                 quantity: normalizedValues.unlimitedQuantity ? -1 : normalizedValues.quantity,
                 deadline: formattedDeadline,
                 salary: salaryString,
                 requirements: requirementsList,
                 detailedBenefits: detailedBenefitsList,
-                logo: logoBase64 || "/placeholder.svg?height=100&width=100",
+                logo: logoBase64,
                 creatorId: user?.id || user?._id,
                 role: user?.role,
             }
@@ -422,7 +442,7 @@ export default function PostJobPage() {
 
                             {/* Logo Upload Section */}
                             <div className="space-y-3">
-                                <FormLabel>Logo doanh nghiệp</FormLabel>
+                                <FormLabel>Logo doanh nghiệp <span className="text-red-500">*</span></FormLabel>
                                 <div className="flex items-center gap-4">
                                     {logoPreview ? (
                                         <div className="relative">
@@ -457,6 +477,9 @@ export default function PostJobPage() {
                                         <p>Kích thước khuyến nghị: 200x200px</p>
                                     </div>
                                 </div>
+                                {logoError && (
+                                    <p className="text-sm font-medium text-red-500">{logoError}</p>
+                                )}
                                 <FormField
                                     control={form.control}
                                     name="logoFit"
@@ -760,6 +783,17 @@ export default function PostJobPage() {
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
+                                            {field.value === "Khác" && (
+                                                <div className="mt-3">
+                                                    <Input
+                                                        placeholder="Nhập tên ngành nghề cụ thể..."
+                                                        value={customField}
+                                                        onChange={(e) => setCustomField(e.target.value)}
+                                                        className="border-blue-200 focus:border-blue-500"
+                                                    />
+                                                    <p className="text-xs text-gray-500 mt-1">Nhập tên ngành nghề nếu không có trong danh sách</p>
+                                                </div>
+                                            )}
                                         </FormItem>
                                     )}
                                 />
