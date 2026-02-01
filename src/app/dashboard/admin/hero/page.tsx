@@ -513,8 +513,8 @@ export default function AdminHeroPage() {
                                                 <>
                                                     <img src={editingSlide.image} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-50" />
                                                     <div className={cn(
-                                                        "absolute inset-0 text-white flex flex-col justify-center px-8",
-                                                        editingSlide.page === "home" ? "items-start text-left" : "items-center text-center"
+                                                        "absolute inset-0 text-white flex flex-col px-8",
+                                                        editingSlide.page === "home" ? "justify-center items-start text-left" : "justify-end pb-4 items-start text-left"
                                                     )}>
                                                         <h4 className={cn(
                                                             "font-bold leading-tight line-clamp-2 transition-all duration-500",

@@ -5,7 +5,7 @@ import { CompaniesListClient } from "@/components/companies/companies-list-clien
 
 async function getBannerData() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/hero-slides?page=companies`, { next: { revalidate: 60 } })
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/hero-slides?page=companies`, { cache: 'no-store' })
     const data = await res.json()
     if (data.success && data.data.length > 0) {
       return data.data[0]
@@ -23,7 +23,7 @@ export default async function CompaniesPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/30 to-background">
       <Header />
       <main className="flex-1">
-        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-56 lg:pt-80">
+        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-end pb-16 lg:pb-24">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
@@ -32,7 +32,7 @@ export default async function CompaniesPage() {
           {/* Light Overlay for clarity */}
           <div className="absolute inset-0 bg-black/20" />
 
-          {/* Content */}
+          {/* Content - Bottom Left */}
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-3xl">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg">
