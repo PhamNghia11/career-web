@@ -22,7 +22,7 @@ export default async function CompaniesPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/30 to-background">
       <Header />
       <main className="flex-1">
-        <div className="relative py-32 overflow-hidden">
+        <div className="relative min-h-[80vh] overflow-hidden flex flex-col justify-start pt-52 lg:pt-72">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
@@ -32,13 +32,15 @@ export default async function CompaniesPage() {
           <div className="absolute inset-0 bg-black/20" />
 
           {/* Content */}
-          <div className="container mx-auto px-4 relative z-10 text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg">
-              {banner?.title || "Khám phá doanh nghiệp"}
-            </h1>
-            <p className="text-xl md:text-2xl text-white drop-shadow-md font-medium max-w-3xl mx-auto">
-              {banner?.subtitle || "Tìm hiểu về các doanh nghiệp hàng đầu và cơ hội nghề nghiệp dành cho bạn"}
-            </p>
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-3xl">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg">
+                {banner?.title || "Khám phá doanh nghiệp"}
+              </h1>
+              <p className="text-xl md:text-2xl text-white drop-shadow-md font-medium">
+                {banner?.subtitle || "Tìm hiểu về các doanh nghiệp hàng đầu và cơ hội nghề nghiệp dành cho bạn"}
+              </p>
+            </div>
           </div>
         </div>
         <div className="container mx-auto px-4 py-8">

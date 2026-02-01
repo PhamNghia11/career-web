@@ -102,7 +102,7 @@ export default async function JobsPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/50 via-background to-muted/30">
       <Header />
       <main className="flex-1">
-        <div className="relative py-32 overflow-hidden">
+        <div className="relative min-h-[80vh] overflow-hidden flex flex-col justify-start pt-52 lg:pt-72">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
@@ -112,13 +112,15 @@ export default async function JobsPage() {
           <div className="absolute inset-0 bg-black/20" />
 
           {/* Content */}
-          <div className="container mx-auto px-4 text-center relative z-10">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg">
-              {banner?.title || "Tìm kiếm cơ hội nghề nghiệp"}
-            </h1>
-            <p className="text-xl md:text-2xl text-white drop-shadow-md font-medium max-w-3xl mx-auto">
-              {banner?.subtitle || "Khám phá hàng ngàn việc làm hấp dẫn từ các doanh nghiệp hàng đầu dành cho sinh viên GDU"}
-            </p>
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-3xl">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg">
+                {banner?.title || "Tìm kiếm cơ hội nghề nghiệp"}
+              </h1>
+              <p className="text-xl md:text-2xl text-white drop-shadow-md font-medium">
+                {banner?.subtitle || "Khám phá hàng ngàn việc làm hấp dẫn từ các doanh nghiệp hàng đầu dành cho sinh viên GDU"}
+              </p>
+            </div>
           </div>
         </div>
         <div className="container mx-auto px-4 py-8">

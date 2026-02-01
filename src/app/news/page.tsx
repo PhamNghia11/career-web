@@ -201,7 +201,7 @@ function NewsPageContent() {
 
             <main>
                 {/* Blue Hero Header */}
-                <div className="relative py-32 overflow-hidden">
+                <div className="relative min-h-[80vh] overflow-hidden flex flex-col justify-start pt-52 lg:pt-72">
                     <div
                         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
                         style={{ backgroundImage: `url('${banner?.image || '/hero-bg.png'}')` }}
