@@ -110,7 +110,7 @@ export function HeroSection() {
           <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${slide.image})` }}>
             <div className="absolute inset-0 bg-black/20" />
           </div>
-          <div className="relative h-full min-h-[80vh] lg:min-h-[85vh] container mx-auto px-4 flex flex-col justify-start pt-40 lg:pt-52">
+          <div className="relative h-full min-h-[80vh] lg:min-h-[85vh] container mx-auto px-4 flex flex-col justify-start pt-52 lg:pt-72">
             <div className="max-w-3xl">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight text-balance drop-shadow-lg min-h-[1.2em]">
                 {slide.title || "\u00A0"}
@@ -120,7 +120,7 @@ export function HeroSection() {
               </p>
               <Button
                 onClick={() => router.push(slide.link)}
-                className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-12 py-8 rounded-xl shadow-xl transition-all hover:scale-105 mt-4 min-w-[280px] w-fit"
+                className="bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-12 py-8 rounded-xl shadow-xl transition-all hover:scale-105 mt-8 min-w-[280px] w-fit"
               >
                 {slide.cta}
               </Button>
