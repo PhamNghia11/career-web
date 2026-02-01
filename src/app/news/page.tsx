@@ -210,14 +210,14 @@ function NewsPageContent() {
 
                     <div className="container px-4 mx-auto relative z-10">
                         <div className="max-w-4xl">
-                            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
+                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight drop-shadow-lg">
                                 {banner?.title || (
                                     <>
                                         Tin tức & Phân tích <br />Thị trường Lao động
                                     </>
                                 )}
                             </h1>
-                            <p className="text-sm md:text-lg text-white/50 max-w-2xl font-medium leading-relaxed">
+                            <p className="text-xl md:text-2xl text-white drop-shadow-md font-medium max-w-3xl">
                                 {banner?.subtitle || "Cập nhật xu hướng tuyển dụng, báo cáo thị trường và kiến thức phát triển sự nghiệp từ đội ngũ chuyên gia GDU."}
                             </p>
                         </div>

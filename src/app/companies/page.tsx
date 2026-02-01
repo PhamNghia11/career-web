@@ -33,10 +33,10 @@ export default async function CompaniesPage() {
 
           {/* Content */}
           <div className="container mx-auto px-4 relative z-10 text-center">
-            <h1 className="text-3xl lg:text-5xl font-bold mb-3 text-white tracking-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg">
               {banner?.title || "Khám phá doanh nghiệp"}
             </h1>
-            <p className="text-lg text-white/90 max-w-2xl mx-auto">
+            <p className="text-xl md:text-2xl text-white drop-shadow-md font-medium max-w-3xl mx-auto">
               {banner?.subtitle || "Tìm hiểu về các doanh nghiệp hàng đầu và cơ hội nghề nghiệp dành cho bạn"}
             </p>
           </div>
