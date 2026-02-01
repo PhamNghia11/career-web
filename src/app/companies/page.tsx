@@ -41,12 +41,6 @@ export default async function CompaniesPage() {
               <p className="text-xl md:text-2xl text-white mb-6 drop-shadow-md font-medium">
                 {banner?.subtitle || "Tìm hiểu về các doanh nghiệp hàng đầu và cơ hội nghề nghiệp dành cho bạn"}
               </p>
-              <Link
-                href={banner?.link || "#companies-list"}
-                className="inline-flex items-center justify-center bg-[#0077B6] hover:bg-[#0077B6]/90 text-white font-bold text-xl px-12 h-[72px] rounded-xl shadow-xl transition-all hover:scale-105 min-w-[300px] w-fit"
-              >
-                {banner?.cta || "Khám phá ngay"}
-              </Link>
             </div>
           </div>
         </div>
