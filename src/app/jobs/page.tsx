@@ -103,7 +103,7 @@ export default async function JobsPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/50 via-background to-muted/30">
       <Header />
       <main className="flex-1">
-        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-40 lg:pt-56">
+        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-48 lg:pt-64">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
