@@ -110,7 +110,7 @@ export function HeroSection() {
           <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${slide.image})` }}>
             <div className="absolute inset-0 bg-black/20" />
           </div>
-          <div className="relative h-full min-h-[80vh] lg:min-h-[85vh] container mx-auto px-4 flex flex-col justify-start pt-44 lg:pt-64">
+          <div className="relative h-full min-h-[80vh] lg:min-h-[85vh] container mx-auto px-4 flex flex-col justify-start pt-40 lg:pt-56">
             <div className="max-w-3xl">
               {/* Title with fixed height space for 2-3 lines */}
               <div className="min-h-[120px] md:min-h-[180px] flex items-end mb-4">
@@ -120,7 +120,7 @@ export function HeroSection() {
               </div>
 
               {/* Subtitle with fixed height space for 2 lines */}
-              <div className="min-h-[50px] md:min-h-[70px] flex items-start mb-8">
+              <div className="min-h-[50px] md:min-h-[70px] flex items-start mb-4">
                 <p className="text-lg md:text-xl text-white drop-shadow-md font-medium opacity-95">
                   {slide.subtitle || "\u00A0"}
                 </p>

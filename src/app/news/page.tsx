@@ -201,7 +201,7 @@ function NewsPageContent() {
 
             <main>
                 {/* Blue Hero Header */}
-                <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-44 lg:pt-64">
+                <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-40 lg:pt-56">
                     <div
                         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
                         style={{ backgroundImage: `url('${banner?.image || '/hero-bg.png'}')` }}
@@ -217,7 +217,7 @@ function NewsPageContent() {
                                     </>
                                 )}
                             </h1>
-                            <p className="text-lg md:text-xl text-white mb-8 drop-shadow-md font-medium max-w-3xl">
+                            <p className="text-lg md:text-xl text-white mb-4 drop-shadow-md font-medium max-w-3xl">
                                 {banner?.subtitle || "Cập nhật xu hướng tuyển dụng, báo cáo thị trường và kiến thức phát triển sự nghiệp từ đội ngũ chuyên gia GDU."}
                             </p>
                             {banner?.cta && (

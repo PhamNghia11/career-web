@@ -23,7 +23,7 @@ export default async function CompaniesPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/30 to-background">
       <Header />
       <main className="flex-1">
-        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-44 lg:pt-64">
+        <div className="relative min-h-[85vh] overflow-hidden flex flex-col justify-start pt-40 lg:pt-56">
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
@@ -38,7 +38,7 @@ export default async function CompaniesPage() {
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 text-white tracking-tight drop-shadow-lg">
                 {banner?.title || "Khám phá doanh nghiệp"}
               </h1>
-              <p className="text-lg md:text-xl text-white mb-8 drop-shadow-md font-medium">
+              <p className="text-lg md:text-xl text-white mb-4 drop-shadow-md font-medium">
                 {banner?.subtitle || "Tìm hiểu về các doanh nghiệp hàng đầu và cơ hội nghề nghiệp dành cho bạn"}
               </p>
               {banner?.cta && (
