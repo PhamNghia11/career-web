@@ -4,9 +4,13 @@ import { useEffect, useState } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { FileText, Users, Eye, Plus, ArrowRight } from "lucide-react"
+import { FileText, Users, Eye, Plus, ArrowRight, User, Mail, Phone, Calendar, Clock, CheckCircle, RotateCcw } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useToast } from "@/hooks/use-toast"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 export function EmployerDashboardContent() {
     const { user } = useAuth()
@@ -17,7 +21,13 @@ export function EmployerDashboardContent() {
         totalViews: 0
     })
     const [recentJobs, setRecentJobs] = useState<any[]>([])
+    const [recentApplications, setRecentApplications] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const { toast } = useToast()
+
+    const [selectedApp, setSelectedApp] = useState<any | null>(null)
+    const [cvUrl, setCvUrl] = useState<string | null>(null)
+    const [cvLoading, setCvLoading] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -65,6 +75,7 @@ export function EmployerDashboardContent() {
                     })
 
                     setRecentJobs(jobsWithCounts.slice(0, 5)) // Get top 5 recent with real counts
+                    setRecentApplications(applications.slice(0, 5)) // Show top 5 latest
                 }
             } catch (error) {
                 console.error("Failed to fetch employer dashboard data", error)
@@ -75,6 +86,71 @@ export function EmployerDashboardContent() {
 
         fetchData()
     }, [user?._id])
+
+    const handleStatusChange = async (appId: string, newStatus: string) => {
+        try {
+            const res = await fetch(`/api/applications/${appId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    status: newStatus,
+                    updaterId: user?.id || user?._id,
+                    updaterRole: 'employer'
+                })
+            })
+
+            if (res.ok) {
+                setRecentApplications(prev =>
+                    prev.map(app => app._id === appId ? { ...app, status: newStatus } : app)
+                )
+
+                toast({
+                    title: "Thành công",
+                    description: "Đã cập nhật trạng thái ứng tuyển",
+                })
+            }
+        } catch (error) {
+            toast({
+                title: "Lỗi",
+                description: "Không thể cập nhật trạng thái",
+                variant: "destructive"
+            })
+        }
+    }
+
+    const handleViewDetails = async (app: any) => {
+        setSelectedApp(app)
+        setCvUrl(null)
+        setCvLoading(true)
+
+        // Auto-mark as viewed
+        if (app.status === 'new') {
+            handleStatusChange(app._id, 'reviewed')
+        }
+
+        try {
+            const res = await fetch(`/api/applications/${app._id}`)
+            const data = await res.json()
+            if (data.success && data.data.cvBase64) {
+                setCvUrl(data.data.cvBase64)
+            }
+        } catch (error) {
+            console.error("Error loading CV", error)
+        } finally {
+            setCvLoading(false)
+        }
+    }
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case "new": return <Badge className="bg-blue-100 text-blue-700">Mới</Badge>
+            case "reviewed": return <Badge className="bg-yellow-100 text-yellow-700">Đã xem</Badge>
+            case "interviewed": return <Badge className="bg-purple-100 text-purple-700">Phỏng vấn</Badge>
+            case "hired": return <Badge className="bg-green-100 text-green-700">Đã tuyển</Badge>
+            case "rejected": return <Badge className="bg-red-100 text-red-700">Từ chối</Badge>
+            default: return <Badge variant="outline">Chưa rõ</Badge>
+        }
+    }
 
     if (loading) {
         return <div className="text-center py-8">Đang tải dữ liệu...</div>
@@ -187,6 +263,115 @@ export function EmployerDashboardContent() {
                     )}
                 </CardContent>
             </Card>
+
+            {/* Recent Applications List */}
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Hồ sơ ứng tuyển mới nhất</CardTitle>
+                    <Link href="/dashboard/applicants-manager">
+                        <Button variant="ghost" size="sm" className="text-primary">Quản lý tất cả <ArrowRight className="ml-1 h-4 w-4" /></Button>
+                    </Link>
+                </CardHeader>
+                <CardContent>
+                    {recentApplications.length === 0 ? (
+                        <div className="text-center py-6 text-muted-foreground">Chưa có hồ sơ mới nào.</div>
+                    ) : (
+                        <div className="space-y-4">
+                            {recentApplications.map((app) => (
+                                <div key={app._id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
+                                    <div className="flex items-center gap-4 min-w-0">
+                                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                                            <User className="h-5 w-5 text-blue-600" />
+                                        </div>
+                                        <div className="space-y-1 min-w-0">
+                                            <h4 className="font-semibold truncate">{app.fullname}</h4>
+                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <span className="font-medium text-blue-600 truncate">{app.jobTitle}</span>
+                                                <span>•</span>
+                                                <span>{new Date(app.createdAt).toLocaleDateString('vi-VN')}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <Select
+                                            value={app.status}
+                                            onValueChange={(val) => handleStatusChange(app._id, val)}
+                                        >
+                                            <SelectTrigger className="w-[130px] h-8 text-xs">
+                                                <SelectValue>{getStatusBadge(app.status)}</SelectValue>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="new">Mới</SelectItem>
+                                                <SelectItem value="reviewed">Đã xem</SelectItem>
+                                                <SelectItem value="interviewed">Mời PV</SelectItem>
+                                                <SelectItem value="hired">Đã tuyển</SelectItem>
+                                                <SelectItem value="rejected">Từ chối</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <Button variant="outline" size="sm" onClick={() => handleViewDetails(app)}>Chi tiết</Button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            {/* Application Detail Dialog */}
+            <Dialog open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
+                <DialogContent className="max-w-4xl h-[90vh] flex flex-col p-6">
+                    <DialogHeader className="border-b pb-4">
+                        <DialogTitle className="flex items-center justify-between">
+                            <div className="flex flex-col gap-1">
+                                <span>Chi tiết ứng viên: {selectedApp?.fullname}</span>
+                                <Badge variant="outline" className="w-fit">{selectedApp?.jobTitle}</Badge>
+                            </div>
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 flex-1 min-h-0 overflow-hidden">
+                        <div className="md:col-span-1 space-y-4 overflow-y-auto pr-2">
+                            <div>
+                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Thông tin liên hệ</h4>
+                                <div className="space-y-2 text-sm bg-muted/50 p-3 rounded-md">
+                                    <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-muted-foreground" /> {selectedApp?.email}</div>
+                                    <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-muted-foreground" /> {selectedApp?.phone}</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Lời nhắn</h4>
+                                <div className="text-sm bg-blue-50/50 p-3 rounded-md italic text-gray-700">
+                                    {selectedApp?.message || "Không có lời nhắn."}
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Trạng thái hiện tại</h4>
+                                <div className="flex items-center gap-2">
+                                    {selectedApp && getStatusBadge(selectedApp.status)}
+                                    <span className="text-xs text-muted-foreground">Nộp ngày: {selectedApp && new Date(selectedApp.createdAt).toLocaleDateString('vi-VN')}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-2 bg-gray-100 rounded-md overflow-hidden relative">
+                            {cvLoading ? (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                </div>
+                            ) : cvUrl ? (
+                                <iframe src={cvUrl} className="w-full h-full" title="CV Preview" />
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center text-gray-500 flex-col gap-2">
+                                    <FileText className="h-10 w-10 text-gray-300" />
+                                    <span>Không thể hiển thị CV</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
