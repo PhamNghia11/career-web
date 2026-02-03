@@ -200,7 +200,7 @@ export default function RegisterPage() {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-1 ml-1">
-                  Hỗ trợ: @student.giadinh.edu.vn, @gmail.com, @outlook.com...
+                  Hỗ trợ tất cả các loại email (Cá nhân, Doanh nghiệp, Giáo dục...)
                 </p>
               </div>
 

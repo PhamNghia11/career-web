@@ -221,11 +221,13 @@ export function ApplyJobDialog({
             const form = e.target as HTMLFormElement
             const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim()
             const phone = (form.elements.namedItem("phone") as HTMLInputElement).value.trim()
+            /* 
             if (!email.toLowerCase().endsWith("@gmail.com")) {
                 setError("Email phải là địa chỉ Gmail (@gmail.com)")
                 setIsSubmitting(false)
                 return
             }
+            */
 
             if (!major || major.trim() === "") {
                 setError("Vui lòng chọn Ngành học")
@@ -499,16 +501,13 @@ export function ApplyJobDialog({
                                         <Input
                                             id="email"
                                             type="email"
-                                            placeholder="example@gmail.com"
+                                            placeholder="your-email@example.com"
                                             defaultValue={user?.email || ""}
                                             required
                                             onChange={(e) => {
                                                 const val = e.target.value
-                                                if (val && !val.endsWith("@gmail.com")) {
-                                                    setError("Email phải có định dạng @gmail.com")
-                                                } else {
-                                                    setError(null)
-                                                }
+                                                // Validation handled by browser or refined regex if needed
+                                                setError(null)
                                             }}
                                         />
                                     </div>
