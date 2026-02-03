@@ -4,6 +4,8 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { JobsListClient } from "@/components/jobs/jobs-list-client"
 import { getCollection, COLLECTIONS } from "@/database/connection"
+
+export const dynamic = "force-dynamic"
 import { Job } from "@/lib/jobs-data"
 
 async function getActiveJobsFromDB(): Promise<Job[]> {
