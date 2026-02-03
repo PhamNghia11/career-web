@@ -124,13 +124,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const updateProfile = async (data: Partial<User>): Promise<boolean> => {
+    console.log("[Auth updateProfile] Called with data:", JSON.stringify(data))
     try {
       if (user) {
         const userId = user.id || user._id
+        console.log("[Auth updateProfile] User ID:", userId)
         if (!userId) {
+          console.error("[Auth updateProfile] User ID not found!")
           throw new Error("User ID not found")
         }
 
+        console.log("[Auth updateProfile] Sending PATCH to /api/users/" + userId)
         const response = await fetch(`/api/users/${userId}`, {
           method: "PATCH",
           headers: {
@@ -139,15 +143,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify(data),
         })
 
+        console.log("[Auth updateProfile] Response status:", response.status)
+        const responseData = await response.json()
+        console.log("[Auth updateProfile] Response body:", JSON.stringify(responseData))
+
         if (!response.ok) {
+          console.error("[Auth updateProfile] Server returned error:", responseData)
           throw new Error("Failed to update profile on server")
         }
 
         const updatedUser = { ...user, ...data, updatedAt: new Date() }
         setUser(updatedUser)
         localStorage.setItem("gdu_user", JSON.stringify(updatedUser))
+        console.log("[Auth updateProfile] Success! Updated localStorage")
         return true
       }
+      console.warn("[Auth updateProfile] No user in context!")
       return false
     } catch (error) {
       console.error("[Auth] Update profile error:", error)
