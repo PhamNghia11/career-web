@@ -279,21 +279,43 @@ export default async function JobPage(props: JobPageProps) {
                             <Card className="border-none shadow-md bg-white">
                                 <CardContent className="p-5">
                                     <div className="flex items-center gap-3 mb-3">
-                                        <div className="p-2 bg-gray-100 rounded-lg">
-                                            <Globe className="h-5 w-5 text-gray-600" />
+                                        <div className="p-2 bg-blue-50 rounded-lg">
+                                            <Globe className="h-5 w-5 text-blue-600" />
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-semibold text-gray-900">Website doanh nghiệp</p>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">Website doanh nghiệp</p>
                                             <a
                                                 href={job.website || "#"}
                                                 target={job.website ? "_blank" : "_self"}
                                                 rel="noopener noreferrer"
-                                                className={`text-sm ${job.website ? "text-blue-600 hover:underline" : "text-gray-500 cursor-default"} truncate block max-w-[200px]`}
+                                                className={`text-sm font-medium ${job.website ? "text-blue-600 hover:underline" : "text-gray-500 cursor-default"} truncate block`}
                                             >
                                                 {job.website || "Đang cập nhật"}
                                             </a>
                                         </div>
                                     </div>
+
+                                    {job.documentUrl && (
+                                        <div className="mt-4 pt-4 border-t border-gray-100">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-orange-50 rounded-lg">
+                                                    <Paperclip className="h-5 w-5 text-orange-600" />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">Tài liệu đính kèm</p>
+                                                    <a
+                                                        href={job.documentUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-sm font-medium text-orange-600 hover:underline truncate block"
+                                                        title={job.documentName || "Xem tài liệu"}
+                                                    >
+                                                        {job.documentName || "Xem tài liệu đính kèm"}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
                             <ReportJobDialog
