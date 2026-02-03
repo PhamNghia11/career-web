@@ -11,6 +11,91 @@ import { useAuth } from "@/lib/auth-context"
 import { toast } from "@/components/ui/use-toast"
 import { normalizeWhitespace } from "@/lib/utils"
 
+const resizeImage = (file: File): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = (event) => {
+      const img = new Image()
+      img.src = event.target?.result as string
+      img.onload = () => {
+        const canvas = document.createElement("canvas")
+        const MAX_WIDTH = 400
+        const MAX_HEIGHT = 400
+        let width = img.width
+        let height = img.height
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width
+            width = MAX_WIDTH
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height
+            height = MAX_HEIGHT
+          }
+        }
+
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext("2d")
+        ctx?.drawImage(img, 0, 0, width, height)
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) resolve(blob)
+            else reject(new Error("Canvas to Blob failed"))
+          },
+          "image/jpeg",
+          0.8,
+        )
+      }
+      img.onerror = reject
+    }
+    reader.onerror = reject
+  })
+}
+
+// Mapping of Majors to their corresponding Faculties (Official GDU List)
+const MAJOR_FACULTY_MAP: Record<string, string> = {
+  // Sức khỏe
+  "Răng Hàm Mặt": "Sức khỏe",
+  "Kỹ thuật phục hồi chức năng": "Sức khỏe",
+  "Điều dưỡng": "Sức khỏe",
+  // Công nghệ thông tin
+  "Công nghệ thông tin": "Công nghệ thông tin",
+  "Kỹ thuật phần mềm": "Công nghệ thông tin",
+  "Mạng máy tính & Truyền thông dữ liệu": "Công nghệ thông tin",
+  "Trí tuệ nhân tạo": "Công nghệ thông tin",
+  // Truyền thông
+  "Truyền thông đa phương tiện": "Truyền thông",
+  "Công nghệ truyền thông": "Truyền thông",
+  "Quan hệ công chúng": "Truyền thông",
+  // Kinh doanh
+  "Kinh doanh quốc tế": "Kinh doanh",
+  "Kinh doanh thương mại": "Kinh doanh",
+  "Thương mại điện tử": "Kinh doanh",
+  // Quản trị - Quản lý
+  "Quản trị kinh doanh": "Quản trị - Quản lý",
+  "Marketing": "Quản trị - Quản lý",
+  "Quản trị khách sạn": "Quản trị - Quản lý",
+  "Quản trị dịch vụ du lịch & lữ hành": "Quản trị - Quản lý",
+  "Logistics & Quản lý chuỗi cung ứng": "Quản trị - Quản lý",
+  // Luật
+  "Luật": "Luật",
+  "Luật kinh tế": "Luật",
+  // Khoa học xã hội & Ngôn ngữ quốc tế
+  "Ngôn ngữ Anh": "Khoa học xã hội & Ngôn ngữ quốc tế",
+  "Đông phương học": "Khoa học xã hội & Ngôn ngữ quốc tế",
+  "Tâm lý học": "Khoa học xã hội & Ngôn ngữ quốc tế",
+  "Ngôn ngữ Trung Quốc": "Khoa học xã hội & Ngôn ngữ quốc tế",
+  // Tài chính ngân hàng
+  "Tài chính - Ngân hàng": "Tài chính ngân hàng",
+  "Công nghệ tài chính": "Tài chính ngân hàng",
+  "Kế toán": "Tài chính ngân hàng",
+}
+
 export default function ProfilePage() {
   const { user, updateProfile } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
@@ -32,44 +117,7 @@ export default function ProfilePage() {
     }
   })
 
-  // Mapping of Majors to their corresponding Faculties (Official GDU List)
-  const MAJOR_FACULTY_MAP: Record<string, string> = {
-    // Sức khỏe
-    "Răng Hàm Mặt": "Sức khỏe",
-    "Kỹ thuật phục hồi chức năng": "Sức khỏe",
-    "Điều dưỡng": "Sức khỏe",
-    // Công nghệ thông tin
-    "Công nghệ thông tin": "Công nghệ thông tin",
-    "Kỹ thuật phần mềm": "Công nghệ thông tin",
-    "Mạng máy tính & Truyền thông dữ liệu": "Công nghệ thông tin",
-    "Trí tuệ nhân tạo": "Công nghệ thông tin",
-    // Truyền thông
-    "Truyền thông đa phương tiện": "Truyền thông",
-    "Công nghệ truyền thông": "Truyền thông",
-    "Quan hệ công chúng": "Truyền thông",
-    // Kinh doanh
-    "Kinh doanh quốc tế": "Kinh doanh",
-    "Kinh doanh thương mại": "Kinh doanh",
-    "Thương mại điện tử": "Kinh doanh",
-    // Quản trị - Quản lý
-    "Quản trị kinh doanh": "Quản trị - Quản lý",
-    "Marketing": "Quản trị - Quản lý",
-    "Quản trị khách sạn": "Quản trị - Quản lý",
-    "Quản trị dịch vụ du lịch & lữ hành": "Quản trị - Quản lý",
-    "Logistics & Quản lý chuỗi cung ứng": "Quản trị - Quản lý",
-    // Luật
-    "Luật": "Luật",
-    "Luật kinh tế": "Luật",
-    // Khoa học xã hội & Ngôn ngữ quốc tế
-    "Ngôn ngữ Anh": "Khoa học xã hội & Ngôn ngữ quốc tế",
-    "Đông phương học": "Khoa học xã hội & Ngôn ngữ quốc tế",
-    "Tâm lý học": "Khoa học xã hội & Ngôn ngữ quốc tế",
-    "Ngôn ngữ Trung Quốc": "Khoa học xã hội & Ngôn ngữ quốc tế",
-    // Tài chính ngân hàng
-    "Tài chính - Ngân hàng": "Tài chính ngân hàng",
-    "Công nghệ tài chính": "Tài chính ngân hàng",
-    "Kế toán": "Tài chính ngân hàng",
-  }
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -117,11 +165,17 @@ export default function ProfilePage() {
     if (!file || !user || !user.id) return
 
     setIsUploading(true)
-    const formData = new FormData()
-    formData.append("file", file)
-    formData.append("userId", user.id)
-
     try {
+      // Resize image before uploading
+      const resizedBlob = await resizeImage(file)
+      const resizedFile = new File([resizedBlob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+        type: "image/jpeg",
+      })
+
+      const formData = new FormData()
+      formData.append("file", resizedFile)
+      formData.append("userId", user.id)
+
       const response = await fetch("/api/user/upload-avatar", {
         method: "POST",
         body: formData,
