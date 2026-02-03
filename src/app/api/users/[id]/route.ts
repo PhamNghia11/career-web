@@ -16,15 +16,36 @@ export async function GET(
             return NextResponse.json({ error: "Invalid user ID" }, { status: 400 })
         }
 
+        // SECURE: Verify authorization
+        const { cookies } = await import("next/headers")
+        const { decrypt } = await import("@/lib/session")
+        const cookie = (await cookies()).get("session")?.value
+        const session = await decrypt(cookie)
+
+        if (!session || (session.userId !== id && session.role !== "admin")) {
+            return NextResponse.json({ success: false, error: "Unauthorized: Access Denied" }, { status: 403 })
+        }
+
         const collection = await getCollection(COLLECTIONS.USERS)
-        const user = await collection.findOne({ _id: new ObjectId(id) }, { projection: { password: 0 } })
+
+        // Project ONLY safe fields
+        const safeProjection = {
+            password: 0,
+            totpSecret: 0,
+            recoveryCodes: 0,
+            totpEnabled: 0,
+            __v: 0
+        }
+
+        const user = await collection.findOne(
+            { _id: new ObjectId(id) },
+            { projection: safeProjection }
+        )
 
         if (!user) {
-            console.log(`[API GET User] User not found for ID: ${id}`)
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
 
-        console.log(`[API GET User] Successfully fetched user: ${user.email} (ID: ${id})`)
         return NextResponse.json({
             success: true,
             user: {
@@ -53,9 +74,17 @@ export async function DELETE(
             return NextResponse.json({ error: "Invalid user ID" }, { status: 400 })
         }
 
-        const usersCollection = await getCollection(COLLECTIONS.USERS)
+        // SECURE: Verify authorization
+        const { cookies } = await import("next/headers")
+        const { decrypt } = await import("@/lib/session")
+        const cookie = (await cookies()).get("session")?.value
+        const session = await decrypt(cookie)
 
-        // 1. Fetch user to get context (email, role) for deep cleanup
+        if (!session || (session.userId !== id && session.role !== "admin")) {
+            return NextResponse.json({ success: false, error: "Unauthorized: Access Denied" }, { status: 403 })
+        }
+
+        const usersCollection = await getCollection(COLLECTIONS.USERS)
         const userToDelete = await usersCollection.findOne({ _id: new ObjectId(id) })
         if (!userToDelete) {
             return NextResponse.json({ error: "User not found" }, { status: 404 })
@@ -170,6 +199,16 @@ export async function PATCH(
 
         if (!ObjectId.isValid(id)) {
             return NextResponse.json({ error: "Invalid user ID" }, { status: 400 })
+        }
+
+        // SECURE: Verify authorization
+        const { cookies } = await import("next/headers")
+        const { decrypt } = await import("@/lib/session")
+        const cookie = (await cookies()).get("session")?.value
+        const session = await decrypt(cookie)
+
+        if (!session || (session.userId !== id && session.role !== "admin")) {
+            return NextResponse.json({ success: false, error: "Unauthorized: Access Denied" }, { status: 403 })
         }
 
         const collection = await getCollection(COLLECTIONS.USERS)

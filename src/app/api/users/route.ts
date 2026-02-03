@@ -26,28 +26,27 @@ export async function GET(request: Request) {
             query.role = role
         }
 
-        // Show all users regardless of verification status
-        // query.emailVerified = true
+        // Project ONLY safe fields
+        const safeProjection = {
+            password: 0,
+            totpSecret: 0,
+            recoveryCodes: 0,
+            totpEnabled: 0,
+            __v: 0
+        }
 
         const users = await collection
             .find(query)
             .sort({ createdAt: -1 })
-            .project({ password: 0 }) // Exclude password for performance, but include avatar now
+            .project(safeProjection)
             .toArray()
 
         return NextResponse.json({
             success: true,
-            debug: {
-                collection: COLLECTIONS.USERS,
-                query: query,
-                count: users.length,
-                dbName: collection.dbName
-            },
             users: users.map(user => ({
                 ...user,
                 _id: user._id.toString(),
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt
+                id: user._id.toString()
             })),
         })
     } catch (error) {
