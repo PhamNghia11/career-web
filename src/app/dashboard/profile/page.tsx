@@ -113,23 +113,33 @@ export default function ProfilePage() {
     cohort: "",
   })
 
-  // Synchronize formData with user data when context loads or updates
-  useEffect(() => {
-    if (user) {
-      // Trim all values coming from user object to avoid space issues
-      const major = (user.major || "").trim()
-      const faculty = (user.faculty || (major ? MAJOR_FACULTY_MAP[major] : "") || "").trim()
+  // Function to initialize form data from user object
+  const initFormData = (userData: User | null) => {
+    if (userData) {
+      const major = (userData.major || "").trim()
+      const faculty = (userData.faculty || (major ? MAJOR_FACULTY_MAP[major] : "") || "").trim()
       setFormData({
-        name: (user.name || "").trim(),
-        email: (user.email || "").trim(),
-        phone: (user.phone || "").trim(),
-        studentId: (user.studentId || "").trim(),
+        name: (userData.name || "").trim(),
+        email: (userData.email || "").trim(),
+        phone: (userData.phone || "").trim(),
+        studentId: (userData.studentId || "").trim(),
         major: major,
         faculty: faculty,
-        cohort: (user.cohort || "").trim(),
+        cohort: (userData.cohort || "").trim(),
       })
     }
+  }
+
+  // Synchronize formData with user data when context loads or updates
+  useEffect(() => {
+    initFormData(user)
   }, [user])
+
+  const handleCancel = () => {
+    initFormData(user)
+    setIsEditing(false)
+    setPhoneError("")
+  }
 
 
 
@@ -292,12 +302,21 @@ export default function ProfilePage() {
               <Button onClick={() => setIsEditing(true)}>Chỉnh sửa</Button>
             ) : (
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                <Button variant="outline" onClick={handleCancel}>
                   Hủy
                 </Button>
                 <Button onClick={handleSave} disabled={isSaving}>
-                  <Save className="h-4 w-4 mr-2" />
-                  {isSaving ? "Đang lưu..." : "Lưu"}
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Đang lưu...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Lưu
+                    </>
+                  )}
                 </Button>
               </div>
             )}

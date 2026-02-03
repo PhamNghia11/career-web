@@ -368,11 +368,33 @@ export async function PATCH(
             }
         }
 
+        console.log(`[API PATCH User] Update result for ${id}: matched=${result.matchedCount}, modified=${result.modifiedCount}`)
+
         if (result.matchedCount === 0) {
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
 
-        return NextResponse.json({ success: true, message: "User updated successfully" })
+        // Fetch the updated user to return to the frontend
+        // Using the same safe projection we used in GET
+        const safeProjection = {
+            password: 0,
+            totpSecret: 0,
+            recoveryCodes: 0,
+            totpEnabled: 0,
+            __v: 0
+        };
+        const updatedUserRaw = await collection.findOne({ _id: new ObjectId(id) }, { projection: safeProjection });
+        const updatedUser = updatedUserRaw ? {
+            ...updatedUserRaw,
+            id: updatedUserRaw._id.toString(),
+            _id: updatedUserRaw._id.toString()
+        } : null;
+
+        return NextResponse.json({
+            success: true,
+            message: "User updated successfully",
+            user: updatedUser
+        })
     } catch (error) {
         console.error("Update user error:", error)
         return NextResponse.json(
