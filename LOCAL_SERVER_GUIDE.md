@@ -110,7 +110,12 @@ Wireless LAN adapter Wi-Fi:
    ...
 ```
 
-> ⚠️ **GHI NHỚ:** Số IP này sẽ dùng ở các bước sau. Ví dụ: `192.168.1.15`
+### 4.3 Cách tìm IP chính xác nhất (Dùng PowerShell)
+Mở **PowerShell** và dán lệnh sau để lấy đúng IP của card Wi-Fi:
+```powershell
+Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias "Wi-Fi" | Select-Object IPAddress
+```
+> 💡 **Mẹo:** Nếu bạn dùng mạng dây, hãy thay `"Wi-Fi"` bằng `"Ethernet"`.
 
 ---
 

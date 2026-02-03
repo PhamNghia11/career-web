@@ -107,7 +107,7 @@ export default async function JobsPage() {
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
-            style={{ backgroundImage: `url('${banner?.image || '/hero-bg.png'}')` }}
+            style={{ backgroundImage: `url('${banner?.image || '/vercel-banner.jpg'}')` }}
           />
           {/* Light Overlay for clarity */}
           <div className="absolute inset-0 bg-black/20" />

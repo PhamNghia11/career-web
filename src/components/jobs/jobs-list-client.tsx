@@ -1361,7 +1361,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                             handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)
                           }}
                           disabled={(user?.role === "employer" || user?.role === "admin") || (!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()) || (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))}
-                          className={`shadow-sm px-6 ${(user?.role === "employer" || user?.role === "admin" || (!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()) || (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))) ? "bg-gray-100 text-gray-400 hover:bg-gray-100" : "bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white"}`}
+                          className={`shadow-sm px-6 ml-auto ${(user?.role === "employer" || user?.role === "admin" || (!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()) || (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))) ? "bg-gray-100 text-gray-400 hover:bg-gray-100" : "bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white"}`}
                         >
                           {!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()
                             ? "Đã hết hạn"

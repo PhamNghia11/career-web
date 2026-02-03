@@ -25,7 +25,7 @@ export async function GET(request: Request) {
         const users = await collection
             .find(query)
             .sort({ createdAt: -1 })
-            .project({ password: 0, avatar: 0 }) // Exclude password and avatar for performance
+            .project({ password: 0 }) // Exclude password for performance, but include avatar now
             .toArray()
 
         return NextResponse.json({

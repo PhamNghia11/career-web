@@ -27,7 +27,7 @@ export default async function CompaniesPage() {
           {/* Background Image */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
-            style={{ backgroundImage: `url('${banner?.image || '/hero-bg.png'}')` }}
+            style={{ backgroundImage: `url('${banner?.image || '/companies-banner.jpg'}')` }}
           />
           {/* Light Overlay for clarity */}
           <div className="absolute inset-0 bg-black/20" />
