@@ -91,7 +91,7 @@ const MAJOR_FACULTY_MAP: Record<string, string> = {
   "Tâm lý học": "Khoa học xã hội & Ngôn ngữ quốc tế",
   "Ngôn ngữ Trung Quốc": "Khoa học xã hội & Ngôn ngữ quốc tế",
   // Tài chính ngân hàng
-  "Tài chính - Ngân hàng": "Tài chính ngân hàng",
+  "Tài chính ngân hàng": "Tài chính ngân hàng",
   "Công nghệ tài chính": "Tài chính ngân hàng",
   "Kế toán": "Tài chính ngân hàng",
 }
@@ -116,16 +116,17 @@ export default function ProfilePage() {
   // Synchronize formData with user data when context loads or updates
   useEffect(() => {
     if (user) {
-      const major = user.major || ""
-      const faculty = user.faculty || (major ? MAJOR_FACULTY_MAP[major] : "") || ""
+      // Trim all values coming from user object to avoid space issues
+      const major = (user.major || "").trim()
+      const faculty = (user.faculty || (major ? MAJOR_FACULTY_MAP[major] : "") || "").trim()
       setFormData({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        studentId: user.studentId || "",
+        name: (user.name || "").trim(),
+        email: (user.email || "").trim(),
+        phone: (user.phone || "").trim(),
+        studentId: (user.studentId || "").trim(),
         major: major,
         faculty: faculty,
-        cohort: user.cohort || "",
+        cohort: (user.cohort || "").trim(),
       })
     }
   }, [user])
@@ -434,7 +435,7 @@ export default function ProfilePage() {
                         <option value="Ngôn ngữ Trung Quốc">Ngôn ngữ Trung Quốc</option>
                       </optgroup>
                       <optgroup label="Tài chính ngân hàng">
-                        <option value="Tài chính - Ngân hàng">Tài chính - Ngân hàng</option>
+                        <option value="Tài chính ngân hàng">Tài chính ngân hàng</option>
                         <option value="Công nghệ tài chính">Công nghệ tài chính</option>
                         <option value="Kế toán">Kế toán</option>
                       </optgroup>
@@ -451,8 +452,8 @@ export default function ProfilePage() {
                       name="faculty"
                       value={formData.faculty}
                       onChange={handleChange}
-                      disabled={!isEditing}
-                      className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed"
+                      disabled={true} // Locked - derived from Major
+                      className="w-full pl-10 pr-4 py-2 border rounded-md bg-muted cursor-not-allowed opacity-70"
                     >
                       <option value="">Chọn khoa / viện</option>
                       <option value="Sức khỏe">Sức khỏe</option>
