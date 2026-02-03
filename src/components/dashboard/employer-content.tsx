@@ -273,14 +273,17 @@ export function EmployerDashboardContent() {
                                             <span className="font-medium text-blue-600">{job.applicants || 0} hồ sơ</span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4 shrink-0">
+                                    <div className="flex items-center gap-3 shrink-0">
                                         <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : 'destructive'}>
                                             {job.status === 'active' ? 'Đang hiển thị' : job.status === 'pending' ? 'Chờ duyệt' : 'Đã đóng/Từ chối'}
                                         </Badge>
                                         <div className="flex items-center gap-2">
-                                            <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleViewJobApplicants(job); }}>Hồ sơ</Button>
+                                            <Link href={`/jobs/${job._id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
+                                                <Button variant="outline" size="sm" className="h-8">Xem</Button>
+                                            </Link>
+                                            <Button variant="outline" size="sm" className="h-8" onClick={(e) => { e.stopPropagation(); handleViewJobApplicants(job); }}>Ứng viên</Button>
                                             <Link href={`/dashboard/jobs/${job._id}/edit`} onClick={(e) => e.stopPropagation()}>
-                                                <Button variant="ghost" size="sm">Sửa</Button>
+                                                <Button variant="ghost" size="sm" className="h-8">Sửa</Button>
                                             </Link>
                                         </div>
                                     </div>
