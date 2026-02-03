@@ -305,10 +305,11 @@ export default async function JobPage(props: JobPageProps) {
                                                     <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">Tài liệu đính kèm</p>
                                                     <a
                                                         href={job.documentUrl}
+                                                        download={job.documentName || "tai-lieu-doanh-nghiep"}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="text-sm font-medium text-orange-600 hover:underline truncate block"
-                                                        title={job.documentName || "Xem tài liệu"}
+                                                        title={job.documentName || "Tải xuống tài liệu"}
                                                     >
                                                         {job.documentName || "Xem tài liệu đính kèm"}
                                                     </a>
