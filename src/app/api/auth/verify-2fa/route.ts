@@ -109,11 +109,16 @@ export async function POST(req: Request) {
 
         const userResponse = {
             ...userWithoutPassword,
+            role: user.role,
             id: _id.toString(),
             _id: _id.toString(),
             emailVerified: user.emailVerified ?? true,
             phoneVerified: user.phoneVerified ?? false,
         }
+
+        // NEW: Create secure session cookie for Admin after 2FA
+        const { createSession } = await import("@/lib/session")
+        await createSession(userResponse.id, userResponse.role)
 
         return NextResponse.json({
             success: true,
