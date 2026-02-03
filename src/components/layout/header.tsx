@@ -68,14 +68,14 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6 xl:gap-10">
+          <nav className="hidden lg:flex items-center gap-2 xl:gap-4">
             {navigation.map((item) => {
               const isActive = pathname === item.href
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`px-5 py-3 transition-colors font-semibold text-lg border-b-2 ${isActive
+                  className={`px-3 py-3 transition-colors font-semibold text-lg border-b-2 ${isActive
                     ? "border-primary text-primary bg-primary/5"
                     : "border-transparent text-gray-800 hover:text-primary hover:bg-primary/10"
                     }`}
