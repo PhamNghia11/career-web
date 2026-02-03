@@ -6,7 +6,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Building2, MapPin, Clock, DollarSign, Calendar, FileText, Download } from "lucide-react"
+import { Building2, MapPin, Clock, DollarSign, Calendar, FileText, Download, Eye } from "lucide-react"
 import Image from "next/image"
 
 // Define a robust Job type that covers all potential fields
@@ -157,14 +157,25 @@ export function JobPreviewDialog({ job, open, onOpenChange }: JobPreviewDialogPr
                                         <p className="font-medium text-gray-900 truncate">{job.documentName || "Tai-lieu-dinh-kem"}</p>
                                         <p className="text-sm text-gray-500">Người đăng đã đính kèm tài liệu này</p>
                                     </div>
-                                    <a
-                                        href={job.documentUrl}
-                                        download={job.documentName || "tai-lieu"}
-                                        className="flex items-center justify-center gap-2 px-4 py-2 bg-white border rounded-lg text-sm font-bold text-blue-600 hover:bg-blue-50 transition-colors shadow-sm min-w-[120px]"
-                                    >
-                                        <Download className="h-4 w-4" />
-                                        Tải ngay
-                                    </a>
+                                    <div className="flex flex-col sm:flex-row gap-2">
+                                        <a
+                                            href={job.documentUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-sm min-w-[120px]"
+                                        >
+                                            <Eye className="h-4 w-4" />
+                                            Xem nhanh
+                                        </a>
+                                        <a
+                                            href={job.documentUrl}
+                                            download={job.documentName || "tai-lieu"}
+                                            className="flex items-center justify-center gap-2 px-4 py-2 bg-white border rounded-lg text-sm font-bold text-blue-600 hover:bg-blue-50 transition-colors shadow-sm min-w-[120px]"
+                                        >
+                                            <Download className="h-4 w-4" />
+                                            Tải ngay
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         )}
