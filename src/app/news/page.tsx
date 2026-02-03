@@ -208,16 +208,16 @@ function NewsPageContent() {
                     />
                     <div className="absolute inset-0 bg-black/20" />
 
-                    <div className="container px-4 mx-auto relative z-10">
+                    <div className="px-4 md:px-12 lg:px-24 relative z-10">
                         <div className="max-w-4xl">
-                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight drop-shadow-lg">
+                            <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight drop-shadow-lg">
                                 {banner?.title || (
                                     <>
                                         Tin tức & Phân tích <br />Thị trường Lao động
                                     </>
                                 )}
                             </h1>
-                            <p className="text-xl md:text-2xl text-white mb-6 drop-shadow-md font-medium max-w-3xl">
+                            <p className="text-xl md:text-2xl lg:text-3xl text-white mb-6 drop-shadow-md font-medium max-w-2xl">
                                 {banner?.subtitle || "Cập nhật xu hướng tuyển dụng, báo cáo thị trường và kiến thức phát triển sự nghiệp từ đội ngũ chuyên gia GDU."}
                             </p>
                         </div>
@@ -231,7 +231,7 @@ function NewsPageContent() {
 
                 {/* News Search & Filter Section */}
                 <div className="bg-white border-y border-slate-100 sticky top-[112px] lg:top-[128px] z-40 backdrop-blur-md bg-white/90">
-                    <div className="container px-4 mx-auto py-6">
+                    <div className="mx-auto px-4 md:px-12 lg:px-24 py-6">
                         <div className="flex flex-col gap-6">
                             {/* Categories Row */}
                             <div className="flex flex-wrap items-center gap-3">
@@ -298,7 +298,7 @@ function NewsPageContent() {
                     </div>
                 </div>
 
-                <div className="container px-4 mx-auto pb-24">
+                <div className="mx-auto px-4 md:px-12 lg:px-24 pb-24">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                         {/* Main Content Area */}
                         <div className="lg:col-span-8 min-h-[800px]">

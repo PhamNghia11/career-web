@@ -115,18 +115,18 @@ export default async function JobsPage() {
           <div className="absolute inset-0 bg-black/20" />
 
           {/* Content - Bottom Left */}
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg">
+          <div className="px-4 md:px-12 lg:px-24 relative z-10">
+            <div className="max-w-4xl">
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold mb-6 text-white tracking-tight drop-shadow-lg leading-tight">
                 {banner?.title || "Tìm kiếm cơ hội nghề nghiệp"}
               </h1>
-              <p className="text-xl md:text-2xl text-white mb-6 drop-shadow-md font-medium">
+              <p className="text-xl md:text-2xl lg:text-3xl text-white mb-6 drop-shadow-md font-medium max-w-2xl">
                 {banner?.subtitle || "Khám phá hàng ngàn việc làm hấp dẫn từ các doanh nghiệp hàng đầu dành cho sinh viên GDU"}
               </p>
             </div>
           </div>
         </div>
-        <div className="container mx-auto px-4 py-8">
+        <div className="mx-auto px-4 md:px-12 lg:px-24 py-12">
           <Suspense fallback={<div className="text-center py-20">Đang tải danh sách việc làm...</div>}>
             <JobsListClient dbJobs={dbJobs} />
           </Suspense>
