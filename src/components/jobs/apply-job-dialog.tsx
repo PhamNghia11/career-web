@@ -490,6 +490,13 @@ export function ApplyJobDialog({
                                                 <SelectItem value="K17">K17</SelectItem>
                                                 <SelectItem value="K18">K18</SelectItem>
                                                 <SelectItem value="K19">K19</SelectItem>
+                                                <SelectItem value="K20">K20</SelectItem>
+                                                <SelectItem value="K21">K21</SelectItem>
+                                                <SelectItem value="K22">K22</SelectItem>
+                                                <SelectItem value="K23">K23</SelectItem>
+                                                <SelectItem value="K24">K24</SelectItem>
+                                                <SelectItem value="K25">K25</SelectItem>
+                                                <SelectItem value="Khác">Khác / Cựu SV</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>

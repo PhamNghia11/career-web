@@ -513,6 +513,13 @@ export default function ProfilePage() {
                       <option value="K17">K17</option>
                       <option value="K18">K18</option>
                       <option value="K19">K19</option>
+                      <option value="K20">K20</option>
+                      <option value="K21">K21</option>
+                      <option value="K22">K22</option>
+                      <option value="K23">K23</option>
+                      <option value="K24">K24</option>
+                      <option value="K25">K25</option>
+                      <option value="Khác">Khác / Cựu SV</option>
                     </select>
                   </div>
                 </div>

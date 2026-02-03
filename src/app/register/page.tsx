@@ -29,6 +29,7 @@ export default function RegisterPage() {
     companySize: "",
     foreignCapital: false,
     province: "",
+    otherProvince: "",
     industry: "",
     address: "",
   })
@@ -89,6 +90,7 @@ export default function RegisterPage() {
           phone: formData.phone.trim(),
           studentId: formData.studentId.trim(),
           major: formData.major.trim(),
+          province: formData.province === "OTHER" ? formData.otherProvince.trim() : formData.province,
           // Employer trims
           contactPerson: formData.contactPerson.trim(),
           companyName: formData.companyName.trim(),
@@ -386,10 +388,27 @@ export default function RegisterPage() {
                             <SelectItem value="BD">Bình Dương</SelectItem>
                             <SelectItem value="DNAI">Đồng Nai</SelectItem>
                             <SelectItem value="CT">Cần Thơ</SelectItem>
-                            {/* Add more as needed or fetch from API in future */}
+                            <SelectItem value="OTHER">Khác (Tỉnh khác)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
+
+                      {/* Other Province Input - Conditional */}
+                      {formData.province === "OTHER" && (
+                        <div className="space-y-2 animate-in slide-in-from-top-2 fade-in duration-300">
+                          <Label htmlFor="otherProvince" className="text-gray-700 font-medium">Nhập tên Tỉnh/Thành <span className="text-red-500">*</span></Label>
+                          <input
+                            id="otherProvince"
+                            name="otherProvince"
+                            type="text"
+                            value={formData.otherProvince}
+                            onChange={handleChange}
+                            placeholder="Ví dụ: Long An, Tiền Giang..."
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 bg-white transition-all placeholder:text-gray-400"
+                            required
+                          />
+                        </div>
+                      )}
 
                       {/* Industry */}
                       <div className="space-y-2">

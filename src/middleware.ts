@@ -31,13 +31,18 @@ export default async function middleware(req: NextRequest) {
             )
         }
 
-        // Special case for /api/users - strictly Admin
-        if (path.startsWith("/api/users") && session.role !== "admin") {
+        // Special case for /api/users (LIST) - strictly Admin
+        // Match exact path or trailing slash, but NOT sub-paths like /api/users/[id]
+        const isUserListRoute = path === "/api/users" || path === "/api/users/"
+        if (isUserListRoute && session.role !== "admin") {
             return NextResponse.json(
                 { success: false, error: "Forbidden: Admin access only" },
                 { status: 403 }
             )
         }
+
+        // Note: Individual user routes /api/users/[id] are handled inside the route.ts 
+        // to check if session.userId matches the requested ID.
     }
 
     return NextResponse.next()

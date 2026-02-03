@@ -1,4 +1,3 @@
-import { cookies } from "next/headers"
 import { SignJWT, jwtVerify } from "jose"
 
 const secretKey = process.env.SESSION_SECRET || "default_secret_key_change_me"
@@ -24,6 +23,7 @@ export async function decrypt(session: string | undefined = "") {
 }
 
 export async function createSession(userId: string, role: string) {
+    const { cookies } = await import("next/headers")
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     const session = await encrypt({ userId, role, expiresAt })
     const cookieStore = await cookies()
@@ -38,6 +38,7 @@ export async function createSession(userId: string, role: string) {
 }
 
 export async function deleteSession() {
+    const { cookies } = await import("next/headers")
     const cookieStore = await cookies()
     cookieStore.delete("session")
 }
