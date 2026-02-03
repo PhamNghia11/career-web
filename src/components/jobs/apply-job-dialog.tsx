@@ -227,6 +227,18 @@ export function ApplyJobDialog({
                 return
             }
 
+            if (!major || major.trim() === "") {
+                setError("Vui lòng chọn Ngành học")
+                setIsSubmitting(false)
+                return
+            }
+
+            if (!phone) {
+                setPhoneError("Vui lòng nhập số điện thoại")
+                setIsSubmitting(false)
+                return
+            }
+
             if (!phone.startsWith('0') || phone.length < 10 || phone.length > 11) {
                 setPhoneError("Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số")
                 setIsSubmitting(false)
