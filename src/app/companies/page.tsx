@@ -3,6 +3,8 @@ import { Footer } from "@/components/layout/footer"
 import Link from "next/link"
 import { CompaniesListClient } from "@/components/companies/companies-list-client"
 
+export const dynamic = "force-dynamic"
+
 async function getBannerData() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/hero-slides?page=companies`, { cache: 'no-store' })
