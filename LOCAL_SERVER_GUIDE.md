@@ -188,9 +188,28 @@ npm run build
 ```
 > ⏳ Đợi 2-5 phút cho đến khi thấy dòng `✓ Compiled successfully`
 
-### 7.4 Chạy ứng dụng với PM2
+### 7.4 Chạy ứng dụng (Chọn 1 trong 2 cách)
+
+#### Cách A: Chế độ Development (Chậm - Dùng để sửa code)
+> ⚠️ **Lưu ý:** Chế độ này sẽ rất lag nếu có từ 2 người truy cập trở lên vì phải biên dịch liên tục.
 ```powershell
-pm2 start ecosystem.config.js
+npm run dev -- -H 0.0.0.0
+```
+
+#### Cách B: Chế độ Production (Nhanh - Dùng để TEST thực tế)
+> ✅ **Khuyên dùng:** Chạy mượt mà, tốc độ cao, chịu tải được nhiều người.
+```powershell
+# 1. Build (Đợi chạy xong)
+npm run build
+
+# 2. Start
+npx next start -H 0.0.0.0 -p 3000
+```
+
+### 7.5 Chạy ứng dụng với PM2 (Tự động chạy lại khi crash)
+```powershell
+pm2 delete all
+pm2 start ecosystem.config.js --env production
 ```
 
 ### 7.5 Kiểm tra ứng dụng đang chạy

@@ -75,31 +75,27 @@ export async function POST(request: Request) {
         }
       )
 
-      // Send OTP email
-      try {
-        await sendEmail({
-          to: email,
-          subject: "Mã xác minh tài khoản GDU Career",
-          html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                  <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8a 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                    <h1 style="margin: 0; font-size: 24px;">GDU Career Portal</h1>
-                    <p style="margin: 10px 0 0; opacity: 0.9;">Xác minh tài khoản</p>
-                  </div>
-                  <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-                    <h2 style="color: #1e3a5f; margin-top: 0;">Xin chào ${name}!</h2>
-                    <p style="color: #666;">Đây là mã xác minh mới của bạn:</p>
-                    <div style="background: #1e3a5f; color: white; font-size: 32px; font-weight: bold; text-align: center; padding: 20px; border-radius: 8px; letter-spacing: 8px; margin: 20px 0;">
-                      ${otp}
-                    </div>
-                    <p style="color: #999; font-size: 14px; text-align: center;">Mã này sẽ hết hạn sau <strong>5 phút</strong></p>
-                  </div>
+      // Send OTP email (non-blocking)
+      sendEmail({
+        to: email,
+        subject: "Mã xác minh tài khoản GDU Career",
+        html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8a 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                  <h1 style="margin: 0; font-size: 24px;">GDU Career Portal</h1>
+                  <p style="margin: 10px 0 0; opacity: 0.9;">Xác minh tài khoản</p>
                 </div>
-              `,
-        })
-      } catch (emailError) {
-        console.error("Failed to send OTP email:", emailError)
-      }
+                <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+                  <h2 style="color: #1e3a5f; margin-top: 0;">Xin chào ${name}!</h2>
+                  <p style="color: #666;">Đây là mã xác minh mới của bạn:</p>
+                  <div style="background: #1e3a5f; color: white; font-size: 32px; font-weight: bold; text-align: center; padding: 20px; border-radius: 8px; letter-spacing: 8px; margin: 20px 0;">
+                    ${otp}
+                  </div>
+                  <p style="color: #999; font-size: 14px; text-align: center;">Mã này sẽ hết hạn sau <strong>5 phút</strong></p>
+                </div>
+              </div>
+            `,
+      }).catch(err => console.error("Background email error:", err))
 
       return NextResponse.json({
         success: true,
@@ -160,35 +156,31 @@ export async function POST(request: Request) {
     // Insert into PENDING collection
     await pendingCollection.insertOne(newUser)
 
-    // Send Email OTP
-    try {
-      await sendEmail({
-        to: email,
-        subject: "Mã xác minh tài khoản GDU Career",
-        html: `
-                  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8a 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                      <h1 style="margin: 0; font-size: 24px;">GDU Career Portal</h1>
-                      <p style="margin: 10px 0 0; opacity: 0.9;">Chào mừng bạn đến với GDU Career!</p>
-                    </div>
-                    <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-                      <h2 style="color: #1e3a5f; margin-top: 0;">Xin chào ${name}!</h2>
-                      <p style="color: #666; line-height: 1.6;">
-                        Cảm ơn bạn đã đăng ký tài khoản. Vui lòng nhập mã xác minh dưới đây để hoàn tất:
-                      </p>
-                      <div style="background: #1e3a5f; color: white; font-size: 32px; font-weight: bold; text-align: center; padding: 20px; border-radius: 8px; letter-spacing: 8px; margin: 20px 0;">
-                        ${otp}
-                      </div>
-                      <p style="color: #999; font-size: 14px; text-align: center;">
-                        Mã này sẽ hết hạn sau <strong>5 phút</strong>
-                      </p>
-                    </div>
+    // Send Email OTP (non-blocking)
+    sendEmail({
+      to: email,
+      subject: "Mã xác minh tài khoản GDU Career",
+      html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                  <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8a 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                    <h1 style="margin: 0; font-size: 24px;">GDU Career Portal</h1>
+                    <p style="margin: 10px 0 0; opacity: 0.9;">Chào mừng bạn đến với GDU Career!</p>
                   </div>
-                `,
-      })
-    } catch (emailError) {
-      console.error("Failed to send OTP email:", emailError)
-    }
+                  <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+                    <h2 style="color: #1e3a5f; margin-top: 0;">Xin chào ${name}!</h2>
+                    <p style="color: #666; line-height: 1.6;">
+                      Cảm ơn bạn đã đăng ký tài khoản. Vui lòng nhập mã xác minh dưới đây để hoàn tất:
+                    </p>
+                    <div style="background: #1e3a5f; color: white; font-size: 32px; font-weight: bold; text-align: center; padding: 20px; border-radius: 8px; letter-spacing: 8px; margin: 20px 0;">
+                      ${otp}
+                    </div>
+                    <p style="color: #999; font-size: 14px; text-align: center;">
+                      Mã này sẽ hết hạn sau <strong>5 phút</strong>
+                    </p>
+                  </div>
+                </div>
+              `,
+    }).catch(err => console.error("Background email error:", err))
 
     // NEW: Notify Admin immediately about new registration (especially Employers)
     try {

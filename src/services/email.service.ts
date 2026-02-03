@@ -10,11 +10,15 @@ export async function sendEmail({ to, subject, html }: SendEmailParams) {
     try {
         const transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST || "smtp.gmail.com",
-            port: Number(process.env.SMTP_PORT) || 587,
+            port: 465, // Using SSL port for reliable connection
+            secure: true,
             auth: {
                 user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASSWORD,
             },
+            connectionTimeout: 10000,
+            greetingTimeout: 10000,
+            socketTimeout: 10000,
         })
 
         await transporter.verify()
