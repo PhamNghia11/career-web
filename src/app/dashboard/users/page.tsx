@@ -456,13 +456,7 @@ export default function UsersManagementPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => {
-                                setEditingUser(u)
-                                setEditDialogOpen(true)
-                              }}>
-                                <Edit className="h-4 w-4 mr-2" />
-                                Chỉnh sửa
-                              </DropdownMenuItem>
+
                               <DropdownMenuItem onClick={() => {
                                 setEditingUser(u)
                                 setSelectedRole(u.role)
@@ -534,13 +528,7 @@ export default function UsersManagementPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => {
-                              setEditingUser(u)
-                              setEditDialogOpen(true)
-                            }}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Chỉnh sửa
-                            </DropdownMenuItem>
+
                             <DropdownMenuItem onClick={() => {
                               setEditingUser(u)
                               setSelectedRole(u.role)
