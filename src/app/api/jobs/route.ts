@@ -83,7 +83,16 @@ export async function GET(req: Request) {
       ]
     }
 
-    const jobs = await collection.find(query).sort({ postedAt: -1 }).toArray()
+    const jobs = await collection.find(query)
+      .sort({ postedAt: -1 })
+      .project({
+        description: 0,
+        requirements: 0,
+        benefits: 0,
+        detailedBenefits: 0,
+        relatedMajors: 0
+      })
+      .toArray()
 
     // Map _id to string
     const mappedJobs = jobs.map(job => ({
