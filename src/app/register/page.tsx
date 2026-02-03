@@ -67,11 +67,12 @@ export default function RegisterPage() {
       if (!formData.contactPerson.trim()) return setError("Vui lòng nhập tên người liên hệ")
       if (!formData.phone.trim()) return setError("Vui lòng nhập số điện thoại")
       if (!/^0\d{9,10}$/.test(formData.phone)) return setError("Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số")
-      // if (!formData.companyType) return setError("Vui lòng chọn loại hình doanh nghiệp") // Optional if select has default? No, needs selection
-      // if (!formData.companySize) return setError("Vui lòng chọn quy mô doanh nghiệp")
+      if (!formData.companyType) return setError("Vui lòng chọn loại hình doanh nghiệp")
+      if (!formData.companySize) return setError("Vui lòng chọn quy mô doanh nghiệp")
       if (!formData.companyName.trim()) return setError("Vui lòng nhập tên doanh nghiệp")
-      // if (!formData.province) return setError("Vui lòng chọn tỉnh/thành")
-      // if (!formData.industry) return setError("Vui lòng chọn lĩnh vực")
+      if (!formData.province) return setError("Vui lòng chọn tỉnh/thành")
+      if (formData.province === "OTHER" && !formData.otherProvince.trim()) return setError("Vui lòng nhập tên tỉnh/thành")
+      if (!formData.industry) return setError("Vui lòng chọn lĩnh vực")
       if (!formData.address.trim()) return setError("Vui lòng nhập địa chỉ")
     }
 
