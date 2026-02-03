@@ -319,39 +319,51 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const email = searchParams.get("email")
-    const role = searchParams.get("role")
-    const employerId = searchParams.get("employerId")
     const jobId = searchParams.get("jobId")
+
+    // Get session for server-side auth
+    const { cookies } = await import("next/headers")
+    const { decrypt } = await import("@/lib/session")
+    const cookieStore = await cookies()
+    const sessionCookie = cookieStore.get("session")?.value
+    const session = await decrypt(sessionCookie)
+
+    if (!session || !session.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const userId = session.userId as string
+    const userRole = session.role as string
 
     const collection = await getCollection(COLLECTIONS.APPLICATIONS)
     let query: Record<string, any> = {}
     const queryParts: any[] = []
 
-    if (role === "admin") {
-      // All for admins
-    } else if (role === "employer") {
-      if (employerId) {
-        if (ObjectId.isValid(employerId)) {
-          queryParts.push({
-            $or: [
-              { employerId: employerId },
-              { employerId: new ObjectId(employerId) }
-            ]
-          })
-        } else {
-          queryParts.push({ employerId: employerId })
-        }
-      } else {
-        // If role is employer but no ID, return empty list to prevent leakage
-        return NextResponse.json({ success: true, data: [] })
-      }
+    if (userRole === "admin") {
+      // Admins see everything
+    } else if (userRole === "employer") {
+      // Employers see applications for their jobs
+      queryParts.push({
+        $or: [
+          { employerId: userId },
+          { employerId: new ObjectId(userId) }
+        ]
+      })
     } else {
-      // Default to student view: filter by email
-      if (email) {
-        queryParts.push({ email: email })
+      // Students see only their own applications
+      // For students, we match by applicantId (preferred) or email (fallback)
+      const usersCollection = await getCollection(COLLECTIONS.USERS)
+      const currentUser = await usersCollection.findOne({ _id: new ObjectId(userId) })
+
+      if (currentUser) {
+        queryParts.push({
+          $or: [
+            { applicantId: userId },
+            { applicantId: new ObjectId(userId) },
+            { email: currentUser.email }
+          ]
+        })
       } else {
-        // No email provided for student? Return empty
         return NextResponse.json({ success: true, data: [] })
       }
     }

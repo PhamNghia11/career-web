@@ -12,16 +12,33 @@ export async function GET(
 ) {
     try {
         const { id } = await params
+        const { cookies } = await import("next/headers")
+        const { decrypt } = await import("@/lib/session")
+        const cookieStore = await cookies()
+        const sessionCookie = cookieStore.get("session")?.value
+        const session = await decrypt(sessionCookie)
 
-        if (!id || !ObjectId.isValid(id)) {
-            return NextResponse.json({ error: "Invalid application ID" }, { status: 400 })
+        if (!session || !session.userId) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
+
+        const userId = session.userId as string
+        const userRole = session.role as string
 
         const collection = await getCollection(COLLECTIONS.APPLICATIONS)
         const application = await collection.findOne({ _id: new ObjectId(id) })
 
         if (!application) {
             return NextResponse.json({ error: "Application not found" }, { status: 404 })
+        }
+
+        // Authorization check
+        const isAdmin = userRole === 'admin'
+        const isEmployer = userRole === 'employer' && (application.employerId === userId || application.employerId?.toString() === userId)
+        const isStudent = userRole === 'student' && (application.applicantId === userId || application.applicantId?.toString() === userId)
+
+        if (!isAdmin && !isEmployer && !isStudent) {
+            return NextResponse.json({ error: "Forbidden: You don't have access to this application" }, { status: 403 })
         }
 
         return NextResponse.json({
@@ -41,8 +58,21 @@ export async function PATCH(
 ) {
     try {
         const { id } = await params
+        const { cookies } = await import("next/headers")
+        const { decrypt } = await import("@/lib/session")
+        const cookieStore = await cookies()
+        const sessionCookie = cookieStore.get("session")?.value
+        const session = await decrypt(sessionCookie)
+
+        if (!session || !session.userId) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        }
+
+        const userId = session.userId as string
+        const userRole = session.role as string
+
         const body = await request.json()
-        const { status, notes, updaterId, updaterRole } = body
+        const { status, notes } = body // Removed updaterId, updaterRole - we use session!
 
         if (!id || !ObjectId.isValid(id)) {
             return NextResponse.json({ error: "Invalid application ID" }, { status: 400 })
@@ -62,10 +92,10 @@ export async function PATCH(
         }
 
         // Authorization check
-        const isAdmin = updaterRole === 'admin'
-        const isOwner = updaterRole === 'employer' && currentApplication.employerId === updaterId
+        const isAdmin = userRole === 'admin'
+        const isOwner = userRole === 'employer' && (currentApplication.employerId === userId || currentApplication.employerId?.toString() === userId)
 
-        console.log(`[Auth Debug] App: ${id}, Updater: ${updaterId}, Role: ${updaterRole}, Owner: ${currentApplication.employerId}`)
+        console.log(`[Auth Debug] App: ${id}, SessionUser: ${userId}, Role: ${userRole}, AppOwner: ${currentApplication.employerId}`)
 
         if (!isAdmin && !isOwner) {
             console.log("[Auth Debug] ACCESS DENIED")
@@ -221,11 +251,40 @@ export async function DELETE(
     try {
         const { id } = await params
 
+        const { cookies } = await import("next/headers")
+        const { decrypt } = await import("@/lib/session")
+        const cookieStore = await cookies()
+        const sessionCookie = cookieStore.get("session")?.value
+        const session = await decrypt(sessionCookie)
+
+        if (!session || !session.userId) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        }
+
+        const userId = session.userId as string
+        const userRole = session.role as string
+
         if (!id || !ObjectId.isValid(id)) {
             return NextResponse.json({ error: "Invalid application ID" }, { status: 400 })
         }
 
         const collection = await getCollection(COLLECTIONS.APPLICATIONS)
+        const application = await collection.findOne({ _id: new ObjectId(id) })
+
+        if (!application) {
+            return NextResponse.json({ error: "Application not found" }, { status: 404 })
+        }
+
+        // Authorization check: Only Admin or the Employer who owns the job can delete?
+        // Actually, usually only Admin can delete applications in this type of system
+        // unless employer needs to "archive" them. Let's stick with Admin or Job Owner.
+        const isAdmin = userRole === 'admin'
+        const isOwner = userRole === 'employer' && (application.employerId === userId || application.employerId?.toString() === userId)
+
+        if (!isAdmin && !isOwner) {
+            return NextResponse.json({ error: "Forbidden: You don't have permission to delete this application" }, { status: 403 })
+        }
+
         await collection.deleteOne({ _id: new ObjectId(id) })
 
         return NextResponse.json({
