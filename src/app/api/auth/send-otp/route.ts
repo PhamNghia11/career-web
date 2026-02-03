@@ -23,7 +23,17 @@ export async function POST(request: Request) {
         }
 
         const collection = await getCollection(COLLECTIONS.USERS)
-        const user = await collection.findOne({ email })
+        const pendingCollection = await getCollection(COLLECTIONS.PENDING_USERS)
+
+        // 1. Check in verified users
+        let user = await collection.findOne({ email })
+        let targetCollection = collection
+
+        if (!user) {
+            // 2. Check in pending users (new registrations)
+            user = await pendingCollection.findOne({ email })
+            targetCollection = pendingCollection
+        }
 
         if (!user) {
             return NextResponse.json({ error: "Email không tồn tại trong hệ thống" }, { status: 404 })
@@ -37,7 +47,7 @@ export async function POST(request: Request) {
         const hashedOTP = hashOTP(otp)
         const expiresAt = new Date(Date.now() + 5 * 60 * 1000) // 5 minutes
 
-        await collection.updateOne(
+        await targetCollection.updateOne(
             { email },
             {
                 $set: {
