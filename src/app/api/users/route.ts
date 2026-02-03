@@ -9,8 +9,15 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url)
         const role = searchParams.get("role") // Filter by role if needed
 
-        // In a real app, verify the requester is an admin here!
-        // For now we assume the frontend protects the route or we trust the caller for this demo.
+        // SECURE: Verify the requester is an admin
+        const { cookies } = await import("next/headers")
+        const { decrypt } = await import("@/lib/session")
+        const cookie = (await cookies()).get("session")?.value
+        const session = await decrypt(cookie)
+
+        if (!session || session.role !== "admin") {
+            return NextResponse.json({ success: false, error: "Unauthorized: Access Denied" }, { status: 403 })
+        }
 
         const collection = await getCollection(COLLECTIONS.USERS)
 

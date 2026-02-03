@@ -43,11 +43,24 @@ export async function POST(request: Request) {
       }, { status: 403 })
     }
 
+    // Remove password from response for general user object
+    const { password: _, _id, ...userWithoutPassword } = user
+
+    // Return user with both id and _id for compatibility
+    const userResponse = {
+      ...userWithoutPassword,
+      role: user.role, // Explicitly include role for createSession
+      id: _id.toString(),
+      _id: _id.toString(),
+      emailVerified: user.emailVerified ?? true, // Old users without field are verified
+      phoneVerified: user.phoneVerified ?? false,
+    }
+
     // 2FA for Admin Role
     if (user.role === "admin") {
       // Check if TOTP is enabled
       if (user.totpEnabled) {
-        // User has Google Authenticator set up - request TOTP code
+        // Admin has 2FA enabled - do NOT set session yet, wait for verify-2fa
         return NextResponse.json({
           success: true,
           needs2FA: true,
@@ -66,17 +79,9 @@ export async function POST(request: Request) {
       }
     }
 
-    // Remove password from response
-    const { password: _, _id, ...userWithoutPassword } = user
-
-    // Return user with both id and _id for compatibility
-    const userResponse = {
-      ...userWithoutPassword,
-      id: _id.toString(),
-      _id: _id.toString(),
-      emailVerified: user.emailVerified ?? true, // Old users without field are verified
-      phoneVerified: user.phoneVerified ?? false,
-    }
+    // NEW: Create secure session cookie for non-admin users
+    const { createSession } = await import("@/lib/session")
+    await createSession(userResponse.id, userResponse.role)
 
     return NextResponse.json({
       success: true,
