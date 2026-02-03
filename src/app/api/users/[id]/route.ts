@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server"
-import { getCollection, COLLECTIONS } from "@/database/connection"
+import { NextResponse, type NextRequest } from "next/server"
 import { ObjectId } from "mongodb"
+import { getCollection, COLLECTIONS } from "@/database/connection"
+
+export const dynamic = 'force-dynamic'
 import { checkNotificationPreference } from "@/lib/notification-utils"
 
 export async function GET(

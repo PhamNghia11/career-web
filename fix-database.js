@@ -9,56 +9,56 @@ async function fixDatabase() {
         const db = client.db('gdu_career');
         const collection = db.collection('users');
 
-        // Find all users with student role
         const users = await collection.find({ role: 'student' }).toArray();
-
-        console.log(`Found ${users.length} students to check`);
+        console.log(`Checking ${users.length} students...`);
 
         let fixedCount = 0;
         for (const user of users) {
             const updates = {};
             let needsUpdate = false;
 
-            // Trim and fix major field
+            // Fix Major: Trim and replace dashes
             if (user.major) {
-                const trimmedMajor = user.major.trim();
-                if (trimmedMajor !== user.major) {
-                    updates.major = trimmedMajor;
+                let fixedMajor = user.major.trim().replace(" - ", " ");
+                if (fixedMajor === "Tài chính ngân hàng" || fixedMajor === "Tài chính - Ngân hàng") {
+                    fixedMajor = "Tài chính ngân hàng";
+                }
+                if (fixedMajor !== user.major) {
+                    updates.major = fixedMajor;
                     needsUpdate = true;
                 }
             }
 
-            // Trim and fix faculty field
+            // Fix Faculty: Trim and replace dashes
             if (user.faculty) {
-                const trimmedFaculty = user.faculty.trim();
-                if (trimmedFaculty !== user.faculty) {
-                    updates.faculty = trimmedFaculty;
+                let fixedFaculty = user.faculty.trim().replace(" - ", " ");
+                if (fixedFaculty === "Tài chính ngân hàng" || fixedFaculty === "Tài chính - Ngân hàng") {
+                    fixedFaculty = "Tài chính ngân hàng";
+                }
+                if (fixedFaculty !== user.faculty) {
+                    updates.faculty = fixedFaculty;
                     needsUpdate = true;
                 }
             }
 
-            // Trim cohort
             if (user.cohort) {
-                const trimmedCohort = user.cohort.trim();
-                if (trimmedCohort !== user.cohort) {
-                    updates.cohort = trimmedCohort;
+                const fixedCohort = user.cohort.trim();
+                if (fixedCohort !== user.cohort) {
+                    updates.cohort = fixedCohort;
                     needsUpdate = true;
                 }
             }
 
             if (needsUpdate) {
-                await collection.updateOne(
-                    { _id: user._id },
-                    { $set: updates }
-                );
+                await collection.updateOne({ _id: user._id }, { $set: updates });
                 console.log(`Fixed user ${user.email}:`, updates);
                 fixedCount++;
             }
         }
 
-        console.log(`\nFixed ${fixedCount} users`);
+        console.log(`\nFixed ${fixedCount} users total.`);
     } catch (err) {
-        console.error('Error:', err.message);
+        console.error(err);
     } finally {
         await client.close();
     }

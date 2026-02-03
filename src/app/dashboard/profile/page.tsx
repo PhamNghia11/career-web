@@ -150,34 +150,41 @@ export default function ProfilePage() {
   const handleSave = async () => {
     if (formData.phone && !/^0\d{9,10}$/.test(formData.phone)) {
       setPhoneError("Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số")
-      // Ensure error is visible by not closing edit mode immediately if there is an error? 
-      // Actually setPhoneError will show the error below the input.
       return
     }
 
     setIsSaving(true)
-    // Normalize string fields
-    const normalizedData = Object.entries(formData).reduce((acc, [key, value]) => {
-      acc[key as keyof typeof formData] = normalizeWhitespace(value)
-      return acc
-    }, {} as typeof formData)
+    try {
+      // Normalize string fields
+      const normalizedData = Object.entries(formData).reduce((acc, [key, value]) => {
+        acc[key as keyof typeof formData] = normalizeWhitespace(value)
+        return acc
+      }, {} as typeof formData)
 
-    const success = await updateProfile(normalizedData)
+      console.log("[ProfilePage] Saving normalized data:", normalizedData)
+      const success = await updateProfile(normalizedData)
 
-    if (success) {
-      // Update local state to reflect normalized text
-      setFormData(normalizedData)
-      setIsEditing(false)
-      toast({ title: "Đã lưu", description: "Thông tin hồ sơ đã được cập nhật." })
-    } else {
+      if (success) {
+        setFormData(normalizedData)
+        setIsEditing(false)
+        toast({ title: "Đã lưu", description: "Thông tin hồ sơ đã được cập nhật." })
+      } else {
+        toast({
+          title: "Lỗi lưu dữ liệu",
+          description: "Máy chủ từ chối cập nhật. Vui lòng kiểm tra lại thông tin.",
+          variant: "destructive"
+        })
+      }
+    } catch (err: any) {
+      console.error("[ProfilePage] Save crash:", err)
       toast({
-        title: "Lỗi",
-        description: "Không thể cập nhật hồ sơ lên hệ thống. Vui lòng thử lại.",
+        title: "Lỗi hệ thống",
+        description: `Đã xảy ra lỗi: ${err.message || "Không xác định"}`,
         variant: "destructive"
       })
+    } finally {
+      setIsSaving(false)
     }
-
-    setIsSaving(false)
   }
 
   const handleAvatarClick = () => {

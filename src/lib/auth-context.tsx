@@ -149,13 +149,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (!response.ok) {
           console.error("[Auth updateProfile] Server returned error:", responseData)
-          throw new Error("Failed to update profile on server")
+          throw new Error(responseData.error || "Failed to update profile on server")
         }
 
-        const updatedUser = { ...user, ...data, updatedAt: new Date() }
-        setUser(updatedUser)
-        localStorage.setItem("gdu_user", JSON.stringify(updatedUser))
-        console.log("[Auth updateProfile] Success! Updated localStorage")
+        // Use the user data returned from the server if available, otherwise merge
+        const finalUser = responseData.success && responseData.user
+          ? { ...user, ...responseData.user }
+          : { ...user, ...data, updatedAt: new Date() }
+
+        setUser(finalUser)
+        localStorage.setItem("gdu_user", JSON.stringify(finalUser))
+        console.log("[Auth updateProfile] Success! Updated localStorage with server data")
         return true
       }
       console.warn("[Auth updateProfile] No user in context!")
