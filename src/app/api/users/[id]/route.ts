@@ -18,9 +18,11 @@ export async function GET(
         const user = await collection.findOne({ _id: new ObjectId(id) }, { projection: { password: 0 } })
 
         if (!user) {
+            console.log(`[API GET User] User not found for ID: ${id}`)
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
 
+        console.log(`[API GET User] Successfully fetched user: ${user.email} (ID: ${id})`)
         return NextResponse.json({
             success: true,
             user: {
@@ -242,10 +244,15 @@ export async function PATCH(
             updateData.email = body.email;
         }
 
+        console.log(`[API PATCH User] Request body for ID ${id}:`, JSON.stringify(body))
+        console.log(`[API PATCH User] Effective updateData:`, JSON.stringify(updateData))
+
         const result = await collection.updateOne(
             { _id: new ObjectId(id) },
             { $set: updateData }
         )
+
+        console.log(`[API PATCH User] Update result: matched=${result.matchedCount}, modified=${result.modifiedCount}`)
 
         // NEW: Send Approval Email to Employer
         if (
