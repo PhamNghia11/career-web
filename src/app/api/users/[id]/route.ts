@@ -213,20 +213,34 @@ export async function PATCH(
             }
         }
 
-        // Validate phone number if present
-        if (body.phone && !/^0\d{9,10}$/.test(body.phone)) {
-            return NextResponse.json({ error: "Số điện thoại phải bắt đầu bằng số 0 và có 10-11 số" }, { status: 400 })
-        }
+        // Create explicit update object to prevent unexpected field updates
+        const allowedFields = [
+            "name", "phone", "studentId", "major", "faculty", "cohort",
+            "avatar", "companyName", "website", "address", "description",
+            "size", "contactPerson", "industry", "status", "role"
+        ];
 
-        // Filter out fields that shouldn't be updated directly via this API if needed
-        // For now allow upgrading body fields
-        const updateData = {
-            ...body,
+        const updateData: any = {
             updatedAt: new Date()
-        }
+        };
 
-        // Remove _id if it exists in body to avoid mongo error
-        delete updateData._id
+        // Transfer only allowed fields from body
+        Object.keys(body).forEach(key => {
+            if (allowedFields.includes(key)) {
+                updateData[key] = body[key];
+            }
+        });
+
+        // Special check: email update is sensitive and usually shouldn't happen via general profile edit
+        // But if allowed, we should probably check for uniqueness.
+        // For now, let's allow it but warn or restrict if needed.
+        if (body.email && body.email !== currentUser.email) {
+            const existingEmail = await collection.findOne({ email: body.email });
+            if (existingEmail) {
+                return NextResponse.json({ error: "Email này đã được sử dụng bởi tài khoản khác." }, { status: 409 });
+            }
+            updateData.email = body.email;
+        }
 
         const result = await collection.updateOne(
             { _id: new ObjectId(id) },

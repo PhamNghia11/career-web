@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { User, Mail, Phone, GraduationCap, Briefcase, Save, Upload, Loader2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -103,19 +103,32 @@ export default function ProfilePage() {
   const [isUploading, setIsUploading] = useState(false)
   const [phoneError, setPhoneError] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [formData, setFormData] = useState(() => {
-    const major = user?.major || ""
-    const faculty = user?.faculty || (major ? MAJOR_FACULTY_MAP[major] : "") || ""
-    return {
-      name: user?.name || "",
-      email: user?.email || "",
-      phone: user?.phone || "",
-      studentId: user?.studentId || "",
-      major: major,
-      faculty: faculty,
-      cohort: user?.cohort || "",
-    }
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    studentId: "",
+    major: "",
+    faculty: "",
+    cohort: "",
   })
+
+  // Synchronize formData with user data when context loads or updates
+  useEffect(() => {
+    if (user) {
+      const major = user.major || ""
+      const faculty = user.faculty || (major ? MAJOR_FACULTY_MAP[major] : "") || ""
+      setFormData({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        studentId: user.studentId || "",
+        major: major,
+        faculty: faculty,
+        cohort: user.cohort || "",
+      })
+    }
+  }, [user])
 
 
 
@@ -148,12 +161,22 @@ export default function ProfilePage() {
       return acc
     }, {} as typeof formData)
 
-    await updateProfile(normalizedData)
-    // Update local state to reflect normalized text
-    setFormData(normalizedData)
-    setIsEditing(false)
+    const success = await updateProfile(normalizedData)
+
+    if (success) {
+      // Update local state to reflect normalized text
+      setFormData(normalizedData)
+      setIsEditing(false)
+      toast({ title: "Đã lưu", description: "Thông tin hồ sơ đã được cập nhật." })
+    } else {
+      toast({
+        title: "Lỗi",
+        description: "Không thể cập nhật hồ sơ lên hệ thống. Vui lòng thử lại.",
+        variant: "destructive"
+      })
+    }
+
     setIsSaving(false)
-    toast({ title: "Đã lưu", description: "Thông tin hồ sơ đã được cập nhật." })
   }
 
   const handleAvatarClick = () => {
@@ -300,8 +323,8 @@ export default function ProfilePage() {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed"
+                  disabled={true}
+                  className="w-full pl-10 pr-4 py-2 border rounded-md bg-muted cursor-not-allowed opacity-70"
                 />
               </div>
             </div>
@@ -369,7 +392,7 @@ export default function ProfilePage() {
                       value={formData.major}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed bg-background"
+                      className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed"
                     >
                       <option value="">Chọn ngành học</option>
                       <optgroup label="Sức khỏe">
@@ -429,7 +452,7 @@ export default function ProfilePage() {
                       value={formData.faculty}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed bg-background"
+                      className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed"
                     >
                       <option value="">Chọn khoa / viện</option>
                       <option value="Sức khỏe">Sức khỏe</option>
@@ -454,7 +477,7 @@ export default function ProfilePage() {
                       value={formData.cohort}
                       onChange={handleChange}
                       disabled={!isEditing}
-                      className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed bg-background"
+                      className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:bg-muted disabled:cursor-not-allowed"
                     >
                       <option value="">Chọn khóa</option>
                       <option value="K14">K14</option>
