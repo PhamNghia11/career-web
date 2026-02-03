@@ -25,6 +25,7 @@ interface ApplyJobDialogProps {
     jobType?: string
     quantity?: number
     hiredCount?: number
+    deadline?: string
 }
 
 export function ApplyJobDialog({
@@ -39,7 +40,8 @@ export function ApplyJobDialog({
     companyWebsite,
     jobType,
     quantity,
-    hiredCount
+    hiredCount,
+    deadline
 }: ApplyJobDialogProps) {
     const { toast } = useToast()
     const { user } = useAuth()
@@ -185,6 +187,38 @@ export function ApplyJobDialog({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        // Robust date parsing helper
+        const parseDateHelper = (dateVal: any): number => {
+            if (!dateVal) return 0
+            try {
+                if (dateVal instanceof Date) return dateVal.getTime()
+                if (typeof dateVal === 'string') {
+                    if (dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                        const [day, month, year] = dateVal.split('/').map(Number)
+                        return new Date(year, month - 1, day).getTime()
+                    }
+                    const date = new Date(dateVal)
+                    return isNaN(date.getTime()) ? 0 : date.getTime()
+                }
+                const date = new Date(dateVal)
+                return isNaN(date.getTime()) ? 0 : date.getTime()
+            } catch {
+                return 0
+            }
+        }
+
+        const timeDeadline = parseDateHelper(deadline)
+        const isExpired = timeDeadline > 0 && timeDeadline < new Date().getTime()
+
+        if (isExpired) {
+            toast({
+                title: "Không thể ứng tuyển",
+                description: "Xin lỗi, công việc này đã hết hạn nhận hồ sơ.",
+                variant: "destructive"
+            })
+            return
+        }
 
         if (isFull) {
             toast({

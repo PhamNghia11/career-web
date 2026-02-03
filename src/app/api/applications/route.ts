@@ -39,22 +39,61 @@ export async function POST(request: Request) {
 
     console.log("[Applications API] POST - jobId:", jobId, "employerId from form:", employerId, "applicantId:", applicantId)
 
-    // If employerId not provided, try to lookup from job in MongoDB
-    if (!employerId && jobId) {
+    // Always lookup job if jobId provided for security and deadline validation
+    if (jobId) {
       try {
         const jobsCollection = await getCollection(COLLECTIONS.JOBS)
-        // Try to find job by ObjectId first (MongoDB jobs)
         let job = null
         try {
-          job = await jobsCollection.findOne({ _id: new ObjectId(jobId) })
-        } catch {
-          // If jobId is not a valid ObjectId, try string match (for static JSON jobs)
+          if (ObjectId.isValid(jobId)) {
+            job = await jobsCollection.findOne({ _id: new ObjectId(jobId) })
+          }
+        } catch (e) {
+          console.error("[Applications API] Invalid ObjectId:", jobId)
+        }
+
+        if (!job) {
           job = await jobsCollection.findOne({ _id: jobId as any })
         }
 
-        if (job?.creatorId) {
-          employerId = job.creatorId
-          console.log("[Applications API] Found employerId from job:", employerId)
+        if (job) {
+          // 1. Sync employerId
+          if (job.creatorId) {
+            employerId = job.creatorId
+            console.log("[Applications API] Found/Verified employerId from job:", employerId)
+          }
+
+          // 2. Strict Deadline validation
+          if (job.deadline) {
+            const parseDateHelper = (dateVal: any): number => {
+              if (!dateVal) return 0
+              try {
+                if (dateVal instanceof Date) return dateVal.getTime()
+                if (typeof dateVal === 'string') {
+                  if (dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                    const [day, month, year] = dateVal.split('/').map(Number)
+                    return new Date(year, month - 1, day).getTime()
+                  }
+                  const date = new Date(dateVal)
+                  return isNaN(date.getTime()) ? 0 : date.getTime()
+                }
+                const date = new Date(dateVal)
+                return isNaN(date.getTime()) ? 0 : date.getTime()
+              } catch {
+                return 0
+              }
+            }
+
+            const timeDeadline = parseDateHelper(job.deadline)
+            // Adjust to end of day if it's DD/MM/YYYY (optional, but keep it consistent for now)
+            // For now, simple check is enough as per front-end
+            if (timeDeadline > 0 && timeDeadline < new Date().getTime()) {
+              return NextResponse.json({ error: "Công việc này đã hết hạn nhận hồ sơ." }, { status: 403 })
+            }
+          }
+
+          // 3. Optional: Check if job is full (quantity vs hiredCount)
+          // This would require another lookup for hiredCount, but let's stick to deadline for now.
         }
       } catch (lookupError) {
         console.error("[Applications API] Error looking up job:", lookupError)

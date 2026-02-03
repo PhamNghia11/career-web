@@ -29,7 +29,7 @@ const typeLabels = {
 export function FeaturedJobs() {
   const { user } = useAuth()
   const router = useRouter()
-  const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string; jobType?: string } | null>(null)
+  const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string; jobType?: string; deadline?: string } | null>(null)
   const [hoveredJob, setHoveredJob] = useState<Job | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
   const [featuredJobs, setFeaturedJobs] = useState<Job[]>(getFeaturedJobs(4))
@@ -64,7 +64,7 @@ export function FeaturedJobs() {
     fetchDbJobs()
   }, [])
 
-  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string) => {
+  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string, deadline?: string) => {
     if (!user) {
       router.push("/login?redirect=/")
       return
@@ -77,9 +77,30 @@ export function FeaturedJobs() {
       companyEmail: email,
       companyPhone: phone,
       companyWebsite: website,
-      jobType: jobType
+      jobType: jobType,
+      deadline: deadline
     })
     setIsApplyDialogOpen(true)
+  }
+
+  // Robust date parsing helper
+  const parseDateHelper = (dateVal: any): number => {
+    if (!dateVal) return 0
+    try {
+      if (dateVal instanceof Date) return dateVal.getTime()
+      if (typeof dateVal === 'string') {
+        if (dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+          const [day, month, year] = dateVal.split('/').map(Number)
+          return new Date(year, month - 1, day).getTime()
+        }
+        const date = new Date(dateVal)
+        return isNaN(date.getTime()) ? 0 : date.getTime()
+      }
+      const date = new Date(dateVal)
+      return isNaN(date.getTime()) ? 0 : date.getTime()
+    } catch {
+      return 0
+    }
   }
 
   return (
@@ -140,7 +161,7 @@ export function FeaturedJobs() {
                     <div className="absolute top-full left-0 z-50 mt-2 w-[350px] shadow-xl rounded-lg border border-gray-200 bg-white animate-in fade-in zoom-in-95 duration-200">
                       <JobPreviewPanel
                         job={hoveredJob}
-                        onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)}
+                        onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type, job.deadline)}
                         onSave={() => { }}
                         isSaved={false}
                       />
@@ -172,11 +193,13 @@ export function FeaturedJobs() {
                   className={`w-full ${(user?.role === "employer" || user?.role === "admin") ? "bg-gray-100 text-gray-400 hover:bg-gray-100" : "bg-primary hover:bg-primary/90"}`}
                   onClick={() => {
                     if (user?.role === "employer" || user?.role === "admin") return
-                    handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)
+                    handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type, job.deadline)
                   }}
-                  disabled={user?.role === "employer" || user?.role === "admin"}
+                  disabled={user?.role === "employer" || user?.role === "admin" || !!(job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime())}
                 >
-                  {user?.role === "employer" || user?.role === "admin" ? "Chỉ dành cho ứng viên" : "Ứng tuyển ngay"}
+                  {job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()
+                    ? "Đã hết hạn"
+                    : (user?.role === "employer" || user?.role === "admin") ? "Chỉ dành cho ứng viên" : "Ứng tuyển ngay"}
                 </Button>
               </CardFooter>
             </Card>
@@ -202,6 +225,7 @@ export function FeaturedJobs() {
         companyPhone={selectedJob?.companyPhone}
         companyWebsite={selectedJob?.companyWebsite}
         jobType={selectedJob?.jobType}
+        deadline={selectedJob?.deadline}
       />
     </section>
   )

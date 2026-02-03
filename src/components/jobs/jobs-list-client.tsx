@@ -156,6 +156,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     jobType?: string;
     quantity?: number;
     hiredCount?: number;
+    deadline?: string;
   } | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
   const [hoveredJob, setHoveredJob] = useState<Job | null>(null)
@@ -601,7 +602,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     setSelectedCompany(prev => prev === company ? null : company)
   }
 
-  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string, quantity?: number, hiredCount?: number) => {
+  const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string, quantity?: number, hiredCount?: number, deadline?: string) => {
     if (!user) {
       router.push("/login?redirect=" + window.location.pathname + window.location.search)
       return
@@ -616,7 +617,8 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
       companyWebsite: website,
       jobType: jobType,
       quantity: quantity,
-      hiredCount: hiredCount
+      hiredCount: hiredCount,
+      deadline: deadline
     })
     setIsApplyDialogOpen(true)
   }
@@ -1289,7 +1291,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                               <div className="absolute top-full left-0 z-50 mt-2 w-[450px] md:w-[600px] shadow-2xl rounded-xl border border-gray-200 bg-white animate-in fade-in zoom-in-95 duration-200">
                                 <JobPreviewPanel
                                   job={job}
-                                  onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type, job.quantity, job.hiredCount)}
+                                  onApply={(job) => handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type, job.quantity, job.hiredCount, job.deadline)}
                                   onSave={(job) => handleSave(job._id, job.title)}
                                   isSaved={savedJobs.includes(job._id)}
                                 />
@@ -1358,7 +1360,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                           onClick={(e) => {
                             e.stopPropagation()
                             if (user?.role === "employer" || user?.role === "admin") return
-                            handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type)
+                            handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type, job.quantity, job.hiredCount, job.deadline)
                           }}
                           disabled={(user?.role === "employer" || user?.role === "admin") || (!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()) || (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))}
                           className={`shadow-sm px-6 ml-auto ${(user?.role === "employer" || user?.role === "admin" || (!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()) || (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))) ? "bg-gray-100 text-gray-400 hover:bg-gray-100" : "bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white"}`}
@@ -1404,6 +1406,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
         jobType={selectedJob?.jobType}
         quantity={selectedJob?.quantity}
         hiredCount={selectedJob?.hiredCount}
+        deadline={selectedJob?.deadline}
       />
     </div>
   )

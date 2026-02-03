@@ -37,7 +37,29 @@ export function ApplyButton({
     const router = useRouter()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const isEmployer = user?.role === "employer" || user?.role === "admin"
-    const isExpired = deadline && new Date(deadline).getTime() > 0 && new Date(deadline).getTime() < new Date().getTime()
+
+    // Robust date parsing helper (consistent with JobsListClient)
+    const parseDateHelper = (dateVal: any): number => {
+        if (!dateVal) return 0
+        try {
+            if (dateVal instanceof Date) return dateVal.getTime()
+            if (typeof dateVal === 'string') {
+                if (dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                    const [day, month, year] = dateVal.split('/').map(Number)
+                    return new Date(year, month - 1, day).getTime()
+                }
+                const date = new Date(dateVal)
+                return isNaN(date.getTime()) ? 0 : date.getTime()
+            }
+            const date = new Date(dateVal)
+            return isNaN(date.getTime()) ? 0 : date.getTime()
+        } catch {
+            return 0
+        }
+    }
+
+    const timeDeadline = parseDateHelper(deadline)
+    const isExpired = timeDeadline > 0 && timeDeadline < new Date().getTime()
     const isFull = quantity !== undefined && quantity !== -1 && hiredCount >= (quantity || 1)
 
     const handleApplyClick = () => {
