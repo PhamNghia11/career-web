@@ -26,8 +26,11 @@ export function EmployerDashboardContent() {
     const { toast } = useToast()
 
     const [selectedApp, setSelectedApp] = useState<any | null>(null)
+    const [viewingJob, setViewingJob] = useState<any | null>(null)
+    const [jobApplicants, setJobApplicants] = useState<any[]>([])
     const [cvUrl, setCvUrl] = useState<string | null>(null)
     const [cvLoading, setCvLoading] = useState(false)
+    const [appsLoading, setAppsLoading] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -98,9 +101,12 @@ export function EmployerDashboardContent() {
                     updaterRole: 'employer'
                 })
             })
-
             if (res.ok) {
                 setRecentApplications(prev =>
+                    prev.map(app => app._id === appId ? { ...app, status: newStatus } : app)
+                )
+
+                setJobApplicants(prev =>
                     prev.map(app => app._id === appId ? { ...app, status: newStatus } : app)
                 )
 
@@ -138,6 +144,24 @@ export function EmployerDashboardContent() {
             console.error("Error loading CV", error)
         } finally {
             setCvLoading(false)
+        }
+    }
+
+    const handleViewJobApplicants = async (job: any) => {
+        setViewingJob(job)
+        setAppsLoading(true)
+        setJobApplicants([])
+
+        try {
+            const res = await fetch(`/api/applications?jobId=${job._id}&employerId=${user?._id}&role=employer`)
+            const data = await res.json()
+            if (data.success) {
+                setJobApplicants(data.data)
+            }
+        } catch (error) {
+            console.error("Error fetching job applicants", error)
+        } finally {
+            setAppsLoading(false)
         }
     }
 
@@ -241,21 +265,24 @@ export function EmployerDashboardContent() {
                         <div className="space-y-4">
                             {recentJobs.map((job) => (
                                 <div key={job._id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
-                                    <div className="space-y-1">
-                                        <h4 className="font-semibold">{job.title}</h4>
+                                    <div className="space-y-1 min-w-0 flex-1 cursor-pointer" onClick={() => handleViewJobApplicants(job)}>
+                                        <h4 className="font-semibold text-primary hover:underline truncate">{job.title}</h4>
                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                             <span>Đăng: {new Date(job.postedAt).toLocaleDateString('vi-VN')}</span>
                                             <span>•</span>
-                                            <span>{job.applicants || 0} hồ sơ</span>
+                                            <span className="font-medium text-blue-600">{job.applicants || 0} hồ sơ</span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-4 shrink-0">
                                         <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : 'destructive'}>
                                             {job.status === 'active' ? 'Đang hiển thị' : job.status === 'pending' ? 'Chờ duyệt' : 'Đã đóng/Từ chối'}
                                         </Badge>
-                                        <Link href={`/dashboard/jobs/${job._id}/edit`}>
-                                            <Button variant="outline" size="sm">Sửa</Button>
-                                        </Link>
+                                        <div className="flex items-center gap-2">
+                                            <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleViewJobApplicants(job); }}>Hồ sơ</Button>
+                                            <Link href={`/dashboard/jobs/${job._id}/edit`} onClick={(e) => e.stopPropagation()}>
+                                                <Button variant="ghost" size="sm">Sửa</Button>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -369,6 +396,63 @@ export function EmployerDashboardContent() {
                                 </div>
                             )}
                         </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Job Applicants List Dialog */}
+            <Dialog open={!!viewingJob} onOpenChange={(open) => !open && setViewingJob(null)}>
+                <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col p-6">
+                    <DialogHeader className="border-b pb-4">
+                        <DialogTitle>
+                            Danh sách ứng viên: {viewingJob?.title}
+                        </DialogTitle>
+                    </DialogHeader>
+
+                    <div className="flex-1 overflow-y-auto pt-4">
+                        {appsLoading ? (
+                            <div className="flex items-center justify-center py-12">
+                                <Clock className="h-8 w-8 animate-spin text-primary" />
+                            </div>
+                        ) : jobApplicants.length === 0 ? (
+                            <div className="text-center py-12 text-muted-foreground">
+                                Chưa có ứng viên nào nộp vào vị trí này.
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {jobApplicants.map((app) => (
+                                    <div key={app._id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/30 transition-colors">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                                                <User className="h-4 w-4 text-blue-600" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="font-medium truncate">{app.fullname}</div>
+                                                <div className="text-xs text-muted-foreground">{new Date(app.createdAt).toLocaleDateString('vi-VN')}</div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <Select
+                                                value={app.status}
+                                                onValueChange={(val) => handleStatusChange(app._id, val)}
+                                            >
+                                                <SelectTrigger className="w-[120px] h-8 text-xs">
+                                                    <SelectValue>{getStatusBadge(app.status)}</SelectValue>
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="new">Mới</SelectItem>
+                                                    <SelectItem value="reviewed">Đã xem</SelectItem>
+                                                    <SelectItem value="interviewed">Mời PV</SelectItem>
+                                                    <SelectItem value="hired">Đã tuyển</SelectItem>
+                                                    <SelectItem value="rejected">Từ chối</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <Button variant="outline" size="sm" className="h-8" onClick={() => handleViewDetails(app)}>Xem CV</Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </DialogContent>
             </Dialog>
