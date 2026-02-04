@@ -110,6 +110,23 @@ export function MajorsSection() {
         setIsMounted(true)
     }, [])
 
+    const [config, setConfig] = useState<any>(null)
+
+    useEffect(() => {
+        const fetchConfig = async () => {
+            try {
+                const res = await fetch("/api/site-configs?key=home_majors")
+                const result = await res.json()
+                if (result.success && result.data) {
+                    setConfig(result.data)
+                }
+            } catch (error) {
+                console.error("Error fetching majors config:", error)
+            }
+        }
+        fetchConfig()
+    }, [])
+
     return (
         <section className="py-20 bg-gradient-to-b from-white via-gray-50/50 to-white">
             <div className="container mx-auto px-4">
@@ -117,13 +134,13 @@ export function MajorsSection() {
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
                         <TrendingUp className="w-4 h-4" />
-                        <span>{isMounted ? totalJobs.toLocaleString() : totalJobs}+ việc làm đang tuyển</span>
+                        <span>{isMounted ? totalJobs.toLocaleString() : totalJobs}+ {config?.badge || "việc làm đang tuyển"}</span>
                     </div>
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Khám phá theo Lĩnh vực
+                        {config?.title || "Khám phá theo Lĩnh vực"}
                     </h2>
                     <p className="text-gray-500 max-w-xl mx-auto">
-                        Tìm kiếm cơ hội việc làm phù hợp với ngành học và đam mê của bạn
+                        {config?.description || "Tìm kiếm cơ hội việc làm phù hợp với ngành học và đam mê của bạn"}
                     </p>
                 </div>
 

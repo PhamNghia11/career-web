@@ -30,7 +30,7 @@ export async function createSession(userId: string, role: string) {
 
     cookieStore.set("session", session, {
         httpOnly: true,
-        secure: false, // Set to false to allow HTTP on local network (10.0.16.213)
+        secure: false, // Set to false to allow HTTP on local network (10.0.16.98)
         expires: expiresAt,
         sameSite: "lax",
         path: "/",

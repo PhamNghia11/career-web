@@ -1,9 +1,40 @@
+"use client"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Facebook, Mail, MapPin, MessageCircle, Phone, ArrowRight, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export function Footer() {
+  const [config, setConfig] = useState<any>(null)
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch("/api/site-configs?key=site_footer")
+        const result = await res.json()
+        if (result.success && result.data) {
+          setConfig(result.data)
+        }
+      } catch (error) {
+        console.error("Error fetching footer config:", error)
+      }
+    }
+    fetchConfig()
+  }, [])
+
+  const defaultFooter = {
+    brandDescription: "Cổng thông tin việc làm chính thức dành cho sinh viên Đại học Gia Định. Kết nối nhân tài trẻ với cộng đồng doanh nghiệp uy tín, kiến tạo tương lai vững chắc.",
+    centerName: "Trung tâm Trải nghiệm & Việc làm",
+    address: "371 Nguyễn Kiệm, Phường Hạnh Thông, Tp. Hồ Chí Minh",
+    email: "Studentcentre@giadinh.edu.vn",
+    facebook: "https://www.facebook.com/GDUStudentCenter",
+    supportTitle: "Bạn cần hỗ trợ trực tiếp?",
+    supportDescription: "Đội ngũ tư vấn viên luôn sẵn sàng giải đáp mọi thắc mắc của bạn."
+  }
+
+  const footer = config || defaultFooter
+
   return (
     <footer className="bg-[#0f172a] text-slate-300 relative overflow-hidden">
       {/* Decorative gradient overlay */}
@@ -24,8 +55,7 @@ export function Footer() {
               </div>
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
-              Cổng thông tin việc làm chính thức dành cho sinh viên Đại học Gia Định.
-              Kết nối nhân tài trẻ với cộng đồng doanh nghiệp uy tín, kiến tạo tương lai vững chắc.
+              {footer.brandDescription}
             </p>
 
           </div>
@@ -59,16 +89,16 @@ export function Footer() {
                   <MapPin className="h-5 w-5 text-blue-400" />
                 </div>
                 <div className="text-sm">
-                  <span className="block text-white mb-1 font-medium">Trung tâm Trải nghiệm & Việc làm</span>
-                  <span className="text-slate-400">371 Nguyễn Kiệm, Phường Hạnh Thông, Tp. Hồ Chí Minh</span>
+                  <span className="block text-white mb-1 font-medium">{footer.centerName}</span>
+                  <span className="text-slate-400">{footer.address}</span>
                 </div>
               </li>
               <li className="flex items-center gap-3 group">
                 <div className="p-2 bg-slate-800/50 rounded-lg group-hover:bg-purple-500/20 transition-colors">
                   <Mail className="h-5 w-5 text-purple-400" />
                 </div>
-                <a href="mailto:Studentcentre@giadinh.edu.vn" className="text-sm hover:text-white transition-colors">
-                  Studentcentre@giadinh.edu.vn
+                <a href={`mailto:${footer.email}`} className="text-sm hover:text-white transition-colors">
+                  {footer.email}
                 </a>
               </li>
               <li className="flex items-center gap-3 group">
@@ -76,7 +106,7 @@ export function Footer() {
                   <Facebook className="h-5 w-5" />
                 </div>
                 <a
-                  href="https://www.facebook.com/GDUStudentCenter"
+                  href={footer.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm hover:text-white transition-colors"
@@ -96,8 +126,8 @@ export function Footer() {
             <div className="absolute right-0 top-0 w-64 h-64 bg-blue-500/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
             <div className="flex-1 text-center md:text-left z-10">
-              <h3 className="text-xl font-bold text-white mb-2">Bạn cần hỗ trợ trực tiếp?</h3>
-              <p className="text-slate-400 text-sm">Đội ngũ tư vấn viên luôn sẵn sàng giải đáp mọi thắc mắc của bạn.</p>
+              <h3 className="text-xl font-bold text-white mb-2">{footer.supportTitle}</h3>
+              <p className="text-slate-400 text-sm">{footer.supportDescription}</p>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-4 z-10">
@@ -120,7 +150,7 @@ export function Footer() {
                 <span>Chat Zalo</span>
               </a>
               <a
-                href="mailto:Studentcentre@giadinh.edu.vn"
+                href={`mailto:${footer.email}`}
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-all text-sm"
               >
                 <Mail className="h-4 w-4" />

@@ -53,6 +53,23 @@ const COMMON_BENEFITS = [
     "Đào tạo chuyên môn", "Phụ cấp ăn trưa", "Phụ cấp gửi xe", "Review lương định kỳ"
 ]
 
+const EXPERIENCE_OPTIONS = [
+    { value: "no-exp", label: "Chưa có kinh nghiệm" },
+    { value: "under-1", label: "Dưới 1 năm" },
+    { value: "1-2", label: "1 - 2 năm" },
+    { value: "2-5", label: "2 - 5 năm" },
+    { value: "5-10", label: "5 - 10 năm" },
+    { value: "above-10", label: "Trên 10 năm" },
+]
+
+const EDUCATION_OPTIONS = [
+    { value: "high-school", label: "Trung học phổ thông" },
+    { value: "college", label: "Cao đẳng" },
+    { value: "bachelor", label: "Đại học" },
+    { value: "master", label: "Thạc sĩ" },
+    { value: "phd", label: "Tiến sĩ" },
+]
+
 const formSchema = z.object({
     title: z.string().min(5, "Tiêu đề phải có ít nhất 5 ký tự"),
     company: z.string().min(2, "Tên doanh nghiệp phải có ít nhất 2 ký tự"),
@@ -60,6 +77,8 @@ const formSchema = z.object({
     location: z.string().min(5, "Địa điểm phải có ít nhất 5 ký tự"),
     type: z.enum(["full-time", "part-time", "internship"]),
     field: z.string().min(2, "Vui lòng chọn hoặc nhập ngành nghề"),
+    experience: z.string().optional(),
+    education: z.string().optional(),
     salaryMin: z.coerce.number().optional(),
     salaryMax: z.coerce.number().optional(),
     isNegotiable: z.boolean().default(false),
@@ -130,6 +149,8 @@ export default function PostJobPage() {
             location: "",
             type: "full-time",
             field: "",
+            experience: "",
+            education: "",
             salaryMin: 0,
             salaryMax: 0,
             isNegotiable: false,
@@ -794,6 +815,58 @@ export default function PostJobPage() {
                                                     <p className="text-xs text-gray-500 mt-1">Nhập tên ngành nghề nếu không có trong danh sách</p>
                                                 </div>
                                             )}
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="experience"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <div className="flex items-center h-6 mb-2">
+                                                <FormLabel className="mb-0">Kinh nghiệm</FormLabel>
+                                            </div>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Chọn mức kinh nghiệm" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {EXPERIENCE_OPTIONS.map(opt => (
+                                                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                <FormField
+                                    control={form.control}
+                                    name="education"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <div className="flex items-center h-6 mb-2">
+                                                <FormLabel className="mb-0">Học vấn</FormLabel>
+                                            </div>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Chọn yêu cầu học vấn" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {EDUCATION_OPTIONS.map(opt => (
+                                                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAuth } from "@/lib/auth-context"
-import { FileText, Mail, Phone, Calendar, User, CheckCircle, XCircle, Clock, Eye, Search, Filter, RotateCcw } from "lucide-react"
+import { FileText, Mail, Phone, Calendar, User, CheckCircle, XCircle, Clock, Eye, Search, Filter, RotateCcw, Maximize2, Minimize2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -49,6 +49,7 @@ function ManageApplicationsContent() {
     const [cvLoading, setCvLoading] = useState(false)
     const [cvUrl, setCvUrl] = useState<string | null>(null)
     const [viewMode, setViewMode] = useState<"cv" | "details">("details")
+    const [isExpanded, setIsExpanded] = useState(false)
 
     // Filter states
     const [searchTerm, setSearchTerm] = useState("")
@@ -551,8 +552,13 @@ function ManageApplicationsContent() {
                 </Card>
             </main>
 
-            <Dialog open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
-                <DialogContent className={`${viewMode === 'cv' ? 'max-w-4xl' : 'max-w-2xl'} w-[95vw] sm:w-full ${viewMode === 'cv' ? 'h-[90vh]' : 'max-h-[85vh]'} flex flex-col p-4 sm:p-6 rounded-2xl sm:rounded-xl overflow-y-auto`}>
+            <Dialog open={!!selectedApp} onOpenChange={(open) => {
+                if (!open) {
+                    setSelectedApp(null)
+                    setIsExpanded(false)
+                }
+            }}>
+                <DialogContent className={`${isExpanded ? 'max-w-[98vw] h-[98vh] w-[98vw]' : (viewMode === 'cv' ? 'max-w-4xl h-[90vh]' : 'max-w-2xl max-h-[85vh]')} flex flex-col p-4 sm:p-6 rounded-2xl sm:rounded-xl overflow-y-auto duration-300`}>
                     <DialogHeader>
                         <DialogTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4 mb-2">
                             <span className="text-base sm:text-lg">
@@ -571,6 +577,15 @@ function ManageApplicationsContent() {
                                         Xem CV
                                     </Button>
                                 )}
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                    className="h-8 w-8 p-0"
+                                    title={isExpanded ? "Thu nhỏ" : "Phóng to"}
+                                >
+                                    {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                                </Button>
                             </div>
                         </DialogTitle>
                     </DialogHeader>
@@ -683,7 +698,7 @@ function ManageApplicationsContent() {
                     )}
                 </DialogContent>
             </Dialog>
-        </div>
+        </div >
     )
 }
 

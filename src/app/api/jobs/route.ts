@@ -121,6 +121,7 @@ export async function POST(req: Request) {
     const body = await req.json()
     const {
       title, company, companyId, location, type, field,
+      experience, education,
       salary, salaryMin, salaryMax, isNegotiable,
       deadline, description, requirements, benefits,
       relatedMajors, detailedBenefits, creatorId, role, website, quantity,
@@ -164,6 +165,8 @@ export async function POST(req: Request) {
       location,
       type,
       field,
+      experience: experience || null,
+      education: education || null,
       salary: isNegotiable ? "Thỏa thuận" : salary,
       salaryMin,
       salaryMax,

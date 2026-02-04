@@ -107,8 +107,49 @@ pm2 save
 
 ---
 
-## 6. Checklist trước khi đánh giá
+## 6. Quản lý Tài khoản Admin (Admin Management)
+
+### 6.1 Thay đổi Admin gốc (Trước khi triển khai)
+
+Mở file `src/app/api/auth/seed/route.ts` và thay đổi thông tin admin tại dòng 7-14:
+
+```typescript
+{
+    email: "admin_moi@gdu.edu.vn",  // Email admin mới
+    password: "matkhau_baomat123",  // Mật khẩu mới (sẽ tự động hash)
+    name: "Tên Admin Mới",          // Tên hiển thị
+    role: "admin",
+    phone: "0909999999",
+    avatar: "",
+},
+```
+
+Sau khi sửa, build lại và truy cập URL sau để tạo/cập nhật admin:
+```
+https://your-domain.com/api/auth/seed
+```
+
+### 6.2 Thay đổi Admin trực tiếp trong Database
+
+1. Mở **MongoDB Compass** hoặc **MongoDB Atlas**
+2. Truy cập collection `users`
+3. Tìm user có `role: "admin"`
+4. Cập nhật các trường: `email`, `name`, `phone`
+
+> ⚠️ **Lưu ý:** Mật khẩu phải được hash bằng bcrypt. Khuyến nghị dùng phương pháp 6.1 để thay đổi mật khẩu.
+
+### 6.3 Nâng cấp User thành Admin
+
+Để biến một user có sẵn thành admin:
+1. Tìm user trong collection `users` theo email
+2. Đổi trường `role` từ `"student"` hoặc `"employer"` thành `"admin"`
+
+---
+
+## 7. Checklist trước khi đánh giá
 - [ ] MongoDB đã import dữ liệu ban đầu.
 - [ ] File `.env` đã đúng thông số của GDU.
+- [ ] Đã cấu hình tài khoản Admin gốc (xem mục 6).
 - [ ] Port 3000 đã được mở nội bộ và Nginx đã nhận kết nối.
 - [ ] Test thử chức năng Đăng ký/Gửi OTP thành công qua mail trường.
+

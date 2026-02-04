@@ -37,9 +37,37 @@ export default function AdminJobsPage() {
     const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
     const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
     const [previewJob, setPreviewJob] = useState<Job | null>(null)
+    const [previewLoading, setPreviewLoading] = useState(false)
     const [feedback, setFeedback] = useState("")
     const { toast } = useToast()
     const router = useRouter()
+
+    // Fetch full job details for preview (includes description, requirements, benefits)
+    const openJobPreview = async (jobId: string) => {
+        setPreviewLoading(true)
+        try {
+            const res = await fetch(`/api/jobs/${jobId}`)
+            const data = await res.json()
+            if (data.success && data.data) {
+                setPreviewJob(data.data)
+            } else {
+                toast({
+                    title: "Lỗi",
+                    description: "Không thể tải chi tiết tin tuyển dụng",
+                    variant: "destructive"
+                })
+            }
+        } catch (error) {
+            console.error("Error fetching job details:", error)
+            toast({
+                title: "Lỗi",
+                description: "Không thể tải chi tiết tin tuyển dụng",
+                variant: "destructive"
+            })
+        } finally {
+            setPreviewLoading(false)
+        }
+    }
 
     useEffect(() => {
         if (!authLoading) {
@@ -220,7 +248,7 @@ export default function AdminJobsPage() {
                                                             size="sm"
                                                             variant="ghost"
                                                             className="h-9 w-9 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                                                            onClick={() => setPreviewJob(job)}
+                                                            onClick={() => openJobPreview(job._id)}
                                                             title="Xem chi tiết"
                                                         >
                                                             <Eye className="h-4.5 w-4.5" />
@@ -323,7 +351,7 @@ export default function AdminJobsPage() {
                                                     variant="outline"
                                                     size="sm"
                                                     className="h-9 px-3 text-blue-600 font-bold"
-                                                    onClick={() => setPreviewJob(job)}
+                                                    onClick={() => openJobPreview(job._id)}
                                                 >
                                                     <Eye className="h-4 w-4" />
                                                 </Button>

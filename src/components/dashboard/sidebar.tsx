@@ -58,6 +58,7 @@ const adminNav = [
   { name: "Đăng tin tuyển dụng", href: "/dashboard/jobs/new", icon: Briefcase },
   { name: "Khách truy cập", href: "/dashboard/visitors", icon: Eye },
   { name: "Đánh giá Google", href: "/dashboard/reviews", icon: Star },
+  { name: "Cấu hình Trang chủ", href: "/dashboard/admin/settings", icon: Settings },
   { name: "Liên hệ", href: "/dashboard/messages", icon: MessageSquare },
   { name: "Báo cáo vi phạm", href: "/dashboard/admin/reports", icon: Flag },
   { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },

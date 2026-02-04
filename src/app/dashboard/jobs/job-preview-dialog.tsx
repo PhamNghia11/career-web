@@ -1,4 +1,6 @@
+"use client"
 
+import { useState } from "react"
 import {
     Dialog,
     DialogContent,
@@ -6,7 +8,8 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Building2, MapPin, Clock, DollarSign, Calendar, FileText, Download, Eye } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Building2, MapPin, Clock, DollarSign, Calendar, FileText, Download, Eye, Maximize2, Minimize2 } from "lucide-react"
 import Image from "next/image"
 
 // Define a robust Job type that covers all potential fields
@@ -35,14 +38,33 @@ interface JobPreviewDialogProps {
 }
 
 export function JobPreviewDialog({ job, open, onOpenChange }: JobPreviewDialogProps) {
+    const [isExpanded, setIsExpanded] = useState(false)
+
     if (!job) return null
 
+    const handleOpenChange = (openState: boolean) => {
+        if (!openState) {
+            setIsExpanded(false)
+        }
+        onOpenChange(openState)
+    }
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-3xl w-[95vw] sm:w-full max-h-[92vh] overflow-y-auto p-0 gap-0 border-none sm:border shadow-2xl rounded-2xl sm:rounded-xl">
-                <DialogHeader className="p-4 sm:p-6 border-b sticky top-0 bg-white z-10 flex flex-row items-center justify-between space-y-0">
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+            <DialogContent className={`${isExpanded ? 'max-w-[98vw] w-[98vw] h-[98vh]' : 'max-w-4xl w-[95vw] sm:w-full h-[90vh]'} overflow-y-auto p-0 gap-0 border border-gray-200 shadow-2xl rounded-2xl sm:rounded-xl transition-all duration-300`}>
+                <DialogHeader className="p-4 sm:p-6 border-b border-gray-200 sticky top-0 bg-white z-10 flex flex-row items-center justify-between space-y-0 pr-14">
                     <DialogTitle className="text-lg sm:text-xl font-bold text-gray-900">Chi tiết tin tuyển dụng</DialogTitle>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        className="h-9 w-9 p-0 border-gray-300 hover:bg-gray-100 hover:border-gray-400 transition-colors"
+                        title={isExpanded ? "Thu nhỏ" : "Phóng to toàn màn hình"}
+                    >
+                        {isExpanded ? <Minimize2 className="h-5 w-5 text-gray-600" /> : <Maximize2 className="h-5 w-5 text-gray-600" />}
+                    </Button>
                 </DialogHeader>
+
 
                 <div className="p-4 sm:p-8 space-y-6">
                     {/* Header Section */}

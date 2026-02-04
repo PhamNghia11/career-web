@@ -60,4 +60,5 @@ export const COLLECTIONS = {
   PENDING_USERS: "pending_users",
   NEWS: "news",
   HERO_SLIDES: "hero_slides",
+  SITE_CONFIGS: "site_configs",
 } as const

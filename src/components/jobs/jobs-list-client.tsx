@@ -106,6 +106,10 @@ interface JobsListClientProps {
   dbJobs?: Job[]
 }
 
+const removeAccents = (str: string): string => {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+}
+
 // Helper function to format date and time in Vietnamese format
 const formatDateTime = (dateVal: any): string => {
   if (!dateVal) return ""
@@ -170,6 +174,14 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Sync URL params to state
+  useEffect(() => {
+    const search = searchParams.get("search") || searchParams.get("jobTitle") || ""
+    const type = searchParams.get("type") || null
+    if (search !== searchQuery) setSearchQuery(search)
+    if (type !== selectedType) setSelectedType(type)
+  }, [searchParams])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -508,10 +520,16 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   }
 
   const filteredJobs = mergedJobs.filter((job) => {
-    const matchesSearch =
-      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const normalizedQuery = removeAccents(searchQuery)
+    const matchesSearch = !searchQuery || [
+      job.title,
+      job.company,
+      job.description,
+      job.location,
+      job.field,
+      typeLabels[job.type as keyof typeof typeLabels],
+      ...(job.skills || [])
+    ].some(field => field && removeAccents(field).includes(normalizedQuery))
 
     const matchesType = !selectedType || job.type === selectedType
     const matchesCompany = !selectedCompany || job.company === selectedCompany

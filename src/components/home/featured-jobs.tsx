@@ -103,13 +103,34 @@ export function FeaturedJobs() {
     }
   }
 
+  const [config, setConfig] = useState<any>(null)
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch("/api/site-configs?key=home_featured_jobs")
+        const result = await res.json()
+        if (result.success && result.data) {
+          setConfig(result.data)
+        }
+      } catch (error) {
+        console.error("Error fetching featured jobs config:", error)
+      }
+    }
+    fetchConfig()
+  }, [])
+
   return (
     <section className="py-16 bg-gradient-to-b from-accent/30 via-muted/40 to-background">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Việc làm nổi bật</h2>
-            <p className="text-muted-foreground mt-2">Cơ hội việc làm hấp dẫn dành cho sinh viên GDU</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+              {config?.title || "Việc làm nổi bật"}
+            </h2>
+            <p className="text-muted-foreground mt-2">
+              {config?.description || "Cơ hội việc làm hấp dẫn dành cho sinh viên GDU"}
+            </p>
           </div>
           <Link href="/jobs">
             <Button variant="outline" className="hidden md:flex items-center gap-2 bg-card hover:bg-accent">
