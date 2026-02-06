@@ -8,6 +8,8 @@ import { PartnersSection } from "@/components/home/partners-section"
 import { MarketTrends } from "@/components/home/market-trends"
 import { getHeroSlides, getLatestJobs, getSiteConfig } from "@/lib/data-service"
 
+export const revalidate = 3600 // Revalidate home page every 1 hour
+
 export default async function HomePage() {
   const [slides, jobs, featuredJobsConfig] = await Promise.all([
     getHeroSlides("home"),

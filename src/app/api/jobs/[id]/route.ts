@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/database/connection"
 import { ObjectId } from "mongodb"
 import { revalidatePath } from "next/cache"
+import { parseNormalizedDeadline } from "@/lib/date-utils"
 
 // DELETE /api/jobs/[id]
 export async function DELETE(
@@ -59,6 +60,11 @@ export async function PATCH(
         const updateData: any = {
             ...updateFields,
             updatedAt: now
+        }
+
+        // Add normalizedDeadline if deadline is being updated
+        if ('deadline' in updateFields) {
+            updateData.normalizedDeadline = parseNormalizedDeadline(updateFields.deadline)
         }
 
         // If job is being activated or renewed, refresh the postedAt date

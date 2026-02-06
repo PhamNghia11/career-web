@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/database/connection"
 import { ObjectId } from "mongodb"
+import { parseNormalizedDeadline, getStartOfToday } from "@/lib/date-utils"
 
 export const dynamic = 'force-dynamic'
 
@@ -76,47 +77,15 @@ export async function GET(req: Request) {
 
     // If it's a public view (no creatorId provided), we definitely want to hide filled and expired jobs
     if (!creatorId) {
-      pipeline.unshift(
-        {
-          $addFields: {
-            normalizedDeadline: {
-              $cond: {
-                if: { $eq: [{ $type: "$deadline" }, "date"] },
-                then: "$deadline",
-                else: {
-                  $cond: {
-                    if: { $regexMatch: { input: { $ifNull: ["$deadline", ""] }, regex: /^\s*\d{2}\/\d{2}\/\d{4}\s*$/ } },
-                    then: {
-                      $dateFromString: {
-                        dateString: { $trim: { input: "$deadline" } },
-                        format: "%d/%m/%Y",
-                        timezone: "Asia/Ho_Chi_Minh"
-                      }
-                    },
-                    else: {
-                      $cond: {
-                        if: { $regexMatch: { input: { $ifNull: ["$deadline", ""] }, regex: /^\s*\d{4}-\d{2}-\d{2}\s*$/ } },
-                        then: {
-                          $dateFromString: {
-                            dateString: { $trim: { input: "$deadline" } },
-                            format: "%Y-%m-%d",
-                            timezone: "Asia/Ho_Chi_Minh"
-                          }
-                        },
-                        else: null
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+      // Prioritize the pre-calculated normalizedDeadline field
+      pipeline.unshift({
+        $addFields: {
+          normalizedDeadline: { $ifNull: ["$normalizedDeadline", null] }
         }
-      )
+      })
 
       // Add expiration check to the match stage (which is now at index 1 after unshift)
-      const now = new Date()
-      const startOfToday = new Date(now.toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }) + 'T00:00:00+07:00')
+      const startOfToday = getStartOfToday()
       const matchStage = pipeline.find(p => p.$match)
       if (matchStage) {
         // Build the OR condition for deadline correctly
@@ -274,6 +243,7 @@ export async function POST(req: Request) {
       salaryMax,
       isNegotiable,
       deadline,
+      normalizedDeadline: parseNormalizedDeadline(deadline),
       description,
       requirements: Array.isArray(requirements) ? requirements : [],
       benefits: Array.isArray(benefits) ? benefits : [],
