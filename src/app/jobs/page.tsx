@@ -8,121 +8,99 @@ import { getCollection, COLLECTIONS } from "@/database/connection"
 export const dynamic = "force-dynamic"
 import { Job } from "@/lib/jobs-data"
 
-async function getActiveJobsFromDB(): Promise<Job[]> {
-  try {
-    const now = new Date()
-    const startOfToday = new Date(now.toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }) + 'T00:00:00+07:00')
+import { unstable_cache } from "next/cache"
+import { getStartOfToday } from "@/lib/date-utils"
 
-    const collection = await getCollection(COLLECTIONS.JOBS)
+// Cache for 60 seconds (short duration as this page is dynamic based on user filters often, 
+// but for initial load of "all" it helps).
+// Note: We might want to move this logic to data-service if reused.
+const getActiveJobsFromDB = unstable_cache(
+  async () => {
+    try {
+      const startOfToday = getStartOfToday()
+      const collection = await getCollection(COLLECTIONS.JOBS)
 
-    // Filter by active status AND deadline >= today
-    // Using aggregation to get hiredCount
-    const jobs = await collection.aggregate([
-      {
-        $addFields: {
-          normalizedDeadline: {
-            $cond: {
-              if: { $eq: [{ $type: "$deadline" }, "date"] },
-              then: "$deadline",
-              else: {
-                $cond: {
-                  if: { $regexMatch: { input: { $ifNull: ["$deadline", ""] }, regex: /^\s*\d{2}\/\d{2}\/\d{4}\s*$/ } },
-                  then: {
-                    $dateFromString: {
-                      dateString: { $trim: { input: "$deadline" } },
-                      format: "%d/%m/%Y",
-                      timezone: "Asia/Ho_Chi_Minh"
-                    }
-                  },
-                  else: {
-                    $cond: {
-                      if: { $regexMatch: { input: { $ifNull: ["$deadline", ""] }, regex: /^\s*\d{4}-\d{2}-\d{2}\s*$/ } },
-                      then: {
-                        $dateFromString: {
-                          dateString: { $trim: { input: "$deadline" } },
-                          format: "%Y-%m-%d",
-                          timezone: "Asia/Ho_Chi_Minh"
-                        }
+      // Filter by active status AND deadline >= today
+      // Using normalizedDeadline directly
+      const jobs = await collection.aggregate([
+        {
+          $match: {
+            status: "active",
+            $or: [
+              { normalizedDeadline: { $gte: startOfToday } },
+              { deadline: { $in: [null, "", "Vô thời hạn"] } },
+              { normalizedDeadline: { $exists: false } }
+            ]
+          }
+        },
+        {
+          $lookup: {
+            from: COLLECTIONS.APPLICATIONS,
+            let: { jobIdStr: { $toString: "$_id" }, jobIdObj: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      {
+                        $or: [
+                          { $eq: ["$jobId", "$$jobIdStr"] },
+                          { $eq: ["$jobId", "$$jobIdObj"] }
+                        ]
                       },
-                      else: null
-                    }
+                      { $eq: ["$status", "hired"] }
+                    ]
                   }
                 }
               }
+            ],
+            as: "hiredApplications"
+          }
+        },
+        {
+          $addFields: {
+            hiredCount: { $size: "$hiredApplications" }
+          }
+        },
+        {
+          $match: {
+            $expr: {
+              $or: [
+                { $eq: ["$quantity", -1] }, // Limitless
+                { $lt: ["$hiredCount", { $ifNull: ["$quantity", 1] }] } // Still has slots
+              ]
             }
           }
-        }
-      },
-      {
-        $match: {
-          status: "active",
-          $or: [
-            { normalizedDeadline: { $gte: startOfToday } },
-            { deadline: { $in: [null, "", "Vô thời hạn"] } },
-            { normalizedDeadline: { $exists: false } }
-          ]
-        }
-      },
-      {
-        $lookup: {
-          from: COLLECTIONS.APPLICATIONS,
-          let: { jobIdStr: { $toString: "$_id" }, jobIdObj: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    {
-                      $or: [
-                        { $eq: ["$jobId", "$$jobIdStr"] },
-                        { $eq: ["$jobId", "$$jobIdObj"] }
-                      ]
-                    },
-                    { $eq: ["$status", "hired"] }
-                  ]
-                }
-              }
-            }
-          ],
-          as: "hiredApplications"
-        }
-      },
-      {
-        $addFields: {
-          hiredCount: { $size: "$hiredApplications" }
-        }
-      },
-      {
-        $match: {
-          $expr: {
-            $or: [
-              { $eq: ["$quantity", -1] }, // Limitless
-              { $lt: ["$hiredCount", { $ifNull: ["$quantity", 1] }] } // Still has slots
-            ]
+        },
+        {
+          $project: {
+            hiredApplications: 0,
+            // Optimization: Exclude heavy fields for list view
+            description: 0,
+            requirements: 0,
+            benefits: 0,
+            detailedBenefits: 0
           }
+        },
+        {
+          $sort: { postedAt: -1 }
         }
-      },
-      {
-        $project: {
-          hiredApplications: 0
-        }
-      },
-      {
-        $sort: { postedAt: -1 }
-      }
-    ]).toArray()
+      ]).toArray()
 
-    return jobs.map(job => ({
-      ...job,
-      _id: job._id.toString(),
-      skills: job.skills || [],
-      hiredCount: job.hiredCount || 0
-    })) as any[]
-  } catch (error) {
-    console.error("Error fetching jobs from MongoDB:", error)
-    return []
-  }
-}
+      return jobs.map(job => ({
+        ...job,
+        _id: job._id.toString(),
+        skills: job.skills || [],
+        hiredCount: job.hiredCount || 0
+      })) as any[]
+    } catch (error) {
+      console.error("Error fetching jobs from MongoDB:", error)
+      return []
+    }
+  },
+  ['active-jobs-list'],
+  { revalidate: 60, tags: ['jobs'] }
+)
 
 // ISR: Cache page for 60 seconds, then revalidate in background
 export const revalidate = 60

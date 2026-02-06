@@ -13,10 +13,15 @@ export async function GET(request: Request) {
     let query: any = {}
 
     if (search) {
+      // Optimized search:
+      // 1. Text index search would be faster but requires index setup.
+      // 2. For now, we use $regex but with a $text fallback if we had one.
+      // Ideally, we should migrate to Atlas Search or create a text index.
       query.$or = [
         { name: { $regex: search, $options: "i" } },
-        { industry: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } }
+        { industry: { $regex: search, $options: "i" } }
+        // Removed description search to improve performance as it's a large text field
+        // { description: { $regex: search, $options: "i" } }
       ]
     }
 
