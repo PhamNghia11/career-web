@@ -15,21 +15,39 @@ import { MongoClient, type Db } from "mongodb"
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/gdu_career"
 
-let client: MongoClient | null = null
-let db: Db | null = null
+// Global definition to persist connection across hot reloads in development
+// and potentially across function invocations in Vercel if the container is reused.
+declare global {
+  var _mongoClientPromise: Promise<MongoClient> | undefined
+}
 
-export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
-  if (client && db) {
-    return { client, db }
-  }
+let client: MongoClient
+let clientPromise: Promise<MongoClient>
 
-  try {
+if (!process.env.MONGODB_URI && process.env.NODE_ENV === "production") {
+  throw new Error("Please add your Mongo URI to .env.local")
+}
+
+if (process.env.NODE_ENV === "development") {
+  // In development mode, use a global variable so that the value
+  // is preserved across module reloads caused by HMR (Hot Module Replacement).
+  if (!global._mongoClientPromise) {
     client = new MongoClient(MONGODB_URI)
-    await client.connect()
-    db = client.db("gdu_career")
+    global._mongoClientPromise = client.connect()
+  }
+  clientPromise = global._mongoClientPromise
+} else {
+  // In production mode, it's best to not use a global variable.
+  client = new MongoClient(MONGODB_URI)
+  clientPromise = client.connect()
+}
 
-    console.log("Connected to MongoDB successfully")
-    return { client, db }
+// We'll export this mostly for NextAuth if used, but also reuse it for our helpers
+export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
+  try {
+    const connectedClient = await clientPromise
+    const db = connectedClient.db("gdu_career")
+    return { client: connectedClient, db }
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error)
     throw error
