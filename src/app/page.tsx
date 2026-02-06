@@ -13,7 +13,7 @@ export const revalidate = 3600 // Revalidate home page every 1 hour
 export default async function HomePage() {
   const [slides, jobs, featuredJobsConfig] = await Promise.all([
     getHeroSlides("home"),
-    getLatestJobs(8),
+    getLatestJobs(4),
     getSiteConfig("home_featured_jobs")
   ])
 
