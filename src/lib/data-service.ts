@@ -1,6 +1,6 @@
 import { getCollection, COLLECTIONS } from "@/database/connection"
 import { unstable_cache } from "next/cache"
-import { getStartOfToday } from "./date-utils"
+import { getStartOfToday, parseNormalizedDeadline } from "./date-utils"
 
 // Cache duration: 1 hour for slides, 10 mins for jobs, 1 hour for config
 const REVALIDATE_SLIDES = 3600
@@ -97,7 +97,26 @@ export const getLatestJobs = unstable_cache(
                 }
             ]).toArray()
 
-            return jobs.map(j => ({ ...j, _id: j._id.toString() }))
+            // Post-query filtering (Safety net for unmigrated data)
+            const validJobs = jobs.filter(job => {
+                const now = getStartOfToday()
+                if (job.normalizedDeadline) return job.normalizedDeadline >= now
+                if (!job.deadline || job.deadline === "Vô thời hạn") return true
+
+                const deadlineDate = parseNormalizedDeadline(job.deadline)
+
+                // If we can't parse it, and it's not "Vô thời hạn", it might be invalid or old format
+                // Safest to keep it if we are unsure, OR hide it.
+                // Given the user wants to HIDE expired jobs, let's compare if valid.
+                if (!deadlineDate) return true
+
+                return deadlineDate >= now
+            })
+
+            return validJobs.map(job => ({
+                ...job,
+                _id: job._id.toString(),
+            }))
         } catch (error) {
             console.error("Error fetching latest jobs:", error)
             return []

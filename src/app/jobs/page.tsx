@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic"
 import { Job } from "@/lib/jobs-data"
 
 import { unstable_cache } from "next/cache"
-import { getStartOfToday } from "@/lib/date-utils"
+import { getStartOfToday, parseNormalizedDeadline } from "@/lib/date-utils"
 
 // Cache for 60 seconds (short duration as this page is dynamic based on user filters often, 
 // but for initial load of "all" it helps).
@@ -33,6 +33,7 @@ const getActiveJobsFromDB = unstable_cache(
             ]
           }
         },
+        // ... (lookup and other stages remain same)
         {
           $lookup: {
             from: COLLECTIONS.APPLICATIONS,
@@ -87,7 +88,23 @@ const getActiveJobsFromDB = unstable_cache(
         }
       ]).toArray()
 
-      return jobs.map(job => ({
+      // Post-query filtering (Safety net for unmigrated data)
+      // Some jobs might match { normalizedDeadline: { $exists: false } } but actually be expired
+      const validJobs = jobs.filter(job => {
+        // If normalizedDeadline exists, it was already checked by DB query
+        if (job.normalizedDeadline) return true
+
+        // If deadline is explicitly indefinite, keep it
+        if (!job.deadline || job.deadline === "Vô thời hạn") return true
+
+        // For jobs without normalizedDeadline, parse and check manually
+        const deadlineDate = parseNormalizedDeadline(job.deadline)
+        if (!deadlineDate) return true // Keep if can't parse (safety)
+
+        return deadlineDate >= startOfToday
+      })
+
+      return validJobs.map(job => ({
         ...job,
         _id: job._id.toString(),
         skills: job.skills || [],
