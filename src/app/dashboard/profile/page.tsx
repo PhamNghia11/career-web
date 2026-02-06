@@ -172,24 +172,16 @@ export default function ProfilePage() {
       }, {} as typeof formData)
 
       console.log("[ProfilePage] Saving normalized data:", normalizedData)
-      const success = await updateProfile(normalizedData)
+      await updateProfile(normalizedData)
 
-      if (success) {
-        setFormData(normalizedData)
-        setIsEditing(false)
-        toast({ title: "Đã lưu", description: "Thông tin hồ sơ đã được cập nhật." })
-      } else {
-        toast({
-          title: "Lỗi lưu dữ liệu",
-          description: "Máy chủ từ chối cập nhật. Vui lòng kiểm tra lại thông tin.",
-          variant: "destructive"
-        })
-      }
+      setFormData(normalizedData)
+      setIsEditing(false)
+      toast({ title: "Đã lưu", description: "Thông tin hồ sơ đã được cập nhật." })
     } catch (err: any) {
       console.error("[ProfilePage] Save crash:", err)
       toast({
-        title: "Lỗi hệ thống",
-        description: `Đã xảy ra lỗi: ${err.message || "Không xác định"}`,
+        title: "Lỗi lưu dữ liệu",
+        description: err.message || "Máy chủ từ chối cập nhật. Vui lòng kiểm tra lại thông tin.",
         variant: "destructive"
       })
     } finally {

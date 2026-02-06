@@ -18,6 +18,26 @@ interface JobPageProps {
 
 export const dynamic = "force-dynamic"
 
+// Helper function to safely parse date strings (handles DD/MM/YYYY and ISO)
+const parseDateHelper = (dateVal: any): Date => {
+    if (!dateVal) return new Date(0)
+    try {
+        if (dateVal instanceof Date) return dateVal
+        if (typeof dateVal === 'string') {
+            if (dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                const [day, month, year] = dateVal.split('/').map(Number)
+                return new Date(year, month - 1, day)
+            }
+            const date = new Date(dateVal)
+            return isNaN(date.getTime()) ? new Date(0) : date
+        }
+        const date = new Date(dateVal)
+        return isNaN(date.getTime()) ? new Date(0) : date
+    } catch {
+        return new Date(0)
+    }
+}
+
 export default async function JobPage(props: JobPageProps) {
     const params = await props.params;
     let job: any = null
@@ -216,11 +236,26 @@ export default async function JobPage(props: JobPageProps) {
                                                     </div>
                                                     <div>
                                                         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Hạn nộp</p>
-                                                        <p className={`text-gray-900 font-bold ${job.deadline && new Date(job.deadline).getTime() > 0 && new Date(job.deadline).getTime() < new Date().getTime() ? "text-red-500" : ""}`}>
+                                                        <p className={`text-gray-900 font-bold ${(() => {
+                                                            if (!job.deadline) return false
+                                                            const dDate = parseDateHelper(job.deadline)
+                                                            if (dDate.getTime() <= 0) return false
+                                                            dDate.setHours(0, 0, 0, 0)
+                                                            const today = new Date()
+                                                            today.setHours(0, 0, 0, 0)
+                                                            return dDate < today
+                                                        })() ? "text-red-500" : ""}`}>
                                                             {job.deadline
-                                                                ? (isNaN(new Date(job.deadline).getTime())
-                                                                    ? job.deadline
-                                                                    : (new Date(job.deadline).getTime() < new Date().getTime() ? `Đã hết hạn (${new Date(job.deadline).toLocaleDateString('vi-VN')})` : new Date(job.deadline).toLocaleDateString('vi-VN')))
+                                                                ? (() => {
+                                                                    const dDate = parseDateHelper(job.deadline)
+                                                                    if (dDate.getTime() <= 0) return job.deadline
+                                                                    dDate.setHours(0, 0, 0, 0)
+                                                                    const today = new Date()
+                                                                    today.setHours(0, 0, 0, 0)
+                                                                    return dDate < today
+                                                                        ? `Đã hết hạn (${dDate.toLocaleDateString('vi-VN')})`
+                                                                        : dDate.toLocaleDateString('vi-VN')
+                                                                })()
                                                                 : "Vô thời hạn"}
                                                         </p>
                                                     </div>

@@ -496,19 +496,25 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {formData.role === "employer" && (
-                <div className="flex items-center gap-2 py-2">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    required
-                    className="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
-                  />
-                  <Label htmlFor="terms" className="font-normal cursor-pointer text-sm">
-                    Tôi đồng ý với <Link href="/terms" className="text-blue-600 hover:underline">Điều khoản sử dụng</Link> và <Link href="/privacy" className="text-blue-600 hover:underline">Chính sách bảo mật</Link> của GDU Career
-                  </Label>
-                </div>
-              )}
+              <div className="flex items-center gap-2 py-2">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  required
+                  className="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
+                />
+                <Label htmlFor="terms" className="font-normal cursor-pointer text-sm">
+                  Tôi đồng ý với{" "}
+                  <Link href="/terms" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    Điều khoản sử dụng
+                  </Link>{" "}
+                  và{" "}
+                  <Link href="/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    Chính sách bảo mật
+                  </Link>{" "}
+                  của GDU Career
+                </Label>
+              </div>
 
               <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl shadow-lg shadow-red-600/20 transition-all hover:shadow-red-600/30 active:scale-[0.98]" disabled={isLoading}>
                 {isLoading ? "Đang xử lý..." : "Đăng ký tài khoản"}

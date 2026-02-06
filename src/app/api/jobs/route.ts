@@ -38,32 +38,12 @@ export async function GET(req: Request) {
       if (status && status !== "all") {
         query.status = status
       }
-      // If no status is provided when filtering by creator, we return ALL jobs (active, pending, rejected)
     } else {
       // Public view or Admin All Jobs view
       if (status && status !== "all") {
         query.status = status
-        // If explicitly requesting active jobs, also apply deadline filtering
-        if (status === "active") {
-          const today = new Date().toISOString().split('T')[0]
-          query.$or = [
-            { deadline: { $gte: today } },
-            { deadline: { $in: [null, "", "Vô thời hạn"] } },
-            { deadline: { $exists: false } }
-          ]
-        }
       } else if (!status) {
-        // Public view usually only wants active AND not expired
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        const todayStr = today.toISOString().split('T')[0]
-
         query.status = "active"
-        query.$or = [
-          { deadline: { $gte: todayStr } },
-          { deadline: { $in: [null, "", "Vô thời hạn"] } },
-          { deadline: { $exists: false } }
-        ]
       }
     }
 
@@ -76,26 +56,148 @@ export async function GET(req: Request) {
     }
 
     if (search) {
-      query.$or = [
+      const searchTerms = [
         { title: { $regex: search, $options: 'i' } },
         { company: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } }
       ]
+      if (query.$or) {
+        query.$and = [{ $or: query.$or }, { $or: searchTerms }]
+        delete query.$or
+      } else {
+        query.$or = searchTerms
+      }
     }
 
-    const jobs = await collection.find(query)
-      .sort({ postedAt: -1 })
-      .project({
-        description: 0,
-        requirements: 0,
-        benefits: 0,
-        detailedBenefits: 0,
-        relatedMajors: 0
-      })
-      .toArray()
+    // Convert to aggregation for consistent processing
+    const pipeline: any[] = [
+      { $match: query }
+    ]
+
+    // If it's a public view (no creatorId provided), we definitely want to hide filled and expired jobs
+    if (!creatorId) {
+      pipeline.unshift(
+        {
+          $addFields: {
+            normalizedDeadline: {
+              $cond: {
+                if: { $eq: [{ $type: "$deadline" }, "date"] },
+                then: "$deadline",
+                else: {
+                  $cond: {
+                    if: { $regexMatch: { input: { $ifNull: ["$deadline", ""] }, regex: /^\s*\d{2}\/\d{2}\/\d{4}\s*$/ } },
+                    then: {
+                      $dateFromString: {
+                        dateString: { $trim: { input: "$deadline" } },
+                        format: "%d/%m/%Y",
+                        timezone: "Asia/Ho_Chi_Minh"
+                      }
+                    },
+                    else: {
+                      $cond: {
+                        if: { $regexMatch: { input: { $ifNull: ["$deadline", ""] }, regex: /^\s*\d{4}-\d{2}-\d{2}\s*$/ } },
+                        then: {
+                          $dateFromString: {
+                            dateString: { $trim: { input: "$deadline" } },
+                            format: "%Y-%m-%d",
+                            timezone: "Asia/Ho_Chi_Minh"
+                          }
+                        },
+                        else: null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      )
+
+      // Add expiration check to the match stage (which is now at index 1 after unshift)
+      const now = new Date()
+      const startOfToday = new Date(now.toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }) + 'T00:00:00+07:00')
+      const matchStage = pipeline.find(p => p.$match)
+      if (matchStage) {
+        // Build the OR condition for deadline correctly
+        const deadlineOr = [
+          { normalizedDeadline: { $gte: startOfToday } },
+          { deadline: { $in: [null, "", "Vô thời hạn"] } },
+          { normalizedDeadline: { $exists: false } }
+        ]
+
+        // If explicitly requesting active jobs, or no status specified (defaults to active)
+        if (query.status === "active") {
+          // MUST use $and to combine with existing search/$or conditions
+          if (matchStage.$match.$or) {
+            matchStage.$match.$and = [
+              { $or: matchStage.$match.$or },
+              { $or: deadlineOr }
+            ]
+            delete matchStage.$match.$or
+          } else {
+            matchStage.$match.$or = deadlineOr
+          }
+        }
+      }
+
+      // Add hiredCount filtering
+      pipeline.push(
+        {
+          $lookup: {
+            from: COLLECTIONS.APPLICATIONS,
+            let: { jobId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$jobId", "$$jobId"] },
+                      { $eq: ["$status", "hired"] }
+                    ]
+                  }
+                }
+              }
+            ],
+            as: "hiredApplications"
+          }
+        },
+        {
+          $addFields: {
+            hiredCount: { $size: "$hiredApplications" }
+          }
+        },
+        {
+          $match: {
+            $expr: {
+              $or: [
+                { $eq: ["$quantity", -1] },
+                { $lt: ["$hiredCount", { $ifNull: ["$quantity", 1] }] }
+              ]
+            }
+          }
+        }
+      )
+    }
+
+    pipeline.push(
+      { $sort: { postedAt: -1 } },
+      {
+        $project: {
+          description: 0,
+          requirements: 0,
+          benefits: 0,
+          detailedBenefits: 0,
+          relatedMajors: 0,
+          hiredApplications: 0
+        }
+      }
+    )
+
+    const jobs = await collection.aggregate(pipeline).toArray()
 
     // Map _id to string
-    const mappedJobs = jobs.map(job => ({
+    const mappedJobs = jobs.map((job: any) => ({
       ...job,
       _id: job._id.toString()
     }))

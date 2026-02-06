@@ -164,9 +164,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       console.warn("[Auth updateProfile] No user in context!")
       return false
-    } catch (error) {
+    } catch (error: any) {
       console.error("[Auth] Update profile error:", error)
-      return false
+      throw error // Re-throw to be caught by component
     }
   }
 

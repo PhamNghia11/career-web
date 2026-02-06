@@ -269,27 +269,22 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   }
 
   // Helper function to safely parse date strings (handles DD/MM/YYYY and ISO)
-  const parseDateHelper = (dateVal: any): number => {
-    if (!dateVal) return 0
+  const parseDateHelper = (dateVal: any): Date => {
+    if (!dateVal) return new Date(0)
     try {
-      // If it's already a Date object
-      if (dateVal instanceof Date) return dateVal.getTime()
-
-      // If it's a string, check format
+      if (dateVal instanceof Date) return dateVal
       if (typeof dateVal === 'string') {
         if (dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
           const [day, month, year] = dateVal.split('/').map(Number)
-          return new Date(year, month - 1, day).getTime()
+          return new Date(year, month - 1, day)
         }
         const date = new Date(dateVal)
-        return isNaN(date.getTime()) ? 0 : date.getTime()
+        return isNaN(date.getTime()) ? new Date(0) : date
       }
-
-      // Fallback
       const date = new Date(dateVal)
-      return isNaN(date.getTime()) ? 0 : date.getTime()
+      return isNaN(date.getTime()) ? new Date(0) : date
     } catch {
-      return 0
+      return new Date(0)
     }
   }
 
@@ -570,8 +565,8 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
       case "deadline":
         // Sort by deadline, soonest first (and process valid deadlines only or push invalid to end)
         return jobs.sort((a, b) => {
-          const timeA = parseDateHelper(a.deadline)
-          const timeB = parseDateHelper(b.deadline)
+          const timeA = parseDateHelper(a.deadline).getTime()
+          const timeB = parseDateHelper(b.deadline).getTime()
 
           // Push jobs with no deadline to the bottom
           if (!timeA && !timeB) return 0
@@ -1341,10 +1336,20 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                           <DollarSign className="h-4 w-4" />
                           <span className="text-green-600 font-medium">{job.salary}</span>
                         </div>
-                        <div className={`flex items-center gap-1.5 ${job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime() ? "text-red-500 font-bold" : ""}`}>
+                        <div className={`flex items-center gap-1.5 ${(() => {
+                          const today = new Date()
+                          today.setHours(0, 0, 0, 0)
+                          return job.deadline && parseDateHelper(job.deadline).getTime() > 0 && parseDateHelper(job.deadline) < today
+                        })() ? "text-red-500 font-bold" : ""}`}>
                           <Clock className="h-4 w-4" />
                           {job.deadline ? (
-                            parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime() ?
+                            (() => {
+                              const today = new Date()
+                              today.setHours(0, 0, 0, 0)
+                              const dDate = parseDateHelper(job.deadline)
+                              dDate.setHours(0, 0, 0, 0)
+                              return dDate.getTime() > 0 && dDate < today
+                            })() ?
                               `Hết hạn: ${formatDeadline(job.deadline)}` :
                               `Hạn: ${formatDeadline(job.deadline)}`
                           ) : "Vô thời hạn"}
@@ -1380,17 +1385,37 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                             if (user?.role === "employer" || user?.role === "admin") return
                             handleApply(job._id, job.title, job.company, job.creatorId, job.contactEmail, job.contactPhone, job.website, job.type, job.quantity, job.hiredCount, job.deadline)
                           }}
-                          disabled={(user?.role === "employer" || user?.role === "admin") || (!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()) || (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))}
-                          className={`shadow-sm px-6 ml-auto ${(user?.role === "employer" || user?.role === "admin" || (!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()) || (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))) ? "bg-gray-100 text-gray-400 hover:bg-gray-100" : "bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white"}`}
+                          disabled={(user?.role === "employer" || user?.role === "admin") || (() => {
+                            const today = new Date()
+                            today.setHours(0, 0, 0, 0)
+                            const dDate = parseDateHelper(job.deadline)
+                            dDate.setHours(0, 0, 0, 0)
+                            return !!job.deadline && dDate.getTime() > 0 && dDate < today
+                          })() || (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))}
+                          className={`shadow-sm px-6 ml-auto ${(user?.role === "employer" || user?.role === "admin" || (() => {
+                            const today = new Date()
+                            today.setHours(0, 0, 0, 0)
+                            return !!job.deadline && parseDateHelper(job.deadline).getTime() > 0 && parseDateHelper(job.deadline) < today
+                          })() || (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))) ? "bg-gray-100 text-gray-400 hover:bg-gray-100" : "bg-[#1e3a5f] hover:bg-[#1e3a5f]/90 text-white"}`}
                         >
-                          {!!job.deadline && parseDateHelper(job.deadline) > 0 && parseDateHelper(job.deadline) < new Date().getTime()
+                          {(() => {
+                            const today = new Date()
+                            today.setHours(0, 0, 0, 0)
+                            return !!job.deadline && parseDateHelper(job.deadline).getTime() > 0 && parseDateHelper(job.deadline) < today
+                          })()
                             ? "Đã hết hạn"
                             : (job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1))
                               ? "Đã đóng nhận hồ sơ"
                               : (user?.role === "employer" || user?.role === "admin")
                                 ? "Chỉ dành cho ứng viên"
                                 : "Ứng tuyển ngay"}
-                          {!(user?.role === "employer" || user?.role === "admin") && (!job.deadline || parseDateHelper(job.deadline) === 0 || parseDateHelper(job.deadline) >= new Date().getTime()) && !(job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1)) && <ChevronRight className="h-4 w-4 ml-1" />}
+                          {!(user?.role === "employer" || user?.role === "admin") && (() => {
+                            const today = new Date()
+                            today.setHours(0, 0, 0, 0)
+                            const dDate = parseDateHelper(job.deadline)
+                            dDate.setHours(0, 0, 0, 0)
+                            return !job.deadline || dDate.getTime() === 0 || dDate >= today
+                          })() && !(job.quantity !== undefined && job.quantity !== -1 && (job.hiredCount || 0) >= (job.quantity || 1)) && <ChevronRight className="h-4 w-4 ml-1" />}
                         </Button>
                       </div>
                     </div>

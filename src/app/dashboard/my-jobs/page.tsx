@@ -27,6 +27,16 @@ import {
 
 
 
+const parseDateHelper = (dateVal: any) => {
+    if (!dateVal) return new Date(0)
+    if (dateVal instanceof Date) return dateVal
+    if (typeof dateVal === 'string' && dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        const [day, month, year] = dateVal.split('/').map(Number)
+        return new Date(year, month - 1, day)
+    }
+    return new Date(dateVal)
+}
+
 function JobActions({
     job,
     setJobToDelete,
@@ -40,16 +50,9 @@ function JobActions({
     setJobToRenew: (job: any) => void,
     setRenewDialogOpen: (open: boolean) => void
 }) {
-    const parseDateHelper = (dateVal: any) => {
-        if (!dateVal) return new Date(0)
-        if (dateVal instanceof Date) return dateVal
-        if (typeof dateVal === 'string' && dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-            const [day, month, year] = dateVal.split('/').map(Number)
-            return new Date(year, month - 1, day)
-        }
-        return new Date(dateVal)
-    }
-    const isExpired = parseDateHelper(job.deadline) < new Date() && job.status === 'active'
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const isExpired = job.status === 'active' && job.deadline && job.deadline !== "Vô thời hạn" && parseDateHelper(job.deadline) < today
 
     return (
         <DropdownMenu>
@@ -195,6 +198,13 @@ export default function MyJobsPage() {
         }
     }
 
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const checkIsExpired = (job: any) => {
+        return job.status === 'active' && job.deadline && job.deadline !== "Vô thời hạn" && parseDateHelper(job.deadline) < today
+    }
+
     const filteredJobs = jobs.filter(job => {
         const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase())
         const matchesStatus = statusFilter === 'all' || job.status === statusFilter
@@ -275,9 +285,13 @@ export default function MyJobsPage() {
                                                     <div className="text-xs text-muted-foreground">{job.location} • {job.type}</div>
                                                 </td>
                                                 <td className="p-4 align-middle">
-                                                    <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : job.status === 'closed' ? 'outline' : 'destructive'}>
-                                                        {job.status === 'active' ? 'Hoạt động' : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'closed' ? 'Đã đóng' : 'Từ chối'}
-                                                    </Badge>
+                                                    {checkIsExpired(job) ? (
+                                                        <Badge variant="destructive">Hết hạn</Badge>
+                                                    ) : (
+                                                        <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : job.status === 'closed' ? 'outline' : 'destructive'}>
+                                                            {job.status === 'active' ? 'Hoạt động' : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'closed' ? 'Đã đóng' : 'Từ chối'}
+                                                        </Badge>
+                                                    )}
                                                 </td>
                                                 <td className="p-4 align-middle text-sm">
                                                     {(job.status === 'rejected' || job.status === 'request_changes') && job.adminFeedback ? (
@@ -346,8 +360,8 @@ export default function MyJobsPage() {
                                         </div>
 
                                         <div className="flex items-center justify-between gap-2 pt-1">
-                                            <Badge variant={job.status === 'active' ? (new Date(job.deadline) < new Date() ? 'destructive' : 'default') : job.status === 'pending' ? 'secondary' : job.status === 'closed' ? 'outline' : 'destructive'} className="text-[10px] px-2 py-0.5">
-                                                {job.status === 'active' ? (new Date(job.deadline) < new Date() ? 'Đã hết hạn' : 'Hoạt động') : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'closed' ? 'Đã đóng' : 'Từ chối'}
+                                            <Badge variant={job.status === 'active' ? (checkIsExpired(job) ? 'destructive' : 'default') : job.status === 'pending' ? 'secondary' : job.status === 'closed' ? 'outline' : 'destructive'} className="text-[10px] px-2 py-0.5">
+                                                {job.status === 'active' ? (checkIsExpired(job) ? 'Hết hạn' : 'Hoạt động') : job.status === 'pending' ? 'Chờ duyệt' : job.status === 'closed' ? 'Đã đóng' : 'Từ chối'}
                                             </Badge>
                                             <div className="flex items-center gap-4 text-xs text-muted-foreground font-medium">
                                                 <div className="flex items-center gap-1">

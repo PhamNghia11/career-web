@@ -6,15 +6,22 @@ import { MajorsSection } from "@/components/home/majors-section"
 import { StatsSection } from "@/components/home/stats-section"
 import { PartnersSection } from "@/components/home/partners-section"
 import { MarketTrends } from "@/components/home/market-trends"
+import { getHeroSlides, getLatestJobs, getSiteConfig } from "@/lib/data-service"
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [slides, jobs, featuredJobsConfig] = await Promise.all([
+    getHeroSlides("home"),
+    getLatestJobs(4),
+    getSiteConfig("home_featured_jobs")
+  ])
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/50 via-background to-muted/30">
       <Header />
       <main className="flex-1">
-        <HeroSection />
+        <HeroSection initialSlides={slides as any} />
         <div className="mt-12">
-          <FeaturedJobs />
+          <FeaturedJobs initialJobs={jobs as any} initialConfig={featuredJobsConfig as any} />
         </div>
         <MarketTrends />
         <MajorsSection />

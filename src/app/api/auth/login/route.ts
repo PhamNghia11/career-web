@@ -13,6 +13,7 @@ export async function POST(request: Request) {
 
     // Find user by email
     const user = await collection.findOne({ email: normalizedEmail })
+    console.log(`[Login Debug] Email: ${normalizedEmail}, Found: ${!!user}`)
 
     if (!user) {
       return NextResponse.json({ error: "Email chưa được đăng ký" }, { status: 401 })
@@ -20,6 +21,7 @@ export async function POST(request: Request) {
 
     // Verify password
     const passwordMatch = await bcrypt.compare(password, user.password)
+    console.log(`[Login Debug] Password Match: ${passwordMatch}`)
 
     if (!passwordMatch) {
       return NextResponse.json({ error: "Mật khẩu không đúng" }, { status: 401 })
@@ -57,30 +59,19 @@ export async function POST(request: Request) {
     }
 
     // 2FA for Admin Role
-    if (user.role === "admin") {
-      // Check if TOTP is enabled
-      if (user.totpEnabled) {
-        // Admin has 2FA enabled - do NOT set session yet, wait for verify-2fa
-        return NextResponse.json({
-          success: true,
-          needs2FA: true,
-          totpEnabled: true,
-          email: user.email
-        })
-      } else {
-        // TOTP not set up yet - require setup
-        return NextResponse.json({
-          success: true,
-          needs2FA: true,
-          needsTotpSetup: true,
-          email: user.email,
-          userId: user._id.toString()
-        })
-      }
+    if (user.role === "admin" && user.totpEnabled) {
+      // Admin has 2FA enabled - do NOT set session yet, wait for verify-2fa
+      return NextResponse.json({
+        success: true,
+        needs2FA: true,
+        totpEnabled: true,
+        email: user.email
+      })
     }
 
     // NEW: Create secure session cookie for non-admin users
     const { createSession } = await import("@/lib/session")
+    console.log(`[Login Debug] Creating session for: ${userResponse.id}, role: ${userResponse.role}`)
     await createSession(userResponse.id, userResponse.role)
 
     return NextResponse.json({

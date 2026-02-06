@@ -3,14 +3,20 @@ import { Footer } from "@/components/layout/footer"
 import Link from "next/link"
 import { CompaniesListClient } from "@/components/companies/companies-list-client"
 
+import { getCollection, COLLECTIONS } from "@/database/connection"
+
 export const dynamic = "force-dynamic"
 
-async function getBannerData() {
+async function getBannerData(): Promise<any> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/hero-slides?page=companies`, { cache: 'no-store' })
-    const data = await res.json()
-    if (data.success && data.data.length > 0) {
-      return data.data[0]
+    const collection = await getCollection(COLLECTIONS.HERO_SLIDES)
+    const slide = await collection.findOne({ page: "companies", isActive: true })
+
+    if (slide) {
+      return {
+        ...slide,
+        _id: slide._id.toString()
+      }
     }
     return null
   } catch (error) {

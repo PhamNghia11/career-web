@@ -274,6 +274,27 @@ export async function PATCH(
             }
         });
 
+        // Special check: studentId uniqueness
+        if (body.studentId && body.studentId !== currentUser.studentId) {
+            console.log(`[API PATCH User] Checking uniqueness for MSSV: ${body.studentId} (Current: ${currentUser.studentId})`)
+            // Validate format
+            if (!/^\d{8}$/.test(body.studentId)) {
+                return NextResponse.json({ error: "Mã số sinh viên phải có đủ 8 số" }, { status: 400 });
+            }
+
+            const existingStudentId = await collection.findOne({
+                studentId: body.studentId,
+                _id: { $ne: new ObjectId(id) } // Exclude current user
+            });
+
+            console.log(`[API PATCH User] MSSV Conflict Search Result:`, existingStudentId ? "Found (CONFLICT)" : "Not Found (OK)")
+
+            if (existingStudentId) {
+                return NextResponse.json({ error: "Mã số sinh viên này đã được đăng ký bởi tài khoản khác." }, { status: 409 });
+            }
+            updateData.studentId = body.studentId;
+        }
+
         // Special check: email update is sensitive and usually shouldn't happen via general profile edit
         // But if allowed, we should probably check for uniqueness.
         // For now, let's allow it but warn or restrict if needed.
@@ -329,7 +350,7 @@ export async function PATCH(
                                         </ul>
                                     </div>
                                     <div style="text-align: center; margin-top: 35px;">
-                                        <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/login" 
+                                        <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/login?approved=true" 
                                            style="background-color: #d32f2f; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block; transition: background-color 0.3s;">
                                             Đăng nhập ngay
                                         </a>

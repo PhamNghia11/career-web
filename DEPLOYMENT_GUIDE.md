@@ -51,17 +51,36 @@ Hệ thống được xây dựng trên mô hình **Monolithic Modern** sử d�
 
 ## 4. Hướng dẫn Cài đặt & Triển khai
 
-### Bước 1: Chuẩn bị Môi trường
-Cài đặt Node.js và MongoDB trên GDU Server. Đảm bảo MongoDB đang chạy và có thể truy cập nội bộ (localhost:27017).
+### 4.1 Chuẩn bị Môi trường (Preparation)
+Trước khi chạy ứng dụng trên máy mới, hãy đảm bảo đã cài đặt:
+1.  **Node.js (LTS):** Phiên bản 18 hoặc 20.
+2.  **MongoDB Community Server:** Cài đặt và đảm bảo service `MongoDB` đang chạy (mặc định port 27017).
+3.  **Git (Tùy chọn):** Để quản lý mã nguồn.
 
-### Bước 2: Triển khai Mã nguồn
-1. Clone hoặc Upload mã nguồn vào thư mục `/var/www/gdu-career`.
-2. Chạy lệnh cài đặt thư viện:
-   ```bash
-   npm install --production=false
-   ```
+### 4.2 Thiết lập tại máy mới (Setup)
+Nếu bạn nhận được file nén `GDU_Career_Migration.zip`, hãy thực hiện các bước sau:
+1.  **Giải nén:** Giải nén mã nguồn vào thư mục mong muốn.
+2.  **Cài đặt thư viện:**
+    ```bash
+    npm install
+    ```
+3.  **Khôi phục dữ liệu (Database Restore):**
+    Sử dụng script đi kèm để nạp dữ liệu từ thư mục `backups/` vào MongoDB local:
+    ```bash
+    node scripts/restore-db.js
+    ```
+    *(Lưu ý: Script này sẽ tự động lấy bản backup mới nhất).*
 
-### Bước 3: Cấu hình Biến môi trường (`.env`)
+4.  **Cấu hình biến môi trường:**
+    Kiểm tra file `.env` hoặc `.env.local` để đảm bảo `MONGODB_URI` và `NEXT_PUBLIC_APP_URL` chính xác.
+
+5.  **Xây dựng và Khởi chạy:**
+    ```bash
+    npm run build
+    npm start
+    ```
+
+### 4.3 Cấu hình Biến môi trường (`.env`)
 Tạo file `.env` tại thư mục gốc với các thông số:
 ```env
 # Kết nối DB
@@ -75,35 +94,35 @@ EMAIL_PASS=your_app_password
 NEXT_PUBLIC_APP_URL=https://career.giadinh.edu.vn
 ```
 
-### Bước 4: Xây dựng (Build) Ứng dụng
-Next.js cần được biên dịch trước khi chạy production:
-```bash
-npm run build
-```
+### 4.4 Xây dựng (Build) & Quản lý Tiến trình (PM2)
+Next.js cần được biên dịch và chạy bằng PM2 để đảm bảo tính ổn định:
+
+1. **Build ứng dụng:**
+   ```bash
+   npm run build
+   ```
+
+2. **Chạy bằng PM2:**
+   ```bash
+   pm2 start npm --name "gdu-portal" -- start
+   pm2 save
+   ```
 
 ---
 
 ## 5. Vận hành và Lưu trữ (Operation & Storage)
 
-### 5.1 Quản lý Tiến trình (PM2)
-Để ứng dụng chạy ngầm và tự khởi động lại:
-```bash
-pm2 start npm --name "gdu-portal" -- start
-pm2 save
-```
-
-### 5.2 Lưu trữ File (Storage)
--   Các file CV ứng viên tải lên sẽ được lưu trữ trong hệ thống file của Server (hoặc cấu hình Cloud Storage nếu cần mở rộng).
+### 5.1 Lưu trữ File (Storage)
+-   Các file CV ứng viên tải lên sẽ được lưu trữ trong hệ thống file của Server.
 -   Cần đảm bảo quyền ghi (Write Permission) cho thư mục đích trên server.
 
-### 5.3 Cơ sở dữ liệu (DB)
--   Sử dụng `mongodump` để backup định kỳ.
--   File `backup.bat` (trên Windows) hoặc cronjob trên Linux có thể được sử dụng để tự động hóa.
+### 5.2 Cơ sở dữ liệu (DB Backup)
+-   Sử dụng `node scripts/backup-db.js` để backup định kỳ ra file JSON.
+-   Dữ liệu backup sẽ nằm trong thư mục `backups/`.
 
-### 5.4 Domain & SSL
--   **Domain:** Cần trỏ bản ghi A về IP của GDU Server.
--   **Nginx:** Cấu hình làm Reverse Proxy trỏ từ port 80/443 về port 3000 của ứng dụng.
--   **SSL:** Khuyến nghị sử dụng Certbot (Let's Encrypt) để cài đặt SSL miễn phí.
+### 5.3 Domain & SSL
+-   **Nginx:** Cấu hình làm Reverse Proxy trỏ từ port 80/443 về port 3000.
+-   **SSL:** Khuyến nghị sử dụng Certbot (Let's Encrypt).
 
 ---
 

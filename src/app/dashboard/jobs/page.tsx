@@ -186,14 +186,31 @@ export default function AdminJobsPage() {
         setRejectDialogOpen(true)
     }
 
-    const getStatusBadge = (status: string) => {
-        switch (status) {
+    const getStatusBadge = (job: Job) => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        const parseDateHelper = (dateVal: any) => {
+            if (!dateVal) return new Date(0)
+            if (dateVal instanceof Date) return dateVal
+            if (typeof dateVal === 'string' && dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                const [day, month, year] = dateVal.split('/').map(Number)
+                return new Date(year, month - 1, day)
+            }
+            return new Date(dateVal)
+        }
+
+        if (job.status === 'active' && job.deadline && job.deadline !== "Vô thời hạn" && parseDateHelper(job.deadline) < today) {
+            return <Badge variant="destructive">Hết hạn</Badge>
+        }
+
+        switch (job.status) {
             case 'active': return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Đã duyệt</Badge>
             case 'pending': return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">Chờ duyệt</Badge>
             case 'rejected': return <Badge variant="destructive">Từ chối</Badge>
             case 'request_changes': return <Badge variant="outline" className="text-orange-600 border-orange-600">Cần sửa</Badge>
             case 'closed': return <Badge variant="secondary">Đã đóng</Badge>
-            default: return <Badge variant="outline">{status}</Badge>
+            default: return <Badge variant="outline">{job.status}</Badge>
         }
     }
 
@@ -239,7 +256,7 @@ export default function AdminJobsPage() {
                                             <TableCell className="font-medium">{job.title}</TableCell>
                                             <TableCell>{job.company}</TableCell>
                                             <TableCell>{job.salary}</TableCell>
-                                            <TableCell>{getStatusBadge(job.status)}</TableCell>
+                                            <TableCell>{getStatusBadge(job)}</TableCell>
                                             <TableCell className="text-center">
                                                 <div className="flex justify-center items-center">
                                                     {/* Slot 1: Eye icon */}
@@ -331,7 +348,7 @@ export default function AdminJobsPage() {
                                                 <h3 className="font-bold text-gray-900 leading-tight">{job.title}</h3>
                                                 <p className="text-sm text-blue-600 font-medium">{job.company}</p>
                                             </div>
-                                            {getStatusBadge(job.status)}
+                                            {getStatusBadge(job)}
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4 text-xs py-3 border-y border-gray-50 bg-gray-50/30 px-2 rounded-lg">

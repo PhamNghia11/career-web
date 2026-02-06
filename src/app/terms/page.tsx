@@ -1,12 +1,25 @@
+"use client"
+
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { useRouter } from "next/navigation"
+import { ArrowLeft } from "lucide-react"
 
 export default function TermsPage() {
+    const router = useRouter()
+
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
             <Header />
             <main className="flex-1 container mx-auto px-4 py-12">
-                <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-gray-100 p-8 md:p-12">
+                <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-gray-100 p-8 md:p-12 relative">
+                    <button
+                        onClick={() => router.back()}
+                        className="absolute left-4 top-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-500 transition-all group"
+                        title="Quay lại"
+                    >
+                        <ArrowLeft className="h-6 w-6 transition-transform group-hover:-translate-x-1" />
+                    </button>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Điều khoản sử dụng</h1>
                     <p className="text-gray-500 mb-8">Cập nhật lần cuối: {new Date().toLocaleDateString('vi-VN')}</p>
 

@@ -59,7 +59,16 @@ export function ApplyButton({
     }
 
     const timeDeadline = parseDateHelper(deadline)
-    const isExpired = timeDeadline > 0 && timeDeadline < new Date().getTime()
+    const isExpired = (() => {
+        if (timeDeadline <= 0) return false
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        const dDate = new Date(timeDeadline)
+        dDate.setHours(0, 0, 0, 0)
+
+        return dDate.getTime() < today.getTime()
+    })()
     const isFull = quantity !== undefined && quantity !== -1 && hiredCount >= (quantity || 1)
 
     const handleApplyClick = () => {

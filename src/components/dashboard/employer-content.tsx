@@ -274,9 +274,32 @@ export function EmployerDashboardContent() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3 shrink-0">
-                                        <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : 'destructive'}>
-                                            {job.status === 'active' ? 'Đang hiển thị' : job.status === 'pending' ? 'Chờ duyệt' : 'Đã đóng/Từ chối'}
-                                        </Badge>
+                                        {(() => {
+                                            const today = new Date()
+                                            today.setHours(0, 0, 0, 0)
+
+                                            const parseDateLocal = (dateVal: any) => {
+                                                if (!dateVal) return new Date(0)
+                                                if (dateVal instanceof Date) return dateVal
+                                                if (typeof dateVal === 'string' && dateVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                                                    const [day, month, year] = dateVal.split('/').map(Number)
+                                                    return new Date(year, month - 1, day)
+                                                }
+                                                return new Date(dateVal)
+                                            }
+
+                                            const isExpired = job.status === 'active' && job.deadline && job.deadline !== "Vô thời hạn" && parseDateLocal(job.deadline) < today
+
+                                            if (isExpired) {
+                                                return <Badge variant="destructive">Hết hạn</Badge>
+                                            }
+
+                                            return (
+                                                <Badge variant={job.status === 'active' ? 'default' : job.status === 'pending' ? 'secondary' : 'destructive'}>
+                                                    {job.status === 'active' ? 'Đang hiển thị' : job.status === 'pending' ? 'Chờ duyệt' : 'Đã đóng/Từ chối'}
+                                                </Badge>
+                                            )
+                                        })()}
                                         <div className="flex items-center gap-2">
                                             <Link href={`/jobs/${job._id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
                                                 <Button variant="outline" size="sm" className="h-8">Xem</Button>

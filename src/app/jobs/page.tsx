@@ -10,9 +10,8 @@ import { Job } from "@/lib/jobs-data"
 
 async function getActiveJobsFromDB(): Promise<Job[]> {
   try {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const todayStr = today.toISOString().split('T')[0]
+    const now = new Date()
+    const startOfToday = new Date(now.toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }) + 'T00:00:00+07:00')
 
     const collection = await getCollection(COLLECTIONS.JOBS)
 
@@ -20,12 +19,47 @@ async function getActiveJobsFromDB(): Promise<Job[]> {
     // Using aggregation to get hiredCount
     const jobs = await collection.aggregate([
       {
+        $addFields: {
+          normalizedDeadline: {
+            $cond: {
+              if: { $eq: [{ $type: "$deadline" }, "date"] },
+              then: "$deadline",
+              else: {
+                $cond: {
+                  if: { $regexMatch: { input: { $ifNull: ["$deadline", ""] }, regex: /^\s*\d{2}\/\d{2}\/\d{4}\s*$/ } },
+                  then: {
+                    $dateFromString: {
+                      dateString: { $trim: { input: "$deadline" } },
+                      format: "%d/%m/%Y",
+                      timezone: "Asia/Ho_Chi_Minh"
+                    }
+                  },
+                  else: {
+                    $cond: {
+                      if: { $regexMatch: { input: { $ifNull: ["$deadline", ""] }, regex: /^\s*\d{4}-\d{2}-\d{2}\s*$/ } },
+                      then: {
+                        $dateFromString: {
+                          dateString: { $trim: { input: "$deadline" } },
+                          format: "%Y-%m-%d",
+                          timezone: "Asia/Ho_Chi_Minh"
+                        }
+                      },
+                      else: null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
         $match: {
           status: "active",
           $or: [
-            { deadline: { $gte: todayStr } },
+            { normalizedDeadline: { $gte: startOfToday } },
             { deadline: { $in: [null, "", "Vô thời hạn"] } },
-            { deadline: { $exists: false } }
+            { normalizedDeadline: { $exists: false } }
           ]
         }
       },
@@ -59,6 +93,16 @@ async function getActiveJobsFromDB(): Promise<Job[]> {
         }
       },
       {
+        $match: {
+          $expr: {
+            $or: [
+              { $eq: ["$quantity", -1] }, // Limitless
+              { $lt: ["$hiredCount", { $ifNull: ["$quantity", 1] }] } // Still has slots
+            ]
+          }
+        }
+      },
+      {
         $project: {
           hiredApplications: 0
         }
@@ -83,12 +127,16 @@ async function getActiveJobsFromDB(): Promise<Job[]> {
 // ISR: Cache page for 60 seconds, then revalidate in background
 export const revalidate = 60
 
-async function getBannerData() {
+async function getBannerData(): Promise<any> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/hero-slides?page=jobs`, { cache: 'no-store' })
-    const data = await res.json()
-    if (data.success && data.data.length > 0) {
-      return data.data[0]
+    const collection = await getCollection(COLLECTIONS.HERO_SLIDES)
+    const slide = await collection.findOne({ page: "jobs", isActive: true })
+
+    if (slide) {
+      return {
+        ...slide,
+        _id: slide._id.toString()
+      }
     }
     return null
   } catch (error) {
@@ -98,8 +146,10 @@ async function getBannerData() {
 }
 
 export default async function JobsPage() {
-  const dbJobs = await getActiveJobsFromDB()
-  const banner = await getBannerData()
+  const [dbJobs, banner] = await Promise.all([
+    getActiveJobsFromDB(),
+    getBannerData()
+  ])
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/50 via-background to-muted/30">

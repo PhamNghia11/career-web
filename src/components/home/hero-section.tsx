@@ -14,10 +14,14 @@ interface HeroSlide {
   link: string
 }
 
-export function HeroSection() {
-  const [slides, setSlides] = useState<HeroSlide[]>([])
+interface HeroSectionProps {
+  initialSlides?: HeroSlide[]
+}
+
+export function HeroSection({ initialSlides }: HeroSectionProps) {
+  const [slides, setSlides] = useState<HeroSlide[]>(initialSlides || [])
   const [current, setCurrent] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!initialSlides)
   const router = useRouter()
 
   useEffect(() => {

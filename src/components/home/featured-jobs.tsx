@@ -26,43 +26,28 @@ const typeLabels = {
   freelance: "Freelance",
 }
 
-export function FeaturedJobs() {
+interface FeaturedJobsProps {
+  initialJobs?: Job[]
+  initialConfig?: any
+}
+
+export function FeaturedJobs({ initialJobs, initialConfig }: FeaturedJobsProps) {
   const { user } = useAuth()
   const router = useRouter()
   const [selectedJob, setSelectedJob] = useState<{ title: string; company: string; jobId: string; creatorId?: string; companyEmail?: string; companyPhone?: string; companyWebsite?: string; jobType?: string; deadline?: string } | null>(null)
   const [hoveredJob, setHoveredJob] = useState<Job | null>(null)
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false)
-  const [featuredJobs, setFeaturedJobs] = useState<Job[]>(getFeaturedJobs(4))
-  const [loading, setLoading] = useState(true)
+  const [featuredJobs, setFeaturedJobs] = useState<Job[]>(initialJobs || getFeaturedJobs(4))
+  const [loading, setLoading] = useState(!initialJobs)
+  const [config, setConfig] = useState<any>(initialConfig || null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Fetch jobs from MongoDB and merge with static JSON
+  // Effect to handle loading state if no initial data
   useEffect(() => {
-    const fetchDbJobs = async () => {
-      try {
-        const response = await fetch("/api/jobs?status=active")
-        const data = await response.json()
-
-        if (data.success && data.data?.jobs) {
-          const dbJobs: Job[] = data.data.jobs
-
-          // Sort by postedAt and take first 4
-          const sorted = dbJobs
-            .sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
-            .slice(0, 4)
-
-          setFeaturedJobs(sorted)
-        }
-      } catch (error) {
-        console.error("Error fetching featured jobs:", error)
-        // Keep using static data on error
-      } finally {
-        setLoading(false)
-      }
+    if (initialJobs && initialConfig) {
+      setLoading(false)
     }
-
-    fetchDbJobs()
-  }, [])
+  }, [initialJobs, initialConfig])
 
   const handleApply = (jobId: string, jobTitle: string, company: string, creatorId?: string, email?: string, phone?: string, website?: string, jobType?: string, deadline?: string) => {
     if (!user) {
@@ -102,23 +87,6 @@ export function FeaturedJobs() {
       return 0
     }
   }
-
-  const [config, setConfig] = useState<any>(null)
-
-  useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const res = await fetch("/api/site-configs?key=home_featured_jobs")
-        const result = await res.json()
-        if (result.success && result.data) {
-          setConfig(result.data)
-        }
-      } catch (error) {
-        console.error("Error fetching featured jobs config:", error)
-      }
-    }
-    fetchConfig()
-  }, [])
 
   return (
     <section className="py-16 bg-gradient-to-b from-accent/30 via-muted/40 to-background">

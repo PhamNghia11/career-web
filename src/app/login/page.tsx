@@ -19,6 +19,7 @@ export const dynamic = "force-dynamic"
 function LoginContent() {
   const searchParams = useSearchParams()
   const isPending = searchParams.get("pending") === "true"
+  const isApproved = searchParams.get("approved") === "true"
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -233,6 +234,16 @@ function LoginContent() {
                   Đang chờ phê duyệt
                 </div>
                 <p className="text-blue-600/80">Tài khoản của bạn đã được xác minh. Vui lòng chờ Admin kiểm tra và phê duyệt thông tin doanh nghiệp.</p>
+              </div>
+            )}
+
+            {isApproved && (
+              <div className="bg-green-50 border border-green-100 text-green-700 text-sm p-4 rounded-xl mb-6 flex flex-col gap-1 animate-in fade-in zoom-in-95">
+                <div className="font-bold flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-green-600" />
+                  Duyệt thành công
+                </div>
+                <p className="text-green-600/80">Tài khoản của bạn đã được Admin phê duyệt. Bây giờ bạn có thể đăng nhập để sử dụng tất cả tính năng.</p>
               </div>
             )}
 
