@@ -83,7 +83,7 @@ export const getLatestJobs = unstable_cache(
                     $sort: { postedAt: -1 }
                 },
                 {
-                    $limit: limit
+                    $limit: limit + 4 // Fetch a few more to account for post-query filtering
                 },
                 {
                     $project: {
@@ -113,7 +113,7 @@ export const getLatestJobs = unstable_cache(
                 return deadlineDate >= now
             })
 
-            return validJobs.map(job => ({
+            return validJobs.slice(0, limit).map(job => ({
                 ...job,
                 _id: job._id.toString(),
             }))
