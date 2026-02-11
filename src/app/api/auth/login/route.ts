@@ -59,14 +59,25 @@ export async function POST(request: Request) {
     }
 
     // 2FA for Admin Role
-    if (user.role === "admin" && user.totpEnabled) {
-      // Admin has 2FA enabled - do NOT set session yet, wait for verify-2fa
-      return NextResponse.json({
-        success: true,
-        needs2FA: true,
-        totpEnabled: true,
-        email: user.email
-      })
+    if (user.role === "admin") {
+      if (user.totpEnabled) {
+        // Admin has 2FA enabled - do NOT set session yet, wait for verify-2fa
+        return NextResponse.json({
+          success: true,
+          needs2FA: true,
+          totpEnabled: true,
+          email: user.email
+        })
+      } else {
+        // Admin has NOT enabled 2FA - force setup
+        return NextResponse.json({
+          success: true,
+          needs2FA: true,
+          needsTotpSetup: true,
+          userId: user._id.toString(),
+          email: user.email
+        })
+      }
     }
 
     // NEW: Create secure session cookie for non-admin users
