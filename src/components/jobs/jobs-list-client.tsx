@@ -1502,7 +1502,7 @@ export function JobsListClient() { // Remove dbJobs prop
               </div>
             ) : sortedJobs.length > 0 && (
               <div className="text-center py-8 text-gray-400 text-sm font-medium">
-                Đã hiển thị toàn bộ việc làm phù hợp
+                Đã hiển thị toàn bộ việc làm
               </div>
             )}
 

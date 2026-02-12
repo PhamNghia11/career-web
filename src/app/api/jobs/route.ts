@@ -82,11 +82,6 @@ export async function GET(req: Request) {
     ]
 
     if (!creatorId) {
-      pipeline.unshift({
-        $addFields: {
-          normalizedDeadline: { $ifNull: ["$normalizedDeadline", null] }
-        }
-      })
 
       const startOfToday = getStartOfToday()
       const matchStage = pipeline.find(p => p.$match)
@@ -94,7 +89,8 @@ export async function GET(req: Request) {
         const deadlineOr = [
           { normalizedDeadline: { $gte: startOfToday } },
           { deadline: { $in: [null, "", "Vô thời hạn"] } },
-          { normalizedDeadline: { $exists: false } }
+          { normalizedDeadline: { $exists: false } },
+          { normalizedDeadline: null }
         ]
 
         if (query.status === "active") {
@@ -140,7 +136,7 @@ export async function GET(req: Request) {
             $expr: {
               $or: [
                 { $eq: ["$quantity", -1] },
-                { $lt: ["$hiredCount", { $ifNull: ["$quantity", 1] }] }
+                { $lt: ["$hiredCount", { $ifNull: ["$quantity", 9999] }] }
               ]
             }
           }
