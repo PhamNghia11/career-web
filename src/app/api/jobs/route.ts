@@ -88,9 +88,7 @@ export async function GET(req: Request) {
       if (matchStage) {
         const deadlineOr = [
           { normalizedDeadline: { $gte: startOfToday } },
-          { deadline: { $in: [null, "", "Vô thời hạn"] } },
-          { normalizedDeadline: { $exists: false } },
-          { normalizedDeadline: null }
+          { deadline: { $in: [null, "", "Vô thời hạn"] } }
         ]
 
         if (query.status === "active") {
