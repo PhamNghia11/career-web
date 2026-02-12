@@ -27,7 +27,8 @@ export function PartnersSection() {
   useEffect(() => {
     const fetchPartners = async () => {
       try {
-        const response = await fetch('/api/companies')
+        // Only fetch 15 random partners for the carousel, not the whole DB
+        const response = await fetch('/api/companies?limit=15&random=true')
         const data = await response.json()
         if (data.companies) {
           setPartners(data.companies)

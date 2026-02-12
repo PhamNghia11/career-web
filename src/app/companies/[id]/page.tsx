@@ -81,16 +81,13 @@ export default function CompanyDetailPage() {
                 if (data.company) {
                     setCompany(data.company)
 
-                    // 2. Fetch All Companies for "Similar" section
-                    const allCompaniesRes = await fetch(`/api/companies`)
-                    const allData = await allCompaniesRes.json()
+                    // 2. Fetch "Similar" section using optimized API
+                    // limit=3, random=true, exclude current ID
+                    const similarRes = await fetch(`/api/companies?limit=3&random=true&excludeId=${params.id}&industry=${encodeURIComponent(data.company.industry || '')}`)
+                    const similarData = await similarRes.json()
 
-                    if (allData.companies) {
-                        const others = allData.companies
-                            .filter((c: Company) => c.id !== params.id)
-                            .sort(() => 0.5 - Math.random()) // Shuffle
-                            .slice(0, 3) // Take 3
-                        setSimilarCompanies(others)
+                    if (similarData.companies) {
+                        setSimilarCompanies(similarData.companies)
                     }
                 }
             } catch (error) {

@@ -15,9 +15,17 @@ export async function GET(request: Request) {
     }
 
     const collection = await getCollection(COLLECTIONS.SAVED_JOBS)
-    const savedJobs = await collection.find({ userId }).sort({ savedAt: -1 }).toArray()
+    const onlyIds = searchParams.get("onlyIds") === "true"
 
-    // Get job details for each saved job
+    if (onlyIds) {
+      const savedJobs = await collection.find({ userId }).project({ jobId: 1, _id: 0 }).toArray()
+      return NextResponse.json({
+        success: true,
+        jobIds: savedJobs.map((sj) => sj.jobId),
+      })
+    }
+
+    const savedJobs = await collection.find({ userId }).sort({ savedAt: -1 }).toArray()
     const jobIds = savedJobs.map((sj) => sj.jobId)
 
     return NextResponse.json({

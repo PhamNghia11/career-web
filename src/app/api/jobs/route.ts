@@ -13,20 +13,19 @@ export async function GET(req: Request) {
     const field = searchParams.get("field")
     const search = searchParams.get("search")?.toLowerCase()
     const creatorId = searchParams.get("creatorId")
+    const location = searchParams.get("location")
+    const company = searchParams.get("company")
 
-    // Default to active jobs if no status specified (for public view)
-    // Admin page will likely request status=all or specific status
+    // Pagination
+    const page = parseInt(searchParams.get("page") || "1")
+    const limit = parseInt(searchParams.get("limit") || "20")
+    const skip = (page - 1) * limit
 
     const collection = await getCollection(COLLECTIONS.JOBS)
 
     let query: any = {}
 
-    // Refined logic:
-    // If creatorId is provided, we fetch jobs for that specific user (Employer/Admin viewing their own jobs)
-    // In this case, we default to ALL statuses unless specific one is requested.
-
     if (creatorId) {
-      // Robust matching: allow both string and ObjectId for creatorId
       if (ObjectId.isValid(creatorId)) {
         query.$or = [
           { creatorId: creatorId },
@@ -40,7 +39,6 @@ export async function GET(req: Request) {
         query.status = status
       }
     } else {
-      // Public view or Admin All Jobs view
       if (status && status !== "all") {
         query.status = status
       } else if (!status) {
@@ -48,19 +46,28 @@ export async function GET(req: Request) {
       }
     }
 
-    if (type && type !== "all") {
+    if (type && type !== "all" && type !== "null") {
       query.type = type
     }
 
-    if (field && field !== "all") {
+    if (field && field !== "all" && field !== "null") {
       query.field = field
+    }
+
+    if (location && location !== "all" && location !== "null") {
+      // Support city-based filtering if it's one of our keys, or free text
+      query.location = { $regex: location, $options: 'i' }
+    }
+
+    if (company && company !== "all" && company !== "null") {
+      query.company = company
     }
 
     if (search) {
       const searchTerms = [
         { title: { $regex: search, $options: 'i' } },
         { company: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+        { location: { $regex: search, $options: 'i' } },
       ]
       if (query.$or) {
         query.$and = [{ $or: query.$or }, { $or: searchTerms }]
@@ -70,34 +77,27 @@ export async function GET(req: Request) {
       }
     }
 
-    // Convert to aggregation for consistent processing
     const pipeline: any[] = [
       { $match: query }
     ]
 
-    // If it's a public view (no creatorId provided), we definitely want to hide filled and expired jobs
     if (!creatorId) {
-      // Prioritize the pre-calculated normalizedDeadline field
       pipeline.unshift({
         $addFields: {
           normalizedDeadline: { $ifNull: ["$normalizedDeadline", null] }
         }
       })
 
-      // Add expiration check to the match stage (which is now at index 1 after unshift)
       const startOfToday = getStartOfToday()
       const matchStage = pipeline.find(p => p.$match)
       if (matchStage) {
-        // Build the OR condition for deadline correctly
         const deadlineOr = [
           { normalizedDeadline: { $gte: startOfToday } },
           { deadline: { $in: [null, "", "Vô thời hạn"] } },
           { normalizedDeadline: { $exists: false } }
         ]
 
-        // If explicitly requesting active jobs, or no status specified (defaults to active)
         if (query.status === "active") {
-          // MUST use $and to combine with existing search/$or conditions
           if (matchStage.$match.$or) {
             matchStage.$match.$and = [
               { $or: matchStage.$match.$or },
@@ -110,7 +110,6 @@ export async function GET(req: Request) {
         }
       }
 
-      // Add hiredCount filtering
       pipeline.push(
         {
           $lookup: {
@@ -149,8 +148,15 @@ export async function GET(req: Request) {
       )
     }
 
+    // Capture total before pagination
+    const countPipeline = [...pipeline, { $count: "total" }]
+    const countResult = await collection.aggregate(countPipeline).toArray()
+    const total = countResult[0]?.total || 0
+
     pipeline.push(
       { $sort: { postedAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
       {
         $project: {
           description: 0,
@@ -165,7 +171,6 @@ export async function GET(req: Request) {
 
     const jobs = await collection.aggregate(pipeline).toArray()
 
-    // Map _id to string
     const mappedJobs = jobs.map((job: any) => ({
       ...job,
       _id: job._id.toString()
@@ -175,7 +180,9 @@ export async function GET(req: Request) {
       success: true,
       data: {
         jobs: mappedJobs,
-        total: mappedJobs.length,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit)
       },
     })
   } catch (error) {

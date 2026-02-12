@@ -8,7 +8,21 @@ const sensitiveApiRoutes = ["/api/applications", "/api/users"]
 const publicRoutes = ["/login", "/register", "/"]
 
 export default async function middleware(req: NextRequest) {
-    // 2. Check if the current route is protected or public
+    const start = Date.now()
+    const path = req.nextUrl.pathname
+    // ... rest of logic will be inside a try/finally to log duration
+    try {
+        const res = await handleMiddleware(req)
+        return res
+    } finally {
+        const duration = Date.now() - start
+        if (duration > 50) {
+            console.log(`[Middleware] [Slow] ${path} took ${duration}ms`)
+        }
+    }
+}
+
+async function handleMiddleware(req: NextRequest) {
     const path = req.nextUrl.pathname
     const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route))
     const isSensitiveApiRoute = sensitiveApiRoutes.some((route) => path.startsWith(route))

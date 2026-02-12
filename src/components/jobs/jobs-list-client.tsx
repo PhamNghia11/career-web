@@ -103,7 +103,7 @@ const advancedSalaryRanges = [
 ]
 
 interface JobsListClientProps {
-  dbJobs?: Job[]
+  // dbJobs removed to reduce payload
 }
 
 const removeAccents = (str: string): string => {
@@ -136,12 +136,19 @@ const formatDateTime = (dateVal: any): string => {
   }
 }
 
-export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
+export function JobsListClient() { // Remove dbJobs prop
 
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
   const { user } = useAuth()
+
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || searchParams.get("jobTitle") || "")
   const [selectedType, setSelectedType] = useState<string | null>(searchParams.get("type") || null)
@@ -194,7 +201,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  // Load saved jobs from database when user is logged in
+  // Load saved jobs from database
   useEffect(() => {
     if (user?.id) {
       loadSavedJobs()
@@ -206,7 +213,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
   const loadSavedJobs = async () => {
     if (!user?.id) return
     try {
-      const response = await fetch(`/api/saved-jobs?userId=${user.id}`)
+      const response = await fetch(`/api/saved-jobs?userId=${user.id}&onlyIds=true`)
       const data = await response.json()
       if (data.success && data.jobIds) {
         setSavedJobs(data.jobIds)
@@ -216,15 +223,66 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     }
   }
 
-  // No more merging with JSON. Everything is in the DB now. 
-  const mergedJobs = useMemo(() => {
-    return dbJobs
-  }, [dbJobs])
+  // Load jobs from API
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchJobs(1, true)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchQuery, selectedType, selectedIndustry, selectedExperience, selectedEducation, selectedPostedDate, selectedLocation, selectedSalary, selectedCompany])
 
-  // Get unique companies with job counts and logos
+  const fetchJobs = async (pageToFetch: number = 1, isInitial: boolean = false) => {
+    if (isInitial) {
+      setLoading(true)
+      setPage(1)
+    } else {
+      setLoadingMore(true)
+    }
+
+    try {
+      const params = new URLSearchParams()
+      if (searchQuery) params.append("search", searchQuery)
+      if (selectedType) params.append("type", selectedType)
+      if (selectedIndustry) params.append("field", selectedIndustry)
+      if (selectedLocation) params.append("location", selectedLocation)
+      if (selectedCompany) params.append("company", selectedCompany)
+      params.append("page", pageToFetch.toString())
+      params.append("limit", "15")
+
+      const response = await fetch(`/api/jobs?${params}`)
+      const result = await response.json()
+
+      if (result.success) {
+        const fetchedJobs = result.data.jobs || []
+        if (isInitial) {
+          setJobs(fetchedJobs)
+        } else {
+          setJobs(prev => [...prev, ...fetchedJobs])
+        }
+        setTotalCount(result.data.total || 0)
+        setTotalPages(result.data.totalPages || 1)
+        setPage(pageToFetch)
+      }
+    } catch (error) {
+      console.error("Error fetching jobs:", error)
+    } finally {
+      setLoading(false)
+      setLoadingMore(false)
+    }
+  }
+
+  const handleLoadMore = () => {
+    if (page < totalPages) {
+      fetchJobs(page + 1, false)
+    }
+  }
+
+  // Calculate companies from current loaded jobs for the sidebar filter
+  // In a real large app, we'd fetch this from a separate API, but for now 
+  // we use what's loaded to keep functionality.
   const companies = useMemo(() => {
     const companyMap = new Map<string, { name: string; logo: string; logoFit?: "cover" | "contain"; count: number }>()
-    mergedJobs.forEach(job => {
+    jobs.forEach(job => {
       if (companyMap.has(job.company)) {
         const existing = companyMap.get(job.company)!
         existing.count++
@@ -233,7 +291,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
       }
     })
     return Array.from(companyMap.values()).sort((a, b) => b.count - a.count)
-  }, [mergedJobs])
+  }, [jobs])
 
   const checkSalaryMatch = (jobSalary: string, filterSalary: string) => {
     if (filterSalary === "negotiate") {
@@ -514,7 +572,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
     }
   }
 
-  const filteredJobs = mergedJobs.filter((job) => {
+  const filteredJobs = jobs.filter((job: Job) => {
     const normalizedQuery = removeAccents(searchQuery)
     const matchesSearch = !searchQuery || [
       job.title,
@@ -543,13 +601,13 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
 
   // Apply sorting based on selected sort option
   const sortedJobs = useMemo(() => {
-    const jobs = [...filteredJobs]
+    const sorted = [...filteredJobs]
 
     switch (sortBy) {
       case "newest":
-        return jobs.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
+        return sorted.sort((a: Job, b: Job) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
       case "salary":
-        return jobs.sort((a, b) => {
+        return sorted.sort((a: Job, b: Job) => {
           const maxA = parseMaxSalary(a.salary)
           const maxB = parseMaxSalary(b.salary)
           if (maxA !== maxB) {
@@ -561,10 +619,8 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
           return minB - minA
         })
       case "deadline":
-      // Sort by deadline, soonest first
-      case "deadline":
         // Sort by deadline, soonest first (and process valid deadlines only or push invalid to end)
-        return jobs.sort((a, b) => {
+        return sorted.sort((a: Job, b: Job) => {
           const timeA = parseDateHelper(a.deadline).getTime()
           const timeB = parseDateHelper(b.deadline).getTime()
 
@@ -576,7 +632,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
           return timeA - timeB
         })
       default:
-        return jobs
+        return sorted
     }
   }, [filteredJobs, sortBy])
 
@@ -664,7 +720,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
         setSavedJobs([...savedJobs, jobId])
       }
 
-      const job = mergedJobs.find(j => j._id === jobId)
+      const job = jobs.find((j: Job) => j._id === jobId)
 
       const response = await fetch("/api/saved-jobs", {
         method: "POST",
@@ -1357,7 +1413,7 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                       </div>
 
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {job.skills?.map((skill) => (
+                        {(job.skills || []).map((skill: string) => (
                           <span key={skill} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
                             {skill}
                           </span>
@@ -1423,6 +1479,32 @@ export function JobsListClient({ dbJobs = [] }: JobsListClientProps) {
                 </CardContent>
               </Card>
             ))}
+
+            {/* Load More Button or Message */}
+            {page < totalPages ? (
+              <div className="flex justify-center py-8">
+                <Button
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  variant="outline"
+                  size="lg"
+                  className="min-w-[200px] border-primary text-primary hover:bg-primary/5 font-extrabold rounded-xl shadow-sm"
+                >
+                  {loadingMore ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      Đang tải...
+                    </div>
+                  ) : (
+                    "Xem thêm việc làm"
+                  )}
+                </Button>
+              </div>
+            ) : sortedJobs.length > 0 && (
+              <div className="text-center py-8 text-gray-400 text-sm font-medium">
+                Đã hiển thị toàn bộ việc làm phù hợp
+              </div>
+            )}
 
             {sortedJobs.length === 0 && (
               <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300">

@@ -13,7 +13,7 @@
 
 import { MongoClient, type Db } from "mongodb"
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/gdu_career"
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/gdu_career"
 
 // Global definition to persist connection across hot reloads in development
 // and potentially across function invocations in Vercel if the container is reused.
@@ -28,28 +28,52 @@ if (!process.env.MONGODB_URI && process.env.NODE_ENV === "production") {
   throw new Error("Please add your Mongo URI to .env.local")
 }
 
+// MongoDB Atlas connection options for stability on Serverless (Vercel)
+const options = {
+  connectTimeoutMS: 10000, // 10s timeout to avoid hanging cold starts
+  socketTimeoutMS: 45000,  // 45s socket timeout
+  maxPoolSize: 10,         // Limit pool size for serverless environment
+}
+
 if (process.env.NODE_ENV === "development") {
   // In development mode, use a global variable so that the value
-  // is preserved across module reloads caused by HMR (Hot Module Replacement).
+  // is preserved across module reloads caused by HMR.
   if (!global._mongoClientPromise) {
-    client = new MongoClient(MONGODB_URI)
+    client = new MongoClient(MONGODB_URI, options)
     global._mongoClientPromise = client.connect()
   }
   clientPromise = global._mongoClientPromise
 } else {
-  // In production mode, it's best to not use a global variable.
-  client = new MongoClient(MONGODB_URI)
-  clientPromise = client.connect()
+  // In production (Vercel), we also want to cache the connection promise
+  // in the global scope if possible, though Vercel containers are ephemeral.
+  // This is a standard pattern for MongoDB + Next.js.
+  if (!global._mongoClientPromise) {
+    client = new MongoClient(MONGODB_URI, options)
+    global._mongoClientPromise = client.connect()
+  }
+  clientPromise = global._mongoClientPromise
 }
 
-// We'll export this mostly for NextAuth if used, but also reuse it for our helpers
+// Helper to get connected client and db
 export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
   try {
+    // If for some reason clientPromise became undefined, re-initialize
+    if (!clientPromise) {
+      client = new MongoClient(MONGODB_URI, options)
+      clientPromise = client.connect()
+    }
+
+    console.time("db-connect")
     const connectedClient = await clientPromise
+    console.timeEnd("db-connect")
+
     const db = connectedClient.db("gdu_career")
     return { client: connectedClient, db }
   } catch (error) {
+    console.timeEnd("db-connect") // Clear timer on error
     console.error("Failed to connect to MongoDB:", error)
+    // Clear the promise so next request can try again
+    global._mongoClientPromise = undefined
     throw error
   }
 }

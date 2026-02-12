@@ -32,59 +32,46 @@ export async function GET(request: Request) {
     // Build query based on role
     let query: any = { userId }
 
-    // For students and other roles, default query { userId } is used
-
-    // Fetch user created date to filter out old broadcast notifications
-    const usersCollection = await getCollection(COLLECTIONS.USERS)
-    let userCreatedAt = new Date(0); // Default to epoch if user not found (shouldn't happen)
-    try {
-      if (userId) {
-        const { ObjectId } = await import("mongodb")
-        // Ensure userId is valid ObjectId before querying
+    // Optimization: Only fetch user info if it's admin/employer to check broadcast timeline
+    if (role === 'admin' || role === 'employer') {
+      const usersCollection = await getCollection(COLLECTIONS.USERS)
+      let userCreatedAt = new Date(0);
+      try {
         if (ObjectId.isValid(userId)) {
-          const currentUser = await usersCollection.findOne({ _id: new ObjectId(userId) })
+          const currentUser = await usersCollection.findOne(
+            { _id: new ObjectId(userId) },
+            { projection: { createdAt: 1 } } // Project only createdAt
+          )
           if (currentUser?.createdAt) {
             userCreatedAt = new Date(currentUser.createdAt)
-            console.log("[Notifications API] User created at:", userCreatedAt)
           }
         }
+      } catch (e) {
+        console.error("[Notifications API] Error fetching user created date:", e)
       }
-    } catch (e) {
-      console.error("[Notifications API] Error fetching user created date:", e)
-    }
 
-    if (role === 'admin') {
-      // Admin sees: their own notifications + all admin-targeted notifications
-      // For admins, maybe we want to show ALL history? Or valid history?
-      // Let's assume admins should see everything for context, OR just their timeline.
-      // For now, let's filter by timeline too to reduce noise.
-      query = {
-        $or: [
-          { userId },
-          {
-            targetRole: 'admin',
-            createdAt: { $gte: userCreatedAt }
-          }
-        ]
-      }
-      console.log("[Notifications API] ADMIN Query Filter - role match found")
-    } else if (role === 'employer') {
-      // Employer sees: their own notifications OR notifications targeted at 'employer' role
-      query = {
-        $or: [
-          { userId },
-          {
-            targetRole: 'employer',
-            createdAt: { $gte: userCreatedAt }
-          }
-        ]
+      if (role === 'admin') {
+        query = {
+          $or: [
+            { userId },
+            { targetRole: 'admin', createdAt: { $gte: userCreatedAt } }
+          ]
+        }
+      } else {
+        query = {
+          $or: [
+            { userId },
+            { targetRole: 'employer', createdAt: { $gte: userCreatedAt } }
+          ]
+        }
       }
     }
-
-    console.log("[Notifications API] Query:", JSON.stringify(query))
 
     const notifications = await collection
       .find(query)
+      .project({
+        // Exclude heavy fields if any (currently notification schema is light)
+      })
       .sort({ createdAt: -1 })
       .limit(50)
       .toArray()

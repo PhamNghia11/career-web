@@ -55,14 +55,6 @@ export async function POST(request: Request) {
         }
 
         const collection = await getCollection(COLLECTIONS.VISITORS)
-
-        // Ensure index for performance on first write
-        try {
-            await collection.createIndex({ visitedAt: -1 })
-        } catch (e) {
-            // Index might already exist or background creation is fine
-        }
-
         await collection.insertOne(visitor)
 
         return NextResponse.json({ success: true })

@@ -28,31 +28,52 @@ export function CompaniesListClient() {
   const router = useRouter()
   const [companies, setCompanies] = useState<Company[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [search, setSearch] = useState("")
   const [selectedIndustry, setSelectedIndustry] = useState("")
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
   const { toast } = useToast()
 
   useEffect(() => {
-    fetchCompanies()
+    fetchCompanies(1, true)
   }, [])
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchCompanies()
+      fetchCompanies(1, true)
     }, 500)
     return () => clearTimeout(timer)
   }, [search, selectedIndustry])
 
-  const fetchCompanies = async () => {
-    setLoading(true)
+  const fetchCompanies = async (pageToFetch: number = 1, isInitial: boolean = false) => {
+    if (isInitial) {
+      setLoading(true)
+      setPage(1)
+    } else {
+      setLoadingMore(true)
+    }
+
     try {
       const params = new URLSearchParams()
       if (search) params.append("search", search)
       if (selectedIndustry) params.append("industry", selectedIndustry)
+      params.append("page", pageToFetch.toString())
+      params.append("limit", "10") // Smaller limit for smoother load
 
       const response = await fetch(`/api/companies?${params}`)
       const data = await response.json()
-      setCompanies(data.companies)
+
+      if (isInitial) {
+        setCompanies(data.companies || [])
+      } else {
+        setCompanies(prev => [...prev, ...(data.companies || [])])
+      }
+
+      setTotalPages(data.totalPages || 1)
+      setTotalCount(data.total || 0)
+      setPage(pageToFetch)
     } catch (error) {
       console.error("[v0] Failed to fetch companies:", error)
       toast({
@@ -62,6 +83,13 @@ export function CompaniesListClient() {
       })
     } finally {
       setLoading(false)
+      setLoadingMore(false)
+    }
+  }
+
+  const handleLoadMore = () => {
+    if (page < totalPages) {
+      fetchCompanies(page + 1, false)
     }
   }
 
@@ -108,8 +136,15 @@ export function CompaniesListClient() {
       </Card>
 
       {/* Results count */}
-      <div className="text-muted-foreground">
-        Tìm thấy <span className="font-semibold text-foreground">{companies.length}</span> doanh nghiệp
+      <div className="flex justify-between items-center text-muted-foreground text-sm">
+        <div>
+          Tìm thấy <span className="font-semibold text-foreground">{totalCount}</span> doanh nghiệp
+        </div>
+        {companies.length > 0 && (
+          <div>
+            Đang hiển thị {companies.length}/{totalCount}
+          </div>
+        )}
       </div>
 
       {/* Companies grid */}
@@ -129,77 +164,101 @@ export function CompaniesListClient() {
           <p className="text-muted-foreground">Không tìm thấy doanh nghiệp phù hợp</p>
         </Card>
       ) : (
-        <div className="grid md:grid-cols-2 gap-6">
-          {companies.map((company) => (
-            <Card key={company.id} className="p-6 hover:shadow-lg transition-shadow bg-card flex flex-col">
-              <div className="flex gap-4">
-                <img
-                  src={company.logo || "/placeholder.svg?height=56&width=56"}
-                  alt={company.name}
-                  className="w-14 h-14 rounded-lg object-contain bg-gray-50 p-1"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
-                      {company.name}
-                      {company.verified && <CheckCircle className="h-5 w-5 text-secondary flex-shrink-0" />}
-                    </h3>
+        <div className="space-y-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            {companies.map((company) => (
+              <Card key={company.id} className="p-6 hover:shadow-lg transition-shadow bg-card flex flex-col">
+                <div className="flex gap-4">
+                  <img
+                    src={company.logo || "/placeholder.svg?height=56&width=56"}
+                    alt={company.name}
+                    className="w-14 h-14 rounded-lg object-contain bg-gray-50 p-1"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h3 className="font-bold text-lg text-foreground flex items-center gap-2">
+                        {company.name}
+                        {company.verified && <CheckCircle className="h-5 w-5 text-secondary flex-shrink-0" />}
+                      </h3>
+                    </div>
+                    <Badge variant="secondary" className="mb-2">
+                      {company.industry}
+                    </Badge>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <span className="font-medium text-foreground">{company.rating}</span>
+                    </div>
                   </div>
-                  <Badge variant="secondary" className="mb-2">
-                    {company.industry}
-                  </Badge>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium text-foreground">{company.rating}</span>
+                </div>
+
+                <p className="text-sm text-muted-foreground mt-4 line-clamp-2 flex-grow">{company.description}</p>
+
+                <div className="mt-4 space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin className="h-4 w-4 flex-shrink-0" />
+                    <span>{company.location}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Users className="h-4 w-4 flex-shrink-0" />
+                    <span>{company.size}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Briefcase className="h-4 w-4 flex-shrink-0" />
+                    <span className="font-medium text-foreground">{company.openPositions} vị trí đang tuyển</span>
                   </div>
                 </div>
-              </div>
 
-              <p className="text-sm text-muted-foreground mt-4 line-clamp-2 flex-grow">{company.description}</p>
-
-              <div className="mt-4 space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MapPin className="h-4 w-4 flex-shrink-0" />
-                  <span>{company.location}</span>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {(company.benefits || []).slice(0, 3).map((benefit, index) => (
+                    <Badge key={index} variant="outline" className="text-xs">
+                      {benefit}
+                    </Badge>
+                  ))}
                 </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Users className="h-4 w-4 flex-shrink-0" />
-                  <span>{company.size}</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Briefcase className="h-4 w-4 flex-shrink-0" />
-                  <span className="font-medium text-foreground">{company.openPositions} vị trí đang tuyển</span>
-                </div>
-              </div>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                {company.benefits.slice(0, 3).map((benefit, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
-                    {benefit}
-                  </Badge>
-                ))}
-              </div>
-
-              <div className="flex gap-3 mt-4">
-                <Button
-                  onClick={() => handleViewDetails(company.id)}
-                  className="flex-1 bg-primary hover:bg-primary/90"
-                >
-                  Xem chi tiết
-                </Button>
-                {company.website && (
+                <div className="flex gap-3 mt-4">
                   <Button
-                    variant="outline"
-                    className="aspect-square p-0"
-                    onClick={() => window.open(company.website, "_blank")}
-                    title="Truy cập website"
+                    onClick={() => handleViewDetails(company.id)}
+                    className="flex-1 bg-primary hover:bg-primary/90"
                   >
-                    <Globe className="h-4 w-4" />
+                    Xem chi tiết
                   </Button>
+                  {company.website && (
+                    <Button
+                      variant="outline"
+                      className="aspect-square p-0"
+                      onClick={() => window.open(company.website, "_blank")}
+                      title="Truy cập website"
+                    >
+                      <Globe className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {/* Load More Button */}
+          {page < totalPages && (
+            <div className="flex justify-center pt-4">
+              <Button
+                onClick={handleLoadMore}
+                variant="outline"
+                size="lg"
+                disabled={loadingMore}
+                className="min-w-[200px] border-primary text-primary hover:bg-primary/5 font-semibold"
+              >
+                {loadingMore ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    Đang tải...
+                  </div>
+                ) : (
+                  "Xem thêm doanh nghiệp"
                 )}
-              </div>
-            </Card>
-          ))}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
