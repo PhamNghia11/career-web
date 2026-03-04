@@ -42,14 +42,14 @@ export function JobPreviewPanel({ job, onApply, onSave, isSaved }: JobPreviewPan
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                            <h2 className="text-base font-bold text-gray-900 leading-tight line-clamp-2">{job.title}</h2>
+                            <h2 className="text-base font-bold text-gray-900 leading-tight line-clamp-2 break-words">{job.title}</h2>
                             <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5 shrink-0 whitespace-nowrap bg-white border-gray-200 font-normal text-gray-500">
                                 {job.type === 'full-time' ? 'Toàn thời gian' : job.type === 'part-time' ? 'Bán thời gian' : job.type === 'internship' ? 'Thực tập' : 'Freelance'}
                             </Badge>
                         </div>
                         <div className="flex items-center gap-1.5 text-gray-500 text-xs font-medium mt-1">
                             <Building className="h-3 w-3" />
-                            <span className="truncate">{job.company}</span>
+                            <span className="truncate break-words">{job.company}</span>
                         </div>
                     </div>
                 </div>

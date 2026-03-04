@@ -93,7 +93,7 @@ export function JobPreview({ data, onBack, onSubmit, isLoading }: JobPreviewProp
                         </div>
 
                         <div className="flex-1 text-white">
-                            <h1 className="text-xl md:text-3xl font-bold mb-3 leading-tight">{data.title || "Tiêu đề công việc"}</h1>
+                            <h1 className="text-xl md:text-3xl font-bold mb-3 leading-tight break-words">{data.title || "Tiêu đề công việc"}</h1>
                             <div className="flex flex-wrap items-center gap-3 text-blue-100/90 text-sm md:text-base">
                                 <span className="flex items-center gap-1.5">
                                     <Building className="h-4 w-4" />
@@ -130,7 +130,7 @@ export function JobPreview({ data, onBack, onSubmit, isLoading }: JobPreviewProp
                                         </div>
                                         Mô tả công việc
                                     </h2>
-                                    <div className="prose prose-blue max-w-none text-gray-600 leading-relaxed text-sm md:text-base whitespace-pre-wrap">
+                                    <div className="prose prose-blue max-w-none text-gray-600 leading-relaxed text-sm md:text-base whitespace-pre-wrap break-words">
                                         {data.description || "Chưa có mô tả"}
                                     </div>
                                 </section>
@@ -150,7 +150,7 @@ export function JobPreview({ data, onBack, onSubmit, isLoading }: JobPreviewProp
                                             {requirements.map((req: string, index: number) => (
                                                 <li key={index} className="flex items-start gap-3 text-gray-600 bg-gray-50/50 p-2.5 rounded-lg border border-gray-100/50">
                                                     <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
-                                                    <span className="text-sm md:text-base">{req}</span>
+                                                    <span className="text-sm md:text-base break-words">{req}</span>
                                                 </li>
                                             ))}
                                         </ul>
@@ -184,7 +184,7 @@ export function JobPreview({ data, onBack, onSubmit, isLoading }: JobPreviewProp
 
                                     {/* Detailed Benefits */}
                                     {detailedBenefits.length > 0 && (
-                                        <div className="prose prose-blue max-w-none text-gray-600 leading-relaxed text-sm md:text-base whitespace-pre-wrap">
+                                        <div className="prose prose-blue max-w-none text-gray-600 leading-relaxed text-sm md:text-base whitespace-pre-wrap break-words">
                                             {data.detailedBenefits}
                                         </div>
                                     )}

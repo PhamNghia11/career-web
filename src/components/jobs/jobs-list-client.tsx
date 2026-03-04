@@ -1351,7 +1351,7 @@ export function JobsListClient() { // Remove dbJobs prop
                               }, 300)
                             }}
                           >
-                            <h3 className="text-lg font-bold text-gray-900 hover:text-[#1e3a5f] transition-colors mb-1 w-fit cursor-pointer border-b border-transparent hover:border-gray-300">
+                            <h3 className="text-lg font-bold text-gray-900 hover:text-[#1e3a5f] transition-colors mb-1 w-fit cursor-pointer border-b border-transparent hover:border-gray-300 break-words">
                               {job.title}
                             </h3>
 
@@ -1368,7 +1368,7 @@ export function JobsListClient() { // Remove dbJobs prop
                             )}
                           </div>
 
-                          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium w-fit mt-1">
+                          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium w-fit mt-1 break-words">
                             <Building className="h-4 w-4" />
                             {job.company}
                           </div>

@@ -18,38 +18,40 @@ export async function saveFile(
     category: StorageCategory,
     originalName: string
 ): Promise<string> {
-    const targetDir = path.join(UPLOAD_DIR, category)
+    try {
+        const targetDir = path.join(UPLOAD_DIR, category)
 
-    // Ensure directory exists
-    await fs.mkdir(targetDir, { recursive: true })
+        // Ensure directory exists - this will fail on Vercel
+        await fs.mkdir(targetDir, { recursive: true })
 
-    let buffer: Buffer
-    let extension = path.extname(originalName) || ""
+        let buffer: Buffer
+        let extension = path.extname(originalName) || ""
 
-    if (typeof source === "string") {
-        // Handle Base64 Data URI
-        const matches = source.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
-        if (matches && matches.length === 3) {
-            buffer = Buffer.from(matches[2], "base64")
-        } else if (source.startsWith("content://") || source.startsWith("http")) {
-            // If it's already a URL, we might not need to save it again, 
-            // but for consistency we return it or handle error
-            return source
+        if (typeof source === "string") {
+            const matches = source.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)
+            if (matches && matches.length === 3) {
+                buffer = Buffer.from(matches[2], "base64")
+            } else if (source.startsWith("http") || source.startsWith("/")) {
+                return source
+            } else {
+                buffer = Buffer.from(source, "base64")
+            }
         } else {
-            // Assume it's a raw base64 string without prefix
-            buffer = Buffer.from(source, "base64")
+            buffer = source
         }
-    } else {
-        buffer = source
+
+        const fileName = `${uuidv4()}${extension}`
+        const filePath = path.join(targetDir, fileName)
+
+        await fs.writeFile(filePath, buffer)
+
+        return path.join("uploads", category, fileName).replace(/\\/g, "/")
+    } catch (error) {
+        console.warn("[Storage] Local write failed, falling back to original source/base64:", error)
+        // If it's a string (Base64), just return it so it can be stored in DB
+        if (typeof source === "string") return source
+        throw error
     }
-
-    const fileName = `${uuidv4()}${extension}`
-    const filePath = path.join(targetDir, fileName)
-
-    await fs.writeFile(filePath, buffer)
-
-    // Return the relative path from project root
-    return path.join("uploads", category, fileName).replace(/\\/g, "/")
 }
 
 /**
