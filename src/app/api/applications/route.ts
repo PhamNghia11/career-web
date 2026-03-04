@@ -319,8 +319,12 @@ export async function POST(request: Request) {
     if (employerId) {
       try {
         const usersCollection = await getCollection(COLLECTIONS.USERS)
-        const { ObjectId } = await import("mongodb")
-        const employer = await usersCollection.findOne({ _id: new ObjectId(employerId) })
+        let employer = null
+        if (ObjectId.isValid(employerId)) {
+          employer = await usersCollection.findOne({ _id: new ObjectId(employerId) })
+        } else {
+          employer = await usersCollection.findOne({ _id: employerId as any })
+        }
 
         if (employer?.email) {
           const shouldSendEmployerEmail = await checkNotificationPreference(employerId, 'email')

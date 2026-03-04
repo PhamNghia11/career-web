@@ -48,9 +48,19 @@ export async function saveFile(
         return path.join("uploads", category, fileName).replace(/\\/g, "/")
     } catch (error) {
         console.warn("[Storage] Local write failed, falling back to original source/base64:", error)
+
         // If it's a string (Base64), just return it so it can be stored in DB
         if (typeof source === "string") return source
-        throw error
+
+        // If it's a Buffer, convert to Base64 and return as data URI
+        const buffer = source as Buffer
+        const base64 = buffer.toString('base64')
+        const extension = path.extname(originalName).toLowerCase()
+        const mimeType = extension === '.pdf' ? 'application/pdf' :
+            (extension === '.doc' ? 'application/msword' :
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+
+        return `data:${mimeType};base64,${base64}`
     }
 }
 
