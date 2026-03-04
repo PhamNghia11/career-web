@@ -287,13 +287,14 @@ export async function POST(req: Request) {
       try {
         const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
         await notifCollection.insertOne({
-          targetRole: 'admin', // Thông báo chung cho tất cả admin
-          type: 'job_pending',
+          targetRole: 'admin',
+          type: 'job',
           title: 'Tin tuyển dụng mới chờ duyệt',
           message: `Công ty ${company} đã đăng tin "${title}" và đang chờ bạn phê duyệt.`,
           relatedId: result.insertedId,
-          isRead: false,
+          read: false,
           createdAt: new Date(),
+          link: '/dashboard/jobs',
         })
       } catch (e) {
         console.error("Failed to create admin notification:", e)

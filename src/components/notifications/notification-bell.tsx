@@ -15,7 +15,7 @@ import { useAuth } from "@/lib/auth-context"
 
 interface Notification {
     _id: string
-    type: "job" | "message" | "interview" | "system" | "visitor"
+    type: "job" | "job_pending" | "message" | "interview" | "system" | "visitor"
     title: string
     message: string
     read: boolean
@@ -23,20 +23,22 @@ interface Notification {
     link?: string
 }
 
-const typeIcons = {
-    job: Briefcase,
-    message: MessageSquare,
-    interview: Calendar,
-    system: Info,
-    visitor: Bell,
-}
-
-const typeColors = {
+const typeColors: any = {
     job: "text-blue-500",
+    job_pending: "text-blue-600",
     message: "text-green-500",
     interview: "text-purple-500",
     system: "text-gray-500",
     visitor: "text-orange-500",
+}
+
+const typeIcons: any = {
+    job: Briefcase,
+    job_pending: Briefcase,
+    message: MessageSquare,
+    interview: Calendar,
+    system: Info,
+    visitor: Bell,
 }
 
 export function NotificationBell() {
@@ -187,17 +189,29 @@ export function NotificationBell() {
                                 key={notification._id}
                                 className={`flex items-start gap-3 p-3 cursor-pointer ${!notification.read ? "bg-blue-50" : ""
                                     }`}
-                                onClick={() => {
+                                onSelect={(e) => {
+                                    // Prevent selecting if click was on delete button
+                                    const target = e.target as HTMLElement;
+                                    if (target.closest('button')) {
+                                        e.preventDefault();
+                                        return;
+                                    }
+
+                                    console.log("[NotificationBell] Selected notification:", notification._id, "link:", notification.link);
+
                                     if (!notification.read) markAsRead(notification._id)
                                     if (notification.link) {
                                         if (notification.link.startsWith('http')) {
                                             window.location.href = notification.link
                                         } else {
+                                            // Handle relative links
+                                            const targetPath = notification.link.startsWith('/') ? notification.link : `/${notification.link}`;
+
                                             // Fix for existing notifications linking to generic dashboard
-                                            if (notification.type === 'job' && notification.link === '/dashboard') {
+                                            if (notification.type === 'job' && targetPath === '/dashboard') {
                                                 router.push('/dashboard/jobs')
                                             } else {
-                                                router.push(notification.link)
+                                                router.push(targetPath)
                                             }
                                         }
                                         setOpen(false)
