@@ -267,7 +267,7 @@ export async function POST(req: Request) {
       creatorId: creatorId ? (ObjectId.isValid(creatorId) ? new ObjectId(creatorId) : creatorId) : null,
       role: role || "employer",
       website: website || "",
-      quantity: typeof quantity === 'number' ? quantity : (quantity === "-1" ? -1 : 1),
+      quantity: typeof quantity === 'number' ? quantity : (parseInt(quantity as string) || (quantity === "-1" ? -1 : 1)),
       hiredCount: 0,
       contactEmail: contactEmail || "",
       contactPhone: contactPhone || "",

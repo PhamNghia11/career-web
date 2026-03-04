@@ -32,7 +32,7 @@ if (!process.env.MONGODB_URI && process.env.NODE_ENV === "production") {
 const options = {
   connectTimeoutMS: 5000,   // Faster timeout to fail fast and retry
   socketTimeoutMS: 30000,  // Standard socket timeout
-  maxPoolSize: 1,          // Serverless doesn't benefit from large pools; 1 is often better to avoid connection limits
+  maxPoolSize: 5,          // Increased slightly for better concurrency in complex handlers
   minPoolSize: 0,
   maxIdleTimeMS: 10000,    // Close idle connections to stay within limits
 }

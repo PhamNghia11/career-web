@@ -98,12 +98,13 @@ export async function DELETE(
         // 2. Cascade cleanup related data
         try {
             // Notifications for this user
+            const userIdCondition = { $in: [id, ObjectId.isValid(id) ? new ObjectId(id) : null].filter(Boolean) }
             const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
-            await notificationsCollection.deleteMany({ userId: id })
+            await notificationsCollection.deleteMany({ userId: userIdCondition as any })
 
             // Saved jobs
             const savedJobsCollection = await getCollection(COLLECTIONS.SAVED_JOBS)
-            await savedJobsCollection.deleteMany({ userId: id })
+            await savedJobsCollection.deleteMany({ userId: userIdCondition as any })
 
             // User reviews, likes and comments
             const userReviewsCollection = await getCollection(COLLECTIONS.USER_REVIEWS)

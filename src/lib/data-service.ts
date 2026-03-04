@@ -73,8 +73,8 @@ export const getLatestJobs = unstable_cache(
                     $match: {
                         $expr: {
                             $or: [
-                                { $eq: ["$quantity", -1] },
-                                { $lt: ["$hiredCount", { $ifNull: ["$quantity", 9999] }] }
+                                { $eq: [{ $ifNull: ["$quantity", -1] }, -1] },
+                                { $lt: ["$hiredCount", { $convert: { input: "$quantity", to: "int", onError: 9999, onNull: 9999 } }] }
                             ]
                         }
                     }
