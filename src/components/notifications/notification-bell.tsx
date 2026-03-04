@@ -183,23 +183,30 @@ export function NotificationBell() {
                         const Icon = typeIcons[notification.type] || Bell
                         const colorClass = typeColors[notification.type] || "text-gray-500"
 
-                        // Smart Fallback Link Logic
+                        // Smart Fallback Link Logic (Enhanced)
                         let finalLink = notification.link
-                        if (!finalLink) {
-                            if (notification.type === "job") {
+                        const lowerTitle = notification.title.toLowerCase()
+                        const lowerMessage = notification.message.toLowerCase()
+
+                        if (!finalLink || finalLink === "#") {
+                            // Check by type or title keywords
+                            if (notification.type === "job" || notification.type === "job_pending" || lowerTitle.includes("tin tuyển dụng") || lowerTitle.includes("hồ sơ")) {
                                 if (user?.role === "admin") finalLink = "/dashboard/jobs"
                                 else if (user?.role === "employer") finalLink = "/dashboard/my-jobs"
-                            } else if (notification.type === "message") {
+                            } else if (notification.type === "message" || lowerTitle.includes("tin nhắn") || lowerMessage.includes("đã nhắn tin")) {
                                 finalLink = "/dashboard/messages"
+                            } else if (notification.type === "visitor" || lowerTitle.includes("truy cập")) {
+                                finalLink = "/dashboard/visitors"
                             }
                         }
 
-                        const handleItemClick = (e: React.MouseEvent) => {
+                        const handleItemClick = (e: React.MouseEvent | React.PointerEvent) => {
                             // Don't trigger if clicking the delete button
                             if ((e.target as HTMLElement).closest('.delete-notif-btn')) {
                                 return
                             }
 
+                            // Immediate effect for UI
                             if (!notification.read) markAsRead(notification._id)
 
                             if (finalLink) {
@@ -207,14 +214,15 @@ export function NotificationBell() {
                                 const url = finalLink
                                 const path = url.startsWith('http') ? url : (url.startsWith('/') ? url : `/${url}`)
 
+                                // Use direct navigation for high reliability
                                 try {
                                     router.push(path)
-                                    // Heavy navigation fallback for mobile/unstable environments
+                                    // Forced fallback after a short delay
                                     setTimeout(() => {
                                         if (window.location.pathname !== path && !path.includes('#') && !url.startsWith('http')) {
                                             window.location.href = path
                                         }
-                                    }, 800)
+                                    }, 500)
                                 } catch (err) {
                                     window.location.href = path
                                 }
