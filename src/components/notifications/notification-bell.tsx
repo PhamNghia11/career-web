@@ -211,20 +211,25 @@ export function NotificationBell() {
                             }
                         }
 
-                        const handleItemClick = (e: React.MouseEvent | React.PointerEvent) => {
+                        const handleSelect = (e: Event) => {
                             // Don't trigger if clicking the delete button or its children
                             if ((e.target as HTMLElement).closest('.delete-notif-btn')) {
+                                e.preventDefault()
                                 return
                             }
-
-                            e.preventDefault()
-                            e.stopPropagation()
 
                             if (!notification.read) markAsRead(notification._id)
 
                             if (finalLink && finalLink !== "#") {
                                 setOpen(false)
                                 const path = finalLink.startsWith('http') ? finalLink : (finalLink.startsWith('/') ? finalLink : `/${finalLink}`)
+
+                                // DEFINITIVE FIX: Use direct navigation for critical admin links 
+                                // to bypass any potential Router or DropdownMenu conflicts
+                                if (user?.role === "admin" && (path.includes("jobs") || path.includes("manager") || path.includes("users"))) {
+                                    window.location.href = path
+                                    return
+                                }
 
                                 try {
                                     router.push(path)
@@ -233,7 +238,7 @@ export function NotificationBell() {
                                         if (window.location.pathname !== path && !path.includes('#') && !finalLink.startsWith('http')) {
                                             window.location.href = path
                                         }
-                                    }, 400)
+                                    }, 300)
                                 } catch (err) {
                                     window.location.href = path
                                 }
@@ -243,13 +248,10 @@ export function NotificationBell() {
                         return (
                             <DropdownMenuItem
                                 key={notification._id}
-                                asChild
-                                className={`p-0 focus:bg-transparent ${!notification.read ? "bg-blue-50/50" : ""}`}
+                                onSelect={handleSelect}
+                                className={`p-0 focus:bg-transparent cursor-pointer ${!notification.read ? "bg-blue-50/50" : ""}`}
                             >
-                                <div
-                                    className="flex items-center w-full group relative hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0 cursor-pointer select-none"
-                                    onPointerDown={handleItemClick}
-                                >
+                                <div className="flex items-center w-full group relative hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0 select-none">
                                     <div className="flex flex-1 items-start gap-3 p-3">
                                         <div className={`mt-0.5 ${colorClass} shrink-0`}>
                                             <Icon className="h-4 w-4" />
