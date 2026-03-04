@@ -183,17 +183,33 @@ export function NotificationBell() {
                         const Icon = typeIcons[notification.type] || Bell
                         const colorClass = typeColors[notification.type] || "text-gray-500"
 
-                        const handleItemClick = () => {
+                        // Smart Fallback Link Logic
+                        let finalLink = notification.link
+                        if (!finalLink) {
+                            if (notification.type === "job") {
+                                if (user?.role === "admin") finalLink = "/dashboard/jobs"
+                                else if (user?.role === "employer") finalLink = "/dashboard/my-jobs"
+                            } else if (notification.type === "message") {
+                                finalLink = "/dashboard/messages"
+                            }
+                        }
+
+                        const handleItemClick = (e: React.MouseEvent) => {
+                            // Don't trigger if clicking the delete button
+                            if ((e.target as HTMLElement).closest('.delete-notif-btn')) {
+                                return
+                            }
+
                             if (!notification.read) markAsRead(notification._id)
 
-                            if (notification.link) {
+                            if (finalLink) {
                                 setOpen(false)
-                                const url = notification.link
+                                const url = finalLink
                                 const path = url.startsWith('http') ? url : (url.startsWith('/') ? url : `/${url}`)
 
                                 try {
                                     router.push(path)
-                                    // Fallback for safety
+                                    // Heavy navigation fallback for mobile/unstable environments
                                     setTimeout(() => {
                                         if (window.location.pathname !== path && !path.includes('#') && !url.startsWith('http')) {
                                             window.location.href = path
@@ -209,34 +225,39 @@ export function NotificationBell() {
                             <DropdownMenuItem
                                 key={notification._id}
                                 asChild
-                                className={`p-0 focus:bg-transparent ${!notification.read ? "bg-blue-50" : ""}`}
+                                className={`p-0 focus:bg-transparent ${!notification.read ? "bg-blue-50/50" : ""}`}
                             >
-                                <div className="flex items-center w-full group relative hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0">
-                                    <div
-                                        className="flex flex-1 items-start gap-3 p-3 cursor-pointer select-none"
-                                        onClick={handleItemClick}
-                                    >
+                                <div
+                                    className="flex items-center w-full group relative hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0 cursor-pointer select-none"
+                                    onClick={handleItemClick}
+                                >
+                                    <div className="flex flex-1 items-start gap-3 p-3">
                                         <div className={`mt-0.5 ${colorClass} shrink-0`}>
                                             <Icon className="h-4 w-4" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className={`text-sm font-medium leading-tight mb-1 ${!notification.read ? "text-gray-900" : "text-gray-600"}`}>
-                                                {notification.title}
-                                            </p>
-                                            <p className="text-xs text-gray-500 line-clamp-2 mb-1">
+                                            <div className="flex justify-between items-start gap-2">
+                                                <p className={`text-sm font-semibold leading-tight mb-1 ${!notification.read ? "text-gray-900" : "text-gray-600"}`}>
+                                                    {notification.title}
+                                                </p>
+                                                <p className="text-[10px] text-gray-400 whitespace-nowrap mt-0.5">
+                                                    {formatTime(notification.createdAt)}
+                                                </p>
+                                            </div>
+                                            <p className="text-xs text-gray-500 line-clamp-2 leading-normal">
                                                 {notification.message}
-                                            </p>
-                                            <p className="text-xs text-gray-400">
-                                                {formatTime(notification.createdAt)}
                                             </p>
                                         </div>
                                     </div>
+
+                                    {/* Delete Button - Separated and uses class for detection */}
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 mr-1 text-gray-300 hover:text-red-500 shrink-0 delete-notif-btn"
+                                        className="h-8 w-8 mr-2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all shrink-0 delete-notif-btn"
                                         onClick={(e) => {
                                             e.stopPropagation()
+                                            e.preventDefault()
                                             deleteNotification(notification._id)
                                         }}
                                     >
