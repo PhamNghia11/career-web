@@ -198,7 +198,7 @@ export async function POST(req: Request) {
       salary, salaryMin, salaryMax, isNegotiable,
       deadline, description, requirements, benefits,
       relatedMajors, detailedBenefits, creatorId, role, website, quantity,
-      contactEmail, contactPhone, documentUrl, documentName, logoFit
+      contactEmail, contactPhone, documentUrl, documentName, logoFit, status
     } = body
 
     // Validate permission (Only Employer or Admin)
@@ -240,72 +240,94 @@ export async function POST(req: Request) {
       finalDocumentPath = await saveFile(documentUrl, "jobs/documents", documentName || "document")
     }
 
-    const newJob = {
+    // Prepare the final job document for MongoDB
+    const newJob: any = {
       title,
       company,
-      website: website || null,
-      companyId: companyId || "unknown", // Should link to company profile
-      logo: finalLogo,
+      companyId: companyId ? (ObjectId.isValid(companyId) ? new ObjectId(companyId) : companyId) : null,
       location,
       type,
       field,
-      experience: experience || null,
-      education: education || null,
-      salary: isNegotiable ? "Thỏa thuận" : salary,
-      salaryMin,
-      salaryMax,
-      isNegotiable,
+      experience: experience || "no-exp",
+      education: education || "bachelor",
+      salary: salary || "Thỏa thuận",
+      salaryMin: salaryMin || 0,
+      salaryMax: salaryMax || 0,
+      isNegotiable: !!isNegotiable,
       deadline,
       normalizedDeadline: parseNormalizedDeadline(deadline),
       description,
-      requirements: Array.isArray(requirements) ? requirements : [],
-      benefits: Array.isArray(benefits) ? benefits : [],
-      detailedBenefits: Array.isArray(detailedBenefits) ? detailedBenefits : [],
-      relatedMajors: Array.isArray(relatedMajors) ? relatedMajors : [],
-
-      postedAt: body.postedAt || new Date().toISOString(),
-      status: role === 'admin' ? 'active' : 'pending', // Admin posts are active immediately
-      applicants: 0,
-      creatorId,
-      views: 0,
-      quantity: quantity || 1,
-      contactEmail: contactEmail || null,
-      contactPhone: contactPhone || null,
-      documentPath: finalDocumentPath, // Store path instead of Base64 URL
+      requirements: Array.isArray(requirements) ? requirements : (requirements ? [requirements] : []),
+      benefits: Array.isArray(benefits) ? benefits : (benefits ? [benefits] : []),
+      detailedBenefits: Array.isArray(detailedBenefits) ? detailedBenefits : (detailedBenefits ? [detailedBenefits] : []),
+      relatedMajors: Array.isArray(relatedMajors) ? relatedMajors : (relatedMajors ? [relatedMajors] : []),
+      status: status || (role === 'admin' ? 'active' : 'pending'), // Admin posts are active immediately
+      postedAt: body.postedAt ? new Date(body.postedAt) : new Date(),
+      updatedAt: new Date(),
+      creatorId: creatorId ? (ObjectId.isValid(creatorId) ? new ObjectId(creatorId) : creatorId) : null,
+      role: role || "employer",
+      website: website || "",
+      quantity: typeof quantity === 'number' ? quantity : (quantity === "-1" ? -1 : 1),
+      hiredCount: 0,
+      contactEmail: contactEmail || "",
+      contactPhone: contactPhone || "",
+      logo: finalLogo,
+      logoFit: logoFit || "cover",
+      documentUrl: body.documentUrl || null,
+      documentPath: finalDocumentPath,
       documentName: documentName || null,
-      logoFit: logoFit || "cover"
+      views: 0,
+      applicants: 0,
     }
 
     const result = await collection.insertOne(newJob)
 
-    // Nếu job cần duyệt (status === 'pending'), tạo thông báo cho Admin
-    if (newJob.status === 'pending') {
+    // Create notification for admin if needed
+    if (newJob.status === "pending") {
       try {
         const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
         await notifCollection.insertOne({
           targetRole: 'admin', // Thông báo chung cho tất cả admin
-          type: 'job',
-          title: 'Tin tuyển dụng mới cần duyệt',
-          message: `${company} vừa đăng tin tuyển dụng: ${title}`,
-          read: false,
+          type: 'job_pending',
+          title: 'Tin tuyển dụng mới chờ duyệt',
+          message: `Công ty ${company} đã đăng tin "${title}" và đang chờ bạn phê duyệt.`,
+          relatedId: result.insertedId,
+          isRead: false,
           createdAt: new Date(),
-          link: '/dashboard/jobs', // Dẫn admin về trang duyệt tin
         })
-      } catch (notifError) {
-        console.error("Failed to create admin notification:", notifError)
-        // Không block flow chính nếu lỗi tạo notif
+      } catch (e) {
+        console.error("Failed to create admin notification:", e)
       }
+    }
+
+    // Convert ObjectIds to strings for the JSON response
+    const responseData = {
+      ...newJob,
+      _id: result.insertedId.toString(),
+      companyId: newJob.companyId?.toString() || newJob.companyId,
+      creatorId: newJob.creatorId?.toString() || newJob.creatorId,
+      normalizedDeadline: newJob.normalizedDeadline ? newJob.normalizedDeadline.toISOString() : null,
+      postedAt: newJob.postedAt.toISOString(),
+      updatedAt: newJob.updatedAt.toISOString(),
     }
 
     return NextResponse.json({
       success: true,
       message: role === 'admin' ? "Đăng tuyển thành công!" : "Đã gửi duyệt tin tuyển dụng!",
-      data: { ...newJob, _id: result.insertedId.toString() },
+      data: responseData,
     })
-  } catch (error) {
-    console.error("Post job error:", error)
+  } catch (error: any) {
+    console.error("Post job error details:", {
+      message: error.message,
+      stack: error.stack,
+      error
+    })
     return NextResponse.json(
-      { success: false, error: "Failed to post job" },
+      {
+        success: false,
+        error: "Failed to post job",
+        details: error.message
+      },
       { status: 500 }
     )
   }
