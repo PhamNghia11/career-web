@@ -11,8 +11,8 @@ export async function GET(request: Request) {
             return new Response("Missing file path", { status: 400 })
         }
 
-        // Security check: Ensure we only serve from uploads/avatars or uploads/jobs/logos
-        if (!filePath.startsWith("uploads/avatars/") && !filePath.startsWith("uploads/jobs/logos/")) {
+        // Security check: Ensure we only serve from the uploads directory
+        if (!filePath.startsWith("uploads/")) {
             return new Response("Forbidden", { status: 403 })
         }
 

@@ -232,7 +232,14 @@ export async function POST(req: Request) {
     // Handle Logo and Document Storage
     let finalLogo = body.logo || "/placeholder.svg?height=100&width=100"
     if (body.logo && body.logo.startsWith("data:")) {
-      finalLogo = "/" + await saveFile(body.logo, "jobs/logos", "logo.png")
+      const savedPath = await saveFile(body.logo, "jobs/logos", "logo.png")
+      // If it returned a local path (starts with uploads/), use the proxy API
+      if (savedPath.startsWith("uploads/")) {
+        finalLogo = `/api/user/avatar?path=${encodeURIComponent(savedPath)}`
+      } else {
+        // It fell back to base64 or is already a URL, don't prepend slash
+        finalLogo = savedPath
+      }
     }
 
     let finalDocumentPath = null

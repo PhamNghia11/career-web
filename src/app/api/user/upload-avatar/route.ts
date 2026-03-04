@@ -33,8 +33,8 @@ export async function POST(request: Request) {
         const buffer = Buffer.from(bytes)
         const filePath = await saveFile(buffer, "avatars", file.name)
 
-        // Serve through a proxy/API route or direct static (using API for security/control)
-        const avatarUrl = `/${filePath}` // e.g. /uploads/avatars/uuid.png
+        // Serve through a proxy/API route for security/access control
+        const avatarUrl = `/api/user/avatar?path=${encodeURIComponent(filePath)}`
 
         const collection = await getCollection(COLLECTIONS.USERS)
 
