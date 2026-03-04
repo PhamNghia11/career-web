@@ -30,9 +30,11 @@ if (!process.env.MONGODB_URI && process.env.NODE_ENV === "production") {
 
 // MongoDB Atlas connection options for stability on Serverless (Vercel)
 const options = {
-  connectTimeoutMS: 10000, // 10s timeout to avoid hanging cold starts
-  socketTimeoutMS: 45000,  // 45s socket timeout
-  maxPoolSize: 10,         // Limit pool size for serverless environment
+  connectTimeoutMS: 5000,   // Faster timeout to fail fast and retry
+  socketTimeoutMS: 30000,  // Standard socket timeout
+  maxPoolSize: 1,          // Serverless doesn't benefit from large pools; 1 is often better to avoid connection limits
+  minPoolSize: 0,
+  maxIdleTimeMS: 10000,    // Close idle connections to stay within limits
 }
 
 if (process.env.NODE_ENV === "development") {
@@ -58,9 +60,12 @@ if (process.env.NODE_ENV === "development") {
 export async function connectToDatabase(): Promise<{ client: MongoClient; db: Db }> {
   try {
     // If for some reason clientPromise became undefined, re-initialize
-    if (!clientPromise) {
+    if (!clientPromise && !global._mongoClientPromise) {
       client = new MongoClient(MONGODB_URI, options)
       clientPromise = client.connect()
+      global._mongoClientPromise = clientPromise
+    } else if (!clientPromise) {
+      clientPromise = global._mongoClientPromise!
     }
 
     console.time("db-connect")
