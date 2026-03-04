@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/database/connection"
 import { ObjectId } from "mongodb"
 import { parseNormalizedDeadline, getStartOfToday } from "@/lib/date-utils"
+import { saveFile } from "@/lib/storage"
 
 export const dynamic = 'force-dynamic'
 
@@ -228,12 +229,23 @@ export async function POST(req: Request) {
 
     const collection = await getCollection(COLLECTIONS.JOBS)
 
+    // Handle Logo and Document Storage
+    let finalLogo = body.logo || "/placeholder.svg?height=100&width=100"
+    if (body.logo && body.logo.startsWith("data:")) {
+      finalLogo = "/" + await saveFile(body.logo, "jobs/logos", "logo.png")
+    }
+
+    let finalDocumentPath = null
+    if (documentUrl && documentUrl.startsWith("data:")) {
+      finalDocumentPath = await saveFile(documentUrl, "jobs/documents", documentName || "document")
+    }
+
     const newJob = {
       title,
       company,
       website: website || null,
       companyId: companyId || "unknown", // Should link to company profile
-      logo: body.logo || "/placeholder.svg?height=100&width=100", // Default logo
+      logo: finalLogo,
       location,
       type,
       field,
@@ -259,7 +271,7 @@ export async function POST(req: Request) {
       quantity: quantity || 1,
       contactEmail: contactEmail || null,
       contactPhone: contactPhone || null,
-      documentUrl: documentUrl || null,
+      documentPath: finalDocumentPath, // Store path instead of Base64 URL
       documentName: documentName || null,
       logoFit: logoFit || "cover"
     }

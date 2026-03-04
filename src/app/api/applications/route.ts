@@ -3,6 +3,7 @@ import { getCollection, COLLECTIONS } from "@/database/connection"
 import { sendEmail } from "@/services/email.service"
 import { ObjectId } from "mongodb"
 import { checkNotificationPreference } from "@/lib/notification-utils"
+import { saveFile } from "@/lib/storage"
 
 export async function POST(request: Request) {
   try {
@@ -114,7 +115,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Số điện thoại không hợp lệ. Phải bắt đầu bằng số 0 và có 10-11 chữ số." }, { status: 400 })
     }
 
-    let cvDataUrl = null
+    let cvFilePath = null
     let cvOriginalName = null
     let cvMimeType = null
 
@@ -131,11 +132,10 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "File quá lớn (>20MB)" }, { status: 400 })
       }
 
-      // Convert CV to Base64
+      // Save CV to Local Storage
       const bytes = await file.arrayBuffer()
       const buffer = Buffer.from(bytes)
-      const cvBase64 = buffer.toString("base64")
-      cvDataUrl = `data:${file.type};base64,${cvBase64}`
+      cvFilePath = await saveFile(buffer, "cvs", file.name)
       cvOriginalName = file.name
       cvMimeType = file.type
     }
@@ -156,7 +156,7 @@ export async function POST(request: Request) {
       faculty,
       cohort,
       message,
-      cvBase64: cvDataUrl,
+      cvPath: cvFilePath,  // Store path instead of Base64
       cvOriginalName: cvOriginalName,
       cvMimeType: cvMimeType,
       createdAt: new Date(),
@@ -427,10 +427,10 @@ export async function GET(request: Request) {
       query = { $and: queryParts }
     }
 
-    // Don't return cvBase64 in list to save bandwidth
+    // Don't return cvPath in list to save bandwidth
     const applications = await collection
       .find(query)
-      .project({ cvBase64: 0 })
+      .project({ cvPath: 0 })
       .sort({ createdAt: -1 })
       .toArray()
 

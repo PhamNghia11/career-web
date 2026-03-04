@@ -3,6 +3,7 @@ import { getCollection, COLLECTIONS } from "@/database/connection"
 import { ObjectId } from "mongodb"
 import { revalidatePath } from "next/cache"
 import { parseNormalizedDeadline } from "@/lib/date-utils"
+import { saveFile, deleteFile } from "@/lib/storage"
 
 // DELETE /api/jobs/[id]
 export async function DELETE(
@@ -62,6 +63,29 @@ export async function PATCH(
             updatedAt: now
         }
 
+        // Handle Logo and Document Updates
+        const currentJob = await collection.findOne({ _id: new ObjectId(id) })
+        if (currentJob) {
+            // Logo update
+            if (updateFields.logo && updateFields.logo.startsWith("data:")) {
+                // Delete old logo if it was a local file
+                if (currentJob.logo && currentJob.logo.startsWith("/uploads/")) {
+                    await deleteFile(currentJob.logo.substring(1))
+                }
+                updateData.logo = "/" + await saveFile(updateFields.logo, "jobs/logos", "logo.png")
+            }
+
+            // Document update
+            if (updateFields.documentUrl && updateFields.documentUrl.startsWith("data:")) {
+                // Delete old document if it was a local file
+                if (currentJob.documentPath) {
+                    await deleteFile(currentJob.documentPath)
+                }
+                updateData.documentPath = await saveFile(updateFields.documentUrl, "jobs/documents", updateFields.documentName || "document")
+                delete updateData.documentUrl // Remove the large Base64 from updateData
+            }
+        }
+
         // Add normalizedDeadline if deadline is being updated
         if ('deadline' in updateFields) {
             updateData.normalizedDeadline = parseNormalizedDeadline(updateFields.deadline)
@@ -73,9 +97,6 @@ export async function PATCH(
         if (updateFields.status === 'active' && !updateFields.postedAt) {
             updateData.postedAt = now
         }
-
-        // Lấy thông tin job cũ để biết creatorId và status cũ
-        const currentJob = await collection.findOne({ _id: new ObjectId(id) })
 
         const result = await collection.updateOne(
             { _id: new ObjectId(id) },

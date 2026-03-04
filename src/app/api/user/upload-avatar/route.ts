@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/database/connection"
 import { ObjectId } from "mongodb"
+import { saveFile, deleteFile } from "@/lib/storage"
 
 export async function POST(request: Request) {
     try {
@@ -22,19 +23,28 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Invalid file type. Only JPG, PNG, WEBP, GIF allowed." }, { status: 400 })
         }
 
-        // Validate file size (max 2MB for Base64 storage)
-        if (file.size > 2 * 1024 * 1024) {
-            return NextResponse.json({ error: "File too large. Max 2MB allowed." }, { status: 400 })
+        // Validate file size (max 5MB for Local storage)
+        if (file.size > 5 * 1024 * 1024) {
+            return NextResponse.json({ error: "File too large. Max 5MB allowed." }, { status: 400 })
         }
 
-        // Convert file to Base64 data URL
+        // Save file to local storage
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
-        const base64 = buffer.toString("base64")
-        const avatarUrl = `data:${file.type};base64,${base64}`
+        const filePath = await saveFile(buffer, "avatars", file.name)
 
-        // Update user in MongoDB with Base64 avatar
+        // Serve through a proxy/API route or direct static (using API for security/control)
+        const avatarUrl = `/${filePath}` // e.g. /uploads/avatars/uuid.png
+
         const collection = await getCollection(COLLECTIONS.USERS)
+
+        // Get old avatar to delete it
+        const user = await collection.findOne({ _id: new ObjectId(userId) })
+        if (user && user.avatar && user.avatar.startsWith("uploads/")) {
+            await deleteFile(user.avatar)
+        }
+
+        // Update user in MongoDB with path
         await collection.updateOne(
             { _id: new ObjectId(userId) },
             { $set: { avatar: avatarUrl, updatedAt: new Date() } }
