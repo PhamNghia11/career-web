@@ -183,46 +183,57 @@ export function NotificationBell() {
                         const Icon = typeIcons[notification.type] || Bell
                         const colorClass = typeColors[notification.type] || "text-gray-500"
 
-                        // Smart Fallback Link Logic (Enhanced)
+                        // Smart Fallback Link Logic (Ultimate)
                         let finalLink = notification.link
-                        const lowerTitle = notification.title.toLowerCase()
-                        const lowerMessage = notification.message.toLowerCase()
+                        const lowerTitle = (notification.title || "").toLowerCase()
+                        const lowerMessage = (notification.message || "").toLowerCase()
 
-                        if (!finalLink || finalLink === "#") {
-                            // Check by type or title keywords
-                            if (notification.type === "job" || notification.type === "job_pending" || lowerTitle.includes("tin tuyển dụng") || lowerTitle.includes("hồ sơ")) {
-                                if (user?.role === "admin") finalLink = "/dashboard/jobs"
-                                else if (user?.role === "employer") finalLink = "/dashboard/my-jobs"
+                        // Force admin links for job-related notifications if missing or generic
+                        if (!finalLink || finalLink === "#" || finalLink === "/dashboard") {
+                            const isJobRelated = notification.type === "job" ||
+                                notification.type === "job_pending" ||
+                                lowerTitle.includes("tuyển dụng") ||
+                                lowerTitle.includes("duyệt") ||
+                                lowerTitle.includes("hồ sơ");
+
+                            if (isJobRelated) {
+                                if (user?.role === "admin") {
+                                    if (lowerTitle.includes("hồ sơ") || lowerMessage.includes("ứng tuyển")) {
+                                        finalLink = "/dashboard/applicants-manager"
+                                    } else {
+                                        finalLink = "/dashboard/jobs"
+                                    }
+                                } else if (user?.role === "employer") {
+                                    finalLink = "/dashboard/my-jobs"
+                                }
                             } else if (notification.type === "message" || lowerTitle.includes("tin nhắn") || lowerMessage.includes("đã nhắn tin")) {
                                 finalLink = "/dashboard/messages"
-                            } else if (notification.type === "visitor" || lowerTitle.includes("truy cập")) {
-                                finalLink = "/dashboard/visitors"
                             }
                         }
 
                         const handleItemClick = (e: React.MouseEvent | React.PointerEvent) => {
-                            // Don't trigger if clicking the delete button
+                            // Don't trigger if clicking the delete button or its children
                             if ((e.target as HTMLElement).closest('.delete-notif-btn')) {
                                 return
                             }
 
-                            // Immediate effect for UI
+                            e.preventDefault()
+                            e.stopPropagation()
+
                             if (!notification.read) markAsRead(notification._id)
 
-                            if (finalLink) {
+                            if (finalLink && finalLink !== "#") {
                                 setOpen(false)
-                                const url = finalLink
-                                const path = url.startsWith('http') ? url : (url.startsWith('/') ? url : `/${url}`)
+                                const path = finalLink.startsWith('http') ? finalLink : (finalLink.startsWith('/') ? finalLink : `/${finalLink}`)
 
-                                // Use direct navigation for high reliability
                                 try {
                                     router.push(path)
-                                    // Forced fallback after a short delay
+                                    // Extreme fallback for navigation
                                     setTimeout(() => {
-                                        if (window.location.pathname !== path && !path.includes('#') && !url.startsWith('http')) {
+                                        if (window.location.pathname !== path && !path.includes('#') && !finalLink.startsWith('http')) {
                                             window.location.href = path
                                         }
-                                    }, 500)
+                                    }, 400)
                                 } catch (err) {
                                     window.location.href = path
                                 }
@@ -237,7 +248,7 @@ export function NotificationBell() {
                             >
                                 <div
                                     className="flex items-center w-full group relative hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0 cursor-pointer select-none"
-                                    onClick={handleItemClick}
+                                    onPointerDown={handleItemClick}
                                 >
                                     <div className="flex flex-1 items-start gap-3 p-3">
                                         <div className={`mt-0.5 ${colorClass} shrink-0`}>
