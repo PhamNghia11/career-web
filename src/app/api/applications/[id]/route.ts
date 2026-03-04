@@ -180,7 +180,7 @@ export async function PATCH(
 
                 if (notificationTitle) {
                     await notificationsCollection.insertOne({
-                        userId: currentApplication.applicantId,
+                        userId: currentApplication.applicantId.toString(),
                         type: notificationType,
                         title: notificationTitle,
                         message: notificationMessage,
@@ -189,7 +189,7 @@ export async function PATCH(
                         link: `/dashboard/applications`,
                         applicationId: id
                     })
-                    console.log(`[Applications API] Created ${status} notification for student:`, currentApplication.applicantId)
+                    console.log(`[Applications API] Created ${status} notification for student:`, currentApplication.applicantId.toString())
                 }
 
                 // --- Send Email Notification to Candidate ---

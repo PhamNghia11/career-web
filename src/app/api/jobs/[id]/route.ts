@@ -109,32 +109,34 @@ export async function PATCH(
                 const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
                 let message = ""
                 let title = ""
+                let targetLink = "/dashboard/my-jobs"
 
                 if (updateData.status === 'active') {
                     title = "Tin tuyển dụng được duyệt"
                     message = `Tin tuyển dụng "${currentJob.title}" của bạn đã được phê duyệt và hiển thị công khai.`
+                    targetLink = `/jobs/${id}`
                 } else if (updateData.status === 'rejected') {
                     title = "Tin tuyển dụng cần chỉnh sửa"
-                    // Include rejection reason if provided
-                    const reason = updateData.rejectionReason || body.rejectionReason
+                    const reason = updateData.rejectionReason || body.rejectionReason || updateData.adminFeedback || body.adminFeedback
                     if (reason) {
                         message = `Tin tuyển dụng "${currentJob.title}" cần chỉnh sửa thêm. Lý do: ${reason}`
                     } else {
                         message = `Tin tuyển dụng "${currentJob.title}" của bạn cần được chỉnh sửa trước khi đăng. Vui lòng kiểm tra và cập nhật lại.`
                     }
+                    targetLink = "/dashboard/jobs"
                 }
 
                 if (title && currentJob.creatorId) {
                     await notifCollection.insertOne({
-                        userId: currentJob.creatorId,
-                        type: 'system',
+                        userId: currentJob.creatorId.toString(),
+                        type: 'job',
                         title: title,
                         message: message,
                         read: false,
                         createdAt: new Date(),
-                        link: `/dashboard/my-jobs`,
+                        link: targetLink,
                     })
-                    console.log(`[Jobs API] Created ${updateData.status} notification for employer:`, currentJob.creatorId)
+                    console.log(`[Jobs API] Created ${updateData.status} notification for employer:`, currentJob.creatorId.toString())
                 }
             } catch (err) {
                 console.error("Failed to create status notification:", err)

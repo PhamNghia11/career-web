@@ -29,8 +29,10 @@ export async function GET(request: Request) {
 
     const collection = await getCollection(COLLECTIONS.NOTIFICATIONS)
 
+    const userIdCondition = { $in: [userId, ObjectId.isValid(userId) ? new ObjectId(userId) : null].filter(Boolean) }
+
     // Build query based on role
-    let query: any = { userId }
+    let query: any = { userId: userIdCondition }
 
     // Optimization: Only fetch user info if it's admin/employer to check broadcast timeline
     if (role === 'admin' || role === 'employer') {
@@ -53,14 +55,14 @@ export async function GET(request: Request) {
       if (role === 'admin') {
         query = {
           $or: [
-            { userId },
+            { userId: userIdCondition },
             { targetRole: 'admin', createdAt: { $gte: userCreatedAt } }
           ]
         }
       } else {
         query = {
           $or: [
-            { userId },
+            { userId: userIdCondition },
             { targetRole: 'employer', createdAt: { $gte: userCreatedAt } }
           ]
         }

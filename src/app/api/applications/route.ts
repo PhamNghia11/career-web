@@ -213,7 +213,7 @@ export async function POST(request: Request) {
     if (employerId && employerId !== applicantId) {
       try {
         await notificationsCollection.insertOne({
-          userId: employerId,
+          userId: employerId.toString(),
           type: 'job',
           title: 'Ứng viên mới ứng tuyển',
           message: `${fullname} vừa ứng tuyển vị trí ${jobTitle}`,
@@ -222,7 +222,7 @@ export async function POST(request: Request) {
           link: `/dashboard/applicants-manager?id=${applicationId}`,
           applicationId: applicationId
         })
-        console.log("[Applications API] Created employer notification for:", employerId)
+        console.log("[Applications API] Created employer notification for:", employerId.toString())
       } catch (notifError) {
         console.error("Failed to create employer notification:", notifError)
       }
@@ -236,7 +236,7 @@ export async function POST(request: Request) {
     if (applicantId) {
       try {
         await notificationsCollection.insertOne({
-          userId: applicantId,
+          userId: applicantId.toString(),
           type: 'job',
           title: 'Ứng tuyển thành công',
           message: `Bạn đã ứng tuyển thành công vào vị trí ${jobTitle} tại ${companyName}. Chúc bạn may mắn!`,
@@ -245,7 +245,7 @@ export async function POST(request: Request) {
           link: `/dashboard/applications`,
           applicationId: applicationId
         })
-        console.log("[Applications API] Created student notification for:", applicantId)
+        console.log("[Applications API] Created student notification for:", applicantId.toString())
       } catch (notifError) {
         console.error("Failed to create student notification:", notifError)
       }

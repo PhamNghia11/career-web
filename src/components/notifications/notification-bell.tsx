@@ -190,31 +190,29 @@ export function NotificationBell() {
                                 className={`flex items-start gap-3 p-3 cursor-pointer ${!notification.read ? "bg-blue-50" : ""
                                     }`}
                                 onSelect={(e) => {
-                                    // Prevent selecting if click was on delete button
+                                    // Only prevent if clicking delete button
                                     const target = e.target as HTMLElement;
-                                    if (target.closest('button')) {
-                                        e.preventDefault();
-                                        return;
+                                    if (target.closest('.delete-notif-btn')) {
+                                        e.preventDefault()
+                                        return
                                     }
 
-                                    console.log("[NotificationBell] Selected notification:", notification._id, "link:", notification.link);
+                                    console.log("[NotificationBell] Navigating to link:", notification.link)
 
-                                    if (!notification.read) markAsRead(notification._id)
+                                    if (!notification.read) {
+                                        markAsRead(notification._id) // Fire and forget for speed
+                                    }
+
                                     if (notification.link) {
-                                        if (notification.link.startsWith('http')) {
-                                            window.location.href = notification.link
-                                        } else {
-                                            // Handle relative links
-                                            const targetPath = notification.link.startsWith('/') ? notification.link : `/${notification.link}`;
+                                        const url = notification.link
+                                        const path = url.startsWith('http') ? url : (url.startsWith('/') ? url : `/${url}`)
 
-                                            // Fix for existing notifications linking to generic dashboard
-                                            if (notification.type === 'job' && targetPath === '/dashboard') {
-                                                router.push('/dashboard/jobs')
-                                            } else {
-                                                router.push(targetPath)
-                                            }
-                                        }
                                         setOpen(false)
+                                        if (path.startsWith('http')) {
+                                            window.location.href = path
+                                        } else {
+                                            router.push(path)
+                                        }
                                     }
                                 }}
                             >
@@ -235,7 +233,7 @@ export function NotificationBell() {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-6 w-6 text-gray-400 hover:text-red-500"
+                                    className="h-6 w-6 text-gray-400 hover:text-red-500 delete-notif-btn"
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         deleteNotification(notification._id)

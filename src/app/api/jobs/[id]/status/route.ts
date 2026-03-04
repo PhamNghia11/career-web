@@ -65,31 +65,32 @@ export async function PATCH(
                 const notifCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
                 let message = ""
                 let title = ""
+                let targetLink = "/dashboard/my-jobs"
 
                 if (status === 'active') {
                     title = "Tin tuyển dụng được duyệt"
                     message = `Tin tuyển dụng "${job.title}" của bạn đã được phê duyệt và hiển thị công khai.`
+                    targetLink = `/jobs/${id}` // Link trực tiếp đến bài đăng
                 } else if (status === 'rejected' || status === 'request_changes') {
                     title = "Tin tuyển dụng cần chỉnh sửa"
-                    // Try to get reason from multiple potential fields
                     const reason = feedback || body.adminFeedback || body.reason || ""
-
                     if (reason) {
                         message = `Từ chối: ${reason}. (Tin: "${job.title}")`
                     } else {
                         message = `Tin tuyển dụng "${job.title}" của bạn cần được chỉnh sửa trước khi đăng. Vui lòng kiểm tra và cập nhật lại.`
                     }
+                    targetLink = `/dashboard/jobs` // Quay lại dashboard để sửa
                 }
 
                 if (title) {
                     await notifCollection.insertOne({
-                        userId: job.creatorId,
-                        type: 'system',
+                        userId: job.creatorId.toString(), // Luôn lưu dạng string để query
+                        type: 'job', // Đổi về 'job' cho đồng bộ icon
                         title: title,
                         message: message,
                         read: false,
                         createdAt: new Date(),
-                        link: `/dashboard/my-jobs`,
+                        link: targetLink,
                     })
                 }
             } catch (err) {
