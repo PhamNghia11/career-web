@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Bell, Check, Trash2, Briefcase, MessageSquare, Calendar, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -71,7 +71,6 @@ export function NotificationBell() {
 
     useEffect(() => {
         fetchNotifications()
-        // Poll for new notifications every 30 seconds
         const interval = setInterval(fetchNotifications, 30000)
         return () => clearInterval(interval)
     }, [user?.id, (user as any)?._id])
@@ -155,7 +154,7 @@ export function NotificationBell() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto">
-                <div className="flex items-center justify-between px-3 py-2 border-b">
+                <div className="flex items-center justify-between px-3 py-2 border-b bg-white sticky top-0 z-10">
                     <h3 className="font-semibold text-sm">Thông báo</h3>
                     {unreadCount > 0 && (
                         <Button
@@ -184,63 +183,66 @@ export function NotificationBell() {
                         const Icon = typeIcons[notification.type] || Bell
                         const colorClass = typeColors[notification.type] || "text-gray-500"
 
+                        const handleItemClick = () => {
+                            if (!notification.read) markAsRead(notification._id)
+
+                            if (notification.link) {
+                                setOpen(false)
+                                const url = notification.link
+                                const path = url.startsWith('http') ? url : (url.startsWith('/') ? url : `/${url}`)
+
+                                try {
+                                    router.push(path)
+                                    // Fallback for safety
+                                    setTimeout(() => {
+                                        if (window.location.pathname !== path && !path.includes('#') && !url.startsWith('http')) {
+                                            window.location.href = path
+                                        }
+                                    }, 800)
+                                } catch (err) {
+                                    window.location.href = path
+                                }
+                            }
+                        }
+
                         return (
                             <DropdownMenuItem
                                 key={notification._id}
-                                className={`flex items-start gap-3 p-3 cursor-pointer ${!notification.read ? "bg-blue-50" : ""
-                                    }`}
-                                onSelect={(e) => {
-                                    // Only prevent if clicking delete button
-                                    const target = e.target as HTMLElement;
-                                    if (target.closest('.delete-notif-btn')) {
-                                        e.preventDefault()
-                                        return
-                                    }
-
-                                    console.log("[NotificationBell] Navigating to link:", notification.link)
-
-                                    if (!notification.read) {
-                                        markAsRead(notification._id) // Fire and forget for speed
-                                    }
-
-                                    if (notification.link) {
-                                        const url = notification.link
-                                        const path = url.startsWith('http') ? url : (url.startsWith('/') ? url : `/${url}`)
-
-                                        setOpen(false)
-                                        if (path.startsWith('http')) {
-                                            window.location.href = path
-                                        } else {
-                                            router.push(path)
-                                        }
-                                    }
-                                }}
+                                asChild
+                                className={`p-0 focus:bg-transparent ${!notification.read ? "bg-blue-50" : ""}`}
                             >
-                                <div className={`mt-0.5 ${colorClass}`}>
-                                    <Icon className="h-4 w-4" />
+                                <div className="flex items-center w-full group relative hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0">
+                                    <div
+                                        className="flex flex-1 items-start gap-3 p-3 cursor-pointer select-none"
+                                        onClick={handleItemClick}
+                                    >
+                                        <div className={`mt-0.5 ${colorClass} shrink-0`}>
+                                            <Icon className="h-4 w-4" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className={`text-sm font-medium leading-tight mb-1 ${!notification.read ? "text-gray-900" : "text-gray-600"}`}>
+                                                {notification.title}
+                                            </p>
+                                            <p className="text-xs text-gray-500 line-clamp-2 mb-1">
+                                                {notification.message}
+                                            </p>
+                                            <p className="text-xs text-gray-400">
+                                                {formatTime(notification.createdAt)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 mr-1 text-gray-300 hover:text-red-500 shrink-0 delete-notif-btn"
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            deleteNotification(notification._id)
+                                        }}
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </Button>
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className={`text-sm font-medium truncate ${!notification.read ? "text-gray-900" : "text-gray-600"}`}>
-                                        {notification.title}
-                                    </p>
-                                    <p className="text-xs text-gray-500 line-clamp-2">
-                                        {notification.message}
-                                    </p>
-                                    <p className="text-xs text-gray-400 mt-1">
-                                        {formatTime(notification.createdAt)}
-                                    </p>
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 text-gray-400 hover:text-red-500 delete-notif-btn"
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        deleteNotification(notification._id)
-                                    }}
-                                >
-                                    <Trash2 className="h-3 w-3" />
-                                </Button>
                             </DropdownMenuItem>
                         )
                     })
@@ -250,8 +252,8 @@ export function NotificationBell() {
                     <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            className="text-center text-primary text-sm py-2 cursor-pointer"
-                            onClick={() => {
+                            className="text-center text-primary text-sm py-2 cursor-pointer justify-center font-medium"
+                            onSelect={() => {
                                 router.push('/dashboard/notifications')
                                 setOpen(false)
                             }}
