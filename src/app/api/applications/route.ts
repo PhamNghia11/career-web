@@ -166,192 +166,79 @@ export async function POST(request: Request) {
     const result = await applicationsCollection.insertOne(applicationData)
     const applicationId = result.insertedId.toString()
 
-    // Increment applicants count on the job
-    if (jobId) {
-      try {
-        const jobsCollection = await getCollection(COLLECTIONS.JOBS)
-        // Try ObjectId first, then string
+    // --- POST-SUBMISSION LOGIC (Non-blocking for the main success response) ---
+    try {
+      // 1. Increment applicants count on the job
+      if (jobId) {
         try {
-          await jobsCollection.updateOne(
-            { _id: new ObjectId(jobId) },
-            { $inc: { applicants: 1 } }
-          )
-        } catch {
-          await jobsCollection.updateOne(
-            { _id: jobId as any },
-            { $inc: { applicants: 1 } }
-          )
-        }
-        console.log("[Applications API] Incremented applicants count for job:", jobId)
-      } catch (incError) {
-        console.error("[Applications API] Failed to increment applicants count:", incError)
+          const jobsCollection = await getCollection(COLLECTIONS.JOBS)
+          if (ObjectId.isValid(jobId)) {
+            await jobsCollection.updateOne({ _id: new ObjectId(jobId) }, { $inc: { applicants: 1 } })
+          } else {
+            await jobsCollection.updateOne({ _id: jobId as any }, { $inc: { applicants: 1 } })
+          }
+        } catch (e) { console.error("Job count increment failed:", e) }
       }
-    }
 
-    // Create Notifications
-    const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
+      // 2. Create Notifications
+      const notificationsCollection = await getCollection(COLLECTIONS.NOTIFICATIONS)
 
-    // 1. Notification for Admin
-    try {
+      // Admin Notif
       await notificationsCollection.insertOne({
-        targetRole: 'admin',
-        type: 'job',
-        title: 'Hồ sơ ứng tuyển mới',
+        targetRole: 'admin', type: 'job', title: 'Hồ sơ ứng tuyển mới',
         message: `${fullname} vừa ứng tuyển vị trí ${jobTitle} tại ${companyName}`,
-        read: false,
-        createdAt: new Date(),
-        link: `/dashboard/applicants-manager?id=${applicationId}`,
-        applicationId: applicationId
-      })
-      console.log("[Applications API] Created admin notification")
-    } catch (notifError) {
-      console.error("Failed to create admin notification:", notifError)
-    }
+        read: false, createdAt: new Date(), link: `/dashboard/applicants-manager?id=${applicationId}`, applicationId
+      }).catch(e => console.error("Admin notif failed:", e))
 
-    // 2. Notification for Employer (if employerId exists)
-    // Only send if the applicant is NOT the employer themselves (self-application)
-    if (employerId && employerId !== applicantId) {
-      try {
+      // Employer Notif
+      if (employerId && employerId !== applicantId) {
         await notificationsCollection.insertOne({
-          userId: employerId.toString(),
-          type: 'job',
-          title: 'Ứng viên mới ứng tuyển',
+          userId: employerId.toString(), type: 'job', title: 'Ứng viên mới ứng tuyển',
           message: `${fullname} vừa ứng tuyển vị trí ${jobTitle}`,
-          read: false,
-          createdAt: new Date(),
-          link: `/dashboard/applicants-manager?id=${applicationId}`,
-          applicationId: applicationId
-        })
-        console.log("[Applications API] Created employer notification for:", employerId.toString())
-      } catch (notifError) {
-        console.error("Failed to create employer notification:", notifError)
+          read: false, createdAt: new Date(), link: `/dashboard/applicants-manager?id=${applicationId}`, applicationId
+        }).catch(e => console.error("Employer notif failed:", e))
       }
-    } else if (!employerId) {
-      // If no employerId (Static/System Job), we don't broadcast to all employers anymore
-      // Only the Admin notification (created above) is sufficient for system jobs
-      console.log("[Applications API] No employerId found, skipping employer broadcast.")
-    }
 
-    // 3. Notification for Student/Applicant (if applicantId exists - logged in user)
-    if (applicantId) {
-      try {
+      // Student Notif
+      if (applicantId) {
         await notificationsCollection.insertOne({
-          userId: applicantId.toString(),
-          type: 'job',
-          title: 'Ứng tuyển thành công',
-          message: `Bạn đã ứng tuyển thành công vào vị trí ${jobTitle} tại ${companyName}. Chúc bạn may mắn!`,
-          read: false,
-          createdAt: new Date(),
-          link: `/dashboard/applications`,
-          applicationId: applicationId
-        })
-        console.log("[Applications API] Created student notification for:", applicantId.toString())
-      } catch (notifError) {
-        console.error("Failed to create student notification:", notifError)
+          userId: applicantId.toString(), type: 'job', title: 'Ứng tuyển thành công',
+          message: `Bạn đã ứng tuyển thành công vào vị trí ${jobTitle} tại ${companyName}.`,
+          read: false, createdAt: new Date(), link: `/dashboard/applications`, applicationId
+        }).catch(e => console.error("Student notif failed:", e))
       }
-    }
 
-    // 3. Send Email Notifications
-    const host = request.headers.get('host')
-    const protocol = host?.includes('localhost') ? 'http' : 'https'
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (host ? `${protocol}://${host}` : 'https://career-web-three.vercel.app')
-    const cleanBaseUrl = baseUrl.replace(/\/$/, '')
-    const applicationLink = `${cleanBaseUrl}/dashboard/applicants-manager?id=${applicationId}`
+      // 3. Send Email Notifications
+      const host = request.headers.get('host')
+      const protocol = host?.includes('localhost') ? 'http' : 'https'
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (host ? `${protocol}://${host}` : '')
+      const applicationLink = `${baseUrl.replace(/\/$/, '')}/dashboard/applicants-manager?id=${applicationId}`
+      const emailSubject = `[GDU Career] Hồ sơ ứng tuyển mới: ${jobTitle}`
 
-    const emailSubject = `[GDU Career] Hồ sơ ứng tuyển mới: ${jobTitle}`
-    const emailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <div style="background: #1e3a5f; color: white; padding: 20px; text-align: center;">
-          <h1 style="margin: 0;">GDU Career Portal</h1>
-        </div>
-        <div style="padding: 30px; background: #f9f9f9;">
-          <h2 style="color: #1e3a5f;">Có ứng viên mới!</h2>
-          <p><strong>Vị trí:</strong> ${jobTitle}</p>
-          <p><strong>Công ty:</strong> ${companyName}</p>
-          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
-          <h3 style="color: #333;">Thông tin ứng viên:</h3>
-          <ul style="list-style: none; padding: 0;">
-            <li style="padding: 8px 0;"><strong>Họ tên:</strong> ${fullname}</li>
-            <li style="padding: 8px 0;"><strong>Email:</strong> ${email}</li>
-            <li style="padding: 8px 0;"><strong>Số điện thoại:</strong> ${phone}</li>
-            <li style="padding: 8px 0;"><strong>MSSV:</strong> ${mssv}</li>
-            <li style="padding: 8px 0;"><strong>Ngành:</strong> ${major}</li>
-            <li style="padding: 8px 0;"><strong>CV:</strong> ${cvOriginalName || 'Không đính kèm'}</li>
-            ${message ? `<li style="padding: 8px 0;"><strong>Lời nhắn:</strong> ${message}</li>` : ''}
-          </ul>
-          <div style="margin-top: 30px; text-align: center;">
-            <a href="${applicationLink}" 
-               style="background-color: #1e3a5f; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-              Xem hồ sơ chi tiết
-            </a>
-          </div>
-        </div>
-        <div style="padding: 15px; text-align: center; color: #666; font-size: 12px;">
-          <p>Email này được gửi tự động từ GDU Career Portal</p>
-        </div>
-      </div>
-    `
-
-    // Send email to admin
-    try {
+      // Admin Email
       if (process.env.ADMIN_EMAIL) {
-        // Look up admin user to check preference
         const usersCollection = await getCollection(COLLECTIONS.USERS)
         const adminUser = await usersCollection.findOne({ email: process.env.ADMIN_EMAIL })
-        const shouldSendAdminEmail = await checkNotificationPreference(adminUser?._id, 'email')
-
-        if (shouldSendAdminEmail) {
-          await sendEmail({
-            to: process.env.ADMIN_EMAIL,
-            subject: emailSubject,
-            html: emailHtml
-          })
-          console.log("[Applications API] Admin email sent")
-        } else {
-          console.log("[Applications API] Admin email skipped (preference off)")
+        if (await checkNotificationPreference(adminUser?._id?.toString(), 'email')) {
+          sendEmail({ to: process.env.ADMIN_EMAIL, subject: emailSubject, html: "New application received. Check dashboard." }).catch(e => console.error("Admin email failed:", e))
         }
       }
-    } catch (emailError) {
-      console.error("Failed to send admin email:", emailError)
-    }
 
-    // Send email to employer (if we have their email)
-    if (employerId) {
-      try {
+      // Employer Email
+      if (employerId) {
         const usersCollection = await getCollection(COLLECTIONS.USERS)
-        let employer = null
-        if (ObjectId.isValid(employerId)) {
-          employer = await usersCollection.findOne({ _id: new ObjectId(employerId) })
-        } else {
-          employer = await usersCollection.findOne({ _id: employerId as any })
+        const employer = await usersCollection.findOne(ObjectId.isValid(employerId) ? { _id: new ObjectId(employerId) } : { _id: employerId as any })
+        if (employer?.email && await checkNotificationPreference(employerId, 'email')) {
+          sendEmail({ to: employer.email, subject: emailSubject, html: "New candidate applied. Check dashboard." }).catch(e => console.error("Employer email failed:", e))
         }
-
-        if (employer?.email) {
-          const shouldSendEmployerEmail = await checkNotificationPreference(employerId, 'email')
-
-          if (shouldSendEmployerEmail) {
-            await sendEmail({
-              to: employer.email,
-              subject: emailSubject,
-              html: emailHtml
-            })
-            console.log("[Applications API] Employer email sent to:", employer.email)
-          } else {
-            console.log("[Applications API] Employer email skipped (preference off) for:", employer.email)
-          }
-        }
-      } catch (emailError) {
-        console.error("Failed to send employer email:", emailError)
       }
+    } catch (postError) {
+      console.error("[Applications API] Post-submission processing error (silenced):", postError)
     }
 
     return NextResponse.json(
-      {
-        success: true,
-        message: "Ứng tuyển thành công",
-        applicationId: applicationId
-      },
-      { status: 200 },
+      { success: true, message: "Ứng tuyển thành công", applicationId },
+      { status: 200 }
     )
   } catch (error) {
     console.error("Application submission error:", error)

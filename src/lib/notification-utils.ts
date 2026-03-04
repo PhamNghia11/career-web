@@ -15,9 +15,18 @@ export async function checkNotificationPreference(
 
     try {
         const usersCollection = await getCollection(COLLECTIONS.USERS)
-        const user = await usersCollection.findOne({
-            _id: typeof userId === 'string' ? new ObjectId(userId) : userId
-        })
+        let queryId = userId
+        if (typeof userId === 'string') {
+            if (ObjectId.isValid(userId)) {
+                queryId = new ObjectId(userId)
+            } else {
+                // If not a valid ObjectId string, it might be a custom ID or legacy string
+                // We'll query it as a string
+                queryId = userId as any
+            }
+        }
+
+        const user = await usersCollection.findOne({ _id: queryId as any })
 
         if (!user || !user.notificationSettings) {
             // Default settings if none exist
