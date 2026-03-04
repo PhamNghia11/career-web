@@ -136,10 +136,10 @@ export async function POST(request: Request) {
   }
 }
 
-// PATCH - Đánh dấu đã đọc
 export async function PATCH(request: Request) {
   try {
-    const { notificationId, action, userId } = await request.json()
+    const body = await request.json()
+    const { notificationId, action, userId, role } = body
 
     const collection = await getCollection(COLLECTIONS.NOTIFICATIONS)
 
@@ -155,7 +155,6 @@ export async function PATCH(request: Request) {
     }
 
     if (action === "mark_all_read" && userId) {
-      const { role } = await request.json().catch(() => ({ role: null }))
 
       let query: any = { userId, read: false }
 
