@@ -28,13 +28,15 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "File too large. Max 5MB allowed." }, { status: 400 })
         }
 
-        // Save file to local storage
+        // Save file - Cloud-first approach
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
-        const filePath = await saveFile(buffer, "avatars", file.name)
+        const savedUrl = await saveFile(buffer, "avatars", file.name)
 
-        // Serve through a proxy/API route for security/access control
-        const avatarUrl = `/api/user/avatar?path=${encodeURIComponent(filePath)}`
+        // If it's a local relative path, wrap with proxy, otherwise use as-is (Cloudinary URL)
+        const avatarUrl = savedUrl.startsWith("uploads/")
+            ? `/api/user/avatar?path=${encodeURIComponent(savedUrl)}`
+            : savedUrl
 
         const collection = await getCollection(COLLECTIONS.USERS)
 

@@ -229,16 +229,16 @@ export async function POST(req: Request) {
 
     const collection = await getCollection(COLLECTIONS.JOBS)
 
-    // Handle Logo and Document Storage
+    // Handle Logo and Document Storage - Cloud-first approach
     let finalLogo = body.logo || "/placeholder.svg?height=100&width=100"
     if (body.logo && body.logo.startsWith("data:")) {
-      const savedPath = await saveFile(body.logo, "jobs/logos", "logo.png")
-      // If it returned a local path (starts with uploads/), use the proxy API
-      if (savedPath.startsWith("uploads/")) {
-        finalLogo = `/api/user/avatar?path=${encodeURIComponent(savedPath)}`
+      const savedUrl = await saveFile(body.logo, "jobs/logos", "logo.png")
+
+      // If it's a local relative path, wrap with proxy, otherwise use as-is (Cloudinary URL)
+      if (savedUrl.startsWith("uploads/")) {
+        finalLogo = `/api/user/avatar?path=${encodeURIComponent(savedUrl)}`
       } else {
-        // It fell back to base64 or is already a URL, don't prepend slash
-        finalLogo = savedPath
+        finalLogo = savedUrl
       }
     }
 
