@@ -1297,7 +1297,7 @@ export function JobsListClient() { // Remove dbJobs prop
         <div className="lg:col-span-3 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-900">
-              Việc làm nổi bật <span className="text-muted-foreground font-normal text-base ml-2">({sortedJobs.length})</span>
+              Danh sách việc làm <span className="text-muted-foreground font-normal text-base ml-2">({sortedJobs.length})</span>
             </h2>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>Sắp xếp theo:</span>

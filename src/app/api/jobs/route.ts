@@ -135,7 +135,7 @@ export async function GET(req: Request) {
             $expr: {
               $or: [
                 { $eq: ["$quantity", -1] },
-                { $lt: ["$hiredCount", { $ifNull: ["$quantity", 9999] }] }
+                { $lt: ["$hiredCount", { $ifNull: ["$quantity", 2147483647] }] } // Increased fallback to a very large number
               ]
             }
           }

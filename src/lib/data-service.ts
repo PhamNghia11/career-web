@@ -74,7 +74,7 @@ export const getLatestJobs = unstable_cache(
                         $expr: {
                             $or: [
                                 { $eq: ["$quantity", -1] },
-                                { $lt: ["$hiredCount", { $ifNull: ["$quantity", 1] }] }
+                                { $lt: ["$hiredCount", { $ifNull: ["$quantity", 9999] }] }
                             ]
                         }
                     }
@@ -83,7 +83,7 @@ export const getLatestJobs = unstable_cache(
                     $sort: { postedAt: -1 }
                 },
                 {
-                    $limit: limit + 4 // Fetch a few more to account for post-query filtering
+                    $limit: 20 // Fetch more to ensure we have enough unexpired ones
                 },
                 {
                     $project: {
