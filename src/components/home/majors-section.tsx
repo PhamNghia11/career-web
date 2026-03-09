@@ -99,7 +99,7 @@ const fieldsData = [
     },
 ]
 
-export function MajorsSection() {
+export function MajorsSection({ initialConfig = null }: { initialConfig?: any }) {
     const [hoveredField, setHoveredField] = useState<string | null>(null)
     const [isMounted, setIsMounted] = useState(false)
 
@@ -110,9 +110,10 @@ export function MajorsSection() {
         setIsMounted(true)
     }, [])
 
-    const [config, setConfig] = useState<any>(null)
+    const [config, setConfig] = useState<any>(initialConfig)
 
     useEffect(() => {
+        if (initialConfig) return
         const fetchConfig = async () => {
             try {
                 const res = await fetch("/api/site-configs?key=home_majors")
@@ -125,7 +126,7 @@ export function MajorsSection() {
             }
         }
         fetchConfig()
-    }, [])
+    }, [initialConfig])
 
     return (
         <section className="py-20 bg-gradient-to-b from-white via-gray-50/50 to-white">

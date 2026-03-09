@@ -23,6 +23,7 @@ export function Footer() {
     fetchConfig()
   }, [])
 
+
   const defaultFooter = {
     brandDescription: "Cổng thông tin việc làm chính thức dành cho sinh viên Đại học Gia Định. Kết nối nhân tài trẻ với cộng đồng doanh nghiệp uy tín, kiến tạo tương lai vững chắc.",
     centerName: "Trung tâm Trải nghiệm & Việc làm",

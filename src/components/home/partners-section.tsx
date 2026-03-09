@@ -5,10 +5,9 @@ import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
 
 const partnersPlaceholder = [] // Removed hardcoded array in favor of dynamic fetch
 
-export function PartnersSection() {
-  const [partners, setPartners] = useState<any[]>([])
+export function PartnersSection({ initialPartners = [] }: { initialPartners?: any[] }) {
+  const [partners, setPartners] = useState<any[]>(initialPartners)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [loading, setLoading] = useState(true)
   const [spacing, setSpacing] = useState(180)
 
   // Cập nhật khoảng cách logo dựa trên kích thước màn hình
@@ -23,11 +22,11 @@ export function PartnersSection() {
     return () => window.removeEventListener('resize', updateSpacing)
   }, [])
 
-  // Fetch partners from API
+  // Fetch partners from API if not provided
   useEffect(() => {
+    if (initialPartners && initialPartners.length > 0) return
     const fetchPartners = async () => {
       try {
-        // Only fetch 15 random partners for the carousel, not the whole DB
         const response = await fetch('/api/companies?limit=15&random=true')
         const data = await response.json()
         if (data.companies) {
@@ -35,12 +34,10 @@ export function PartnersSection() {
         }
       } catch (error) {
         console.error("Failed to fetch partners:", error)
-      } finally {
-        setLoading(false)
       }
     }
     fetchPartners()
-  }, [])
+  }, [initialPartners])
 
   // Tự động chuyển slide liên tục mỗi 3 giây
   useEffect(() => {

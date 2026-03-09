@@ -13,11 +13,13 @@ const DEFAULT_CONFIG = {
     hotTags: ["#Intern", "#ReactJS", "#Marketing", "#Designer", "#AI"]
 }
 
-export function MarketTrends() {
-    const [news, setNews] = useState<News[]>([])
-    const [loading, setLoading] = useState(true)
+export function MarketTrends({ initialNews = [], initialConfig = null }: { initialNews?: News[], initialConfig?: any }) {
+    const [news, setNews] = useState<News[]>(initialNews)
+    const [config, setConfig] = useState<any>(initialConfig)
+    const [searchQuery, setSearchQuery] = useState("")
 
     useEffect(() => {
+        if (initialNews && initialNews.length > 0) return
         const fetchNews = async () => {
             try {
                 const response = await fetch("/api/news?limit=3")
@@ -27,18 +29,13 @@ export function MarketTrends() {
                 }
             } catch (error) {
                 console.error("Error fetching market trends:", error)
-            } finally {
-                setLoading(false)
             }
         }
-
         fetchNews()
-    }, [])
-
-    const [config, setConfig] = useState<any>(null)
-    const [searchQuery, setSearchQuery] = useState("")
+    }, [initialNews])
 
     useEffect(() => {
+        if (initialConfig) return
         const fetchConfig = async () => {
             try {
                 const res = await fetch("/api/site-configs?key=home_quick_search")
@@ -51,7 +48,7 @@ export function MarketTrends() {
             }
         }
         fetchConfig()
-    }, [])
+    }, [initialConfig])
 
     const handleSearch = () => {
         if (searchQuery.trim()) {
@@ -59,7 +56,8 @@ export function MarketTrends() {
         }
     }
 
-    if (loading) {
+
+    if (news.length === 0) {
         return (
             <section className="py-20 bg-muted/30">
                 <div className="container px-4 mx-auto">
