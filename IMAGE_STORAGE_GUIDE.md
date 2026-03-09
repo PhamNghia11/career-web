@@ -1,6 +1,6 @@
 # Hướng dẫn Hệ thống Lưu trữ Hình ảnh (Image Storage Guide)
 
-Tài liệu này giải thích cơ chế lưu trữ hình ảnh hiện tại của dự án GDU Career để bàn giao cho đối tác và đội ngũ vận hành.
+Tài liệu này giải thích cơ chế lưu trữ hình ảnh hiện tại của dự án GDU Career
 
 ## 1. Kiến trúc Tổng quan
 Hệ thống sử dụng cơ chế **Hybrid Storage** (Lưu trữ hỗn hợp) để đảm bảo tính ổn định tối đa (High Availability) và hiệu suất cao.
@@ -13,8 +13,8 @@ Hệ thống sử dụng cơ chế **Hybrid Storage** (Lưu trữ hỗn hợp) �
 Để kích hoạt tính năng lưu trữ chuyên nghiệp, các biến môi trường sau đã được cấu hình:
 
 ```bash
-CLOUDINARY_CLOUD_NAME=drz4r1v0j
-CLOUDINARY_API_KEY=576534982223512
+CLOUDINARY_CLOUD_NAME=......
+CLOUDINARY_API_KEY=.......
 CLOUDINARY_API_SECRET=*********** (Bảo mật)
 ```
 
@@ -27,5 +27,3 @@ CLOUDINARY_API_SECRET=*********** (Bảo mật)
 ## 4. Bảo trì và Mở rộng
 Mọi logic xử lý được tập trung tại file `src/lib/storage.ts`. Hệ thống đã được thiết kế để dễ dàng thay đổi sang các nhà cung cấp khác (như AWS S3 hoặc Google Cloud Storage) trong tương lai nếu cần thiết mà không phải sửa đổi quá nhiều ở phần giao diện (Front-end).
 
----
-*Tài liệu bàn giao ngày 04/03/2026*

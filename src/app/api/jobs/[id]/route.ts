@@ -72,7 +72,12 @@ export async function PATCH(
                 if (currentJob.logo && currentJob.logo.startsWith("/uploads/")) {
                     await deleteFile(currentJob.logo.substring(1))
                 }
-                updateData.logo = "/" + await saveFile(updateFields.logo, "jobs/logos", "logo.png")
+                const savedUrl = await saveFile(updateFields.logo, "jobs/logos", "logo.png");
+                if (savedUrl.startsWith("uploads/")) {
+                    updateData.logo = `/api/user/avatar?path=${encodeURIComponent(savedUrl)}`;
+                } else {
+                    updateData.logo = savedUrl;
+                }
             }
 
             // Document update

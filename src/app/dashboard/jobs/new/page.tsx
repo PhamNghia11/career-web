@@ -192,17 +192,18 @@ export default function PostJobPage() {
             return
         }
 
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
+        // Validate file size (max 2MB due to Vercel Limits)
+        if (file.size > 2 * 1024 * 1024) {
             toast({
                 title: "File quá lớn",
-                description: "Dung lượng tối đa 5MB",
+                description: "Dung lượng tối đa 2MB",
                 variant: "destructive",
             })
             return
         }
 
         // Convert to Base64
+
         const reader = new FileReader()
         reader.onloadend = () => {
             const base64String = reader.result as string
@@ -579,7 +580,7 @@ export default function PostJobPage() {
                                             </div>
                                             <div className="text-center">
                                                 <span className="text-sm font-medium text-gray-700">Nhấn để chọn file hoặc kéo thả vào đây</span>
-                                                <p className="text-xs text-gray-500 mt-1">Hỗ trợ PDF, Word, Hình ảnh (Tối đa 20MB)</p>
+                                                <p className="text-xs text-gray-500 mt-1">Hỗ trợ PDF, Word, Hình ảnh (Tối đa 3MB)</p>
                                             </div>
                                             <input
                                                 type="file"
@@ -588,10 +589,10 @@ export default function PostJobPage() {
                                                     const file = e.target.files?.[0]
                                                     if (!file) return
 
-                                                    if (file.size > 20 * 1024 * 1024) {
+                                                    if (file.size > 3 * 1024 * 1024) {
                                                         toast({
                                                             title: "File quá lớn",
-                                                            description: "Dung lượng tối đa 20MB",
+                                                            description: "Dung lượng tối đa 3MB",
                                                             variant: "destructive",
                                                         })
                                                         return

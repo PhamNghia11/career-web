@@ -11,7 +11,9 @@ export function VisitorTracker() {
     const lastPage = useRef<string | null>(null)
 
     useEffect(() => {
-        // Track each page view during session
+        // Feature disabled temporarily to save Vercel serverless function limits
+        // and database connections.
+        /*
         const trackVisit = async () => {
             // Skip if same page
             if (lastPage.current === pathname) return
@@ -37,6 +39,7 @@ export function VisitorTracker() {
         // Delay slightly to ensure page has loaded
         const timeout = setTimeout(trackVisit, 500)
         return () => clearTimeout(timeout)
+        */
     }, [pathname, user?.id, user?.name])
 
     return null // This component doesn't render anything

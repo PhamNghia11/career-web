@@ -34,8 +34,6 @@ interface Application {
 
 import { Suspense } from "react"
 
-export const dynamic = "force-dynamic"
-
 function ManageApplicationsContent() {
     const router = useRouter()
     const { user, isLoading } = useAuth()
