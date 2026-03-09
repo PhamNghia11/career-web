@@ -128,31 +128,14 @@ function ManageApplicationsContent() {
     const handleViewCV = async (app: Application) => {
         setSelectedApp(app)
         setViewMode("cv")
-        setCvUrl(null)
         setCvLoading(true)
+        // Use the dedicated CV proxy route that serves files with inline headers
+        setCvUrl(`/api/applications/${app._id}/cv`)
+        setCvLoading(false)
 
         // Auto-update status to "Reviewed" if currently "New"
         if (app.status === "new") {
             handleStatusChange(app._id, "reviewed")
-        }
-
-        try {
-            const res = await fetch(`/api/applications/${app._id}`)
-            const data = await res.json()
-
-            if (data.success && data.data.cvBase64) {
-                setCvUrl(data.data.cvBase64)
-            } else {
-                toast({
-                    title: "Lỗi",
-                    description: "Không thể tải CV",
-                    variant: "destructive"
-                })
-            }
-        } catch (error) {
-            console.error("Error fetching CV:", error)
-        } finally {
-            setCvLoading(false)
         }
     }
 

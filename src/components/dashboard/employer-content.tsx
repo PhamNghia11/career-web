@@ -126,24 +126,14 @@ export function EmployerDashboardContent() {
 
     const handleViewDetails = async (app: any) => {
         setSelectedApp(app)
-        setCvUrl(null)
         setCvLoading(true)
+        // Use the dedicated CV proxy route that serves files with inline headers
+        setCvUrl(`/api/applications/${app._id}/cv`)
+        setCvLoading(false)
 
         // Auto-mark as viewed
         if (app.status === 'new') {
             handleStatusChange(app._id, 'reviewed')
-        }
-
-        try {
-            const res = await fetch(`/api/applications/${app._id}`)
-            const data = await res.json()
-            if (data.success && data.data.cvBase64) {
-                setCvUrl(data.data.cvBase64)
-            }
-        } catch (error) {
-            console.error("Error loading CV", error)
-        } finally {
-            setCvLoading(false)
         }
     }
 
