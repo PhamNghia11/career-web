@@ -35,8 +35,42 @@ async function getBannerData(): Promise<any> {
   }
 }
 
+async function getInitialJobs() {
+  try {
+    const collection = await getCollection(COLLECTIONS.JOBS)
+    const [jobs, total] = await Promise.all([
+      collection.aggregate([
+        { $match: { status: "active" } },
+        { $sort: { postedAt: -1 } },
+        { $limit: 15 },
+        { $lookup: { from: "companies", localField: "companyId", foreignField: "_id", as: "companyInfo" } },
+        { $addFields: { companyData: { $arrayElemAt: ["$companyInfo", 0] } } },
+        { $project: { companyInfo: 0 } }
+      ]).toArray(),
+      collection.countDocuments({ status: "active" })
+    ])
+
+    // Serialize ObjectIds to strings
+    const serialized = jobs.map(job => ({
+      ...job,
+      _id: job._id.toString(),
+      companyId: job.companyId?.toString?.() || job.companyId,
+      creatorId: job.creatorId?.toString?.() || job.creatorId,
+      companyData: job.companyData ? { ...job.companyData, _id: job.companyData._id?.toString?.() } : undefined,
+    }))
+
+    return { jobs: serialized, total }
+  } catch (error) {
+    console.error("Error fetching initial jobs:", error)
+    return { jobs: [], total: 0 }
+  }
+}
+
 export default async function JobsPage() {
-  const banner = await getBannerData()
+  const [banner, initialData] = await Promise.all([
+    getBannerData(),
+    getInitialJobs()
+  ])
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-muted/50 via-background to-muted/30">
@@ -65,7 +99,7 @@ export default async function JobsPage() {
         </div>
         <div className="w-full px-4 md:px-10 lg:px-20 py-12">
           <Suspense fallback={<div className="text-center py-20">Đang tải danh sách việc làm...</div>}>
-            <JobsListClient />
+            <JobsListClient initialJobs={initialData.jobs as any} initialTotal={initialData.total} />
           </Suspense>
         </div>
       </main>

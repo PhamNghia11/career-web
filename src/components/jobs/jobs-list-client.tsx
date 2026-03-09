@@ -103,7 +103,8 @@ const advancedSalaryRanges = [
 ]
 
 interface JobsListClientProps {
-  // dbJobs removed to reduce payload
+  initialJobs?: Job[]
+  initialTotal?: number
 }
 
 const removeAccents = (str: string): string => {
@@ -136,18 +137,18 @@ const formatDateTime = (dateVal: any): string => {
   }
 }
 
-export function JobsListClient() { // Remove dbJobs prop
+export function JobsListClient({ initialJobs, initialTotal }: JobsListClientProps) {
 
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
   const { user } = useAuth()
 
-  const [jobs, setJobs] = useState<Job[]>([])
-  const [totalCount, setTotalCount] = useState(0)
+  const [jobs, setJobs] = useState<Job[]>(initialJobs || [])
+  const [totalCount, setTotalCount] = useState(initialTotal || 0)
   const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [loading, setLoading] = useState(true)
+  const [totalPages, setTotalPages] = useState(initialTotal ? Math.ceil(initialTotal / 15) : 1)
+  const [loading, setLoading] = useState(!initialJobs)
   const [loadingMore, setLoadingMore] = useState(false)
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || searchParams.get("jobTitle") || "")
@@ -223,8 +224,17 @@ export function JobsListClient() { // Remove dbJobs prop
     }
   }
 
+  // Track if this is the very first render with server data
+  const hasInitialData = useRef(!!initialJobs)
+
   // Load jobs from API
   useEffect(() => {
+    // Skip the first fetch if we already have server-side data and no filters are active
+    if (hasInitialData.current && !searchQuery && !selectedType && !selectedIndustry && !selectedExperience && !selectedEducation && !selectedPostedDate && !selectedLocation && !selectedSalary && !selectedCompany) {
+      hasInitialData.current = false
+      return
+    }
+    hasInitialData.current = false
     const timer = setTimeout(() => {
       fetchJobs(1, true)
     }, 300)
