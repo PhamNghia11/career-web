@@ -51,19 +51,8 @@ export async function GET(
         const cvMimeType = (application.cvMimeType as string) || "application/pdf"
         const cvOriginalName = (application.cvOriginalName as string) || "cv.pdf"
 
-        // Detect if this is a non-PDF document (DOCX, DOC)
-        const isWordDoc = cvMimeType.includes("msword") ||
-            cvMimeType.includes("wordprocessingml") ||
-            cvOriginalName.toLowerCase().endsWith(".docx") ||
-            cvOriginalName.toLowerCase().endsWith(".doc")
-
-        // For DOCX/DOC files stored on Cloudinary, use Office Online Viewer
-        if (isWordDoc && cvPath && cvPath.startsWith("http")) {
-            const officeViewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cvPath)}`
-            return NextResponse.redirect(officeViewerUrl)
-        }
-
-        // For PDF files or local files, serve directly
+        // For local DOCX files, we need a fallback (serve as download)
+        // For PDF files or any file, serve directly with proper headers
         let fileBuffer: Buffer | null = null
         let contentType = cvMimeType
 

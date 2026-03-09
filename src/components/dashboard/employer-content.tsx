@@ -126,14 +126,39 @@ export function EmployerDashboardContent() {
 
     const handleViewDetails = async (app: any) => {
         setSelectedApp(app)
+        setCvUrl(null)
         setCvLoading(true)
-        // Use the dedicated CV proxy route that serves files with inline headers
-        setCvUrl(`/api/applications/${app._id}/cv`)
-        setCvLoading(false)
 
         // Auto-mark as viewed
         if (app.status === 'new') {
             handleStatusChange(app._id, 'reviewed')
+        }
+
+        try {
+            const res = await fetch(`/api/applications/${app._id}`)
+            const data = await res.json()
+
+            if (data.success) {
+                const appData = data.data
+                const cvPath = appData.cvPath || appData.cvBase64
+                const cvOriginalName = (appData.cvOriginalName || "").toLowerCase()
+                const cvMimeType = appData.cvMimeType || ""
+
+                const isWordDoc = cvMimeType.includes("msword") ||
+                    cvMimeType.includes("wordprocessingml") ||
+                    cvOriginalName.endsWith(".docx") ||
+                    cvOriginalName.endsWith(".doc")
+
+                if (isWordDoc && cvPath && cvPath.startsWith("http")) {
+                    setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cvPath)}`)
+                } else {
+                    setCvUrl(`/api/applications/${app._id}/cv`)
+                }
+            }
+        } catch (error) {
+            console.error("Error loading CV", error)
+        } finally {
+            setCvLoading(false)
         }
     }
 

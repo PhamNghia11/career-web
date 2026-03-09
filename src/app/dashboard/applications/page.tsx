@@ -62,10 +62,40 @@ export default function MyApplicationsPage() {
 
   const handleViewCV = async (app: Application) => {
     setSelectedApp(app)
+    setCvUrl(null)
     setCvLoading(true)
-    // Use the dedicated CV proxy route that serves files with inline headers
-    setCvUrl(`/api/applications/${app._id}/cv`)
-    setCvLoading(false)
+
+    try {
+      const res = await fetch(`/api/applications/${app._id}`)
+      const data = await res.json()
+
+      if (!data.success) {
+        toast({ title: "Lỗi", description: "Không thể tải CV", variant: "destructive" })
+        setCvLoading(false)
+        return
+      }
+
+      const appData = data.data
+      const cvPath = appData.cvPath || appData.cvBase64
+      const cvOriginalName = (appData.cvOriginalName || "").toLowerCase()
+      const cvMimeType = appData.cvMimeType || ""
+
+      const isWordDoc = cvMimeType.includes("msword") ||
+        cvMimeType.includes("wordprocessingml") ||
+        cvOriginalName.endsWith(".docx") ||
+        cvOriginalName.endsWith(".doc")
+
+      if (isWordDoc && cvPath && cvPath.startsWith("http")) {
+        setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cvPath)}`)
+      } else {
+        setCvUrl(`/api/applications/${app._id}/cv`)
+      }
+    } catch (error) {
+      console.error("Error fetching CV:", error)
+      toast({ title: "Lỗi", description: "Không thể tải CV", variant: "destructive" })
+    } finally {
+      setCvLoading(false)
+    }
   }
 
   const getStatusBadge = (status: string) => {
