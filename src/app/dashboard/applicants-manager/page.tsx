@@ -137,7 +137,6 @@ function ManageApplicationsContent() {
         }
 
         try {
-            // Fetch full application details to get cvPath and metadata
             const res = await fetch(`/api/applications/${app._id}`)
             const data = await res.json()
 
@@ -148,20 +147,22 @@ function ManageApplicationsContent() {
             }
 
             const appData = data.data
-            const cvPath = appData.cvPath || appData.cvBase64
             const cvOriginalName = (appData.cvOriginalName || "").toLowerCase()
             const cvMimeType = appData.cvMimeType || ""
+            const cvToken = appData.cvToken
 
             const isWordDoc = cvMimeType.includes("msword") ||
                 cvMimeType.includes("wordprocessingml") ||
                 cvOriginalName.endsWith(".docx") ||
                 cvOriginalName.endsWith(".doc")
 
-            if (isWordDoc && cvPath && cvPath.startsWith("http")) {
-                // DOCX on Cloudinary → use Office Online Viewer
-                setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cvPath)}`)
+            if (isWordDoc && cvToken) {
+                // For DOCX: use Office Online Viewer with public token-based URL
+                const baseUrl = window.location.origin
+                const publicCvUrl = `${baseUrl}/api/cv-public?token=${cvToken}`
+                setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(publicCvUrl)}`)
             } else {
-                // PDF or other → use proxy route
+                // For PDF: use proxy route
                 setCvUrl(`/api/applications/${app._id}/cv`)
             }
         } catch (error) {

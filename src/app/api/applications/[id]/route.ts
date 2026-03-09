@@ -41,30 +41,16 @@ export async function GET(
             return NextResponse.json({ error: "Forbidden: You don't have access to this application" }, { status: 403 })
         }
 
-        // Resolve cvPath into cvBase64 for backwards compatibility with frontend CV viewer
+        // Add cvToken for public access (used by Office Online Viewer for DOCX files)
         const responseData: any = { ...application }
-        if (!responseData.cvBase64 && responseData.cvPath) {
-            const cvPath = responseData.cvPath as string
-            if (cvPath.startsWith("http")) {
-                // Cloudinary or external URL - wrap with Google Docs Viewer for inline PDF display
-                // Cloudinary serves PDFs with download headers, so iframe can't display them directly
-                responseData.cvBase64 = `https://docs.google.com/gview?url=${encodeURIComponent(cvPath)}&embedded=true`
-            } else if (cvPath.startsWith("data:")) {
-                // Already a data URI
-                responseData.cvBase64 = cvPath
-            } else {
-                // Local file path - read and convert to base64 data URI
-                try {
-                    const { readFile } = await import("@/lib/storage")
-                    const buffer = await readFile(cvPath)
-                    const mimeType = responseData.cvMimeType || "application/pdf"
-                    responseData.cvBase64 = `data:${mimeType};base64,${buffer.toString("base64")}`
-                } catch (fileError) {
-                    console.error("[Applications API] Failed to read CV file:", cvPath, fileError)
-                    // cvBase64 will remain undefined, frontend will show error
-                }
-            }
-        }
+
+        // Generate a time-limited public token for CV viewing
+        const crypto = await import("crypto")
+        const CV_TOKEN_SECRET = process.env.JWT_SECRET || process.env.SESSION_SECRET || "gdu-career-cv-token-secret"
+        const expiresAt = Date.now() + 10 * 60 * 1000
+        const payload = `${id}:${expiresAt}`
+        const signature = crypto.createHmac("sha256", CV_TOKEN_SECRET).update(payload).digest("hex").substring(0, 16)
+        responseData.cvToken = Buffer.from(`${payload}:${signature}`).toString("base64url")
 
         return NextResponse.json({
             success: true,

@@ -76,17 +76,19 @@ export default function MyApplicationsPage() {
       }
 
       const appData = data.data
-      const cvPath = appData.cvPath || appData.cvBase64
       const cvOriginalName = (appData.cvOriginalName || "").toLowerCase()
       const cvMimeType = appData.cvMimeType || ""
+      const cvToken = appData.cvToken
 
       const isWordDoc = cvMimeType.includes("msword") ||
         cvMimeType.includes("wordprocessingml") ||
         cvOriginalName.endsWith(".docx") ||
         cvOriginalName.endsWith(".doc")
 
-      if (isWordDoc && cvPath && cvPath.startsWith("http")) {
-        setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cvPath)}`)
+      if (isWordDoc && cvToken) {
+        const baseUrl = window.location.origin
+        const publicCvUrl = `${baseUrl}/api/cv-public?token=${cvToken}`
+        setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(publicCvUrl)}`)
       } else {
         setCvUrl(`/api/applications/${app._id}/cv`)
       }
