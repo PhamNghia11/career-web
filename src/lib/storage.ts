@@ -31,7 +31,20 @@ export async function saveFile(
     // 1. Try Cloudinary first for a "trơn tru" and permanent solution
     if (process.env.CLOUDINARY_CLOUD_NAME) {
         try {
-            const fileToUpload = typeof source === "string" ? source : `data:image/png;base64,${source.toString("base64")}`
+            const ext = originalName.toLowerCase().split('.').pop() || ''
+            const mimeMap: Record<string, string> = {
+                'pdf': 'application/pdf',
+                'doc': 'application/msword',
+                'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'png': 'image/png',
+                'jpg': 'image/jpeg',
+                'jpeg': 'image/jpeg',
+                'gif': 'image/gif',
+                'webp': 'image/webp',
+                'svg': 'image/svg+xml',
+            }
+            const mime = mimeMap[ext] || 'application/octet-stream'
+            const fileToUpload = typeof source === "string" ? source : `data:${mime};base64,${source.toString("base64")}`
 
             const result = await cloudinary.uploader.upload(fileToUpload, {
                 folder: `gdu-career/${category}`,

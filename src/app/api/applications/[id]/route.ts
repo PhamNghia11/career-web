@@ -46,8 +46,9 @@ export async function GET(
         if (!responseData.cvBase64 && responseData.cvPath) {
             const cvPath = responseData.cvPath as string
             if (cvPath.startsWith("http")) {
-                // Cloudinary or external URL - use directly
-                responseData.cvBase64 = cvPath
+                // Cloudinary or external URL - wrap with Google Docs Viewer for inline PDF display
+                // Cloudinary serves PDFs with download headers, so iframe can't display them directly
+                responseData.cvBase64 = `https://docs.google.com/gview?url=${encodeURIComponent(cvPath)}&embedded=true`
             } else if (cvPath.startsWith("data:")) {
                 // Already a data URI
                 responseData.cvBase64 = cvPath
