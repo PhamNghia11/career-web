@@ -41,9 +41,33 @@ export async function GET(
             return NextResponse.json({ error: "Forbidden: You don't have access to this application" }, { status: 403 })
         }
 
+        // Resolve cvPath into cvBase64 for backwards compatibility with frontend CV viewer
+        const responseData: any = { ...application }
+        if (!responseData.cvBase64 && responseData.cvPath) {
+            const cvPath = responseData.cvPath as string
+            if (cvPath.startsWith("http")) {
+                // Cloudinary or external URL - use directly
+                responseData.cvBase64 = cvPath
+            } else if (cvPath.startsWith("data:")) {
+                // Already a data URI
+                responseData.cvBase64 = cvPath
+            } else {
+                // Local file path - read and convert to base64 data URI
+                try {
+                    const { readFile } = await import("@/lib/storage")
+                    const buffer = await readFile(cvPath)
+                    const mimeType = responseData.cvMimeType || "application/pdf"
+                    responseData.cvBase64 = `data:${mimeType};base64,${buffer.toString("base64")}`
+                } catch (fileError) {
+                    console.error("[Applications API] Failed to read CV file:", cvPath, fileError)
+                    // cvBase64 will remain undefined, frontend will show error
+                }
+            }
+        }
+
         return NextResponse.json({
             success: true,
-            data: application
+            data: responseData
         })
     } catch (error) {
         console.error("Error fetching application:", error)
