@@ -5,7 +5,7 @@ import { CompaniesListClient } from "@/components/companies/companies-list-clien
 
 import { getCollection, COLLECTIONS } from "@/database/connection"
 
-export const dynamic = "force-dynamic"
+
 export const revalidate = 3600 // Cache page for 1 hour
 
 async function getBannerData(): Promise<any> {

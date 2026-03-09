@@ -16,7 +16,7 @@ interface JobPageProps {
     }>
 }
 
-export const dynamic = "force-dynamic"
+export const revalidate = 60
 
 // Helper function to safely parse date strings (handles DD/MM/YYYY and ISO)
 const parseDateHelper = (dateVal: any): Date => {
