@@ -4,8 +4,9 @@ import { ObjectId } from "mongodb"
 
 /**
  * GET /api/applications/[id]/cv
- * Serves the CV file inline with proper Content-Type headers.
- * This proxy approach works for Cloudinary URLs, local files, and base64 data URIs.
+ * Serves the CV file inline.
+ * - PDF files: served directly with Content-Disposition: inline
+ * - DOCX/DOC files: redirected to Microsoft Office Online Viewer
  */
 export async function GET(
     request: Request,
@@ -46,70 +47,67 @@ export async function GET(
 
         // Determine CV source
         const cvPath = application.cvPath as string | undefined
-        const cvBase64 = application.cvBase64 as string | undefined
+        const cvBase64Legacy = application.cvBase64 as string | undefined
         const cvMimeType = (application.cvMimeType as string) || "application/pdf"
         const cvOriginalName = (application.cvOriginalName as string) || "cv.pdf"
 
-        let pdfBuffer: Buffer | null = null
+        // Detect if this is a non-PDF document (DOCX, DOC)
+        const isWordDoc = cvMimeType.includes("msword") ||
+            cvMimeType.includes("wordprocessingml") ||
+            cvOriginalName.toLowerCase().endsWith(".docx") ||
+            cvOriginalName.toLowerCase().endsWith(".doc")
+
+        // For DOCX/DOC files stored on Cloudinary, use Office Online Viewer
+        if (isWordDoc && cvPath && cvPath.startsWith("http")) {
+            const officeViewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cvPath)}`
+            return NextResponse.redirect(officeViewerUrl)
+        }
+
+        // For PDF files or local files, serve directly
+        let fileBuffer: Buffer | null = null
         let contentType = cvMimeType
 
-        if (cvPath) {
-            if (cvPath.startsWith("http")) {
+        const sourceUrl = cvPath || cvBase64Legacy
+
+        if (sourceUrl) {
+            if (sourceUrl.startsWith("http")) {
                 // Fetch from Cloudinary/external URL
                 try {
-                    const response = await fetch(cvPath)
+                    const response = await fetch(sourceUrl)
                     if (!response.ok) throw new Error(`Fetch failed: ${response.status}`)
                     const arrayBuffer = await response.arrayBuffer()
-                    pdfBuffer = Buffer.from(arrayBuffer)
-                    // Use content-type from response if available
+                    fileBuffer = Buffer.from(arrayBuffer)
                     const responseContentType = response.headers.get("content-type")
                     if (responseContentType && !responseContentType.includes("octet-stream")) {
                         contentType = responseContentType
                     }
                 } catch (fetchError) {
-                    console.error("[CV Proxy] Failed to fetch from URL:", cvPath, fetchError)
+                    console.error("[CV Proxy] Failed to fetch from URL:", sourceUrl, fetchError)
                 }
-            } else if (cvPath.startsWith("data:")) {
+            } else if (sourceUrl.startsWith("data:")) {
                 // Parse data URI
-                const matches = cvPath.match(/^data:([^;]+);base64,(.+)$/)
+                const matches = sourceUrl.match(/^data:([^;]+);base64,(.+)$/)
                 if (matches) {
                     contentType = matches[1]
-                    pdfBuffer = Buffer.from(matches[2], "base64")
+                    fileBuffer = Buffer.from(matches[2], "base64")
                 }
             } else {
-                // Local file
+                // Local file path
                 try {
                     const { readFile } = await import("@/lib/storage")
-                    pdfBuffer = await readFile(cvPath)
+                    fileBuffer = await readFile(sourceUrl)
                 } catch (fileError) {
-                    console.error("[CV Proxy] Failed to read local file:", cvPath, fileError)
-                }
-            }
-        } else if (cvBase64) {
-            // Legacy base64 field
-            if (cvBase64.startsWith("data:")) {
-                const matches = cvBase64.match(/^data:([^;]+);base64,(.+)$/)
-                if (matches) {
-                    contentType = matches[1]
-                    pdfBuffer = Buffer.from(matches[2], "base64")
-                }
-            } else if (cvBase64.startsWith("http")) {
-                try {
-                    const response = await fetch(cvBase64)
-                    const arrayBuffer = await response.arrayBuffer()
-                    pdfBuffer = Buffer.from(arrayBuffer)
-                } catch (e) {
-                    console.error("[CV Proxy] Failed to fetch cvBase64 URL:", e)
+                    console.error("[CV Proxy] Failed to read local file:", sourceUrl, fileError)
                 }
             }
         }
 
-        if (!pdfBuffer) {
+        if (!fileBuffer) {
             return NextResponse.json({ error: "CV not found or could not be loaded" }, { status: 404 })
         }
 
         // Return the file with inline Content-Disposition so browser displays it
-        return new NextResponse(new Uint8Array(pdfBuffer), {
+        return new NextResponse(new Uint8Array(fileBuffer), {
             status: 200,
             headers: {
                 "Content-Type": contentType,
