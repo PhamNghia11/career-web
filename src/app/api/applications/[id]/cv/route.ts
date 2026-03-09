@@ -56,7 +56,8 @@ export async function GET(
         let fileBuffer: Buffer | null = null
         let contentType = cvMimeType
 
-        const sourceUrl = cvPath || cvBase64Legacy
+        const rawSource = application.cvPath || application.cvBase64
+        const sourceUrl = typeof rawSource === 'string' ? rawSource.trim() : null
 
         if (sourceUrl) {
             if (sourceUrl.startsWith("http")) {
@@ -71,7 +72,7 @@ export async function GET(
                         contentType = responseContentType
                     }
                 } catch (fetchError) {
-                    console.error("[CV Proxy] Failed to fetch from URL:", sourceUrl, fetchError)
+                    console.error(`[CV Proxy] Failed to fetch from URL (${id}):`, sourceUrl, fetchError)
                 }
             } else if (sourceUrl.startsWith("data:")) {
                 // Parse data URI
@@ -80,19 +81,31 @@ export async function GET(
                     contentType = matches[1]
                     fileBuffer = Buffer.from(matches[2], "base64")
                 }
+            } else if (sourceUrl.length > 100 && !sourceUrl.includes("/") && !sourceUrl.includes("\\")) {
+                // Heuristic: looks like raw base64 (long string, no path separators)
+                try {
+                    fileBuffer = Buffer.from(sourceUrl, "base64")
+                    // If it starts with %PDF in base64 (JVBERi), it's a PDF
+                    if (sourceUrl.startsWith("JVBERi")) {
+                        contentType = "application/pdf"
+                    }
+                } catch (b64Error) {
+                    console.error(`[CV Proxy] Failed to decode raw base64 (${id})`)
+                }
             } else {
                 // Local file path
                 try {
                     const { readFile } = await import("@/lib/storage")
                     fileBuffer = await readFile(sourceUrl)
                 } catch (fileError) {
-                    console.error("[CV Proxy] Failed to read local file:", sourceUrl, fileError)
+                    console.error(`[CV Proxy] Failed to read local file (${id}):`, sourceUrl, fileError)
                 }
             }
         }
 
         if (!fileBuffer) {
-            return NextResponse.json({ error: "CV not found or could not be loaded" }, { status: 404 })
+            console.warn(`[CV Proxy] CV not found for application ${id}. sourceUrl length: ${sourceUrl?.length || 0}`)
+            return NextResponse.json({ error: "CV not found or could not be loaded", detail: "File buffer is empty" }, { status: 404 })
         }
 
         // Return the file with inline Content-Disposition so browser displays it

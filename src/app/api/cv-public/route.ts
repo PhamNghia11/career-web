@@ -76,7 +76,8 @@ export async function GET(request: Request) {
 
         let fileBuffer: Buffer | null = null
         let contentType = cvMimeType
-        const sourceUrl = cvPath || cvBase64
+        const rawSource = application.cvPath || application.cvBase64
+        const sourceUrl = typeof rawSource === 'string' ? rawSource.trim() : null
 
         if (sourceUrl) {
             if (sourceUrl.startsWith("http")) {
@@ -85,8 +86,12 @@ export async function GET(request: Request) {
                     if (!response.ok) throw new Error(`Fetch failed: ${response.status}`)
                     const arrayBuffer = await response.arrayBuffer()
                     fileBuffer = Buffer.from(arrayBuffer)
+                    const responseContentType = response.headers.get("content-type")
+                    if (responseContentType && !responseContentType.includes("octet-stream")) {
+                        contentType = responseContentType
+                    }
                 } catch (fetchError) {
-                    console.error("[CV Public] Failed to fetch from URL:", sourceUrl, fetchError)
+                    console.error(`[CV Public] Failed to fetch from URL (${applicationId}):`, sourceUrl, fetchError)
                 }
             } else if (sourceUrl.startsWith("data:")) {
                 const matches = sourceUrl.match(/^data:([^;]+);base64,(.+)$/)
@@ -94,18 +99,29 @@ export async function GET(request: Request) {
                     contentType = matches[1]
                     fileBuffer = Buffer.from(matches[2], "base64")
                 }
+            } else if (sourceUrl.length > 100 && !sourceUrl.includes("/") && !sourceUrl.includes("\\")) {
+                // Heuristic: looks like raw base64
+                try {
+                    fileBuffer = Buffer.from(sourceUrl, "base64")
+                    if (sourceUrl.startsWith("JVBERi")) {
+                        contentType = "application/pdf"
+                    }
+                } catch (b64Error) {
+                    console.error(`[CV Public] Failed to decode raw base64 (${applicationId})`)
+                }
             } else {
                 try {
                     const { readFile } = await import("@/lib/storage")
                     fileBuffer = await readFile(sourceUrl)
                 } catch (fileError) {
-                    console.error("[CV Public] Failed to read local file:", sourceUrl, fileError)
+                    console.error(`[CV Public] Failed to read local file (${applicationId}):`, sourceUrl, fileError)
                 }
             }
         }
 
         if (!fileBuffer) {
-            return NextResponse.json({ error: "CV file not found" }, { status: 404 })
+            console.warn(`[CV Public] CV not found for application ${applicationId}. sourceUrl length: ${sourceUrl?.length || 0}`)
+            return NextResponse.json({ error: "CV file not found", detail: "File buffer is empty" }, { status: 404 })
         }
 
         return new NextResponse(new Uint8Array(fileBuffer), {
