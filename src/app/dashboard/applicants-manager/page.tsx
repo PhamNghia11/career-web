@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import * as docx from "docx-preview"
 
 interface Application {
     _id: string
@@ -48,6 +49,8 @@ function ManageApplicationsContent() {
     const [cvUrl, setCvUrl] = useState<string | null>(null)
     const [viewMode, setViewMode] = useState<"cv" | "details">("details")
     const [isExpanded, setIsExpanded] = useState(false)
+    const [cvBlob, setCvBlob] = useState<Blob | null>(null)
+    const [isWord, setIsWord] = useState(false)
 
     // Filter states
     const [searchTerm, setSearchTerm] = useState("")
@@ -129,6 +132,8 @@ function ManageApplicationsContent() {
         setSelectedApp(app)
         setViewMode("cv")
         setCvUrl(null)
+        setCvBlob(null)
+        setIsWord(false)
         setCvLoading(true)
 
         // Auto-update status to "Reviewed" if currently "New"
@@ -137,45 +142,46 @@ function ManageApplicationsContent() {
         }
 
         try {
-            const res = await fetch(`/api/applications/${app._id}`)
-            const data = await res.json()
+            // First, fetch application metadata to get original name/mime
+            const appRes = await fetch(`/api/applications/${app._id}`)
+            const appDataJson = await appRes.json()
 
-            if (!data.success) {
-                toast({ title: "Lỗi", description: "Không thể tải CV", variant: "destructive" })
-                setCvLoading(false)
-                return
+            if (!appDataJson.success) {
+                throw new Error("Không thể tải thông tin hồ sơ")
             }
 
-            const appData = data.data
+            const appData = appDataJson.data
             const cvOriginalName = (appData.cvOriginalName || "").toLowerCase()
-            const cvMimeType = appData.cvMimeType || ""
-            const cvToken = appData.cvToken
+            const cvMimeType = (appData.cvMimeType || "").toLowerCase()
 
             const isWordDoc = cvMimeType.includes("msword") ||
                 cvMimeType.includes("wordprocessingml") ||
                 cvOriginalName.endsWith(".docx") ||
                 cvOriginalName.endsWith(".doc")
 
-            if (isWordDoc) {
-                // Prefer direct public link if available (e.g. Cloudinary)
-                if (appData.cvPath && appData.cvPath.startsWith("http")) {
-                    setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(appData.cvPath)}`)
-                } else if (cvToken) {
-                    // Fallback to proxy route with token
-                    const baseUrl = window.location.origin
-                    const publicCvUrl = `${baseUrl}/api/cv-public?token=${cvToken}`
-                    setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(publicCvUrl)}`)
-                } else {
-                    // Last resort - try proxy (might not work in iframe for Word)
-                    setCvUrl(`/api/applications/${app._id}/cv`)
-                }
-            } else {
-                // For PDF: use proxy route
-                setCvUrl(`/api/applications/${app._id}/cv`)
+            setIsWord(isWordDoc)
+
+            // Fetch the actual file content as a Blob
+            const res = await fetch(`/api/applications/${app._id}/cv`)
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}))
+                throw new Error(errorData.error || "Không thể tải nội dung CV")
             }
-        } catch (error) {
+
+            const blob = await res.blob()
+            setCvBlob(blob)
+
+            // For both PDF and Word (as a backup/source), create a local URL
+            const url = URL.createObjectURL(blob)
+            setCvUrl(url)
+
+        } catch (error: any) {
             console.error("Error fetching CV:", error)
-            toast({ title: "Lỗi", description: "Không thể tải CV", variant: "destructive" })
+            toast({
+                title: "Lỗi hiển thị CV",
+                description: error.message || "Không thể tải CV. Vui lòng thử nút Tải xuống.",
+                variant: "destructive"
+            })
         } finally {
             setCvLoading(false)
         }
@@ -627,26 +633,45 @@ function ManageApplicationsContent() {
                     </DialogHeader>
 
                     {viewMode === 'cv' ? (
-                        <div className="flex-1 bg-gray-100 rounded-md overflow-hidden relative min-h-[500px]">
+                        <div className="flex-1 bg-white rounded-md overflow-hidden relative min-h-[500px] border shadow-inner">
                             {cvLoading ? (
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                <div className="absolute inset-0 flex items-center justify-center bg-gray-50/50 z-10">
+                                    <div className="flex flex-col items-center gap-3">
+                                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+                                        <p className="text-sm text-gray-500 animate-pulse">Đang nạp dữ liệu trực tiếp...</p>
+                                    </div>
                                 </div>
+                            ) : null}
+
+                            {isWord && cvBlob ? (
+                                <WordPreview blob={cvBlob} />
                             ) : cvUrl ? (
                                 <iframe
-                                    src={cvUrl}
-                                    className="w-full h-full"
+                                    src={`${cvUrl}#toolbar=0&navpanes=0`}
+                                    className="w-full h-full border-none"
                                     title="CV Preview"
                                 />
-                            ) : (
-                                <div className="absolute inset-0 flex items-center justify-center text-gray-500 flex-col gap-2">
-                                    <FileText className="h-10 w-10 text-gray-300" />
-                                    <span>Không thể hiển thị CV</span>
-                                    <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)}>
-                                        Thử lại
-                                    </Button>
+                            ) : !cvLoading ? (
+                                <div className="absolute inset-0 flex items-center justify-center text-gray-500 flex-col gap-4 p-8 text-center">
+                                    <div className="bg-red-50 p-4 rounded-full">
+                                        <XCircle className="h-12 w-12 text-red-500" />
+                                    </div>
+                                    <div className="max-w-xs">
+                                        <h3 className="font-bold text-gray-900">Không thể xem trực tiếp</h3>
+                                        <p className="text-sm text-gray-500 mt-1">File này có thể đã bị xóa hoặc định dạng không hỗ trợ xem online.</p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)}>
+                                            <RotateCcw className="h-4 w-4 mr-1" /> Thử lại
+                                        </Button>
+                                        <Button size="sm" asChild>
+                                            <a href={`/api/applications/${selectedApp?._id}/cv?download=true`} download>
+                                                <Download className="h-4 w-4 mr-1" /> Tải về máy
+                                            </a>
+                                        </Button>
+                                    </div>
                                 </div>
-                            )}
+                            ) : null}
                         </div>
                     ) : (
                         <div className="space-y-6 py-2">
@@ -735,6 +760,20 @@ function ManageApplicationsContent() {
                 </DialogContent>
             </Dialog>
         </div >
+    )
+}
+
+function WordPreview({ blob }: { blob: Blob }) {
+    const containerRef = useEffect(() => {
+        const container = document.getElementById("word-container")
+        if (container && blob) {
+            docx.renderAsync(blob, container)
+                .catch(err => console.error("Word rendering error:", err))
+        }
+    }, [blob])
+
+    return (
+        <div id="word-container" className="w-full h-full overflow-auto p-4 sm:p-8 bg-white" />
     )
 }
 
