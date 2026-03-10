@@ -4,11 +4,9 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { JobsListClient } from "@/components/jobs/jobs-list-client"
 import { getCollection, COLLECTIONS } from "@/database/connection"
-
+import { getStartOfToday } from "@/lib/date-utils"
 
 import { Job } from "@/lib/jobs-data"
-
-import { unstable_cache } from "next/cache"
 
 // ISR: Cache page for 60 seconds, then revalidate in background
 export const revalidate = 60
@@ -38,16 +36,26 @@ async function getBannerData(): Promise<any> {
 async function getInitialJobs() {
   try {
     const collection = await getCollection(COLLECTIONS.JOBS)
+    const startOfToday = getStartOfToday()
+
+    const filterQuery = {
+      status: "active",
+      $or: [
+        { normalizedDeadline: { $gte: startOfToday } },
+        { deadline: { $in: [null, "", "Vô thời hạn"] } }
+      ]
+    }
+
     const [jobs, total] = await Promise.all([
       collection.aggregate([
-        { $match: { status: "active" } },
+        { $match: filterQuery },
         { $sort: { postedAt: -1 } },
         { $limit: 15 },
         { $lookup: { from: "companies", localField: "companyId", foreignField: "_id", as: "companyInfo" } },
         { $addFields: { companyData: { $arrayElemAt: ["$companyInfo", 0] } } },
         { $project: { companyInfo: 0 } }
       ]).toArray(),
-      collection.countDocuments({ status: "active" })
+      collection.countDocuments(filterQuery)
     ])
 
     // Serialize ObjectIds to strings

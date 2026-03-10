@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { getCollection, COLLECTIONS } from "@/database/connection"
+import { parseNormalizedDeadline } from "@/lib/date-utils"
 import jobsData from "@/data/jobs.json"
 
 export const dynamic = 'force-dynamic'
@@ -56,6 +57,7 @@ export async function POST() {
             return {
                 ...jobWithoutId,
                 postedAt: job.postedAt || new Date().toISOString(),
+                normalizedDeadline: parseNormalizedDeadline(job.deadline),
                 status: "active",
                 applicants: job.applicants || 0,
                 views: job.views || 0
