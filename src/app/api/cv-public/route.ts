@@ -83,12 +83,9 @@ export async function GET(request: Request) {
             if (sourceUrl.startsWith("http")) {
                 try {
                     const response = await fetch(sourceUrl)
-                    if (!response.ok) throw new Error(`Fetch failed: ${response.status}`)
-                    const arrayBuffer = await response.arrayBuffer()
-                    fileBuffer = Buffer.from(arrayBuffer)
-                    const responseContentType = response.headers.get("content-type")
-                    if (responseContentType && !responseContentType.includes("octet-stream")) {
-                        contentType = responseContentType
+                    if (response.ok) {
+                        fileBuffer = Buffer.from(await response.arrayBuffer())
+                        contentType = response.headers.get("content-type") || contentType
                     }
                 } catch (fetchError) {
                     console.error(`[CV Public] Failed to fetch from URL (${applicationId}):`, sourceUrl, fetchError)
@@ -97,19 +94,14 @@ export async function GET(request: Request) {
                 const matches = sourceUrl.match(/^data:([^;]+);base64,([\s\S]+)$/)
                 if (matches) {
                     contentType = matches[1]
-                    const b64Data = matches[2].replace(/\s/g, "")
+                    const b64Data = matches[2].replace(/\s/gi, "")
                     fileBuffer = Buffer.from(b64Data, "base64")
                 }
-            } else if (sourceUrl.length > 100 && !sourceUrl.includes("/") && !sourceUrl.includes("\\") && !sourceUrl.startsWith("http")) {
+            } else if (sourceUrl.length > 200 && !sourceUrl.includes("/") && !sourceUrl.includes("\\") && !sourceUrl.startsWith("http")) {
                 // Heuristic: looks like raw base64
                 try {
-                    fileBuffer = Buffer.from(sourceUrl, "base64")
-                    if (sourceUrl.startsWith("JVBERi")) {
-                        contentType = "application/pdf"
-                    }
-                } catch (b64Error) {
-                    console.error(`[CV Public] Failed to decode raw base64 (${applicationId})`)
-                }
+                    fileBuffer = Buffer.from(sourceUrl.replace(/\s/gi, ""), "base64")
+                } catch (e) { }
             } else {
                 try {
                     const { readFile } = await import("@/lib/storage")

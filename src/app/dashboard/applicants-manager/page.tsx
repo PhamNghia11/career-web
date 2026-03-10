@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAuth } from "@/lib/auth-context"
-import { FileText, Mail, Phone, Calendar, User, CheckCircle, XCircle, Clock, Eye, Search, Filter, RotateCcw, Maximize2, Minimize2 } from "lucide-react"
+import { FileText, Mail, Phone, Calendar, User, CheckCircle, XCircle, Clock, Eye, Search, Filter, RotateCcw, Maximize2, Minimize2, Download } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -590,10 +590,23 @@ function ManageApplicationsContent() {
                             <div className="flex items-center gap-2 shrink-0">
                                 <Badge variant="outline" className="hidden sm:inline-flex">{selectedApp?.jobTitle}</Badge>
                                 {viewMode === 'cv' ? (
-                                    <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)} className="h-8">
-                                        <RotateCcw className="h-3 w-3 mr-1" />
-                                        Tải lại
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            asChild
+                                            className="h-8 border-green-200 text-green-700 hover:bg-green-50"
+                                        >
+                                            <a href={`/api/applications/${selectedApp?._id}/cv?download=true`} download>
+                                                <Download className="h-3 w-3 mr-1" />
+                                                Tải xuống
+                                            </a>
+                                        </Button>
+                                        <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)} className="h-8">
+                                            <RotateCcw className="h-3 w-3 mr-1" />
+                                            Tải lại
+                                        </Button>
+                                    </div>
                                 ) : (
                                     <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)} className="h-8 border-blue-200 text-blue-600 hover:bg-blue-50">
                                         <FileText className="h-3 w-3 mr-1" />

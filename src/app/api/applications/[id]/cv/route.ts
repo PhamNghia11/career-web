@@ -14,6 +14,8 @@ export async function GET(
 ) {
     try {
         const { id } = await params
+        const { searchParams } = new URL(request.url)
+        const isDownload = searchParams.get("download") === "true"
 
         // Auth check
         const { cookies } = await import("next/headers")
@@ -26,8 +28,8 @@ export async function GET(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
-        const userId = session.userId as string
         const userRole = session.role as string
+        const userId = session.userId as string
 
         const collection = await getCollection(COLLECTIONS.APPLICATIONS)
         const application = await collection.findOne({ _id: new ObjectId(id) })
@@ -36,7 +38,7 @@ export async function GET(
             return NextResponse.json({ error: "Application not found" }, { status: 404 })
         }
 
-        // Authorization
+        // Authorization check
         const isAdmin = userRole === 'admin'
         const isEmployer = userRole === 'employer' && (application.employerId === userId || application.employerId?.toString() === userId)
         const isStudent = userRole === 'student' && (application.applicantId === userId || application.applicantId?.toString() === userId)
@@ -45,31 +47,27 @@ export async function GET(
             return NextResponse.json({ error: "Forbidden" }, { status: 403 })
         }
 
-        // Determine CV source
         const cvPath = application.cvPath as string | undefined
         const cvBase64Legacy = application.cvBase64 as string | undefined
-        const cvMimeType = (application.cvMimeType as string) || "application/pdf"
         const cvOriginalName = (application.cvOriginalName as string) || "cv.pdf"
+        const cvMimeType = (application.cvMimeType as string) || "application/pdf"
 
-        // For local DOCX files, we need a fallback (serve as download)
-        // For PDF files or any file, serve directly with proper headers
+        // Priority 1: cvPath (Cloudinary or Local)
+        // Priority 2: cvBase64 (Legacy/Fallback)
+        const rawSource = cvPath || cvBase64Legacy
         let fileBuffer: Buffer | null = null
         let contentType = cvMimeType
 
-        const rawSource = application.cvPath || application.cvBase64
-        const sourceUrl = typeof rawSource === 'string' ? rawSource.trim() : null
+        if (rawSource) {
+            const sourceUrl = rawSource.trim()
 
-        if (sourceUrl) {
             if (sourceUrl.startsWith("http")) {
-                // Fetch from Cloudinary/external URL
+                // External URL (Cloudinary)
                 try {
                     const response = await fetch(sourceUrl)
-                    if (!response.ok) throw new Error(`Fetch failed: ${response.status}`)
-                    const arrayBuffer = await response.arrayBuffer()
-                    fileBuffer = Buffer.from(arrayBuffer)
-                    const responseContentType = response.headers.get("content-type")
-                    if (responseContentType && !responseContentType.includes("octet-stream")) {
-                        contentType = responseContentType
+                    if (response.ok) {
+                        fileBuffer = Buffer.from(await response.arrayBuffer())
+                        contentType = response.headers.get("content-type") || contentType
                     }
                 } catch (fetchError) {
                     console.error(`[CV Proxy] Failed to fetch from URL (${id}):`, sourceUrl, fetchError)
@@ -80,25 +78,19 @@ export async function GET(
                 if (matches) {
                     contentType = matches[1]
                     // Remove any whitespace/newlines from the base64 part
-                    const b64Data = matches[2].replace(/\s/g, "")
+                    const b64Data = matches[2].replace(/\s/gi, "")
                     fileBuffer = Buffer.from(b64Data, "base64")
                 }
-            } else if (sourceUrl.length > 100 && !sourceUrl.includes("/") && !sourceUrl.includes("\\") && !sourceUrl.startsWith("http")) {
+            } else if (sourceUrl.length > 200 && !sourceUrl.includes("/") && !sourceUrl.includes("\\") && !sourceUrl.startsWith("http")) {
                 // Heuristic: looks like raw base64 (long string, no path separators)
                 try {
-                    fileBuffer = Buffer.from(sourceUrl, "base64")
-                    // If it starts with %PDF in base64 (JVBERi), it's a PDF
-                    if (sourceUrl.startsWith("JVBERi")) {
-                        contentType = "application/pdf"
-                    }
-                } catch (b64Error) {
-                    console.error(`[CV Proxy] Failed to decode raw base64 (${id})`)
-                }
+                    fileBuffer = Buffer.from(sourceUrl.replace(/\s/gi, ""), "base64")
+                } catch (e) { }
             } else {
                 // Local file path
                 try {
                     const { readFile } = await import("@/lib/storage")
-                    // Normalize path: handle leading slashes if they exist, but path.join(cwd, /path) on windows can be tricky
+                    // Normalize path: handle leading slashes
                     const normalizedPath = sourceUrl.startsWith("/") ? sourceUrl.substring(1) : sourceUrl
                     fileBuffer = await readFile(normalizedPath)
                 } catch (fileError) {
@@ -107,22 +99,23 @@ export async function GET(
             }
         }
 
-        if (!fileBuffer) {
-            console.warn(`[CV Proxy] CV not found for application ${id}. sourceUrl length: ${sourceUrl?.length || 0}`)
-            return NextResponse.json({ error: "CV not found or could not be loaded", detail: "File buffer is empty" }, { status: 404 })
+        if (!fileBuffer || fileBuffer.length === 0) {
+            console.warn(`[CV Proxy] File buffer is empty for application ${id}`)
+            return NextResponse.json({ error: "File buffer is empty" }, { status: 404 })
         }
 
-        // Return the file with inline Content-Disposition so browser displays it
-        return new NextResponse(new Uint8Array(fileBuffer), {
-            status: 200,
-            headers: {
-                "Content-Type": contentType,
-                "Content-Disposition": `inline; filename="${cvOriginalName}"`,
-                "Cache-Control": "private, max-age=3600",
-            }
-        })
+        const headers = new Headers()
+        headers.set("Content-Type", contentType)
+
+        if (isDownload) {
+            headers.set("Content-Disposition", `attachment; filename="${encodeURIComponent(cvOriginalName)}"`)
+        } else {
+            headers.set("Content-Disposition", `inline; filename="${encodeURIComponent(cvOriginalName)}"`)
+        }
+
+        return new NextResponse(new Uint8Array(fileBuffer), { headers })
     } catch (error) {
-        console.error("[CV Proxy] Error:", error)
-        return NextResponse.json({ error: "Failed to serve CV" }, { status: 500 })
+        console.error("Error in CV proxy:", error)
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 })
     }
 }
