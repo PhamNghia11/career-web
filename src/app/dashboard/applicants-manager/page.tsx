@@ -161,19 +161,25 @@ function ManageApplicationsContent() {
 
             setIsWord(isWordDoc)
 
-            // Fetch the actual file content as a Blob
-            const res = await fetch(`/api/applications/${app._id}/cv`)
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}))
-                throw new Error(errorData.error || "Không thể tải nội dung CV")
+            if (isWordDoc) {
+                // Fetch the actual file content as a Blob
+                const res = await fetch(`/api/applications/${app._id}/cv`)
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}))
+                    throw new Error(errorData.error || "Không thể tải nội dung CV")
+                }
+
+                const blob = await res.blob()
+                setCvBlob(blob)
+
+                // For Word, create a local URL for the renderer
+                const url = URL.createObjectURL(blob)
+                setCvUrl(url)
+            } else {
+                // For PDF, use the direct proxy URL instead of a blob URL
+                // This is more reliable for iframe rendering
+                setCvUrl(`/api/applications/${app._id}/cv`)
             }
-
-            const blob = await res.blob()
-            setCvBlob(blob)
-
-            // For both PDF and Word (as a backup/source), create a local URL
-            const url = URL.createObjectURL(blob)
-            setCvUrl(url)
 
         } catch (error: any) {
             console.error("Error fetching CV:", error)
