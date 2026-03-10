@@ -156,11 +156,19 @@ function ManageApplicationsContent() {
                 cvOriginalName.endsWith(".docx") ||
                 cvOriginalName.endsWith(".doc")
 
-            if (isWordDoc && cvToken) {
-                // For DOCX: use Office Online Viewer with public token-based URL
-                const baseUrl = window.location.origin
-                const publicCvUrl = `${baseUrl}/api/cv-public?token=${cvToken}`
-                setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(publicCvUrl)}`)
+            if (isWordDoc) {
+                // Prefer direct public link if available (e.g. Cloudinary)
+                if (appData.cvPath && appData.cvPath.startsWith("http")) {
+                    setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(appData.cvPath)}`)
+                } else if (cvToken) {
+                    // Fallback to proxy route with token
+                    const baseUrl = window.location.origin
+                    const publicCvUrl = `${baseUrl}/api/cv-public?token=${cvToken}`
+                    setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(publicCvUrl)}`)
+                } else {
+                    // Last resort - try proxy (might not work in iframe for Word)
+                    setCvUrl(`/api/applications/${app._id}/cv`)
+                }
             } else {
                 // For PDF: use proxy route
                 setCvUrl(`/api/applications/${app._id}/cv`)

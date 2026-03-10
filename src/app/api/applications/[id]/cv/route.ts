@@ -75,13 +75,15 @@ export async function GET(
                     console.error(`[CV Proxy] Failed to fetch from URL (${id}):`, sourceUrl, fetchError)
                 }
             } else if (sourceUrl.startsWith("data:")) {
-                // Parse data URI
-                const matches = sourceUrl.match(/^data:([^;]+);base64,(.+)$/)
+                // Parse data URI - be robust against newlines in base64
+                const matches = sourceUrl.match(/^data:([^;]+);base64,([\s\S]+)$/)
                 if (matches) {
                     contentType = matches[1]
-                    fileBuffer = Buffer.from(matches[2], "base64")
+                    // Remove any whitespace/newlines from the base64 part
+                    const b64Data = matches[2].replace(/\s/g, "")
+                    fileBuffer = Buffer.from(b64Data, "base64")
                 }
-            } else if (sourceUrl.length > 100 && !sourceUrl.includes("/") && !sourceUrl.includes("\\")) {
+            } else if (sourceUrl.length > 100 && !sourceUrl.includes("/") && !sourceUrl.includes("\\") && !sourceUrl.startsWith("http")) {
                 // Heuristic: looks like raw base64 (long string, no path separators)
                 try {
                     fileBuffer = Buffer.from(sourceUrl, "base64")
@@ -96,7 +98,9 @@ export async function GET(
                 // Local file path
                 try {
                     const { readFile } = await import("@/lib/storage")
-                    fileBuffer = await readFile(sourceUrl)
+                    // Normalize path: handle leading slashes if they exist, but path.join(cwd, /path) on windows can be tricky
+                    const normalizedPath = sourceUrl.startsWith("/") ? sourceUrl.substring(1) : sourceUrl
+                    fileBuffer = await readFile(normalizedPath)
                 } catch (fileError) {
                     console.error(`[CV Proxy] Failed to read local file (${id}):`, sourceUrl, fileError)
                 }

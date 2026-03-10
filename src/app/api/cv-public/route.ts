@@ -94,12 +94,13 @@ export async function GET(request: Request) {
                     console.error(`[CV Public] Failed to fetch from URL (${applicationId}):`, sourceUrl, fetchError)
                 }
             } else if (sourceUrl.startsWith("data:")) {
-                const matches = sourceUrl.match(/^data:([^;]+);base64,(.+)$/)
+                const matches = sourceUrl.match(/^data:([^;]+);base64,([\s\S]+)$/)
                 if (matches) {
                     contentType = matches[1]
-                    fileBuffer = Buffer.from(matches[2], "base64")
+                    const b64Data = matches[2].replace(/\s/g, "")
+                    fileBuffer = Buffer.from(b64Data, "base64")
                 }
-            } else if (sourceUrl.length > 100 && !sourceUrl.includes("/") && !sourceUrl.includes("\\")) {
+            } else if (sourceUrl.length > 100 && !sourceUrl.includes("/") && !sourceUrl.includes("\\") && !sourceUrl.startsWith("http")) {
                 // Heuristic: looks like raw base64
                 try {
                     fileBuffer = Buffer.from(sourceUrl, "base64")
@@ -112,7 +113,8 @@ export async function GET(request: Request) {
             } else {
                 try {
                     const { readFile } = await import("@/lib/storage")
-                    fileBuffer = await readFile(sourceUrl)
+                    const normalizedPath = sourceUrl.startsWith("/") ? sourceUrl.substring(1) : sourceUrl
+                    fileBuffer = await readFile(normalizedPath)
                 } catch (fileError) {
                     console.error(`[CV Public] Failed to read local file (${applicationId}):`, sourceUrl, fileError)
                 }
