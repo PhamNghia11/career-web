@@ -172,8 +172,7 @@ function ManageApplicationsContent() {
                 // Fetch the actual file content as a Blob for Word preview
                 const res = await fetch(`/api/applications/${app._id}/cv`)
                 if (!res.ok) {
-                    const errorData = await res.json().catch(() => ({}))
-                    throw new Error(errorData.error || "Không thể tải nội dung CV")
+                    throw new Error("Không thể tải nội dung CV (Word)")
                 }
 
                 const blob = await res.blob()
@@ -183,14 +182,31 @@ function ManageApplicationsContent() {
                 const url = URL.createObjectURL(blob)
                 setCvUrl(url)
             } else {
-                // For PDF, try to use direct URL if it's already a full URL (Cloudinary)
-                // This is much more reliable than proxying
-                if (appData.cvPath && appData.cvPath.startsWith("http")) {
-                    setCvUrl(appData.cvPath)
-                } else {
-                    // Fallback to proxy for local files or other sources
-                    setCvUrl(`/api/applications/${app._id}/cv`)
+                // For PDF: fetch as blob first, check response validity
+                let pdfUrl = appData.cvPath && appData.cvPath.startsWith("http")
+                    ? appData.cvPath
+                    : `/api/applications/${app._id}/cv`
+
+                const res = await fetch(pdfUrl)
+
+                if (!res.ok) {
+                    throw new Error("File CV không tồn tại trên hệ thống. Ứng viên cần nộp lại CV.")
                 }
+
+                const contentType = res.headers.get("content-type") || ""
+
+                // If proxy returned HTML error page instead of PDF, treat as error
+                if (contentType.includes("text/html")) {
+                    throw new Error("File CV đã bị mất trên hệ thống. Ứng viên cần nộp lại CV.")
+                }
+
+                const blob = await res.blob()
+                if (blob.size < 100) {
+                    throw new Error("File CV trống hoặc bị hỏng.")
+                }
+
+                const blobUrl = URL.createObjectURL(blob)
+                setCvUrl(blobUrl)
             }
 
         } catch (error: any) {
