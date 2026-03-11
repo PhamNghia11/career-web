@@ -162,7 +162,7 @@ function ManageApplicationsContent() {
             setIsWord(isWordDoc)
 
             if (isWordDoc) {
-                // Fetch the actual file content as a Blob
+                // Fetch the actual file content as a Blob for Word preview
                 const res = await fetch(`/api/applications/${app._id}/cv`)
                 if (!res.ok) {
                     const errorData = await res.json().catch(() => ({}))
@@ -176,9 +176,14 @@ function ManageApplicationsContent() {
                 const url = URL.createObjectURL(blob)
                 setCvUrl(url)
             } else {
-                // For PDF, use the direct proxy URL instead of a blob URL
-                // This is more reliable for iframe rendering
-                setCvUrl(`/api/applications/${app._id}/cv`)
+                // For PDF, try to use direct URL if it's already a full URL (Cloudinary)
+                // This is much more reliable than proxying
+                if (appData.cvPath && appData.cvPath.startsWith("http")) {
+                    setCvUrl(appData.cvPath)
+                } else {
+                    // Fallback to proxy for local files or other sources
+                    setCvUrl(`/api/applications/${app._id}/cv`)
+                }
             }
 
         } catch (error: any) {
