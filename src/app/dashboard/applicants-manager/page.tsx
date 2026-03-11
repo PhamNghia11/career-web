@@ -51,6 +51,8 @@ function ManageApplicationsContent() {
     const [isExpanded, setIsExpanded] = useState(false)
     const [cvBlob, setCvBlob] = useState<Blob | null>(null)
     const [isWord, setIsWord] = useState(false)
+    const [cvFileName, setCvFileName] = useState<string>("")
+    const [cvMimeType, setCvMimeType] = useState<string>("")
 
     // Filter states
     const [searchTerm, setSearchTerm] = useState("")
@@ -136,10 +138,12 @@ function ManageApplicationsContent() {
         setIsWord(false)
         setCvLoading(true)
 
-        // Auto-update status to "Reviewed" if currently "New"
         if (app.status === "new") {
             handleStatusChange(app._id, "reviewed")
         }
+
+        setCvFileName("")
+        setCvMimeType("")
 
         try {
             // First, fetch application metadata to get original name/mime
@@ -151,13 +155,16 @@ function ManageApplicationsContent() {
             }
 
             const appData = appDataJson.data
-            const cvOriginalName = (appData.cvOriginalName || "").toLowerCase()
-            const cvMimeType = (appData.cvMimeType || "").toLowerCase()
+            const cvOriginalName = (appData.cvOriginalName || "cv.pdf")
+            const cvMimeType = (appData.cvMimeType || "application/pdf")
 
-            const isWordDoc = cvMimeType.includes("msword") ||
-                cvMimeType.includes("wordprocessingml") ||
-                cvOriginalName.endsWith(".docx") ||
-                cvOriginalName.endsWith(".doc")
+            setCvFileName(cvOriginalName)
+            setCvMimeType(cvMimeType)
+
+            const isWordDoc = cvMimeType.toLowerCase().includes("msword") ||
+                cvMimeType.toLowerCase().includes("wordprocessingml") ||
+                cvOriginalName.toLowerCase().endsWith(".docx") ||
+                cvOriginalName.toLowerCase().endsWith(".doc")
 
             setIsWord(isWordDoc)
 
@@ -607,21 +614,44 @@ function ManageApplicationsContent() {
                             <div className="flex items-center gap-2 shrink-0">
                                 <Badge variant="outline" className="hidden sm:inline-flex">{selectedApp?.jobTitle}</Badge>
                                 {viewMode === 'cv' ? (
-                                    <div className="flex gap-2">
+                                    <div className="flex items-center gap-1">
                                         <Button
                                             variant="outline"
                                             size="sm"
+                                            className="h-8 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
                                             asChild
-                                            className="h-8 border-green-200 text-green-700 hover:bg-green-50"
                                         >
-                                            <a href={`/api/applications/${selectedApp?._id}/cv?download=true`} download>
-                                                <Download className="h-3 w-3 mr-1" />
-                                                Tải xuống
+                                            <a
+                                                href={`/api/applications/${selectedApp?._id}/cv?download=true`}
+                                                download={cvFileName}
+                                            >
+                                                <Download className="h-3.5 w-3.5 mr-1.5" />
+                                                Tải CV
                                             </a>
                                         </Button>
-                                        <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)} className="h-8">
-                                            <RotateCcw className="h-3 w-3 mr-1" />
-                                            Tải lại
+
+                                        {!isWord && cvUrl && (
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="h-8 border-gray-200 text-gray-700 hover:bg-gray-50"
+                                                asChild
+                                            >
+                                                <a href={cvUrl} target="_blank" rel="noopener noreferrer">
+                                                    <Maximize2 className="h-3.5 w-3.5 mr-1.5" />
+                                                    Mở tab mới
+                                                </a>
+                                            </Button>
+                                        )}
+
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => selectedApp && handleViewCV(selectedApp)}
+                                            className="h-8 text-gray-400 hover:text-blue-600 px-2"
+                                            title="Tải lại"
+                                        >
+                                            <RotateCcw className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 ) : (

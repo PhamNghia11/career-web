@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { FileText, Users, Eye, Plus, ArrowRight, User, Mail, Phone, Calendar, Clock, CheckCircle, RotateCcw } from "lucide-react"
+import { FileText, Users, Eye, Plus, ArrowRight, User, Mail, Phone, Calendar, Clock, CheckCircle, RotateCcw, Download } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -31,6 +31,9 @@ export function EmployerDashboardContent() {
     const [cvUrl, setCvUrl] = useState<string | null>(null)
     const [cvLoading, setCvLoading] = useState(false)
     const [appsLoading, setAppsLoading] = useState(false)
+    const [cvFileName, setCvFileName] = useState<string>("")
+    const [cvMimeType, setCvMimeType] = useState<string>("")
+    const [isWord, setIsWord] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -140,14 +143,19 @@ export function EmployerDashboardContent() {
 
             if (data.success) {
                 const appData = data.data
-                const cvOriginalName = (appData.cvOriginalName || "").toLowerCase()
-                const cvMimeType = appData.cvMimeType || ""
+                const cvOriginalName = appData.cvOriginalName || "cv.pdf"
+                const cvMimeType = appData.cvMimeType || "application/pdf"
                 const cvToken = appData.cvToken
 
-                const isWordDoc = cvMimeType.includes("msword") ||
-                    cvMimeType.includes("wordprocessingml") ||
-                    cvOriginalName.endsWith(".docx") ||
-                    cvOriginalName.endsWith(".doc")
+                setCvFileName(cvOriginalName)
+                setCvMimeType(cvMimeType)
+
+                const isWordDoc = cvMimeType.toLowerCase().includes("msword") ||
+                    cvMimeType.toLowerCase().includes("wordprocessingml") ||
+                    cvOriginalName.toLowerCase().endsWith(".docx") ||
+                    cvOriginalName.toLowerCase().endsWith(".doc")
+
+                setIsWord(isWordDoc)
 
                 if (isWordDoc && cvToken) {
                     const baseUrl = window.location.origin
@@ -395,6 +403,46 @@ export function EmployerDashboardContent() {
                             <div className="flex flex-col gap-1">
                                 <span>Chi tiết ứng viên: {selectedApp?.fullname}</span>
                                 <Badge variant="outline" className="w-fit">{selectedApp?.jobTitle}</Badge>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                                    asChild
+                                >
+                                    <a
+                                        href={`/api/applications/${selectedApp?._id}/cv?download=true`}
+                                        download={cvFileName}
+                                    >
+                                        <Download className="h-3.5 w-3.5 mr-1" />
+                                        Tải CV
+                                    </a>
+                                </Button>
+
+                                {!isWord && cvUrl && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8 hidden sm:flex"
+                                        asChild
+                                    >
+                                        <a href={cvUrl} target="_blank" rel="noopener noreferrer">
+                                            <ArrowRight className="h-3.5 w-3.5 mr-1" />
+                                            Mở tab mới
+                                        </a>
+                                    </Button>
+                                )}
+
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleViewDetails(selectedApp)}
+                                    className="h-8 px-2"
+                                    title="Tải lại"
+                                >
+                                    <RotateCcw className="h-4 w-4" />
+                                </Button>
                             </div>
                         </DialogTitle>
                     </DialogHeader>

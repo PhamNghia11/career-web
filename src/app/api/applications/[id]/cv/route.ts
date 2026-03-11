@@ -48,13 +48,16 @@ export async function GET(
         }
 
         const cvPath = application.cvPath as string | undefined
-        const cvBase64Legacy = application.cvBase64 as string | undefined
+        const cvBase64Field = application.cvBase64 as string | undefined
         const cvOriginalName = (application.cvOriginalName as string) || "cv.pdf"
         const cvMimeType = (application.cvMimeType as string) || "application/pdf"
 
+        // Debug log
+        console.log(`[CV Proxy] Accessing CV for app ${id}. Path: ${cvPath}, Base64Field length: ${cvBase64Field?.length || 0}`)
+
         // Priority 1: cvPath (Cloudinary or Local)
-        // Priority 2: cvBase64 (Legacy/Fallback)
-        const rawSource = cvPath || cvBase64Legacy
+        // Priority 2: cvBase64 field (sometimes used to store paths or raw data)
+        const rawSource = cvPath || cvBase64Field
         let fileBuffer: Buffer | null = null
         let contentType = cvMimeType
 
@@ -64,7 +67,6 @@ export async function GET(
             if (sourceUrl.startsWith("http")) {
                 // External URL (Cloudinary)
                 try {
-                    // Use encodeURI to handle spaces and special characters in Cloudinary URLs
                     const encodedUrl = encodeURI(sourceUrl)
                     const response = await fetch(encodedUrl)
                     if (response.ok) {
@@ -72,29 +74,38 @@ export async function GET(
                         contentType = response.headers.get("content-type") || contentType
                     } else {
                         console.error(`[CV Proxy] External fetch failed with status ${response.status} for ${encodedUrl}`)
-                        // Fallback: If fetch failed but we have a direct URL, we'll try to redirect later
                     }
                 } catch (fetchError) {
                     console.error(`[CV Proxy] Failed to fetch from URL (${id}):`, sourceUrl, fetchError)
                 }
             } else if (sourceUrl.startsWith("data:")) {
-                // ... rest of the logic remains same for base64/local ...
-                // I will keep the existing block but ensure it's correct
                 const matches = sourceUrl.match(/^data:([^;]+);base64,([\s\S]+)$/)
                 if (matches) {
                     contentType = matches[1]
                     const b64Data = matches[2].replace(/\s/gi, "")
                     fileBuffer = Buffer.from(b64Data, "base64")
                 }
-            } else if (sourceUrl.length > 200 && !sourceUrl.includes("/") && !sourceUrl.includes("\\") && !sourceUrl.startsWith("http")) {
+            } else if (sourceUrl.length > 300 && !sourceUrl.includes("/") && !sourceUrl.includes("\\") && !sourceUrl.startsWith("http")) {
+                // Probable raw base64
                 try {
                     fileBuffer = Buffer.from(sourceUrl.replace(/\s/gi, ""), "base64")
                 } catch (e) { }
             } else {
+                // Local File path
                 try {
                     const { readFile } = await import("@/lib/storage")
-                    const normalizedPath = sourceUrl.startsWith("/") ? sourceUrl.substring(1) : sourceUrl
-                    fileBuffer = await readFile(normalizedPath)
+                    // Handle various path formats
+                    let normalizedPath = sourceUrl
+                    if (normalizedPath.startsWith("/")) normalizedPath = normalizedPath.substring(1)
+
+                    // Possible prefixes: "uploads/cvs/", "/uploads/cvs/", "cvs/"
+                    fileBuffer = await readFile(normalizedPath).catch(async () => {
+                        // Retry without 'uploads/' if present
+                        if (normalizedPath.startsWith("uploads/")) {
+                            return await readFile(normalizedPath.replace("uploads/", ""))
+                        }
+                        throw new Error("File not found")
+                    })
                 } catch (fileError) {
                     console.error(`[CV Proxy] Failed to read local file (${id}):`, sourceUrl, fileError)
                 }
@@ -102,19 +113,30 @@ export async function GET(
         }
 
         // Fallback for PDF/External: If we couldn't get the buffer but have a direct URL, redirect the user to it
-        // This is a powerful backup for PDFs specifically
         if ((!fileBuffer || fileBuffer.length === 0) && rawSource?.startsWith("http")) {
             console.log(`[CV Proxy] Using redirection fallback for external file: ${id}`)
             return NextResponse.redirect(new URL(rawSource))
         }
 
         if (!fileBuffer || fileBuffer.length === 0) {
-            console.warn(`[CV Proxy] File buffer is empty for application ${id}`)
-            return NextResponse.json({ error: "File buffer is empty" }, { status: 404 })
+            console.warn(`[CV Proxy] CV not found or empty for application ${id}. source: ${rawSource?.substring(0, 50)}...`)
+            return NextResponse.json({
+                error: "CV file not found",
+                message: "Không tìm thấy file CV trên hệ thống. Vui lòng thử tải lại hoặc liên hệ quản trị viên.",
+                detail: `Source: ${rawSource?.substring(0, 100)}`
+            }, {
+                status: 404,
+                headers: {
+                    "Cache-Control": "no-store, must-revalidate",
+                    "X-Content-Type-Options": "nosniff"
+                }
+            })
         }
 
         const headers = new Headers()
         headers.set("Content-Type", contentType)
+        headers.set("X-Content-Type-Options", "nosniff")
+        headers.set("Cache-Control", "private, max-age=3600")
 
         if (isDownload) {
             headers.set("Content-Disposition", `attachment; filename="${encodeURIComponent(cvOriginalName)}"`)
