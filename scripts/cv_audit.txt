@@ -1,0 +1,152 @@
+ID: 6948c2f7a8de7ba4a524a245
+Name: Phạm Lê Nghĩa
+Mime: ?
+OrigName: CV_Phạm Lê Nghĩa.pdf
+cvPath: /uploads/1766376183551-CV_Phạm Lê Nghĩa.pdf
+b64Len: 0
+b64Start: 
+---
+ID: 69796ba35ff712f46189c412
+Name: Tuong Ho
+Mime: application/pdf
+OrigName: 2431_HĐNVQS_VV XAC MINH THOI GIAN HOAN THANH KHOA HOC CUA THANH NIEN NGUYEN HOANG MINH CHANH.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/9bb439d3-df65-441a-80b0-2d410a5f2391.pdf
+---
+ID: 6979ba5fcafdfa48410fb1e5
+Name: Họa Sĩ Người Áo
+Mime: application/pdf
+OrigName: Cao Văn Hoàng Duyên.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/3069eabd-7dbe-4d92-828e-181fa748cf5a.pdf
+---
+ID: 6979bc1e2e065ab209ffb4a5
+Name: Minh Khôi
+Mime: application/pdf
+OrigName: Cao Văn Hoàng Duyên.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/11906c0e-41d5-49c0-8e16-39b11e30063c.pdf
+---
+ID: 6979c17c3a413040bd20d151
+Name: Tuong Ho
+Mime: application/pdf
+OrigName: 4378-4100-2030-2755 (1).pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/89df60a8-531d-4cec-9f79-b6d3db8a5558.pdf
+---
+ID: 697b0e8ad5f2413a90a404b6
+Name: Minh Khôi
+Mime: application/pdf
+OrigName: Cao Văn Hoàng Duyên.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/3c2fe201-2011-4e9a-b718-8ce8d41bd775.pdf
+---
+ID: 697b1efafba46d4d8879137c
+Name: Passobemsolto
+Mime: application/pdf
+OrigName: CV.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/f6ef17dc-a25f-40b3-a8ac-f8e26b148e7b.pdf
+---
+ID: 697b1f95f11058fa585398b9
+Name: Passobemsolto
+Mime: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+OrigName: Mô tả công việc Project Manager (PM).docx
+cvPath: (none)
+b64Len: 15952
+b64Start: data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;bas
+---
+ID: 697b2a3016c1b5e2dcb6a843
+Name: Họa Sĩ Người Áo
+Mime: application/pdf
+OrigName: Cao Văn Hoàng Duyên.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/f15c8779-fd0e-46a0-83f3-d7ce87ee99f7.pdf
+---
+ID: 697b2c45b6d1f3b0610b9837
+Name: Họa Sĩ Người Áo
+Mime: application/pdf
+OrigName: Cao Văn Hoàng Duyên.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/99e47db7-96e5-4961-bf9d-c7a27d6379be.pdf
+---
+ID: 697c5f91233dc30bee03c9a6
+Name: Tuong Ho
+Mime: application/pdf
+OrigName: 20241114.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/851bf64a-cfe5-4675-b15f-38c3f8a9b863.pdf
+---
+ID: 69814fd35d92b3b183b308a2
+Name: Passobemsolto
+Mime: application/pdf
+OrigName: CV_TTS_Nguyễn Ngọc Anh Thư_23150231 .pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/f6dfc37d-1318-49a9-89c4-ec0b6b38d551.pdf
+---
+ID: 698163096be5158cac1b2eba
+Name: Họa Sĩ Người Áo
+Mime: application/pdf
+OrigName: Cao Văn Hoàng Duyên.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/eba32cda-61f4-4f39-918b-a71568b110d7.pdf
+---
+ID: 69816e3ba4e5cb31f66ecfba
+Name: Họa Sĩ Người Áo
+Mime: application/pdf
+OrigName: Cao Văn Hoàng Duyên.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/2cf154ec-e3f6-45c9-97a8-15e54099c89a.pdf
+---
+ID: 698172f87aa52f7a17e7224a
+Name: CAO VĂN HOÀNG DUYÊN
+Mime: application/pdf
+OrigName: CV_NGUYENTHITHUYTIEN.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/5cfd07dc-e593-41d5-b1db-be2476a7a345.pdf
+---
+ID: 698179a4d8fad5f23f7115b9
+Name: Test
+Mime: application/pdf
+OrigName: CV_TTS_Nguyễn Ngọc Anh Thư_23150231 .pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/c1ac3cdd-9645-4312-91c7-fa280a66f85d.pdf
+---
+ID: 698305675e6e4e5870317963
+Name: Họa Sĩ Người Áo
+Mime: application/pdf
+OrigName: Cao Văn Hoàng Duyên.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/4e3cbc27-84c3-440b-ae90-e05535b213de.pdf
+---
+ID: 698d9695446f33b860f845a6
+Name: Lien Phong Shop
+Mime: application/pdf
+OrigName: MITPE-DTR-ENG.pdf
+cvPath: (none)
+b64Len: 53
+b64Start: /uploads/cvs/2e0e6609-e485-43a3-a290-cf10061ba6cb.pdf
+---
+ID: 699fbc8279e8b6d1dc7edb02
+Name: Nguyễn Thị Thu Thảo
+Mime: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+OrigName: Bao_cao_Issue_CareerGDU.docx
+cvPath: (none)
+b64Len: 50668
+b64Start: data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;bas
+---

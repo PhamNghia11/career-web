@@ -1,0 +1,7 @@
+DB: BookStore | Collections: students
+DB: gdu_career | Collections: jobs, applications, news, notifications, hero_slides, site_configs, user_reviews, review_likes, companies, pending_users, contacts, users, reports, review_comments, visitors, saved_jobs
+DB: gdu_jobs | Collections: reviews
+DB: lab3 | Collections: restaurants
+DB: sampledb | Collections: zips
+DB: techstore | Collections: suppliers, categories, customers, orders, products
+DB: test | Collections: students
