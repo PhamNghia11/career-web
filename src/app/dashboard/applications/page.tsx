@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAuth } from "@/lib/auth-context"
-import { FileText, Calendar, Building, Clock } from "lucide-react"
+import { FileText, Calendar, Building, Clock, Download, Maximize2, RotateCcw } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 
@@ -32,6 +32,8 @@ export default function MyApplicationsPage() {
   const [loading, setLoading] = useState(true)
   const [selectedApp, setSelectedApp] = useState<Application | null>(null)
   const [cvLoading, setCvLoading] = useState(false)
+  const [cvFileName, setCvFileName] = useState<string>("")
+  const [isWord, setIsWord] = useState(false)
   const [cvUrl, setCvUrl] = useState<string | null>(null)
 
   useEffect(() => {
@@ -80,17 +82,25 @@ export default function MyApplicationsPage() {
       const cvMimeType = appData.cvMimeType || ""
       const cvToken = appData.cvToken
 
-      const isWordDoc = cvMimeType.includes("msword") ||
-        cvMimeType.includes("wordprocessingml") ||
-        cvOriginalName.endsWith(".docx") ||
-        cvOriginalName.endsWith(".doc")
+      const isWordDoc = cvMimeType.toLowerCase().includes("msword") ||
+        cvMimeType.toLowerCase().includes("wordprocessingml") ||
+        cvOriginalName.toLowerCase().endsWith(".docx") ||
+        cvOriginalName.toLowerCase().endsWith(".doc")
+
+      setIsWord(isWordDoc)
+      setCvFileName(appData.cvOriginalName || "cv.pdf")
 
       if (isWordDoc && cvToken) {
         const baseUrl = window.location.origin
         const publicCvUrl = `${baseUrl}/api/cv-public?token=${cvToken}`
         setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(publicCvUrl)}`)
       } else {
-        setCvUrl(`/api/applications/${app._id}/cv`)
+        // For PDF, prioritize direct Cloudinary URL if available
+        if (appData.cvPath && appData.cvPath.startsWith("http")) {
+          setCvUrl(appData.cvPath)
+        } else {
+          setCvUrl(`/api/applications/${app._id}/cv`)
+        }
       }
     } catch (error) {
       console.error("Error fetching CV:", error)
@@ -201,8 +211,50 @@ export default function MyApplicationsPage() {
 
       <Dialog open={!!selectedApp} onOpenChange={(open) => !open && setSelectedApp(null)}>
         <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>CV của bạn: {selectedApp?.jobTitle}</DialogTitle>
+          <DialogHeader className="border-b pb-4">
+            <DialogTitle className="flex items-center justify-between">
+              <span>CV của bạn: {selectedApp?.jobTitle}</span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                  asChild
+                >
+                  <a
+                    href={`/api/applications/${selectedApp?._id}/cv?download=true`}
+                    download={cvFileName}
+                  >
+                    <Download className="h-3.5 w-3.5 mr-1" />
+                    Tải CV
+                  </a>
+                </Button>
+
+                {!isWord && cvUrl && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 hidden sm:flex"
+                    asChild
+                  >
+                    <a href={cvUrl} target="_blank" rel="noopener noreferrer">
+                      <Maximize2 className="h-3.5 w-3.5 mr-1" />
+                      Mở tab mới
+                    </a>
+                  </Button>
+                )}
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => selectedApp && handleViewCV(selectedApp)}
+                  className="h-8 px-2"
+                  title="Tải lại"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+              </div>
+            </DialogTitle>
           </DialogHeader>
           <div className="flex-1 bg-gray-100 rounded-md overflow-hidden relative">
             {cvLoading ? (
