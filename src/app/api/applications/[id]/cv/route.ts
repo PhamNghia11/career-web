@@ -120,13 +120,33 @@ export async function GET(
 
         if (!fileBuffer || fileBuffer.length === 0) {
             console.warn(`[CV Proxy] CV not found or empty for application ${id}. source: ${rawSource?.substring(0, 50)}...`)
-            return NextResponse.json({
-                error: "CV file not found",
-                message: "Không tìm thấy file CV trên hệ thống. Vui lòng thử tải lại hoặc liên hệ quản trị viên.",
-                detail: `Source: ${rawSource?.substring(0, 100)}`
-            }, {
+            // Return an HTML page that the iframe can render visually
+            // (JSON responses appear blank in iframes)
+            const errorHtml = `<!DOCTYPE html>
+<html lang="vi">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f9fafb;color:#374151}
+.card{text-align:center;padding:2.5rem;max-width:420px}
+.icon{width:64px;height:64px;margin:0 auto 1.5rem;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.icon svg{width:32px;height:32px;color:#ef4444}
+h2{font-size:1.1rem;margin-bottom:.5rem;color:#111827}
+p{font-size:.875rem;color:#6b7280;line-height:1.6;margin-bottom:1.5rem}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.625rem 1.25rem;background:#2563eb;color:#fff;border:none;border-radius:.5rem;font-size:.875rem;cursor:pointer;text-decoration:none;transition:background .2s}
+.btn:hover{background:#1d4ed8}
+</style></head>
+<body>
+<div class="card">
+<div class="icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg></div>
+<h2>Không tìm thấy file CV</h2>
+<p>File CV này không còn tồn tại trên hệ thống. Có thể file đã bị xóa hoặc chưa được tải lên đúng cách.<br/>Vui lòng sử dụng nút <b>Tải CV</b> ở phía trên hoặc liên hệ quản trị viên.</p>
+</div>
+</body></html>`
+            return new NextResponse(errorHtml, {
                 status: 404,
                 headers: {
+                    "Content-Type": "text/html; charset=utf-8",
                     "Cache-Control": "no-store, must-revalidate",
                     "X-Content-Type-Options": "nosniff"
                 }
