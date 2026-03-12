@@ -176,8 +176,7 @@ function ManageApplicationsContent() {
                 setCvBlob(blob)
                 const url = URL.createObjectURL(blob)
                 setCvUrl(url)
-            } else {
-                // PDF: Revert to direct URL to avoid CORS/Fetching issues
+                // PDF: Direct URL. Remove toolbar=0 to allow native toolbar as shown in screenshot.
                 const pdfUrl = appData.cvPath && appData.cvPath.startsWith("http")
                     ? appData.cvPath
                     : `/api/applications/${app._id}/cv`
@@ -429,7 +428,7 @@ function ManageApplicationsContent() {
                                         {filteredApplications.map((app) => (
                                             <TableRow key={app._id}>
                                                 <TableCell>
-                                                    <div className="font-medium text-blue-900">{app.jobTitle}</div>
+                                                    <div className="font-medium text-blue-600">{app.jobTitle}</div>
                                                     <div className="text-sm text-gray-500">{app.companyName}</div>
                                                 </TableCell>
                                                 <TableCell>
@@ -451,8 +450,7 @@ function ManageApplicationsContent() {
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                        <Calendar className="h-3 w-3" />
+                                                    <div className="text-sm text-gray-500">
                                                         {new Date(app.createdAt).toLocaleDateString("vi-VN")}
                                                     </div>
                                                 </TableCell>
@@ -605,48 +603,22 @@ function ManageApplicationsContent() {
                             <div className="flex items-center gap-2 shrink-0">
                                 <Badge variant="outline" className="hidden sm:inline-flex">{selectedApp?.jobTitle}</Badge>
                                 {viewMode === 'cv' ? (
-                                    <div className="flex items-center gap-1">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="h-8 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
-                                            asChild
-                                        >
-                                            <a
-                                                href={`/api/applications/${selectedApp?._id}/cv?download=true`}
-                                                download={cvFileName}
-                                            >
-                                                <Download className="h-3.5 w-3.5 mr-1.5" />
-                                                Tải CV
-                                            </a>
-                                        </Button>
-
-                                        {!isWord && cvUrl && (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="h-8 border-gray-200 text-gray-700 hover:bg-gray-50"
-                                                asChild
-                                            >
-                                                <a href={cvUrl} target="_blank" rel="noopener noreferrer">
-                                                    <Maximize2 className="h-3.5 w-3.5 mr-1.5" />
-                                                    Mở tab mới
-                                                </a>
-                                            </Button>
-                                        )}
-
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => selectedApp && handleViewCV(selectedApp)}
-                                            className="h-8 text-gray-400 hover:text-blue-600 px-2"
-                                            title="Tải lại"
-                                        >
-                                            <RotateCcw className="h-4 w-4" />
-                                        </Button>
-                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => selectedApp && handleViewCV(selectedApp)}
+                                        className="h-8 border-gray-200 text-gray-700 hover:bg-gray-50 flex items-center gap-1.5 px-3"
+                                    >
+                                        <RotateCcw className="h-3.5 w-3.5" />
+                                        <span>Tải lại</span>
+                                    </Button>
                                 ) : (
-                                    <Button variant="outline" size="sm" onClick={() => selectedApp && handleViewCV(selectedApp)} className="h-8 border-blue-200 text-blue-600 hover:bg-blue-50">
+                                    <Button 
+                                        variant="outline" 
+                                        size="sm" 
+                                        onClick={() => selectedApp && handleViewCV(selectedApp)} 
+                                        className="h-8 border-blue-200 text-blue-600 hover:bg-blue-50"
+                                    >
                                         <FileText className="h-3 w-3 mr-1" />
                                         Xem CV
                                     </Button>
@@ -679,7 +651,7 @@ function ManageApplicationsContent() {
                                 <WordPreview blob={cvBlob} />
                             ) : cvUrl ? (
                                 <iframe
-                                    src={`${cvUrl}#toolbar=0&navpanes=0`}
+                                    src={cvUrl}
                                     className="w-full h-full border-none"
                                     title="CV Preview"
                                 />

@@ -405,46 +405,17 @@ export function EmployerDashboardContent() {
                                 <span>Chi tiết ứng viên: {selectedApp?.fullname}</span>
                                 <Badge variant="outline" className="w-fit">{selectedApp?.jobTitle}</Badge>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-8 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
-                                    asChild
-                                >
-                                    <a
-                                        href={`/api/applications/${selectedApp?._id}/cv?download=true`}
-                                        download={cvFileName}
-                                    >
-                                        <Download className="h-3.5 w-3.5 mr-1" />
-                                        Tải CV
-                                    </a>
-                                </Button>
-
-                                {!isWord && cvUrl && (
+                                <div className="flex items-center gap-2">
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        className="h-8 hidden sm:flex"
-                                        asChild
+                                        onClick={() => handleViewDetails(selectedApp)}
+                                        className="h-8 border-gray-200 text-gray-700 hover:bg-gray-50 flex items-center gap-1.5 px-3"
                                     >
-                                        <a href={cvUrl} target="_blank" rel="noopener noreferrer">
-                                            <ArrowRight className="h-3.5 w-3.5 mr-1" />
-                                            Mở tab mới
-                                        </a>
+                                        <RotateCcw className="h-3.5 w-3.5" />
+                                        <span>Tải lại</span>
                                     </Button>
-                                )}
-
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleViewDetails(selectedApp)}
-                                    className="h-8 px-2"
-                                    title="Tải lại"
-                                >
-                                    <RotateCcw className="h-4 w-4" />
-                                </Button>
-                            </div>
+                                </div>
                         </DialogTitle>
                     </DialogHeader>
 
