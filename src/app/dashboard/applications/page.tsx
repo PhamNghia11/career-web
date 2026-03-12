@@ -95,28 +95,11 @@ export default function MyApplicationsPage() {
         const publicCvUrl = `${baseUrl}/api/cv-public?token=${cvToken}`
         setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(publicCvUrl)}`)
       } else {
-        // For PDF: fetch as blob, check response before displaying
+        // PDF: Revert to direct URL
         const pdfUrl = appData.cvPath && appData.cvPath.startsWith("http")
           ? appData.cvPath
           : `/api/applications/${app._id}/cv`
-
-        const res = await fetch(pdfUrl)
-
-        if (!res.ok) {
-          throw new Error("File CV không tồn tại trên hệ thống.")
-        }
-
-        const ct = res.headers.get("content-type") || ""
-        if (ct.includes("text/html")) {
-          throw new Error("File CV đã bị mất trên hệ thống.")
-        }
-
-        const blob = await res.blob()
-        if (blob.size < 100) {
-          throw new Error("File CV trống hoặc bị hỏng.")
-        }
-
-        setCvUrl(URL.createObjectURL(blob))
+        setCvUrl(pdfUrl)
       }
     } catch (error) {
       console.error("Error fetching CV:", error)

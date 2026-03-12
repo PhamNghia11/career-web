@@ -169,44 +169,19 @@ function ManageApplicationsContent() {
             setIsWord(isWordDoc)
 
             if (isWordDoc) {
-                // Fetch the actual file content as a Blob for Word preview
+                // Keep Word logic as it handles local blob rendering
                 const res = await fetch(`/api/applications/${app._id}/cv`)
-                if (!res.ok) {
-                    throw new Error("Không thể tải nội dung CV (Word)")
-                }
-
+                if (!res.ok) throw new Error("Không thể tải nội dung CV (Word)")
                 const blob = await res.blob()
                 setCvBlob(blob)
-
-                // For Word, create a local URL for the renderer
                 const url = URL.createObjectURL(blob)
                 setCvUrl(url)
             } else {
-                // For PDF: fetch as blob first, check response validity
-                let pdfUrl = appData.cvPath && appData.cvPath.startsWith("http")
+                // PDF: Revert to direct URL to avoid CORS/Fetching issues
+                const pdfUrl = appData.cvPath && appData.cvPath.startsWith("http")
                     ? appData.cvPath
                     : `/api/applications/${app._id}/cv`
-
-                const res = await fetch(pdfUrl)
-
-                if (!res.ok) {
-                    throw new Error("File CV không tồn tại trên hệ thống. Ứng viên cần nộp lại CV.")
-                }
-
-                const contentType = res.headers.get("content-type") || ""
-
-                // If proxy returned HTML error page instead of PDF, treat as error
-                if (contentType.includes("text/html")) {
-                    throw new Error("File CV đã bị mất trên hệ thống. Ứng viên cần nộp lại CV.")
-                }
-
-                const blob = await res.blob()
-                if (blob.size < 100) {
-                    throw new Error("File CV trống hoặc bị hỏng.")
-                }
-
-                const blobUrl = URL.createObjectURL(blob)
-                setCvUrl(blobUrl)
+                setCvUrl(pdfUrl)
             }
 
         } catch (error: any) {

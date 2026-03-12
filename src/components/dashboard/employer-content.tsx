@@ -162,29 +162,8 @@ export function EmployerDashboardContent() {
                     const publicCvUrl = `${baseUrl}/api/cv-public?token=${cvToken}`
                     setCvUrl(`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(publicCvUrl)}`)
                 } else {
-                    // For PDF: fetch as blob, check response before displaying
-                    const pdfUrl = `/api/applications/${app._id}/cv`
-                    const res = await fetch(pdfUrl)
-
-                    if (!res.ok) {
-                        setCvUrl(null)
-                        return
-                    }
-
-                    const ct = res.headers.get("content-type") || ""
-                    if (ct.includes("text/html")) {
-                        // Proxy returned HTML error page — file is missing
-                        setCvUrl(null)
-                        return
-                    }
-
-                    const blob = await res.blob()
-                    if (blob.size < 100) {
-                        setCvUrl(null)
-                        return
-                    }
-
-                    setCvUrl(URL.createObjectURL(blob))
+                    // PDF: Revert to direct URL
+                    setCvUrl(`/api/applications/${app._id}/cv`)
                 }
             }
         } catch (error) {
